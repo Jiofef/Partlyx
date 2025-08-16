@@ -8,4 +8,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Partlyx.ViewModels\Partlyx.ViewModels.csproj" />
+  </ItemGroup>
+
 </Project>
