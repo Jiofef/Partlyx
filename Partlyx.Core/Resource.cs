@@ -8,8 +8,15 @@
             _recipes = new List<Recipe>();
         }
 
+        public static Resource CreateWithId(int id, string name = "Resource")
+        {
+            var resource = new Resource(name) { Id = id };
+
+            return resource;
+        }
+
         // Main features
-        public int Id { get; private set; } // !Not done yet!
+        public int Id { get; private set; }
 
         public string Name { get; set; }
 

@@ -56,7 +56,7 @@
 
         public bool IsOutput() => Quantity < 0;
 
-        private Recipe? _componentSelectedRecipe = null; // null means default value for recipe. See Recipe.ComponentDefaultRecipe
+        private Recipe? _componentSelectedRecipe = null; // null means default value for recipe. See Resource.DefaultRecipe
 
         public Recipe ComponentSelectedRecipe
         {
