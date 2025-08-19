@@ -28,7 +28,7 @@ namespace Partlyx.Tests.CoreTests
             testResource.SetDefaultRecipe(recipe);
 
             // Assert
-            Assert.Equal(recipe, testResource.ComponentDefaultRecipe);
+            Assert.Equal(recipe, testResource.DefaultRecipe);
         }
     }
 }
