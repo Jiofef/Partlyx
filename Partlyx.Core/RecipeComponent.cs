@@ -47,13 +47,14 @@
 
         protected RecipeComponent() { } // EF
 
+        public int Id { get; private set; }
+
         // Main features
         public Resource ComponentResource { get; private set; }
 
         public double Quantity { get; set; }
 
         // Secondary features
-
         public bool IsOutput() => Quantity < 0;
 
         private Recipe? _componentSelectedRecipe = null; // null means default value for recipe. See Resource.DefaultRecipe

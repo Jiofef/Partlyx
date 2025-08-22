@@ -49,6 +49,8 @@ namespace Partlyx.Core
 
         protected Recipe() { } // EF
 
+        public int Id { get; private set; }
+
         // Main features
         private List<RecipeComponent> _components { get; set; } = new List<RecipeComponent>();
         public IReadOnlyList<RecipeComponent> Components => _components;

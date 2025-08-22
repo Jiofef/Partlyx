@@ -23,6 +23,12 @@
         private readonly List<Recipe> _recipes = new();
         public IReadOnlyList<Recipe> Recipes => _recipes;
 
+        public int? DefaultRecipeId // WIP
+        {
+            get => DefaultRecipe.Id;
+            set => SetDefaultRecipeByID(value);
+        }
+
         public Recipe DefaultRecipe { get; private set; }
 
         // Secondary features
@@ -67,6 +73,15 @@
         {
             if (!HasRecipe(recipe)) 
                 throw new ArgumentException($"Attempt to set the default recipe that is not in the resource. Name of the resource: {Name}");
+
+            DefaultRecipe = recipe;
+        }
+        public void SetDefaultRecipeByID(int? id)
+        {
+            var recipe = _recipes.FirstOrDefault(r => r.Id == id);
+
+            if (recipe == null)
+                throw new ArgumentNullException(nameof(id));
 
             DefaultRecipe = recipe;
         }

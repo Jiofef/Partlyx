@@ -9,7 +9,7 @@ namespace Partlyx.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=sqltest.db");
+            optionsBuilder.UseSqlite("Data Source=partlyxmain.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

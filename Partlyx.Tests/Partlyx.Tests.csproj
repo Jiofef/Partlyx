@@ -26,8 +26,4 @@
     <ProjectReference Include="..\Partlyx.Services\Partlyx.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="InfrastructureTests\" />
-  </ItemGroup>
-
 </Project>

@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace Partlyx.Services
 {
-    public class ResourceService
+    public class ResourceService : IResourceService
     {
         private readonly IDbContextFactory<PartlyxDBContext> _dbFactory;
         public ResourceService(IDbContextFactory<PartlyxDBContext> dbFactory) => _dbFactory = dbFactory;
@@ -41,8 +41,20 @@ namespace Partlyx.Services
             var r = await db.Resources.Include(x => x.Recipes)
                 .ThenInclude(rc => rc.Components)
                 .FirstOrDefaultAsync(x => x.Id == id);
-            
+
             return r == null ? null : r.ToDto();
+        }
+
+        public async Task<List<ResourceDto>> SearchResourcesAsync(string query)
+        {
+            using var db = _dbFactory.CreateDbContext();
+
+            var rl = await db.Resources.
+                Where(r => EF.Functions.Like(r.Name, $"%{query}")).
+                Select(r => r.ToDto()).
+                ToListAsync();
+
+            return rl;
         }
     }
 }
