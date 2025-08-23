@@ -1,6 +1,6 @@
 ﻿namespace Partlyx.Services.Dtos
 {
-    public record RecipeComponentDto(int ResourceId, string ResourceName, double Quantity, int? SelectedRecipeIndex);
-    public record RecipeDto(List<RecipeComponentDto> Components);
-    public record ResourceDto(int Id, string Name, List<RecipeDto> Recipes, int DefaultRecipeIndex);
+    public record RecipeComponentDto(Guid ResourceUid, string ResourceName, double Quantity, Guid? SelectedRecipeUid);
+    public record RecipeDto(Guid Uid, double CraftAmount, List<RecipeComponentDto> Components);
+    public record ResourceDto(Guid Uid, string Name, List<RecipeDto> Recipes, Guid? DefaultRecipeUid);
 }

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Data;
 using Partlyx.Services;
+using System;
 
 namespace Partlyx.Tests
 {
@@ -16,21 +16,35 @@ namespace Partlyx.Tests
             services.AddTransient<IResourceService, ResourceService>();
         }
 
+        private void InitDB()
+        {
+            var connection = new Microsoft.Data.Sqlite.SqliteConnection("DataSource=:memory:");
+            connection.Open();
+
+            services.AddDbContextFactory<PartlyxDBContext>(opts => opts.UseSqlite(connection));
+
+            var provider = services.BuildServiceProvider();
+
+            var factory = provider.GetRequiredService<IDbContextFactory<PartlyxDBContext>>();
+            using var ctx = factory.CreateDbContext();
+            ctx.Database.EnsureCreated();
+        }
+
         [Fact]
-        public async void CreateAndGetResourceAsync_CreateEmptyResource_GetItFromDB()
+        public async Task CreateAndGetResourceAsync_CreateEmptyResource_GetItFromDB()
         {
             // Arrange
-            services.AddDbContextFactory<PartlyxDBContext>(opts => opts.UseInMemoryDatabase("test"));
+            InitDB();
 
             var provider = services.BuildServiceProvider();
             var resourceService = provider.GetRequiredService<IResourceService>();
 
             // Act
-            int resourceId = await resourceService.CreateResourceAsync();
-            var resource = await resourceService.GetResourceAsync(resourceId);
+            Guid resourceUid = await resourceService.CreateResourceAsync();
+            var resource = await resourceService.GetResourceAsync(resourceUid);
 
             // Assert
-            Assert.Null(resource);
+            Assert.NotNull(resource);
         }
     }
 

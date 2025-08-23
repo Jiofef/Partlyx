@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Partlyx.Core
 {
@@ -47,13 +48,14 @@ namespace Partlyx.Core
 
         internal bool RemoveRecipeComponentFromList(RecipeComponent component) => _components.Remove(component);
 
-        protected Recipe() { } // EF
+        protected Recipe() { Uid = new Guid(); }
 
-        public int Id { get; private set; }
+        public Guid Uid { get; private set; }
 
         // Main features
         private List<RecipeComponent> _components { get; set; } = new List<RecipeComponent>();
         public IReadOnlyList<RecipeComponent> Components => _components;
+        public double CraftAmount { get; set; } = 1;
 
         public RecipeComponent CreateComponent(Resource componentRes, double quantity)
         {

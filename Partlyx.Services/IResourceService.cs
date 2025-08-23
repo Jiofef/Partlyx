@@ -4,9 +4,9 @@ namespace Partlyx.Services
 {
     public interface IResourceService
     {
-        Task<int> CreateResourceAsync();
-        Task DeleteResourceAsync(int id);
-        Task<ResourceDto?> GetResourceAsync(int id);
+        Task<Guid> CreateResourceAsync();
+        Task DeleteResourceAsync(Guid uid);
+        Task<ResourceDto?> GetResourceAsync(Guid uid);
         Task<List<ResourceDto>> SearchResourcesAsync(string SearchQuery);
     }
 }

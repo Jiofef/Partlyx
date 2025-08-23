@@ -8,16 +8,18 @@ namespace Partlyx.Services.Dtos
         public static ResourceDto ToDto(this Resource r)
         {
             return new ResourceDto(
-                r.Id,
+                r.Uid,
                 r.Name,
                 r.Recipes.Select(rc => rc.ToDto()).ToList(),
-                r.Recipes.ToList().IndexOf(r.DefaultRecipe)
+                r.DefaultRecipeUid
                 );
         }
 
         public static RecipeDto ToDto(this Recipe recipe)
         {
             return new RecipeDto(
+                recipe.Uid,
+                recipe.CraftAmount,
                 recipe.Components.Select(c => c.ToDto()).ToList()
                 );
         }
@@ -25,10 +27,10 @@ namespace Partlyx.Services.Dtos
         public static RecipeComponentDto ToDto(this RecipeComponent c)
         {
             return new RecipeComponentDto(
-                c.ComponentResource.Id,
+                c.ComponentResource.Uid,
                 c.ComponentResource.Name,
                 c.Quantity,
-                c.ComponentResource.Recipes.ToList().IndexOf(c.ComponentSelectedRecipe)
+                c.ComponentSelectedRecipe.Uid
                 );
         }
     }

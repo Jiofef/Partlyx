@@ -12,21 +12,21 @@ namespace Partlyx.Services
         private readonly IDbContextFactory<PartlyxDBContext> _dbFactory;
         public ResourceService(IDbContextFactory<PartlyxDBContext> dbFactory) => _dbFactory = dbFactory;
 
-        public async Task<int> CreateResourceAsync()
+        public async Task<Guid> CreateResourceAsync()
         {
             using var db = _dbFactory.CreateDbContext();
 
             var resource = new Resource();
             db.Resources.Add(resource);
             await db.SaveChangesAsync();
-            return resource.Id;
+            return resource.Uid;
         }
 
-        public async Task DeleteResourceAsync(int id)
+        public async Task DeleteResourceAsync(Guid uid)
         {
             using var db = _dbFactory.CreateDbContext();
 
-            var r = await db.Resources.FindAsync(id);
+            var r = await db.Resources.FindAsync(uid);
             if (r != null)
             {
                 db.Resources.Remove(r);
@@ -34,13 +34,13 @@ namespace Partlyx.Services
             }
         }
 
-        public async Task<ResourceDto?> GetResourceAsync(int id)
+        public async Task<ResourceDto?> GetResourceAsync(Guid uid)
         {
             using var db = _dbFactory.CreateDbContext();
 
             var r = await db.Resources.Include(x => x.Recipes)
                 .ThenInclude(rc => rc.Components)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Uid == uid);
 
             return r == null ? null : r.ToDto();
         }

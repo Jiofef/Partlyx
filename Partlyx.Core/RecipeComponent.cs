@@ -1,4 +1,6 @@
-﻿namespace Partlyx.Core
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Partlyx.Core
 {
     public class RecipeComponent : ICopiable<Recipe>
     {
@@ -45,9 +47,9 @@
         }
 
 
-        protected RecipeComponent() { } // EF
+        protected RecipeComponent() { Uid = new Guid(); }
 
-        public int Id { get; private set; }
+        public Guid Uid { get; private set; }
 
         // Main features
         public Resource ComponentResource { get; private set; }
@@ -57,8 +59,21 @@
         // Secondary features
         public bool IsOutput() => Quantity < 0;
 
-        private Recipe? _componentSelectedRecipe = null; // null means default value for recipe. See Resource.DefaultRecipe
+        private Guid? _componentSelectedRecipeUid;
+        public Guid? ComponentSelectedRecipeUid
+        {
+            get => _componentSelectedRecipeUid;
+            set
+            {
+                _componentSelectedRecipeUid = value;
+                // Trying to resolve DefaultRecipe if recipes already loaded
+                _componentSelectedRecipe = value.HasValue ? ComponentResource.Recipes.FirstOrDefault(r => r.Uid == value.Value) : null;
+            }
+        }
 
+        [NotMapped]
+        private Recipe? _componentSelectedRecipe = null; // null means default value for recipe. See Resource.DefaultRecipe
+        [NotMapped]
         public Recipe ComponentSelectedRecipe
         {
             get => _componentSelectedRecipe ?? ComponentResource.DefaultRecipe;
@@ -76,6 +91,7 @@
                 throw new ArgumentException($"Attempt to set the recipe that is not in the resource. Name of the resource: {ComponentResource.Name}");
 
             _componentSelectedRecipe = recipe;
+            _componentSelectedRecipeUid = recipe != null ? recipe.Uid : null;
         }
 
         public void Remove() => ParentRecipe?.RemoveComponent(this);
