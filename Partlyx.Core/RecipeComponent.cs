@@ -20,9 +20,10 @@ namespace Partlyx.Core
             return recipeComponent;
         }
 
-        public static RecipeComponent CreateDetached()
+        public static RecipeComponent CreateDetached(Resource resourceComponent)
         {
             var recipeComponent = new RecipeComponent();
+            recipeComponent.SetComponentResource(resourceComponent);
 
             return recipeComponent;
         }
@@ -55,6 +56,13 @@ namespace Partlyx.Core
         public Resource ComponentResource { get; private set; }
 
         public double Quantity { get; set; }
+
+        public void SetComponentResource(Resource resource)
+        {
+            ComponentResource = resource;
+
+            ComponentSelectedRecipeUid = null;
+        }
 
         // Secondary features
         public bool IsOutput() => Quantity < 0;
@@ -113,9 +121,8 @@ namespace Partlyx.Core
     
         public RecipeComponent CloneDetached()
         {
-            var clone = CreateDetached();
+            var clone = CreateDetached(ComponentResource);
 
-            clone.ComponentResource = ComponentResource;
             clone.Quantity = Quantity;
             clone.SetSelectedRecipe(_componentSelectedRecipe);
 

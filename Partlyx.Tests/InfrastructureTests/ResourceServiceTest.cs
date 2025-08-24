@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Partlyx.Data;
 using Partlyx.Services;
 using System;
 
@@ -8,35 +7,24 @@ namespace Partlyx.Tests
 {
     public class ResourceServiceTest
     {
-        private ServiceCollection services;
+        private ServiceCollection _services;
 
         public ResourceServiceTest() 
         {
-            services = new ServiceCollection();
-            services.AddTransient<IResourceService, ResourceService>();
-        }
+            _services = new ServiceCollection();
+            TestDBInitializer.InitTestDB(_services);
 
-        private void InitDB()
-        {
-            var connection = new Microsoft.Data.Sqlite.SqliteConnection("DataSource=:memory:");
-            connection.Open();
-
-            services.AddDbContextFactory<PartlyxDBContext>(opts => opts.UseSqlite(connection));
-
-            var provider = services.BuildServiceProvider();
-
-            var factory = provider.GetRequiredService<IDbContextFactory<PartlyxDBContext>>();
-            using var ctx = factory.CreateDbContext();
-            ctx.Database.EnsureCreated();
+            _services.AddTransient<Data.IResourceRepository, Data.ResourceRepository>();
+            _services.AddTransient<IResourceService, ResourceService>();
         }
 
         [Fact]
-        public async Task CreateAndGetResourceAsync_CreateEmptyResource_GetItFromDB()
+        public async void CreateAndGetResourceAsync_CreateEmptyResource_CheckItsExistence()
         {
             // Arrange
-            InitDB();
 
-            var provider = services.BuildServiceProvider();
+            var provider = _services.BuildServiceProvider();
+            var resourceRepo = provider.GetRequiredService<Data.IResourceRepository>();
             var resourceService = provider.GetRequiredService<IResourceService>();
 
             // Act

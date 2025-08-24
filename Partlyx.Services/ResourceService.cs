@@ -9,52 +9,61 @@ namespace Partlyx.Services
 {
     public class ResourceService : IResourceService
     {
-        private readonly IDbContextFactory<PartlyxDBContext> _dbFactory;
-        public ResourceService(IDbContextFactory<PartlyxDBContext> dbFactory) => _dbFactory = dbFactory;
+        private readonly IResourceRepository _repo;
+        public ResourceService(IResourceRepository repo) => _repo = repo;
 
         public async Task<Guid> CreateResourceAsync()
         {
-            using var db = _dbFactory.CreateDbContext();
-
             var resource = new Resource();
-            db.Resources.Add(resource);
-            await db.SaveChangesAsync();
-            return resource.Uid;
+            var Uid = await _repo.AddAsync(resource);
+
+            return Uid;
+        }
+        public async Task<Guid> DuplicateResourceAsync(Guid uid)
+        {
+            var duplicateUid = await _repo.DuplicateAsync(uid);
+
+            return duplicateUid;
         }
 
         public async Task DeleteResourceAsync(Guid uid)
         {
-            using var db = _dbFactory.CreateDbContext();
-
-            var r = await db.Resources.FindAsync(uid);
-            if (r != null)
-            {
-                db.Resources.Remove(r);
-                await db.SaveChangesAsync();
-            }
+            await _repo.DeleteAsync(uid);
         }
 
         public async Task<ResourceDto?> GetResourceAsync(Guid uid)
         {
-            using var db = _dbFactory.CreateDbContext();
+            var resource = await _repo.GetByUidAsync(uid);
 
-            var r = await db.Resources.Include(x => x.Recipes)
-                .ThenInclude(rc => rc.Components)
-                .FirstOrDefaultAsync(x => x.Uid == uid);
-
-            return r == null ? null : r.ToDto();
+            return resource == null ? null : resource.ToDto();
         }
 
         public async Task<List<ResourceDto>> SearchResourcesAsync(string query)
         {
-            using var db = _dbFactory.CreateDbContext();
+            var resourcesList = await _repo.SearchAsync(query);
+            var resourcesDtoList = resourcesList.Select(x => x.ToDto()).ToList();
 
-            var rl = await db.Resources.
-                Where(r => EF.Functions.Like(r.Name, $"%{query}")).
-                Select(r => r.ToDto()).
-                ToListAsync();
+            return resourcesDtoList;
+        }
 
-            return rl;
+        public async Task SetDefaultRecipeAsync(Guid resourceUid, Guid recipeUid)
+        {
+            await _repo.ExecuteOnRecipeAsync(resourceUid, recipeUid, recipe =>
+            {
+                var resource = recipe.ParentResource!;
+                resource.SetDefaultRecipe(recipe);
+
+                return Task.CompletedTask;
+            });
+        }
+
+        public async Task SetNameAsync(Guid resourceUid, string name)
+        {
+            await _repo.ExecuteOnResourceAsync(resourceUid, resource =>
+            {
+                resource.Name = name;
+                return Task.CompletedTask;
+            });
         }
     }
 }

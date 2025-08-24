@@ -26,8 +26,13 @@ namespace Partlyx.UI.WPF
             // DB
             services.AddDbContextFactory<Data.PartlyxDBContext>(opts => opts.UseSqlite("..."));
 
+            // Data
+            services.AddTransient<Data.IResourceRepository, Data.ResourceRepository>();
+
             // Services
             services.AddTransient<Services.IResourceService, Services.ResourceService>();
+            services.AddTransient<Services.IRecipeService, Services.RecipeService>();
+            services.AddTransient<Services.IRecipeComponentService, Services.RecipeComponentService>();
 
             services.AddSingleton<CommandDispatcher>();
             services.AddTransient<IServiceProvider, ServiceProvider>();
