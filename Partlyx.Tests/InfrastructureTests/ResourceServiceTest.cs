@@ -1,7 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Services;
-using System;
 
 namespace Partlyx.Tests
 {
@@ -22,7 +20,6 @@ namespace Partlyx.Tests
         public async void CreateAndGetResourceAsync_CreateEmptyResource_CheckItsExistence()
         {
             // Arrange
-
             var provider = _services.BuildServiceProvider();
             var resourceRepo = provider.GetRequiredService<Data.IResourceRepository>();
             var resourceService = provider.GetRequiredService<IResourceService>();

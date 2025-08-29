@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Partlyx.ViewModels;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +21,8 @@ namespace Partlyx.UI.WPF
         public MainWindow()
         {
             InitializeComponent();
+
+            DataContext = App.Services.GetRequiredService<MainViewModel>();
         }
     }
 }

@@ -4,11 +4,50 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Partlyx.UI.WPF"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:viewmodel="clr-namespace:Partlyx.ViewModels;assembly=Partlyx.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="720" Width="1280"
-        WindowState="Maximized">
+        WindowState="Maximized"
+        Background="#eef5ff">
+
     <Grid>
-        <ContentControl Content="{Binding ResourceList}" />
-        <ContentControl Content="{Binding RecipeEditor}" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="360"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="360"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Background="{StaticResource PxBlue0Brush}"> 
+            <TextBlock Text="Resources" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center"/>
+
+            <Button Style="{StaticResource BaseButtonStyle}">
+                <Button.Content>
+                    <StackPanel>
+                        <fa:ImageAwesome Icon="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Style="{StaticResource BaseButtonStyle}">
+                <Button.Content>
+                    <StackPanel>
+                        <fa:ImageAwesome Icon="Gear" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+
+        </StackPanel>   
+        
+        <StackPanel Background="{StaticResource PxBlue0Brush}" Grid.Column="2">
+            <TextBlock Text="Recipes" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center"/>
+        </StackPanel>
+
+        <ContentControl Grid.Column="1" >
+
+        </ContentControl>
+
+        <UniformGrid VerticalAlignment="Center" Columns="4">
+
+        </UniformGrid>
     </Grid>
 </Window>

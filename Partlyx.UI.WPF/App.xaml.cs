@@ -34,11 +34,17 @@ namespace Partlyx.UI.WPF
             services.AddTransient<Services.IRecipeService, Services.RecipeService>();
             services.AddTransient<Services.IRecipeComponentService, Services.RecipeComponentService>();
 
-            services.AddSingleton<CommandDispatcher>();
+            services.AddSingleton<Services.Commands.CommandDispatcher>();
             services.AddTransient<IServiceProvider, ServiceProvider>();
 
             // Viewmodels and windows
             services.AddTransient<MainViewModel>();
+
+            services.AddTransient<ResourceListViewModel>();
+            services.AddTransient<RecipeListViewModel>();
+            services.AddTransient<RecipeComponentsViewModel>();
+            services.AddTransient<PartsTreeViewModel>();
+
             services.AddTransient<MainWindow>();
 
             Services = services.BuildServiceProvider();
