@@ -46,6 +46,15 @@ namespace Partlyx.Services
             });
         }
 
+        public async Task QuantifyRecipeAsync(Guid parentResourceUid, Guid recipeUid)
+        {
+            await _repo.ExecuteOnRecipeAsync(parentResourceUid, recipeUid, recipe =>
+            {
+                recipe.MakeQuantified();
+                return Task.CompletedTask;
+            });
+        }
+
         public async Task<RecipeDto?> GetRecipeAsync(Guid parentResourceUid, Guid recipeUid)
         {
             var resource = await _repo.GetByUidAsync(parentResourceUid);

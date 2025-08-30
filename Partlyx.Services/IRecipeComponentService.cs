@@ -8,6 +8,7 @@ namespace Partlyx.Services
         Task DeleteComponentAsync(Guid parentResourceUid, Guid componentUid);
         Task<Guid> DuplicateComponentAsync(Guid parentResourceUid, Guid componentUid);
         Task<RecipeComponentDto?> GetComponentAsync(Guid parentResourceUid, Guid componentUid);
+        Task SetComponentResourceAsync(Guid parentResourceUid, Guid componentUid, Guid resourceToSelectUid);
         Task SetQuantityAsync(Guid parentResourceUid, Guid componentUid, double quantity);
         Task SetResourceSelectedRecipeAsync(Guid parentResourceUid, Guid componentUid, Guid resourceToSelectUid);
     }

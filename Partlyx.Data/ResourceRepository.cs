@@ -86,9 +86,10 @@ namespace Partlyx.Data
         {
             await using var db = _dbFactory.CreateDbContext();
 
-            var r = await db.Resources.Include(x => x.Recipes)
-            .ThenInclude(rc => rc.Components)
-            .FirstOrDefaultAsync(x => x.Uid == resourceUid);
+            var r = await db.Resources
+                .Include(x => x.Recipes)
+                .ThenInclude(rc => rc.Components)
+                .FirstOrDefaultAsync(x => x.Uid == resourceUid);
 
             if (r == null) throw ResourceNotFound(resourceUid);
 
@@ -118,8 +119,7 @@ namespace Partlyx.Data
 
             if (resource == null) throw ResourceNotFound(resourceUid);
 
-            // Find a recipe that contains the component
-            var recipe = resource.Recipes.FirstOrDefault(r => r.Uid == recipeUid);
+            var recipe = resource.GetRecipeByUid(recipeUid);
 
             if (recipe == null) throw new InvalidOperationException("Recipe not found with Uid: " + recipeUid);
 
@@ -152,14 +152,11 @@ namespace Partlyx.Data
             if (resource == null) throw ResourceNotFound(resourceUid);
 
             // Find a recipe that contains the component
-            var recipe = resource.Recipes.FirstOrDefault(
-                rp => rp.Components.Any(c => c.Uid == componentUid));
+            var resourceComponent = resource.GetRecipeComponentByUid(componentUid);
 
-            if (recipe == null) throw new InvalidOperationException("Component's recipe not found in resource. Component's Uid: " + componentUid);
+            if (resourceComponent == null) throw new InvalidOperationException("Component was not found in resource. Component's Uid: " + componentUid);
 
-            var component = recipe.Components.First(c => c.Uid == componentUid);
-
-            var result = await action(component);
+            var result = await action(resourceComponent);
 
             await db.SaveChangesAsync();
             return result;

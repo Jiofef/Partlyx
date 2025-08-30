@@ -41,7 +41,7 @@ namespace Partlyx.Services.Commands
 
         public async Task ExcecuteAsync(ICommand command)
         {
-            await command.ExcecuteAsync();
+            await command.ExecuteAsync();
 
             if (command is IUndoableCommand uCommand)
             {
@@ -71,7 +71,7 @@ namespace Partlyx.Services.Commands
             var command = _canceledCommandsHistory.Last!.Value;
             _canceledCommandsHistory.RemoveLast();
 
-            await command.ExcecuteAsync();
+            await command.ExecuteAsync();
 
             _commandsHistory.AddLast(command);
 

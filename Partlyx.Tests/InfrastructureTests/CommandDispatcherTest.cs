@@ -99,7 +99,7 @@ namespace Partlyx.Tests
                 _valueToAdd = valueToAdd;
             }
 
-            public Task ExcecuteAsync()
+            public Task ExecuteAsync()
             {
                 _numberObject.Value += _valueToAdd;
                 return Task.CompletedTask;

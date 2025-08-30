@@ -38,6 +38,11 @@ namespace Partlyx.Services
             return resource == null ? null : resource.ToDto();
         }
 
+        internal async Task<Resource?> GetOriginalResourceAsync(Guid uid)
+        {
+            return await _repo.GetByUidAsync(uid);
+        }
+
         public async Task<List<ResourceDto>> SearchResourcesAsync(string query)
         {
             var resourcesList = await _repo.SearchAsync(query);

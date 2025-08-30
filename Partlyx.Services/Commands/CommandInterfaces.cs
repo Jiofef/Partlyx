@@ -2,7 +2,7 @@
 {
     public interface ICommand 
     {
-        Task ExcecuteAsync();
+        Task ExecuteAsync();
     }
 
     public interface IUndoableCommand : ICommand 

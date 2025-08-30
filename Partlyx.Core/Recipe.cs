@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Partlyx.Core
 {
-    public class Recipe : ICopiable<Resource>
+    public class Recipe : ICopiable<Resource>, IPart
     {
         // Hierarchy
         public Resource? ParentResource { get; private set; }
@@ -133,6 +133,13 @@ namespace Partlyx.Core
                     }
                 }
             }
+        }
+
+
+        public RecipeComponent? GetRecipeComponentByUid(Guid uid)
+        {
+            var component = Components.FirstOrDefault(component => component.Uid == uid);
+            return component;
         }
 
         /// <summary>

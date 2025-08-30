@@ -74,18 +74,31 @@ namespace Partlyx.Services
             });
         }
 
-        public async Task SetResourceSelectedRecipeAsync(Guid parentResourceUid, Guid componentUid, Guid resourceToSelectUid)
+        public async Task SetResourceSelectedRecipeAsync(Guid parentResourceUid, Guid componentUid, Guid recipeToSelectUid)
         {
             await _repo.ExecuteOnComponentAsync(parentResourceUid, componentUid, component =>
             {
                 var componentResource = component.ComponentResource;
-                var resToSelect = componentResource.Recipes.FirstOrDefault(x => x.Uid == resourceToSelectUid);
+                var recipeToSelect = componentResource.Recipes.FirstOrDefault(x => x.Uid == recipeToSelectUid);
 
-                if (resToSelect == null)
-                    throw new InvalidOperationException("Recipe not found with Uid: " + resourceToSelectUid);
+                if (recipeToSelect == null)
+                    throw new InvalidOperationException("Recipe not found with Uid: " + recipeToSelectUid);
 
-                component.SetSelectedRecipe(resToSelect);
+                component.SetSelectedRecipe(recipeToSelect);
                 return Task.CompletedTask;
+            });
+        }
+
+        public async Task SetComponentResourceAsync(Guid parentResourceUid, Guid componentUid, Guid resourceToSelectUid)
+        {
+            await _repo.ExecuteOnComponentAsync(parentResourceUid, componentUid, async component =>
+            {
+                var newComponentResource = await _repo.GetByUidAsync(resourceToSelectUid);
+
+                if (newComponentResource == null)
+                    throw new InvalidOperationException("Resource not found with Uid: " + resourceToSelectUid);
+
+                component.SetComponentResource(newComponentResource);
             });
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Partlyx.Core
 {
-    public class Resource : ICloneable
+    public class Resource : ICloneable, IPart
     {
         public Resource(string name = "Resource")
         {
@@ -89,6 +89,20 @@ namespace Partlyx.Core
                 recipe.Detach();
         }
 
+        public Recipe? GetRecipeByUid(Guid uid)
+        {
+            var recipe = Recipes.FirstOrDefault(recipe => recipe.Uid == uid);
+            return recipe;
+        }
+        public RecipeComponent? GetRecipeComponentByUid(Guid uid)
+        {
+            var recipe = Recipes.FirstOrDefault(
+                rp => rp.Components.Any(c => c.Uid == uid));
+            var recipeComponent = recipe?.Components.FirstOrDefault(
+                c => c.Uid == uid);
+
+            return recipeComponent;
+        }
 
         public Resource Clone()
         {

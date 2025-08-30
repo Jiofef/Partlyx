@@ -2,7 +2,7 @@
 
 namespace Partlyx.Core
 {
-    public class RecipeComponent : ICopiable<Recipe>
+    public class RecipeComponent : ICopiable<Recipe>, IPart
     {
         // Hierarchy
         public Recipe? ParentRecipe { get; private set; }
