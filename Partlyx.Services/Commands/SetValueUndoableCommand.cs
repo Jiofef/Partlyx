@@ -7,7 +7,7 @@ namespace Partlyx.Services.Commands
     /// <summary>
     /// This class should reduce the same code for the commands whose task it is to set new values, and restore old ones.
     /// </summary>
-    public abstract class SetValueUndoableCommand<TValue> : IUndoableCommand
+    public abstract class SetValueUndoableCommand<TValue> : IUndoableCommand, IAsyncInitializable
     {
         private readonly TValue? _value;
         private readonly TValue? _savedValue;
@@ -19,6 +19,11 @@ namespace Partlyx.Services.Commands
             _value = value;
             _savedValue = savedValue;
             _setter = setter ?? throw new ArgumentNullException(nameof(setter));
+        }
+
+        public Task InitializeAsync(params object[] args)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task ExecuteAsync()

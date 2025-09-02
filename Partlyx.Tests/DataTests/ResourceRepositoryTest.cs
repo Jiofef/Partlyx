@@ -1,29 +1,31 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core;
-using Partlyx.Data;
+using Partlyx.Infrastructure.Data;
+using Partlyx.Tests.DataTests;
 using System;
 
 namespace Partlyx.Tests
 {
-    public class ResourceRepositoryTest
+    [Collection("InMemoryDB")]
+    public class ResourceRepositoryTest : IDisposable
     {
-        private ServiceCollection _services;
+        private ServiceProvider _provider;
 
-        public ResourceRepositoryTest()
+        public ResourceRepositoryTest(DBFixture fixture)
         {
-            _services = new ServiceCollection();
-            TestDBInitializer.InitTestDB(_services);
-            _services.AddTransient<IResourceRepository, ResourceRepository>();
+            _provider = fixture.CreateProvider( services =>
+            {
+                services.AddTransient<IResourceRepository, ResourceRepository>();
+            });
         }
+        public void Dispose() => _provider.Dispose();
 
         [Fact]
         public async Task CreateAndGetResourceAsync_CreateEmptyResource_GetItFromDBAndCheckCorrectness()
         {
             // Arrange
-            var provider = _services.BuildServiceProvider();
-            var resourceRepo = provider.GetRequiredService<IResourceRepository>();
-
+            var resourceRepo = _provider.GetRequiredService<IResourceRepository>();
             var resource = new Resource("SomeResource");
 
             // Act

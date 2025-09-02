@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core;
-using Partlyx.Data;
+using Partlyx.Infrastructure.Data;
 
 namespace Partlyx.Services.Commands.RecipeCommonCommands
 {
@@ -9,24 +9,24 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
         private IRecipeService _recipeService;
 
         private Guid _resourceUid;
-        private Guid _recipeUid;
+        public Guid RecipeUid { get; private set; }
 
-        public CreateRecipeCommand(IServiceProvider serviceProvider, Guid parentResourceUid)
+        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs)
         {
-            _recipeService = serviceProvider.GetRequiredService<IRecipeService>();
+            _recipeService = rs;
             _resourceUid = parentResourceUid;
         }
 
         public async Task ExecuteAsync()
         {
             Guid uid = await _recipeService.CreateRecipeAsync(_resourceUid);
-            _recipeUid = uid;
+            RecipeUid = uid;
         }
 
         public async Task UndoAsync()
         {
-            await _recipeService.DeleteRecipeAsync(_resourceUid, _recipeUid);
-            _recipeUid = Guid.Empty;
+            await _recipeService.DeleteRecipeAsync(_resourceUid, RecipeUid);
+            RecipeUid = Guid.Empty;
         }
     }
 
@@ -38,14 +38,14 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
         private Guid _resourceUid;
         private Guid _recipeUid;
 
-        private Recipe? _deletedRecipe;
+        public Recipe? DeletedRecipe { get; private set; }
 
-        public DeleteRecipeCommand(IServiceProvider serviceProvider, Guid parentResourceUid, Guid recipeUid)
+        public DeleteRecipeCommand(Guid parentResourceUid, Guid recipeUid, IRecipeService rs, IResourceRepository rr)
         {
             _resourceUid = parentResourceUid;
-            _recipeService = serviceProvider.GetRequiredService<IRecipeService>();
+            _recipeService = rs;
             _recipeUid = recipeUid;
-            _resourceRepository = serviceProvider.GetRequiredService<IResourceRepository>();
+            _resourceRepository = rr;
         }
 
         public async Task ExecuteAsync()
@@ -55,23 +55,23 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
             if (resource == null) 
                 throw new ArgumentNullException(nameof(resource));
 
-            _deletedRecipe = resource.GetRecipeByUid(_recipeUid);
+            DeletedRecipe = resource.GetRecipeByUid(_recipeUid);
 
             await _recipeService.DeleteRecipeAsync(_resourceUid, _recipeUid);
         }
 
         public async Task UndoAsync()
         {
-            if (_deletedRecipe == null) return;
+            if (DeletedRecipe == null) return;
 
             await _resourceRepository.ExecuteOnResourceAsync(_resourceUid,
                 (resource) => 
                 {
-                    _deletedRecipe.AttachTo(resource);
+                    DeletedRecipe.AttachTo(resource);
                     return Task.CompletedTask;
                 }); 
 
-            _deletedRecipe = null;
+            DeletedRecipe = null;
         }
     }
 
@@ -82,23 +82,23 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
         private Guid _resourceUid;
         private Guid _recipeUid;
 
-        private Guid _duplicateUid;
+        public Guid DuplicateUid { get; private set; }
 
-        public DuplicateRecipeCommand(IServiceProvider serviceProvider, Guid parentResourceUid, Guid recipeUid)
+        public DuplicateRecipeCommand(Guid parentResourceUid, Guid recipeUid, IRecipeService rs)
         {
-            _recipeService = serviceProvider.GetRequiredService<IRecipeService>();
+            _recipeService = rs;
             _resourceUid = parentResourceUid;
         }
 
         public async Task ExecuteAsync()
         {
-            _duplicateUid = await _recipeService.DuplicateRecipeAsync(_resourceUid, _recipeUid);
+            DuplicateUid = await _recipeService.DuplicateRecipeAsync(_resourceUid, _recipeUid);
         }
 
         public async Task UndoAsync()
         {
-            await _recipeService.DeleteRecipeAsync(_resourceUid, _duplicateUid);
-            _duplicateUid = Guid.Empty;
+            await _recipeService.DeleteRecipeAsync(_resourceUid, DuplicateUid);
+            DuplicateUid = Guid.Empty;
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 
-namespace Partlyx.Data
+namespace Partlyx.Infrastructure.Data
 {
     internal class SettingsDBContext : DbContext
     {

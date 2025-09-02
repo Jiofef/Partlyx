@@ -33,7 +33,7 @@ namespace Partlyx.Tests
             await dispatcher.ExcecuteAsync(command);
             await dispatcher.UndoAsync();
 
-            // Arrange
+            // Assert
             Assert.Equal(0, number.Value);
         }
 
@@ -61,7 +61,7 @@ namespace Partlyx.Tests
             await dispatcher.UndoAsync();
             await dispatcher.UndoAsync();
 
-            // Arrange
+            // Assert
             Assert.Equal(14, number.Value);
         }
 
@@ -79,7 +79,7 @@ namespace Partlyx.Tests
             await dispatcher.UndoAsync();
             await dispatcher.RedoAsync();
 
-            // Arrange
+            // Assert
             Assert.Equal(8, number.Value);
         }
 

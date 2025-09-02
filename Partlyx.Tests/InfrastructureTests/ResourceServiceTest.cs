@@ -1,28 +1,32 @@
 using Microsoft.Extensions.DependencyInjection;
+using Partlyx.Infrastructure.Data;
 using Partlyx.Services;
+using Partlyx.Tests.DataTests;
 
 namespace Partlyx.Tests
 {
-    public class ResourceServiceTest
+    [Collection("InMemoryDB")]
+    public class ResourceServiceTest : IDisposable
     {
-        private ServiceCollection _services;
+        private ServiceProvider _provider;
 
-        public ResourceServiceTest() 
+        public ResourceServiceTest(DBFixture fixture) 
         {
-            _services = new ServiceCollection();
-            TestDBInitializer.InitTestDB(_services);
-
-            _services.AddTransient<Data.IResourceRepository, Data.ResourceRepository>();
-            _services.AddTransient<IResourceService, ResourceService>();
+            _provider = fixture.CreateProvider(
+                services =>
+                {
+                    services.AddTransient<IResourceService, ResourceService>();
+                    services.AddTransient<IResourceRepository, ResourceRepository>();
+                });
         }
+        public void Dispose() => _provider.Dispose();
 
         [Fact]
         public async void CreateAndGetResourceAsync_CreateEmptyResource_CheckItsExistence()
         {
             // Arrange
-            var provider = _services.BuildServiceProvider();
-            var resourceRepo = provider.GetRequiredService<Data.IResourceRepository>();
-            var resourceService = provider.GetRequiredService<IResourceService>();
+            var resourceRepo = _provider.GetRequiredService<IResourceRepository>();
+            var resourceService = _provider.GetRequiredService<IResourceService>();
 
             // Act
             Guid resourceUid = await resourceService.CreateResourceAsync();
@@ -30,6 +34,39 @@ namespace Partlyx.Tests
 
             // Assert
             Assert.NotNull(resource);
+        }
+
+        [Fact]
+        public async void GetAllTheResourcesAsync_CreateThreeResources_GetResourcesCountEquals3()
+        {
+            // Arrange
+            var resourceRepo = _provider.GetRequiredService<IResourceRepository>();
+            var resourceService = _provider.GetRequiredService<IResourceService>();
+
+            // Act
+            for (int i = 0; i < 3; i++)
+                await resourceService.CreateResourceAsync();
+            var resources = await resourceService.GetAllTheResourcesAsync();
+
+            // Assert
+            Assert.Equal(3, resources.Count);
+        }
+
+        [Fact]
+        public async void SetNameAsync_CreateResourceAndSetNameAsTestObject_GetNameTestObject()
+        {
+            // Arrange
+            var resourceRepo = _provider.GetRequiredService<IResourceRepository>();
+            var resourceService = _provider.GetRequiredService<IResourceService>();
+
+            var uid = await resourceService.CreateResourceAsync();
+
+            // Act
+            await resourceService.SetNameAsync(uid, "TestObject");
+            var resource = await resourceService.GetResourceAsync(uid);
+
+            // Assert
+            Assert.Equal("TestObject", resource!.Name);
         }
     }
 

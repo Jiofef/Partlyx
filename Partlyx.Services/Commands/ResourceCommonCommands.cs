@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core;
-using Partlyx.Data;
+using Partlyx.Infrastructure.Data;
 
 namespace Partlyx.Services.Commands.ResourceCommonCommands
 {
@@ -8,23 +8,23 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
     {
         private IResourceService _resourceService;
 
-        private Guid _resourceUid;
+        public Guid ResourceUid { get; private set; }
 
-        public CreateResourceCommand(IServiceProvider serviceProvider)
+        public CreateResourceCommand(IResourceService rs)
         {
-            _resourceService = serviceProvider.GetRequiredService<IResourceService>();
+            _resourceService = rs;
         }
 
         public async Task ExecuteAsync()
         {
             Guid uid = await _resourceService.CreateResourceAsync();
-            _resourceUid = uid;
+            ResourceUid = uid;
         }
 
         public async Task UndoAsync()
         {
-            await _resourceService.DeleteResourceAsync(_resourceUid);
-            _resourceUid = Guid.Empty;
+            await _resourceService.DeleteResourceAsync(ResourceUid);
+            ResourceUid = Guid.Empty;
         }
     }
 
@@ -35,27 +35,27 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
 
         private Guid _resourceUid;
 
-        private Resource? _deletedResource;
+        public Resource? DeletedResource { get; private set; }
 
-        public DeleteResourceCommand(IServiceProvider serviceProvider, Guid resourceUid)
+        public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IResourceRepository rr)
         {
             _resourceUid = resourceUid;
-            _resourceService = serviceProvider.GetRequiredService<IResourceService>();
-            _resourceRepository = serviceProvider.GetRequiredService<IResourceRepository>();
+            _resourceService = rs;
+            _resourceRepository = rr;
         }
 
         public async Task ExecuteAsync()
         {
-            _deletedResource = await _resourceRepository.GetByUidAsync(_resourceUid);
+            DeletedResource = await _resourceRepository.GetByUidAsync(_resourceUid);
             await _resourceService.DeleteResourceAsync(_resourceUid);
         }
 
         public async Task UndoAsync()
         {
-            if (_deletedResource == null) return;
+            if (DeletedResource == null) return;
 
-            await _resourceRepository.AddAsync(_deletedResource);
-            _deletedResource = null;
+            await _resourceRepository.AddAsync(DeletedResource);
+            DeletedResource = null;
         }
     }
 
@@ -65,29 +65,29 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
 
         private Guid _resourceUid;
 
-        private Guid _duplicateUid;
+        public Guid DuplicateUid { get; private set; }
 
-        public DuplicateResourceCommand(IServiceProvider serviceProvider, Guid resourceUid)
+        public DuplicateResourceCommand(Guid resourceUid, IResourceService rs)
         {
-            _resourceService = serviceProvider.GetRequiredService<IResourceService>();
+            _resourceService = rs;
             _resourceUid = resourceUid;
         }
 
         public async Task ExecuteAsync()
         {
-            _duplicateUid = await _resourceService.DuplicateResourceAsync(_resourceUid);
+            DuplicateUid = await _resourceService.DuplicateResourceAsync(_resourceUid);
         }
 
         public async Task UndoAsync()
         {
-            await _resourceService.DeleteResourceAsync(_duplicateUid);
-            _duplicateUid = Guid.Empty;
+            await _resourceService.DeleteResourceAsync(DuplicateUid);
+            DuplicateUid = Guid.Empty;
         }
     }
 
     public class SetDefaultRecipeToResourceCommand : SetValueUndoableCommand<Guid>
     {
-        public SetDefaultRecipeToResourceCommand(Guid recipeUid, Guid previousRecipeUid, Func<Guid, Task> setter)
+        private SetDefaultRecipeToResourceCommand(Guid recipeUid, Guid previousRecipeUid, Func<Guid, Task> setter)
             : base(recipeUid, previousRecipeUid, setter) { }
 
         public static async Task<SetDefaultRecipeToResourceCommand?> CreateAsync(IServiceProvider serviceProvider, Guid resourceUid, Guid recipeUid)
@@ -112,7 +112,7 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
 
     public class SetNameToResourceCommand : SetValueUndoableCommand<string>
     {
-        public SetNameToResourceCommand(string newName, string previousName, Func<string, Task> setter)
+        private SetNameToResourceCommand(string newName, string previousName, Func<string, Task> setter)
             : base(newName, previousName, setter!) { }
 
         public static async Task<SetNameToResourceCommand?> CreateAsync(IServiceProvider serviceProvider, Guid resourceUid, string newName)

@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Partlyx.Data\Partlyx.Data.csproj" />
+    <ProjectReference Include="..\Partlyx.Data\Partlyx.Infrastructure.csproj" />
     <ProjectReference Include="..\Partlyx.Services\Partlyx.Services.csproj" />
   </ItemGroup>
 

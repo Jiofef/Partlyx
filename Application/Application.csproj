@@ -6,9 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Partlyx.Core\Partlyx.Core.csproj" />
-    <ProjectReference Include="..\Partlyx.Data\Partlyx.Infrastructure.csproj" />
-  </ItemGroup>
-
 </Project>

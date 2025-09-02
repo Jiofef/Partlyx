@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Partlyx.Core;
-using Partlyx.Data;
+using Partlyx.Infrastructure.Data;
 using Partlyx.Services.Dtos;
 using System;
 using System.Collections.Generic;
@@ -63,6 +63,19 @@ namespace Partlyx.Services
             var recipe = resource.Recipes.FirstOrDefault(x => x.Uid == recipeUid);
 
             return recipe != null ? recipe.ToDto() : null;
+        }
+
+        public async Task<List<RecipeDto>> GetAllTheRecipesAsync(Guid parentResourceUid)
+        {
+            var resource = await _repo.GetByUidAsync(parentResourceUid);
+            if (resource == null) 
+                throw new InvalidOperationException("Resource not found with Uid: " + parentResourceUid);
+
+            var recipes = resource.Recipes;
+
+            var recipesDto = recipes.Select(r => r.ToDto()).ToList();
+
+            return recipesDto;
         }
 
         public async Task SetRecipeCraftAmountAsync(Guid parentResourceUid, Guid recipeUid, double craftAmount)

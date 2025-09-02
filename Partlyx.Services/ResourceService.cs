@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Partlyx.Core;
-using Partlyx.Data;
+using Partlyx.Infrastructure.Data;
 using Partlyx.Services.Dtos;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -38,9 +38,13 @@ namespace Partlyx.Services
             return resource == null ? null : resource.ToDto();
         }
 
-        internal async Task<Resource?> GetOriginalResourceAsync(Guid uid)
+        public async Task<List<ResourceDto>> GetAllTheResourcesAsync()
         {
-            return await _repo.GetByUidAsync(uid);
+            var resources = await _repo.GetAllTheResourcesAsync();
+
+            var resourcesDto = resources.Select(x => x.ToDto()).ToList();
+
+            return resourcesDto;
         }
 
         public async Task<List<ResourceDto>> SearchResourcesAsync(string query)

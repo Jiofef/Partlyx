@@ -1,17 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Partlyx.Core;
+using System.Diagnostics;
 using System.Reflection.Metadata;
 
-namespace Partlyx.Data
+namespace Partlyx.Infrastructure.Data
 {
     public class PartlyxDBContext : DbContext, IDisposable
     {
         public DbSet<Resource> Resources { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Data Source=partlyxmain.db");
-        }
+        public PartlyxDBContext(DbContextOptions<PartlyxDBContext> options)
+    : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

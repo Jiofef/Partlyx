@@ -12,5 +12,6 @@ namespace Partlyx.Services
         Task<List<ResourceDto>> SearchResourcesAsync(string SearchQuery);
         Task SetDefaultRecipeAsync(Guid resourceUid, Guid recipeUid);
         Task SetNameAsync(Guid resourceUid, string name);
+        Task<List<ResourceDto>> GetAllTheResourcesAsync();
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Partlyx.Core;
-using Partlyx.Data;
+using Partlyx.Infrastructure.Data;
 using Partlyx.Services.Dtos;
 using System;
 using System.Collections.Generic;
@@ -63,6 +63,22 @@ namespace Partlyx.Services
             var component = recipe.Components.First(c => c.Uid == componentUid);
 
             return component != null ? component.ToDto() : null;
+        }
+
+        public async Task<List<RecipeComponentDto>> GetAllTheComponentsAsync(Guid grandParentResourceUid, Guid parentRecipeUid)
+        {
+            var resource = await _repo.GetByUidAsync(grandParentResourceUid);
+            if (resource == null) 
+                throw new InvalidOperationException("Resource not found with Uid: " + grandParentResourceUid); ;
+
+            var recipe = resource.GetRecipeByUid(parentRecipeUid);
+            if (recipe == null) 
+                throw new InvalidOperationException("Recipe not found with Uid: " + parentRecipeUid);
+
+            var components = recipe.Components;
+            var componentsDto = components.Select(c => c.ToDto()).ToList();
+
+            return componentsDto;
         }
 
         public async Task SetQuantityAsync(Guid parentResourceUid, Guid componentUid, double quantity)

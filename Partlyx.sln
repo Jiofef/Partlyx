@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35521.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Partlyx.Core", "Partlyx.Core\Partlyx.Core.csproj", "{92D4F1F4-D77A-48A3-8165-227348C13E2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Partlyx.Data", "Partlyx.Data\Partlyx.Data.csproj", "{6292CAE1-5A62-4EC0-B1A3-450DC1E96592}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Partlyx.Infrastructure", "Partlyx.Data\Partlyx.Infrastructure.csproj", "{6292CAE1-5A62-4EC0-B1A3-450DC1E96592}"
 	ProjectSection(ProjectDependencies) = postProject
 		{92D4F1F4-D77A-48A3-8165-227348C13E2E} = {92D4F1F4-D77A-48A3-8165-227348C13E2E}
 	EndProjectSection
@@ -67,5 +67,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A4452EAA-25B5-4617-BA84-BF0F081FEF0C}
 	EndGlobalSection
 EndGlobal

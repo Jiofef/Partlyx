@@ -1,5 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Partlyx.Infrastructure.Data;
+using Partlyx.Services.Commands;
+using Partlyx.Services.Commands.RecipeCommonCommands;
+using Partlyx.Services.Commands.RecipeComponentCommonCommands;
+using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.ViewModels;
 using System.Configuration;
 using System.Data;
@@ -24,10 +29,10 @@ namespace Partlyx.UI.WPF
             var services = new ServiceCollection();
 
             // DB
-            services.AddDbContextFactory<Data.PartlyxDBContext>(opts => opts.UseSqlite("..."));
+            services.AddDbContextFactory<PartlyxDBContext>(opts => opts.UseSqlite("..."));
 
             // Data
-            services.AddTransient<Data.IResourceRepository, Data.ResourceRepository>();
+            services.AddTransient<IResourceRepository, ResourceRepository>();
 
             // Services
             services.AddTransient<Services.IResourceService, Services.ResourceService>();
@@ -36,6 +41,9 @@ namespace Partlyx.UI.WPF
 
             services.AddSingleton<Services.Commands.CommandDispatcher>();
             services.AddTransient<IServiceProvider, ServiceProvider>();
+            services.AddTransient<ICommandFactory, DICommandFactory>();
+
+            InitializeCommands(services);
 
             // Viewmodels and windows
             services.AddTransient<MainViewModel>();
@@ -48,6 +56,29 @@ namespace Partlyx.UI.WPF
             services.AddTransient<MainWindow>();
 
             Services = services.BuildServiceProvider();
+        }
+
+        private void InitializeCommands(ServiceCollection services)
+        {
+            // Resource commands
+            services.AddTransient<CreateResourceCommand>();
+            services.AddTransient<DeleteResourceCommand>();
+            services.AddTransient<DuplicateResourceCommand>();
+            services.AddTransient<SetDefaultRecipeToResourceCommand>();
+            services.AddTransient<SetNameToResourceCommand>();
+
+            // Recipe commands
+            services.AddTransient<CreateRecipeCommand>();
+            services.AddTransient<DeleteRecipeCommand>();
+            services.AddTransient<DuplicateRecipeCommand>();
+            services.AddTransient<SetRecipeCraftAmountCommand>();
+
+            // Recipe component commands
+            services.AddTransient<CreateRecipeComponentCommand>();
+            services.AddTransient<DeleteRecipeComponentCommand>();
+            services.AddTransient<DuplicateRecipeComponentCommand>();
+            services.AddTransient<SetRecipeComponentQuantityCommand>();
+            services.AddTransient<SetRecipeComponentResourceCommand>();
         }
     }
 

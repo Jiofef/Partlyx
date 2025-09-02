@@ -6,8 +6,9 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace Partlyx.Data
+namespace Partlyx.Infrastructure.Data
 {
     public class ResourceRepository : IResourceRepository
     {
@@ -74,6 +75,15 @@ namespace Partlyx.Data
             var rl = await db.Resources.
                 Where(r => EF.Functions.Like(r.Name, $"%{query}")).
                 ToListAsync();
+
+            return rl;
+        }
+
+        public async Task<List<Resource>> GetAllTheResourcesAsync()
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            var rl = await db.Resources.ToListAsync();
 
             return rl;
         }

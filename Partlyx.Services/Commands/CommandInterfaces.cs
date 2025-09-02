@@ -9,4 +9,9 @@
     {
         Task UndoAsync();
     }
+
+    public interface IAsyncInitializable
+    {
+        Task InitializeAsync(params object[] args);
+    }
 }

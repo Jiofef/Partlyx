@@ -1,6 +1,6 @@
 ﻿using Partlyx.Core;
 
-namespace Partlyx.Data
+namespace Partlyx.Infrastructure.Data
 {
     public interface IResourceRepository
     {
@@ -17,5 +17,6 @@ namespace Partlyx.Data
         Task<TResult> ExecuteOnRecipeAsync<TResult>(Guid resourceUid, Guid recipeUid, Func<Recipe, Task<TResult>> action);
         Task ExecuteOnRecipeAsync(Guid resourceUid, Guid recipeUid, Func<Recipe, Task> action);
         Task<TResult> ExecuteOnResourceAsync<TResult>(Guid resourceUid, Func<Resource, Task<TResult>> action);
+        Task<List<Resource>> GetAllTheResourcesAsync();
     }
 }
