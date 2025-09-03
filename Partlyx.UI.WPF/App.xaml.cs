@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Partlyx.Infrastructure;
 using Partlyx.Infrastructure.Data;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.ViewModels;
+using Partlyx.ViewModels.PartsViewModels;
 using System.Configuration;
 using System.Data;
 using System.Windows;
@@ -31,7 +33,10 @@ namespace Partlyx.UI.WPF
             // DB
             services.AddDbContextFactory<PartlyxDBContext>(opts => opts.UseSqlite("..."));
 
-            // Data
+            // Infrastructure
+            services.AddTransient<IPartUpdater, PartUpdater>();
+            services.AddSingleton<Infrastructure.Events.IEventBus, Infrastructure.Events.EventBus>();
+
             services.AddTransient<IResourceRepository, ResourceRepository>();
 
             // Services
@@ -47,6 +52,12 @@ namespace Partlyx.UI.WPF
 
             // Viewmodels and windows
             services.AddTransient<MainViewModel>();
+
+            services.AddTransient<IVMPartsFactory, VMPartsFactory>();
+
+            services.AddTransient<ResourceItemViewModel>();
+            services.AddTransient<RecipeItemViewModel>();
+            services.AddTransient<RecipeComponentItemViewModel>();
 
             services.AddTransient<ResourceListViewModel>();
             services.AddTransient<RecipeListViewModel>();

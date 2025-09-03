@@ -19,6 +19,7 @@ namespace Partlyx.Services.Dtos
         {
             return new RecipeDto(
                 recipe.Uid,
+                recipe.ParentResource?.Uid,
                 recipe.CraftAmount,
                 recipe.Components.Select(c => c.ToDto()).ToList()
                 );
@@ -27,8 +28,9 @@ namespace Partlyx.Services.Dtos
         public static RecipeComponentDto ToDto(this RecipeComponent c)
         {
             return new RecipeComponentDto(
+                c.Uid,
+                c.ParentRecipe?.Uid,
                 c.ComponentResource.Uid,
-                c.ComponentResource.Name,
                 c.Quantity,
                 c.ComponentSelectedRecipe.Uid
                 );

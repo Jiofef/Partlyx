@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Partlyx.Core;
 using Partlyx.Infrastructure.Data;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
+using Partlyx.Services.PartsEventClasses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +14,13 @@ namespace Partlyx.Services
 {
     public class RecipeService : IRecipeService
     {
-        private readonly ResourceRepository _repo;
-        public RecipeService(ResourceRepository repo) => _repo = repo;
+        private readonly IResourceRepository _repo;
+        private readonly IEventBus _eventBus;
+        public RecipeService(IResourceRepository repo, IEventBus bus)
+        {
+            _repo = repo;
+            _eventBus = bus;
+        }
 
         public async Task<Guid> CreateRecipeAsync(Guid parentResourceUid)
         {
@@ -22,6 +29,10 @@ namespace Partlyx.Services
                 var recipe = resource.CreateRecipe();
                 return Task.FromResult(recipe.Uid);
             });
+
+            var recipe = await GetRecipeAsync(parentResourceUid, result);
+            if (recipe != null)
+                _eventBus.Publish(new RecipeCreatedEvent(recipe));
 
             return result;
         }
@@ -34,6 +45,10 @@ namespace Partlyx.Services
                 return Task.FromResult(duplicate.Uid);
             });
 
+            var recipe = await GetRecipeAsync(parentResourceUid, result);
+            if (recipe != null)
+                _eventBus.Publish(new RecipeCreatedEvent(recipe));
+
             return result;
         }
 
@@ -44,6 +59,8 @@ namespace Partlyx.Services
                 recipe.Detach();
                 return Task.CompletedTask;
             });
+
+            _eventBus.Publish(new RecipeDeletedEvent(parentResourceUid, recipeUid));
         }
 
         public async Task QuantifyRecipeAsync(Guid parentResourceUid, Guid recipeUid)
@@ -85,6 +102,10 @@ namespace Partlyx.Services
                 recipe.CraftAmount = craftAmount;
                 return Task.CompletedTask;
             });
+
+            var recipe = await GetRecipeAsync(parentResourceUid, recipeUid);
+            if (recipe != null)
+                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "CraftAmount" }));
         }
     }
 }

@@ -1,8 +1,11 @@
 ﻿using Partlyx.Core;
 using Partlyx.Infrastructure.Data;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
+using Partlyx.Services.PartsEventClasses;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,8 +14,13 @@ namespace Partlyx.Services
 {
     public class RecipeComponentService : IRecipeComponentService
     {
-        private readonly ResourceRepository _repo;
-        public RecipeComponentService(ResourceRepository repo) => _repo = repo;
+        private readonly IResourceRepository _repo;
+        private readonly IEventBus _eventBus;
+        public RecipeComponentService(IResourceRepository repo, IEventBus bus)
+        {
+            _repo = repo;
+            _eventBus = bus;
+        }
 
         public async Task<Guid> CreateComponentAsync(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid)
         {
@@ -26,27 +34,39 @@ namespace Partlyx.Services
                 return component.Uid;
             });
 
+            var component = await GetComponentAsync(grandParentResourceUid, result);
+            if (component != null)
+                _eventBus.Publish(new RecipeComponentCreatedEvent(component));
+
             return result;
         }
 
-        public async Task<Guid> DuplicateComponentAsync(Guid parentResourceUid, Guid componentUid)
+        public async Task<Guid> DuplicateComponentAsync(Guid grandParentResourceUid, Guid componentUid)
         {
-            var result = await _repo.ExecuteOnComponentAsync(parentResourceUid, componentUid, component =>
+            var result = await _repo.ExecuteOnComponentAsync(grandParentResourceUid, componentUid, component =>
             {
                 var duplicate = component.CopyTo(component.ParentRecipe!);
                 return Task.FromResult(duplicate.Uid);
             });
+
+            var component = await GetComponentAsync(grandParentResourceUid, result);
+            if (component != null)
+                _eventBus.Publish(new RecipeComponentCreatedEvent(component));
 
             return result;
         }
 
         public async Task DeleteComponentAsync(Guid parentResourceUid, Guid componentUid)
         {
+            Guid componentParentRecipeGuid = Guid.Empty;
             await _repo.ExecuteOnComponentAsync(parentResourceUid, componentUid, component =>
             {
+                componentParentRecipeGuid = component.ParentRecipe!.Uid;
                 component.Detach();
                 return Task.CompletedTask;
             });
+
+            _eventBus.Publish(new RecipeComponentDeletedEvent(parentResourceUid, componentParentRecipeGuid, componentUid));
         }
 
         public async Task<RecipeComponentDto?> GetComponentAsync(Guid parentResourceUid, Guid componentUid)
@@ -88,6 +108,10 @@ namespace Partlyx.Services
                 component.Quantity = quantity;
                 return Task.CompletedTask;
             });
+
+            var component = await GetComponentAsync(parentResourceUid, componentUid);
+            if (component != null)
+                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, new[] { "Quantity" }));
         }
 
         public async Task SetResourceSelectedRecipeAsync(Guid parentResourceUid, Guid componentUid, Guid recipeToSelectUid)
@@ -103,6 +127,10 @@ namespace Partlyx.Services
                 component.SetSelectedRecipe(recipeToSelect);
                 return Task.CompletedTask;
             });
+
+            var component = await GetComponentAsync(parentResourceUid, componentUid);
+            if (component != null)
+                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, new[] { "ComponentSelectedRecipe" }));
         }
 
         public async Task SetComponentResourceAsync(Guid parentResourceUid, Guid componentUid, Guid resourceToSelectUid)
@@ -116,6 +144,10 @@ namespace Partlyx.Services
 
                 component.SetComponentResource(newComponentResource);
             });
+
+            var component = await GetComponentAsync(parentResourceUid, componentUid);
+            if (component != null)
+                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, new[] { "ComponentResource" }));
         }
     }
 }

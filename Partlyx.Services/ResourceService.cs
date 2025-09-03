@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Partlyx.Core;
 using Partlyx.Infrastructure.Data;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
+using Partlyx.Services.PartsEventClasses;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -10,12 +12,19 @@ namespace Partlyx.Services
     public class ResourceService : IResourceService
     {
         private readonly IResourceRepository _repo;
-        public ResourceService(IResourceRepository repo) => _repo = repo;
+        private readonly IEventBus _eventBus;
+        public ResourceService(IResourceRepository repo, IEventBus bus)
+        {
+            _repo = repo;
+            _eventBus = bus;
+        }
 
         public async Task<Guid> CreateResourceAsync()
         {
             var resource = new Resource();
             var Uid = await _repo.AddAsync(resource);
+
+            _eventBus.Publish(new ResourceCreatedEvent(resource.ToDto()));
 
             return Uid;
         }
@@ -23,12 +32,18 @@ namespace Partlyx.Services
         {
             var duplicateUid = await _repo.DuplicateAsync(uid);
 
+            var resource = await GetResourceAsync(uid);
+            if (resource != null)
+                _eventBus.Publish(new ResourceCreatedEvent(resource));
+
             return duplicateUid;
         }
 
         public async Task DeleteResourceAsync(Guid uid)
         {
             await _repo.DeleteAsync(uid);
+
+            _eventBus.Publish(new ResourceDeletedEvent(uid));
         }
 
         public async Task<ResourceDto?> GetResourceAsync(Guid uid)
@@ -64,6 +79,10 @@ namespace Partlyx.Services
 
                 return Task.CompletedTask;
             });
+
+            var resource = await GetResourceAsync(resourceUid);
+            if (resource != null)
+                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[] { "DefaultRecipe" }));
         }
 
         public async Task SetNameAsync(Guid resourceUid, string name)
@@ -73,6 +92,10 @@ namespace Partlyx.Services
                 resource.Name = name;
                 return Task.CompletedTask;
             });
+
+            var resource = await GetResourceAsync(resourceUid);
+            if (resource != null)
+                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[]{"Name"}));
         }
     }
 }
