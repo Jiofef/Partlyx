@@ -7,24 +7,36 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
     public class CreateResourceCommand : IUndoableCommand
     {
         private IResourceService _resourceService;
+        private IResourceRepository _resourceRepository;
 
         public Guid ResourceUid { get; private set; }
 
-        public CreateResourceCommand(IResourceService rs)
+        private Resource? _createdResource;
+
+        public CreateResourceCommand(IResourceService rs, IResourceRepository rr)
         {
             _resourceService = rs;
+            _resourceRepository = rr;
         }
 
         public async Task ExecuteAsync()
         {
             Guid uid = await _resourceService.CreateResourceAsync();
             ResourceUid = uid;
+            _createdResource = await _resourceRepository.GetByUidAsync(uid);
         }
 
         public async Task UndoAsync()
         {
             await _resourceService.DeleteResourceAsync(ResourceUid);
             ResourceUid = Guid.Empty;
+        }
+
+        public async Task Redo()
+        {
+            if (_createdResource == null) return;
+
+            await _resourceRepository.AddAsync(_createdResource);
         }
     }
 
@@ -33,29 +45,29 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
         private IResourceService _resourceService;
         private IResourceRepository _resourceRepository;
 
-        private Guid _resourceUid;
+        public Guid DeletedResourceUid { get; private set; }
 
-        public Resource? DeletedResource { get; private set; }
+        private Resource? _deletedResource;
 
         public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IResourceRepository rr)
         {
-            _resourceUid = resourceUid;
+            DeletedResourceUid = resourceUid;
             _resourceService = rs;
             _resourceRepository = rr;
         }
 
         public async Task ExecuteAsync()
         {
-            DeletedResource = await _resourceRepository.GetByUidAsync(_resourceUid);
-            await _resourceService.DeleteResourceAsync(_resourceUid);
+            _deletedResource = await _resourceRepository.GetByUidAsync(DeletedResourceUid);
+            await _resourceService.DeleteResourceAsync(DeletedResourceUid);
         }
 
         public async Task UndoAsync()
         {
-            if (DeletedResource == null) return;
+            if (_deletedResource == null) return;
 
-            await _resourceRepository.AddAsync(DeletedResource);
-            DeletedResource = null;
+            await _resourceRepository.AddAsync(_deletedResource);
+            _deletedResource = null;
         }
     }
 

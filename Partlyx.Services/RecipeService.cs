@@ -1,14 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Partlyx.Core;
-using Partlyx.Infrastructure.Data;
+﻿using Partlyx.Infrastructure.Data;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Partlyx.Services
 {

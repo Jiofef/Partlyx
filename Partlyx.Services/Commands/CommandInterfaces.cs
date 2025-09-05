@@ -8,6 +8,8 @@
     public interface IUndoableCommand : ICommand 
     {
         Task UndoAsync();
+
+        async Task RedoAsync() { await ExecuteAsync(); }
     }
 
     public interface IAsyncInitializable

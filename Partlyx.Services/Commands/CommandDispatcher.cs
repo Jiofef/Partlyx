@@ -71,7 +71,7 @@ namespace Partlyx.Services.Commands
             var command = _canceledCommandsHistory.Last!.Value;
             _canceledCommandsHistory.RemoveLast();
 
-            await command.ExecuteAsync();
+            await command.RedoAsync();
 
             _commandsHistory.AddLast(command);
 

@@ -33,6 +33,8 @@ namespace Partlyx.Tests.InfrastructureTests
                 services.AddTransient<DuplicateResourceCommand>();
                 services.AddTransient<SetDefaultRecipeToResourceCommand>();
                 services.AddTransient<SetNameToResourceCommand>();
+
+                services.AddSingleton<Infrastructure.Events.IEventBus, Infrastructure.Events.EventBus>();
             });
 
             _factory = _provider.GetRequiredService<ICommandFactory>();

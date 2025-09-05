@@ -10,7 +10,7 @@ namespace Partlyx.Tests.CoreTests
             // Arrange
             Resource testResource = new Resource() { Name = "TestResource" };
 
-            Resource supportResource = new Resource() { Name = "SupportResource" }; // The recipe cannot exist without a resource, so an auxiliary is required
+            Resource supportResource = new Resource() { Name = "SupportResource" };
             Recipe recipe = supportResource.CreateRecipe();
 
             // Act & assert

@@ -12,6 +12,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
     public class CreateRecipeComponentCommand : IUndoableCommand
     {
         private IRecipeComponentService _recipeComponentService;
+        private IResourceRepository _resourceRepository;
 
         private Guid _resourceUid;
         private Guid _recipeUid;
@@ -19,7 +20,10 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
 
         public Guid RecipeComponentUid { get; private set; }
 
-        public CreateRecipeComponentCommand(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid, IRecipeComponentService rcs)
+        private RecipeComponent? _createdRecipeComponent;
+
+        public CreateRecipeComponentCommand(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid, 
+            IRecipeComponentService rcs, IResourceRepository rr)
         {
             _recipeComponentService = rcs;
             _resourceUid = grandParentResourceUid;
@@ -31,12 +35,30 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         {
             Guid uid = await _recipeComponentService.CreateComponentAsync(_resourceUid, _recipeUid, _componentResourceUid);
             RecipeComponentUid = uid;
+
+            var resource = await _resourceRepository.GetByUidAsync(_resourceUid);
+            var recipe = resource?.GetRecipeByUid(_recipeUid);
+            _createdRecipeComponent = recipe?.GetRecipeComponentByUid(RecipeComponentUid);
         }
 
         public async Task UndoAsync()
         {
             await _recipeComponentService.DeleteComponentAsync(_resourceUid, RecipeComponentUid);
             RecipeComponentUid = Guid.Empty;
+        }
+
+        public async Task RedoAsync()
+        {
+            if (_createdRecipeComponent == null) return;
+
+            await _resourceRepository.ExecuteOnRecipeAsync(_resourceUid, _recipeUid,
+                (recipe) =>
+                {
+                    _createdRecipeComponent.AttachTo(recipe);
+                    return Task.CompletedTask;
+                });
+
+            _createdRecipeComponent = null;
         }
     }
 
@@ -49,7 +71,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         private Guid _recipeUid;
         private Guid _recipeComponentUid;
 
-        public RecipeComponent? DeletedRecipeComponent { get; private set; }
+        private RecipeComponent? _deletedRecipeComponent;
 
         public DeleteRecipeComponentCommand(Guid grandParentResourceUid, Guid parentRecipeUid, Guid recipeComponentUid,
             IRecipeComponentService rcs, IResourceRepository rr)
@@ -74,23 +96,23 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
             if (recipe == null)
                 throw new ArgumentNullException(nameof(recipe));
 
-            DeletedRecipeComponent = recipe.GetRecipeComponentByUid(_recipeComponentUid);
+            _deletedRecipeComponent = recipe.GetRecipeComponentByUid(_recipeComponentUid);
 
             await _recipeComponentService.DeleteComponentAsync(_resourceUid, _recipeComponentUid);
         }
 
         public async Task UndoAsync()
         {
-            if (DeletedRecipeComponent == null) return;
+            if (_deletedRecipeComponent == null) return;
 
             await _resourceRepository.ExecuteOnRecipeAsync(_resourceUid, _recipeUid,
                 (recipe) =>
                 {
-                    DeletedRecipeComponent.AttachTo(recipe);
+                    _deletedRecipeComponent.AttachTo(recipe);
                     return Task.CompletedTask;
                 });
 
-            DeletedRecipeComponent = null;
+            _deletedRecipeComponent = null;
         }
     }
 

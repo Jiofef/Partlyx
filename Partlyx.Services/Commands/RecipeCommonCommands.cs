@@ -7,11 +7,14 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
     public class CreateRecipeCommand : IUndoableCommand
     {
         private IRecipeService _recipeService;
+        private IResourceRepository _resourceRepository;
 
         private Guid _resourceUid;
         public Guid RecipeUid { get; private set; }
 
-        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs)
+        private Recipe? _createdRecipe;
+
+        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceRepository rr)
         {
             _recipeService = rs;
             _resourceUid = parentResourceUid;
@@ -21,12 +24,26 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
         {
             Guid uid = await _recipeService.CreateRecipeAsync(_resourceUid);
             RecipeUid = uid;
+            var resource = await _resourceRepository.GetByUidAsync(_resourceUid);
+            _createdRecipe = resource?.GetRecipeByUid(uid);
         }
 
         public async Task UndoAsync()
         {
             await _recipeService.DeleteRecipeAsync(_resourceUid, RecipeUid);
             RecipeUid = Guid.Empty;
+        }
+
+        public async Task RedoAsync()
+        {
+            if (_createdRecipe == null) return;
+
+            await _resourceRepository.ExecuteOnResourceAsync(_resourceUid,
+                (resource) =>
+                {
+                    _createdRecipe.AttachTo(resource);
+                    return Task.CompletedTask;
+                });
         }
     }
 
@@ -36,15 +53,15 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
         private IResourceRepository _resourceRepository;
 
         private Guid _resourceUid;
-        private Guid _recipeUid;
+        public Guid RecipeUid { get; private set; }
 
-        public Recipe? DeletedRecipe { get; private set; }
+        private Recipe? _deletedRecipe;
 
         public DeleteRecipeCommand(Guid parentResourceUid, Guid recipeUid, IRecipeService rs, IResourceRepository rr)
         {
             _resourceUid = parentResourceUid;
             _recipeService = rs;
-            _recipeUid = recipeUid;
+            RecipeUid = recipeUid;
             _resourceRepository = rr;
         }
 
@@ -55,23 +72,23 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
             if (resource == null) 
                 throw new ArgumentNullException(nameof(resource));
 
-            DeletedRecipe = resource.GetRecipeByUid(_recipeUid);
+            _deletedRecipe = resource.GetRecipeByUid(RecipeUid);
 
-            await _recipeService.DeleteRecipeAsync(_resourceUid, _recipeUid);
+            await _recipeService.DeleteRecipeAsync(_resourceUid, RecipeUid);
         }
 
         public async Task UndoAsync()
         {
-            if (DeletedRecipe == null) return;
+            if (_deletedRecipe == null) return;
 
             await _resourceRepository.ExecuteOnResourceAsync(_resourceUid,
                 (resource) => 
                 {
-                    DeletedRecipe.AttachTo(resource);
+                    _deletedRecipe.AttachTo(resource);
                     return Task.CompletedTask;
                 }); 
 
-            DeletedRecipe = null;
+            _deletedRecipe = null;
         }
     }
 

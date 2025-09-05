@@ -4,19 +4,23 @@ using Partlyx.Services;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using System.Collections.ObjectModel;
+using System.Xml.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels
 {
     public class RecipeItemViewModel : UpdatableViewModel<RecipeDto>, IDisposable
     {
+        // Services
         private readonly IPartsService _service;
         private readonly IVMPartsStore _store;
         private readonly IVMPartsFactory _partsFactory;
 
+        // Events
         private readonly IEventBus _bus;
         private readonly IDisposable _subscription;
         private readonly IDisposable _childAddSubscription;
         private readonly IDisposable _childRemoveSubscription;
+        private readonly IDisposable _childMoveSubscription;
 
         public RecipeItemViewModel(RecipeDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus)
         {
@@ -29,8 +33,9 @@ namespace Partlyx.ViewModels.PartsViewModels
             _bus = bus;
 
             // Info
+            _parentResourceUid = dto.ParentResourceUid;
             _craftAmount = dto.CraftAmount;
-
+            
             foreach (var component in dto.Components)
             {
                 var vm = _partsFactory.CreateRecipeComponentVM(component);
@@ -41,10 +46,15 @@ namespace Partlyx.ViewModels.PartsViewModels
             _subscription = _bus.Subscribe<RecipeUpdatedEvent>(OnRecipeUpdated, true);
             _childAddSubscription = bus.Subscribe<RecipeComponentCreatedEvent>(OnComponentCreated, true);
             _childRemoveSubscription = bus.Subscribe<RecipeComponentDeletedEvent>(OnComponentDeleted, true);
+            _childMoveSubscription = bus.Subscribe<RecipeComponentMovedEvent>(OnComponentMoved, true);
         }
 
         // Recipe info
         public Guid Uid { get; }
+
+        private Guid? _parentResourceUid;
+        public Guid? ParentResourceUid { get => _parentResourceUid; set => SetProperty(ref _parentResourceUid, value); }
+        public ResourceItemViewModel? ParentResource => ParentResourceUid != null ? _store.Resources[(Guid)ParentResourceUid] : null;
 
         private double _craftAmount;
         public double CraftAmount { get => _craftAmount; set => SetProperty(ref _craftAmount, value); }
@@ -52,10 +62,11 @@ namespace Partlyx.ViewModels.PartsViewModels
         private ObservableCollection<RecipeComponentItemViewModel> _components = new();
         public ObservableCollection<RecipeComponentItemViewModel> Components { get => _components; } // Updates locally when component is created/removed
 
+
         // Info updating
         protected override Dictionary<string, Action<RecipeDto>> ConfigureUpdaters() => new()
         {
-            
+            { nameof(RecipeDto.CraftAmount), dto => CraftAmount = dto.CraftAmount },
         };
 
         private void OnRecipeUpdated(RecipeUpdatedEvent ev)
@@ -82,6 +93,26 @@ namespace Partlyx.ViewModels.PartsViewModels
             {
                 Components.Remove(componentVM);
                 componentVM.Dispose();
+            }
+        }
+
+        private void OnComponentMoved(RecipeComponentMovedEvent ev)
+        {
+            if (Uid == ev.OldRecipeUid)
+            {
+                var componentVM = Components.FirstOrDefault(c => c.Uid == ev.RecipeComponentUid);
+                if (componentVM != null)
+                {
+                    Components.Remove(componentVM);
+                }
+            }
+            else if (Uid == ev.NewRecipeUid)
+            {
+                var componentVM = _store.RecipeComponents.GetValueOrDefault(ev.RecipeComponentUid);
+                if (componentVM != null)
+                {
+                    Components.Add(componentVM);
+                }
             }
         }
 

@@ -5,6 +5,7 @@ namespace Partlyx.Infrastructure.Events;
 
 public sealed partial class EventBus : IEventBus, IDisposable
 {
+    public EventBus() { }
     private sealed class Subscription
     {
         public Guid Id { get; } = Guid.NewGuid();

@@ -16,6 +16,8 @@ namespace Partlyx.Services.PartsEventClasses
 
     public record RecipeCreatedEvent(RecipeDto Recipe);
 
+    public record RecipeMovedEvent(Guid OldResourceUid, Guid NewResourceUid, Guid RecipeUid);
+
     // Recipe component events
     public record RecipeComponentUpdatedEvent(RecipeComponentDto RecipeComponent, IReadOnlyList<string>? ChangedProperties);
 
@@ -23,4 +25,5 @@ namespace Partlyx.Services.PartsEventClasses
 
     public record RecipeComponentCreatedEvent(RecipeComponentDto RecipeComponent);
 
+    public record RecipeComponentMovedEvent(Guid OldRecipeUid, Guid NewRecipeUid, Guid RecipeComponentUid);
 }

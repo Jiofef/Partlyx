@@ -9,14 +9,17 @@ namespace Partlyx.ViewModels.PartsViewModels
 {
     public class ResourceItemViewModel : UpdatableViewModel<ResourceDto>, IDisposable
     {
+        // Services
         private readonly IPartsService _service;
         private readonly IVMPartsStore _store;
         private readonly IVMPartsFactory _partsFactory;
         
+        // Events
         private readonly IEventBus _bus;
         private readonly IDisposable _subscription;
         private readonly IDisposable _childAddSubscription;
         private readonly IDisposable _childRemoveSubscription;
+        private readonly IDisposable _childMoveSubscription;
 
         public ResourceItemViewModel(ResourceDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus)
         {
@@ -30,6 +33,7 @@ namespace Partlyx.ViewModels.PartsViewModels
 
             // Info
             _name = dto.Name;
+            _defaultRecipeUid = dto.DefaultRecipeUid;
 
             foreach (var recipe in dto.Recipes)
             {
@@ -41,17 +45,14 @@ namespace Partlyx.ViewModels.PartsViewModels
             _subscription = _bus.Subscribe<ResourceUpdatedEvent>(OnResourceUpdated, true);
             _childAddSubscription = bus.Subscribe<RecipeCreatedEvent>(OnRecipeCreated, true);
             _childRemoveSubscription = bus.Subscribe<RecipeDeletedEvent>(OnRecipeDeleted, true);
+            _childMoveSubscription = bus.Subscribe<RecipeMovedEvent>(OnRecipeMoved, true);
         }
 
         // Resource info
         public Guid Uid { get; }
 
         private string _name;
-        public string Name
-        {
-            get => _name;
-            set => SetProperty(ref _name, value);
-        }
+        public string Name { get => _name; set => SetProperty(ref _name, value); }
 
         private ObservableCollection<RecipeItemViewModel> _recipes = new();
 
@@ -64,7 +65,8 @@ namespace Partlyx.ViewModels.PartsViewModels
         // Info updating
         protected override Dictionary<string, Action<ResourceDto>> ConfigureUpdaters() => new()
         {
-            { nameof(ResourceDto.Name), dto => Name = dto.Name }
+            { nameof(ResourceDto.Name), dto => Name = dto.Name },
+            { nameof(ResourceDto.DefaultRecipeUid), dto => DefaultRecipeUid = dto.DefaultRecipeUid },
         };
 
         private void OnResourceUpdated(ResourceUpdatedEvent ev)
@@ -91,6 +93,26 @@ namespace Partlyx.ViewModels.PartsViewModels
             {
                 Recipes.Remove(recipeVM);
                 recipeVM.Dispose();
+            }
+        }
+
+        private void OnRecipeMoved(RecipeMovedEvent ev)
+        {
+            if (Uid == ev.OldResourceUid)
+            {
+                var recipeVM = Recipes.FirstOrDefault(c => c.Uid == ev.RecipeUid);
+                if (recipeVM != null)
+                {
+                    Recipes.Remove(recipeVM);
+                }
+            }
+            else if (Uid == ev.NewResourceUid)
+            {
+                var recipeVM = _store.Recipes.GetValueOrDefault(ev.RecipeUid);
+                if (recipeVM != null)
+                {
+                    Recipes.Add(recipeVM);
+                }
             }
         }
 

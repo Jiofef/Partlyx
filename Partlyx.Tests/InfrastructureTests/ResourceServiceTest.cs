@@ -17,6 +17,7 @@ namespace Partlyx.Tests
                 {
                     services.AddTransient<IResourceService, ResourceService>();
                     services.AddTransient<IResourceRepository, ResourceRepository>();
+                    services.AddSingleton<Infrastructure.Events.IEventBus, Infrastructure.Events.EventBus>();
                 });
         }
         public void Dispose() => _provider.Dispose();
