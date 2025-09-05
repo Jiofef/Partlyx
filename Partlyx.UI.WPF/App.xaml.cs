@@ -43,6 +43,7 @@ namespace Partlyx.UI.WPF
             services.AddTransient<Services.IResourceService, Services.ResourceService>();
             services.AddTransient<Services.IRecipeService, Services.RecipeService>();
             services.AddTransient<Services.IRecipeComponentService, Services.RecipeComponentService>();
+            services.AddTransient<Services.IPartsService, Services.PartsService>();
 
             services.AddSingleton<Services.Commands.CommandDispatcher>();
             services.AddTransient<IServiceProvider, ServiceProvider>();
@@ -53,18 +54,21 @@ namespace Partlyx.UI.WPF
             // Viewmodels and windows
             services.AddTransient<MainViewModel>();
 
-            services.AddTransient<IVMPartsFactory, VMPartsFactory>();
-
-            services.AddTransient<ResourceItemViewModel>();
-            services.AddTransient<RecipeItemViewModel>();
-            services.AddTransient<RecipeComponentItemViewModel>();
-
             services.AddTransient<ResourceListViewModel>();
             services.AddTransient<RecipeListViewModel>();
             services.AddTransient<RecipeComponentsViewModel>();
             services.AddTransient<PartsTreeViewModel>();
 
             services.AddTransient<MainWindow>();
+
+            // Helper viewmodels
+            services.AddTransient<IVMPartsFactory, VMPartsFactory>();
+
+            services.AddTransient<ResourceItemViewModel>();
+            services.AddTransient<RecipeItemViewModel>();
+            services.AddTransient<RecipeComponentItemViewModel>();
+
+            services.AddSingleton<IVMPartsStore, VMPartsStore>();
 
             Services = services.BuildServiceProvider();
         }

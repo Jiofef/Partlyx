@@ -34,7 +34,7 @@ namespace Partlyx.Core
         }
 
         [NotMapped]
-        public Recipe DefaultRecipe { get; private set; }
+        public Recipe? DefaultRecipe { get; private set; }
 
         // Secondary features
         public Recipe CreateRecipe()
