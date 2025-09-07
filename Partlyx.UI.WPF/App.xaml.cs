@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Infrastructure;
 using Partlyx.Infrastructure.Data;
@@ -11,6 +12,11 @@ using Partlyx.ViewModels.PartsViewModels;
 using System.Configuration;
 using System.Data;
 using System.Windows;
+using Partlyx.Services.ServiceInterfaces;
+using Partlyx.Services.ServiceImplementations;
+using Partlyx.ViewModels.UIObjectViewModels;
+using Partlyx.ViewModels.UIServices.Interfaces;
+using Partlyx.ViewModels.UIServices.Implementations;
 
 namespace Partlyx.UI.WPF
 {
@@ -21,17 +27,32 @@ namespace Partlyx.UI.WPF
     {
         public static IServiceProvider Services { get; private set; }
 
-        public App()
+        protected override void OnStartup(StartupEventArgs e)
         {
-            InitializeDI();
+            base.OnStartup(e);
+
+            var services = new ServiceCollection();
+            InitializeDI(services);
+            Services = services.BuildServiceProvider();
+
+            InitializeDatabase();
         }
 
-        private void InitializeDI()
+        private void InitializeDI(IServiceCollection services)
         {
-            var services = new ServiceCollection();
-
             // DB
-            services.AddDbContextFactory<PartlyxDBContext>(opts => opts.UseSqlite("..."));
+            services.AddSingleton<SqliteConnection>(sp =>
+            {
+                var conn = new SqliteConnection("DataSource=:memory:;Cache=Shared");
+                conn.Open();
+                return conn;
+            });
+
+            services.AddDbContextFactory<PartlyxDBContext>((sp, opt) =>
+            {
+                var conn = sp.GetRequiredService<SqliteConnection>();
+                opt.UseSqlite(conn);
+            });
 
             // Infrastructure
             services.AddTransient<IPartUpdater, PartUpdater>();
@@ -39,11 +60,17 @@ namespace Partlyx.UI.WPF
 
             services.AddTransient<IResourceRepository, ResourceRepository>();
 
+
             // Services
-            services.AddTransient<Services.IResourceService, Services.ResourceService>();
-            services.AddTransient<Services.IRecipeService, Services.RecipeService>();
-            services.AddTransient<Services.IRecipeComponentService, Services.RecipeComponentService>();
-            services.AddTransient<Services.IPartsService, Services.PartsService>();
+            services.AddTransient<Services.Commands.ICommandDispatcher, Services.Commands.CommandDispatcher>();
+            services.AddTransient<IResourceService, ResourceService>();
+            services.AddTransient<IRecipeService, RecipeService>();
+            services.AddTransient<IRecipeComponentService, RecipeComponentService>();
+            services.AddTransient<IPartsService, PartsService>();
+
+            services.AddTransient<IIconInfoProvider, IconInfoProvider>();
+            services.AddTransient<IResourceFigureIconService, ResourceFigureIconService>();
+            services.AddTransient<IResourceImageIconService, ResourceImageIconService>();
 
             services.AddSingleton<Services.Commands.CommandDispatcher>();
             services.AddTransient<IServiceProvider, ServiceProvider>();
@@ -70,10 +97,12 @@ namespace Partlyx.UI.WPF
 
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
 
+            services.AddTransient<IResourceItemUiStateService, ResourceItemUiStateService>();
+
             Services = services.BuildServiceProvider();
         }
 
-        private void InitializeCommands(ServiceCollection services)
+        private void InitializeCommands(IServiceCollection services)
         {
             // Resource commands
             services.AddTransient<CreateResourceCommand>();
@@ -95,6 +124,14 @@ namespace Partlyx.UI.WPF
             services.AddTransient<SetRecipeComponentQuantityCommand>();
             services.AddTransient<SetRecipeComponentResourceCommand>();
         }
-    }
 
+        private void InitializeDatabase()
+        {
+            using var scope = Services.CreateScope();
+            var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<PartlyxDBContext>>();
+            using var ctx = factory.CreateDbContext();
+
+            ctx.Database.EnsureCreated();
+        }
+    }
 }

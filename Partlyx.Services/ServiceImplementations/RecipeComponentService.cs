@@ -3,14 +3,9 @@ using Partlyx.Infrastructure.Data;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Partlyx.Services.ServiceInterfaces;
 
-namespace Partlyx.Services
+namespace Partlyx.Services.ServiceImplementations
 {
     public class RecipeComponentService : IRecipeComponentService
     {
@@ -24,7 +19,7 @@ namespace Partlyx.Services
 
         public async Task<Guid> CreateComponentAsync(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid)
         {
-            var result = await _repo.ExecuteOnRecipeAsync<Guid>(grandParentResourceUid, parentRecipeUid, async recipe =>
+            var result = await _repo.ExecuteOnRecipeAsync(grandParentResourceUid, parentRecipeUid, async recipe =>
             {
                 var componentResource = await _repo.GetByUidAsync(componentResourceUid);
                 if (componentResource == null)
@@ -67,6 +62,24 @@ namespace Partlyx.Services
             });
 
             _eventBus.Publish(new RecipeComponentDeletedEvent(parentResourceUid, componentParentRecipeGuid, componentUid));
+        }
+
+        public async Task MoveComponentAsync(Guid grandParentResourceUid, Guid newGrandParentResourceUid, Guid parentRecipeUid, Guid newParentRecipeUid, Guid componentUid)
+        {
+            RecipeComponent? component = null;
+            await _repo.ExecuteOnComponentAsync(grandParentResourceUid, componentUid, _component =>
+            {
+                _component.Detach();
+                component = _component;
+                return Task.CompletedTask;
+            });
+            await _repo.ExecuteOnRecipeAsync(newGrandParentResourceUid, newParentRecipeUid, recipe =>
+            {
+                component?.AttachTo(recipe);
+                return Task.CompletedTask;
+            });
+
+            _eventBus.Publish(new RecipeComponentMovedEvent(grandParentResourceUid, newGrandParentResourceUid, parentRecipeUid, newParentRecipeUid, componentUid));
         }
 
         public async Task<RecipeComponentDto?> GetComponentAsync(Guid parentResourceUid, Guid componentUid)

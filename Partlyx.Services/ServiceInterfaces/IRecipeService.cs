@@ -1,6 +1,6 @@
 ﻿using Partlyx.Services.Dtos;
 
-namespace Partlyx.Services
+namespace Partlyx.Services.ServiceInterfaces
 {
     public interface IRecipeService
     {
@@ -9,6 +9,7 @@ namespace Partlyx.Services
         Task<Guid> DuplicateRecipeAsync(Guid parentResourceUid, Guid recipeUid);
         Task<List<RecipeDto>> GetAllTheRecipesAsync(Guid parentResourceUid);
         Task<RecipeDto?> GetRecipeAsync(Guid parentResourceUid, Guid recipeUid);
+        Task MoveRecipeAsync(Guid parentResourceUid, Guid newParentResourceUid, Guid recipeUid);
         Task QuantifyRecipeAsync(Guid parentResourceUid, Guid recipeUid);
         Task SetRecipeCraftAmountAsync(Guid parentResourceUid, Guid recipeUid, double craftAmount);
     }

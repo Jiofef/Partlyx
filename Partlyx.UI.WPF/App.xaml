@@ -7,8 +7,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Styles/Colors.xaml"/>
-
+                <ResourceDictionary Source="/Styles/DefaultResources.xaml"/>
                 <ResourceDictionary Source="/Styles/CommonStylesDictionary.xaml"/>
+                <ResourceDictionary Source="Styles/FavsScrollViewer.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

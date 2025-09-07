@@ -1,8 +1,9 @@
 ﻿using Partlyx.Core;
 using Partlyx.Infrastructure.Events;
-using Partlyx.Services;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
+using Partlyx.Services.ServiceImplementations;
+using Partlyx.Services.ServiceInterfaces;
 using System.Collections.ObjectModel;
 using System.Xml.Linq;
 
@@ -121,6 +122,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             _subscription.Dispose();
             _childAddSubscription.Dispose();
             _childRemoveSubscription.Dispose();
+            _childMoveSubscription.Dispose();
 
             foreach(var component in Components)
                 component.Dispose();

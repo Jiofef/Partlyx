@@ -1,4 +1,4 @@
-﻿namespace Partlyx.Services
+﻿namespace Partlyx.Services.ServiceInterfaces
 {
     public interface IPartsService
     {

@@ -1,7 +1,8 @@
 ﻿using Partlyx.Infrastructure.Events;
-using Partlyx.Services;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
+using Partlyx.Services.ServiceImplementations;
+using Partlyx.Services.ServiceInterfaces;
 using System.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels

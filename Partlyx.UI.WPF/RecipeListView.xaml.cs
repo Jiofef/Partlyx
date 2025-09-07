@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Partlyx.ViewModels.UIObjectViewModels;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,15 +16,13 @@ using System.Windows.Shapes;
 namespace Partlyx.UI.WPF
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Логика взаимодействия для ResourceListView.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class RecipeListView : UserControl
     {
-        public MainWindow()
+        public RecipeListView()
         {
             InitializeComponent();
-
-            DataContext = App.Services.GetRequiredService<MainViewModel>();
         }
     }
 }

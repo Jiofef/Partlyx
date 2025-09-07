@@ -1,4 +1,5 @@
-﻿namespace Partlyx.Services.Dtos
+﻿
+namespace Partlyx.Services.Dtos
 {
     public record ResourceDto(Guid Uid, string Name, List<RecipeDto> Recipes, Guid? DefaultRecipeUid);
 

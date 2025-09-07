@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Partlyx.Services.Commands
 {
-    public class CommandDispatcher
+    public class CommandDispatcher : ICommandDispatcher
     {
         private int maxHistoryLength = 100;
-        public int MaxHistoryLength 
-        { 
+        public int MaxHistoryLength
+        {
             get => maxHistoryLength;
-            set 
+            set
             {
                 if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
 

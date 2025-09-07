@@ -1,11 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core;
 using Partlyx.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Partlyx.Services.ServiceInterfaces;
 
 namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
 {
@@ -26,6 +22,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
             IRecipeComponentService rcs, IResourceRepository rr)
         {
             _recipeComponentService = rcs;
+            _resourceRepository = rr;
             _resourceUid = grandParentResourceUid;
             _recipeUid = parentRecipeUid;
             _componentResourceUid = componentResourceUid;
@@ -116,6 +113,56 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         }
     }
 
+    public class MoveRecipeComponentCommand : IUndoableCommand
+    {
+        private IRecipeComponentService _recipeComponentService;
+
+        private Guid _resourceUid;
+        private Guid _newResourceUid;
+        private Guid _recipeUid;
+        private Guid _newRecipeUid;
+        private Guid _recipeComponentUid;
+
+        public MoveRecipeComponentCommand(Guid grandParentResourceUid, Guid newGrandParentResourceUid, Guid parentRecipeUid, Guid newParentRecipeUid, Guid componentUid, IRecipeComponentService rcs)
+        {
+            _recipeComponentService = rcs;
+            _resourceUid = grandParentResourceUid;
+            _newResourceUid = newGrandParentResourceUid;
+            _recipeUid = parentRecipeUid;
+            _newRecipeUid = newParentRecipeUid;
+            _recipeComponentUid = componentUid;
+        }
+
+        public async Task ExecuteAsync()
+        {
+            await _recipeComponentService.MoveComponentAsync(_resourceUid, _newResourceUid, _recipeUid, _newRecipeUid, _recipeComponentUid);
+        }
+
+        public async Task UndoAsync()
+        {
+            await _recipeComponentService.MoveComponentAsync(_newResourceUid, _resourceUid, _newRecipeUid, _recipeUid, _recipeComponentUid);
+        }
+    }
+
+    public class SetRecipeComponentQuantityCommand : SetValueUndoableCommand<double>
+    {
+        private SetRecipeComponentQuantityCommand(double quantity, double savedValue, Func<double, Task> setter)
+            : base(quantity, savedValue, setter) { }
+
+        public static async Task<SetRecipeComponentQuantityCommand?> CreateAsync(IServiceProvider serviceProvider, Guid grandParentResourceUid, Guid recipeComponentUid, double amount)
+        {
+            var resourceService = serviceProvider.GetRequiredService<IRecipeComponentService>();
+            var component = await resourceService.GetComponentAsync(grandParentResourceUid, recipeComponentUid);
+            if (component == null)
+                throw new ArgumentException("Component not found with Uid: " + recipeComponentUid);
+
+            return new SetRecipeComponentQuantityCommand(amount, component.Quantity, async (value) =>
+            {
+                await resourceService.SetQuantityAsync(grandParentResourceUid, recipeComponentUid, value);
+            });
+        }
+    }
+
     public class DuplicateRecipeComponentCommand : IUndoableCommand
     {
         private IRecipeComponentService _recipeComponentService;
@@ -141,25 +188,6 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         {
             await _recipeComponentService.DeleteComponentAsync(_resourceUid, DuplicateUid);
             DuplicateUid = Guid.Empty;
-        }
-    }
-
-    public class SetRecipeComponentQuantityCommand : SetValueUndoableCommand<double>
-    {
-        private SetRecipeComponentQuantityCommand(double quantity, double savedValue, Func<double, Task> setter)
-            : base(quantity, savedValue, setter) { }
-
-        public static async Task<SetRecipeComponentQuantityCommand?> CreateAsync(IServiceProvider serviceProvider, Guid grandParentResourceUid, Guid recipeComponentUid, double amount)
-        {
-            var resourceService = serviceProvider.GetRequiredService<IRecipeComponentService>();
-            var component = await resourceService.GetComponentAsync(grandParentResourceUid, recipeComponentUid);
-            if (component == null)
-                throw new ArgumentException("Component not found with Uid: " + recipeComponentUid);
-
-            return new SetRecipeComponentQuantityCommand(amount, component.Quantity, async (value) =>
-            {
-                await resourceService.SetQuantityAsync(grandParentResourceUid, recipeComponentUid, value);
-            });
         }
     }
 

@@ -1,22 +1,29 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core;
 using Partlyx.Infrastructure.Data;
+using Partlyx.Infrastructure.Events;
+using Partlyx.Services.Dtos;
+using Partlyx.Services.PartsEventClasses;
+using Partlyx.Services.ServiceInterfaces;
 
 namespace Partlyx.Services.Commands.RecipeCommonCommands
 {
     public class CreateRecipeCommand : IUndoableCommand
     {
-        private IRecipeService _recipeService;
-        private IResourceRepository _resourceRepository;
+        private readonly IRecipeService _recipeService;
+        private readonly IResourceService _resourceService;
+        private readonly IResourceRepository _resourceRepository;
 
         private Guid _resourceUid;
         public Guid RecipeUid { get; private set; }
 
         private Recipe? _createdRecipe;
 
-        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceRepository rr)
+        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceService rs2, IResourceRepository rr)
         {
             _recipeService = rs;
+            _resourceService = rs2;
+            _resourceRepository = rr;
             _resourceUid = parentResourceUid;
         }
 
@@ -42,27 +49,35 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
                 (resource) =>
                 {
                     _createdRecipe.AttachTo(resource);
+
                     return Task.CompletedTask;
                 });
+
+            var resource = await _resourceService.GetResourceAsync(_resourceUid);
+            if (resource?.Recipes.Count == 1)
+                await _resourceService.SetDefaultRecipeAsync(_resourceUid, RecipeUid);
         }
     }
 
     public class DeleteRecipeCommand : IUndoableCommand
     {
-        private IRecipeService _recipeService;
-        private IResourceRepository _resourceRepository;
+        private readonly IRecipeService _recipeService;
+        private readonly IResourceService _resourceService;
+        private readonly IResourceRepository _resourceRepository;
 
         private Guid _resourceUid;
         public Guid RecipeUid { get; private set; }
 
         private Recipe? _deletedRecipe;
 
-        public DeleteRecipeCommand(Guid parentResourceUid, Guid recipeUid, IRecipeService rs, IResourceRepository rr)
+        public DeleteRecipeCommand(Guid parentResourceUid, Guid recipeUid, IRecipeService rs, IResourceService rs2, IResourceRepository rr)
         {
-            _resourceUid = parentResourceUid;
             _recipeService = rs;
-            RecipeUid = recipeUid;
+            _resourceService = rs2;
             _resourceRepository = rr;
+
+            _resourceUid = parentResourceUid;
+            RecipeUid = recipeUid;
         }
 
         public async Task ExecuteAsync()
@@ -85,16 +100,48 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
                 (resource) => 
                 {
                     _deletedRecipe.AttachTo(resource);
+
                     return Task.CompletedTask;
                 }); 
 
             _deletedRecipe = null;
+
+            var resource = await _resourceService.GetResourceAsync(_resourceUid);
+            if (resource?.Recipes.Count == 1)
+                await _resourceService.SetDefaultRecipeAsync(_resourceUid, RecipeUid);
+        }
+    }
+
+    public class MoveRecipeCommand : IUndoableCommand
+    {
+        private readonly IRecipeService _recipeService;
+
+        private Guid _resourceUid;
+        private Guid _newResourceUid;
+        private Guid _recipeUid;
+
+        public MoveRecipeCommand(Guid parentResourceUid, Guid newParentResourceUid, Guid recipeUid, IRecipeService rs)
+        {
+            _recipeService = rs;
+            _resourceUid = parentResourceUid;
+            _newResourceUid = newParentResourceUid;
+            _recipeUid = recipeUid;
+        }
+
+        public async Task ExecuteAsync()
+        {
+            await _recipeService.MoveRecipeAsync(_resourceUid, _newResourceUid, _recipeUid);
+        }
+
+        public async Task UndoAsync()
+        {
+            await _recipeService.MoveRecipeAsync(_newResourceUid, _resourceUid, _recipeUid);
         }
     }
 
     public class DuplicateRecipeCommand : IUndoableCommand
     {
-        private IRecipeService _recipeService;
+        private readonly IRecipeService _recipeService;
 
         private Guid _resourceUid;
         private Guid _recipeUid;

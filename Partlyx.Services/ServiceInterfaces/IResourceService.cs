@@ -1,7 +1,7 @@
 ﻿using Partlyx.Core;
 using Partlyx.Services.Dtos;
 
-namespace Partlyx.Services
+namespace Partlyx.Services.ServiceInterfaces
 {
     public interface IResourceService
     {

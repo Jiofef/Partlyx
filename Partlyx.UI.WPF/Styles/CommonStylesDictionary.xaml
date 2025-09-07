@@ -3,9 +3,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:Partlyx.UI.WPF">
 
+    
     <Style TargetType="Button" x:Key="BaseButtonStyle">
         <Setter Property="Margin" Value="2"/>
-        <Setter Property="MinHeight" Value="24"/>
+        <Setter Property="MinHeight" Value="32"/>
         <Setter Property="Background" Value="{StaticResource PxBlue1Brush}"/>
         <Setter Property="Foreground" Value="{StaticResource PxBlackBrush}"/>
         <Setter Property="FontSize" Value="16"/>
@@ -20,9 +21,13 @@
 
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource PxBlue0Brush}"/>
-                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                                <Condition Property="IsPressed" Value="False"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" Value="{StaticResource PxWhiteBrush}"/>
+                        </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -55,6 +60,9 @@
     </Style>
 
     <Style TargetType="TextBlock" x:Key="CommonTextBlock">
-  
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
     </Style>
+
+
+
 </ResourceDictionary>

@@ -1,6 +1,6 @@
 ﻿using Partlyx.Services.Dtos;
 
-namespace Partlyx.Services
+namespace Partlyx.Services.ServiceInterfaces
 {
     public interface IRecipeComponentService
     {
@@ -8,6 +8,7 @@ namespace Partlyx.Services
         Task DeleteComponentAsync(Guid parentResourceUid, Guid componentUid);
         Task<Guid> DuplicateComponentAsync(Guid parentResourceUid, Guid componentUid);
         Task<RecipeComponentDto?> GetComponentAsync(Guid parentResourceUid, Guid componentUid);
+        Task MoveComponentAsync(Guid grandParentResourceUid, Guid newGrandParentResourceUid, Guid parentRecipeUid, Guid newParentRecipeUid, Guid componentUid);
         Task SetComponentResourceAsync(Guid parentResourceUid, Guid componentUid, Guid resourceToSelectUid);
         Task SetQuantityAsync(Guid parentResourceUid, Guid componentUid, double quantity);
         Task SetResourceSelectedRecipeAsync(Guid parentResourceUid, Guid componentUid, Guid resourceToSelectUid);

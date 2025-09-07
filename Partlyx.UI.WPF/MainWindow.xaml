@@ -7,7 +7,9 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:viewmodel="clr-namespace:Partlyx.ViewModels;assembly=Partlyx.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1280"
+        Title="Partlyx" Height="720" Width="1280"
+        MinHeight="640" MinWidth="968"
+        Icon="/Images/Partlyx.ico"
         WindowState="Maximized"
         Background="#eef5ff">
 
@@ -17,37 +19,11 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="360"/>
         </Grid.ColumnDefinitions>
+        <local:ResourceListView DataContext="{Binding ResourceList}" 
+                                Grid.Row="0" Grid.Column="0" />
 
-        <StackPanel Background="{StaticResource PxBlue0Brush}"> 
-            <TextBlock Text="Resources" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center"/>
-
-            <Button Style="{StaticResource BaseButtonStyle}">
-                <Button.Content>
-                    <StackPanel>
-                        <fa:ImageAwesome Icon="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-            <Button Style="{StaticResource BaseButtonStyle}">
-                <Button.Content>
-                    <StackPanel>
-                        <fa:ImageAwesome Icon="Gear" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-
-        </StackPanel>   
-        
         <StackPanel Background="{StaticResource PxBlue0Brush}" Grid.Column="2">
-            <TextBlock Text="Recipes" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center"/>
+            
         </StackPanel>
-
-        <ContentControl Grid.Column="1" >
-
-        </ContentControl>
-
-        <UniformGrid VerticalAlignment="Center" Columns="4">
-
-        </UniformGrid>
     </Grid>
 </Window>

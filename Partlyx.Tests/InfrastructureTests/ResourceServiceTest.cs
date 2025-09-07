@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Infrastructure.Data;
-using Partlyx.Services;
+using Partlyx.Services.ServiceImplementations;
+using Partlyx.Services.ServiceInterfaces;
 using Partlyx.Tests.DataTests;
 
 namespace Partlyx.Tests

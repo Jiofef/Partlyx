@@ -1,4 +1,6 @@
-﻿namespace Partlyx.Services
+﻿using Partlyx.Services.ServiceInterfaces;
+
+namespace Partlyx.Services.ServiceImplementations
 {
     /// <summary>
     /// Facade class for all the parts services

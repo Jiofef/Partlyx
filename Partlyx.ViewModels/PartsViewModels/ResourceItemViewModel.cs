@@ -1,7 +1,9 @@
 ﻿using Partlyx.Infrastructure.Events;
-using Partlyx.Services;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
+using Partlyx.Services.ServiceImplementations;
+using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 
@@ -13,6 +15,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         private readonly IPartsService _service;
         private readonly IVMPartsStore _store;
         private readonly IVMPartsFactory _partsFactory;
+        private readonly IResourceItemUiStateService _uiStateService;
         
         // Events
         private readonly IEventBus _bus;
@@ -21,7 +24,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
 
-        public ResourceItemViewModel(ResourceDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus)
+        public ResourceItemViewModel(ResourceDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS)
         {
             Uid = dto.Uid;
 
@@ -30,6 +33,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             _store = store;
             _partsFactory = partsFactory;
             _bus = bus;
+            _uiStateService = uiStateS;
 
             // Info
             _name = dto.Name;
@@ -121,11 +125,15 @@ namespace Partlyx.ViewModels.PartsViewModels
             _subscription.Dispose();
             _childAddSubscription.Dispose();
             _childRemoveSubscription.Dispose();
+            _childMoveSubscription.Dispose();
 
             foreach (var recipe in  Recipes)
                 recipe.Dispose();
 
             _store.Resources.Remove(Uid);
         }
+
+        // For UI
+        public ResourceItemUIState Ui => _uiStateService.GetOrCreate(Uid);
     }
 }

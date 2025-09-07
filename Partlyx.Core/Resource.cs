@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Partlyx.Core.VisualsInfo;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Partlyx.Core
 {
@@ -10,13 +11,28 @@ namespace Partlyx.Core
             _recipes = new List<Recipe>();
         }
 
-        protected Resource() { Uid = new Guid(); }
+        protected Resource() { Uid = new Guid(); Name = "Resource"; }
 
         public Guid Uid { get; private set; }
 
         // Main features
 
         public string Name { get; set; }
+
+        public IconTypeEnum IconType { get; private set; }
+        public string IconData { get; private set; }
+        [NotMapped]
+        public IIcon? Icon { get; private set; }
+        public void SetIcon(IIcon icon, IconInfo info)
+        {
+            Icon = icon;
+            UpdateIconInfo(info);
+        }
+        public void UpdateIconInfo(IconInfo info)
+        {
+            IconType = info.Type;
+            IconData = info.Data;
+        }
 
         private readonly List<Recipe> _recipes = new();
         public IReadOnlyList<Recipe> Recipes => _recipes;
@@ -49,22 +65,11 @@ namespace Partlyx.Core
         internal void AddRecipeToList(Recipe recipe)
         {
             _recipes.Add(recipe);
-
-            // If the added recipe is the only one
-            if (_recipes.Count == 1)
-                SetDefaultRecipe(recipe);
         }
 
         internal void RemoveRecipeFromList(Recipe recipe)
         {
             _recipes.Remove(recipe);
-            if (DefaultRecipe == recipe)
-            {
-                if (_recipes.Count > 0)
-                    SetDefaultRecipe(_recipes[0]);
-                else
-                    SetDefaultRecipe(null);
-            }
         }
 
         public bool HasRecipe(Recipe recipe) => _recipes.Contains(recipe);
@@ -76,7 +81,7 @@ namespace Partlyx.Core
 
         public void SetDefaultRecipe(Recipe? recipe)
         {
-            if (!HasRecipe(recipe)) 
+            if (recipe != null && !HasRecipe(recipe)) 
                 throw new ArgumentException($"Attempt to set the default recipe that is not in the resource. Name of the resource: {Name}");
 
             DefaultRecipe = recipe;

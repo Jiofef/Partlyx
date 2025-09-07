@@ -1,27 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Partlyx.Core;
+﻿using Partlyx.Core;
+using Partlyx.Core.VisualsInfo;
 using Partlyx.Infrastructure.Data;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
-using System.Threading.Tasks;
-using System.Windows.Input;
+using Partlyx.Services.ServiceInterfaces;
 
-namespace Partlyx.Services
+namespace Partlyx.Services.ServiceImplementations
 {
     public class ResourceService : IResourceService
     {
         private readonly IResourceRepository _repo;
         private readonly IEventBus _eventBus;
-        public ResourceService(IResourceRepository repo, IEventBus bus)
+        private readonly IIconInfoProvider _infoProvider;
+        public ResourceService(IResourceRepository repo, IEventBus bus, IIconInfoProvider iip)
         {
             _repo = repo;
             _eventBus = bus;
+            _infoProvider = iip;
         }
 
         public async Task<Guid> CreateResourceAsync()
         {
             var resource = new Resource();
+            var icon = new FigureIcon();
+            var iconInfo = _infoProvider.GetInfo(icon);
+            resource.SetIcon(icon, iconInfo);
+            
             var Uid = await _repo.AddAsync(resource);
 
             _eventBus.Publish(new ResourceCreatedEvent(resource.ToDto()));
