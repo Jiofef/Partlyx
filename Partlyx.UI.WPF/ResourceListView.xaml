@@ -1,6 +1,8 @@
 ﻿<UserControl x:Class="Partlyx.UI.WPF.ResourceListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
              xmlns:fa="http://schemas.fontawesome.io/icons/">
     <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
@@ -17,14 +19,14 @@
         </StackPanel>
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Style="{StaticResource FavsScrollViewer}">
-                <ItemsControl ItemsSource="{Binding Resources}" HorizontalContentAlignment="Stretch">
-                    <ItemsControl.ItemsPanel>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource FavsScrollViewer}">
+                <ListView ItemsSource="{Binding Resources}" HorizontalContentAlignment="Stretch" Margin="0,0,10,0" Style="{StaticResource CommonListView}" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
+                    <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
                         </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="32">
                                 <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
@@ -35,12 +37,20 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
-                                    <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"/>
+                                    <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"
+                                               MouseDown="NameBlock_MouseDown" Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVis}}"/>
+                                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Column="1"
+                                             LostKeyboardFocus="NameBox_LostFocus" KeyDown="NameBox_KeyDown" Visibility="{Binding Ui.IsRenaming, Converter={StaticResource BoolToVis}}">
+                                        <i:Interaction.Behaviors>
+                                            <beh:FocusBehavior IsFocused="{Binding Ui.IsRenaming, Mode=TwoWay}"
+                                                               SelectAllOnFocus="True"/>
+                                        </i:Interaction.Behaviors>
+                                    </TextBox>
                                 </Grid>
                             </Grid>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ListView.ItemTemplate>
+                </ListView>
             </ScrollViewer>
         </Grid>
         <Grid Grid.Row="2">

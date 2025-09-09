@@ -63,6 +63,9 @@
         <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
     </Style>
 
+    <Style TargetType="ListView" x:Key="CommonListView">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
+    </Style>
 
 
 </ResourceDictionary>

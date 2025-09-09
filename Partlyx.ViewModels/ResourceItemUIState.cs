@@ -1,8 +1,12 @@
-﻿namespace Partlyx.ViewModels
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+namespace Partlyx.ViewModels
 {
-    public class ResourceItemUIState
+    public class ResourceItemUIState : ObservableObject
     {
-        public bool IsSelected { get; set; }
-        public bool IsRenaming { get; set; }
+        private bool isSelected;
+        private bool isRenaming;
+
+        public bool IsSelected { get => isSelected; set => SetProperty(ref isRenaming, value); }
+        public bool IsRenaming { get => isRenaming; set => SetProperty(ref isRenaming, value); }
     }
 }

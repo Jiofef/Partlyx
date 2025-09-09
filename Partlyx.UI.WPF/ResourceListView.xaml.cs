@@ -1,5 +1,8 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using Partlyx.ViewModels.PartsViewModels;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
 namespace Partlyx.UI.WPF
 {
     /// <summary>
@@ -23,6 +27,34 @@ namespace Partlyx.UI.WPF
         public ResourceListView()
         {
             InitializeComponent();
+        }
+
+        private void NameBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                if (sender is TextBlock tb && tb.DataContext is ResourceItemViewModel vm)
+                {
+                    vm.Ui.IsRenaming = true;
+                }
+            }
+        }
+
+        private void NameBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox tb && tb.DataContext is ResourceItemViewModel vm)
+            {
+                vm.Ui.IsRenaming = false;
+            }    
+        }
+
+        private void NameBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (sender is TextBox tb && tb.DataContext is ResourceItemViewModel vm)
+            {
+                if (e.Key == Key.Enter)
+                    vm.Ui.IsRenaming = false;
+            }
         }
     }
 }

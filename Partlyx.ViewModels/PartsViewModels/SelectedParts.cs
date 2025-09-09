@@ -2,6 +2,7 @@
 using Partlyx.Core;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,48 +11,102 @@ namespace Partlyx.ViewModels.PartsViewModels
 {
     public class SelectedParts : ObservableObject, ISelectedParts
     {
-        private ResourceItemViewModel? _resource;
-        private RecipeItemViewModel? _recipe;
-        private RecipeComponentItemViewModel? _component;
+        public ObservableCollection<ResourceItemViewModel> Resources { get; }
 
-        public ResourceItemViewModel? Resource { get => _resource; private set => SetProperty(ref _resource, value); }
+        public ObservableCollection<RecipeItemViewModel> Recipes { get; }
 
-        public RecipeItemViewModel? Recipe { get => _recipe; private set => SetProperty(ref _recipe, value); }
+        public ObservableCollection<RecipeComponentItemViewModel> Components { get; }
 
-        public RecipeComponentItemViewModel? Component { get => _component; private set => SetProperty(ref _component, value); }
-
-        public void SetResource(ResourceItemViewModel? resource)
+        public SelectedParts()
         {
-            if (resource == Resource) return;
-
-            Resource = resource;
-
-            if (resource == null || resource.Recipes.Contains(Recipe))
-            {
-                Recipe = null;
-                Component = null;
-                return;
-            }
+            Resources = new();
+            Recipes = new();
+            Components = new();
         }
 
-        public void SetRecipe(RecipeItemViewModel? recipe)
+        #region Resource methods
+        public void SelectSingleResource(ResourceItemViewModel resource)
         {
-            if (recipe == Recipe) return;
+            if (Resources.Count == 1 && Resources.Contains(resource)) return;
 
-            Recipe = recipe;
-
-            if (recipe == null || recipe.Components.Contains(_component))
-            {
-                Component = null;
-                return;
-            }
+            ClearSelectedResources();
+            
+            Resources.Add(resource);
         }
 
-        public void SetComponent(RecipeComponentItemViewModel? component)
+        public void AddResourceToSelected(ResourceItemViewModel resource)
         {
-            if (component == Component) return;
-
-            Component = component;
+            if (Resources.Contains(resource!)) return;
+            Resources.Add(resource);
         }
+
+        public void ClearSelectedResources()
+        {
+            Resources.Clear();
+            ClearSelectedRecipes();
+        }
+
+        public ResourceItemViewModel? GetSingleResourceOrNull()
+        {
+            bool isResourceSingle = Resources.Count == 1;
+            return isResourceSingle ? Resources.Single() : null;
+        }
+        #endregion
+
+        #region Recipe methods
+        public void SelectSingleRecipe(RecipeItemViewModel recipe)
+        {
+            if (Recipes.Count == 1 && Recipes.Contains(recipe)) return;
+
+            ClearSelectedRecipes();
+
+            Recipes.Add(recipe);
+        }
+
+        public void AddRecipeToSelected(RecipeItemViewModel recipe)
+        {
+            if (Recipes.Contains(recipe!)) return;
+            Recipes.Add(recipe);
+        }
+
+        public void ClearSelectedRecipes()
+        {
+            Resources.Clear();
+            ClearSelectedComponents();
+        }
+
+        public RecipeItemViewModel? GetSingleRecipeOrNull()
+        {
+            bool isRecipeSingle = Recipes.Count == 1;
+            return isRecipeSingle ? Recipes.Single() : null;
+        }
+        #endregion
+
+        #region Component methods
+        public void SelectSingleComponent(RecipeComponentItemViewModel component)
+        {
+            if (Components.Count == 1 && Components.Contains(component)) return;
+
+            ClearSelectedComponents();
+
+            Components.Add(component);
+        }
+        public void AddComponentToSelected(RecipeComponentItemViewModel component)
+        {
+            if (Components.Contains(component!)) return;
+            Components.Add(component);
+        }
+
+        public void ClearSelectedComponents()
+        {
+            Components.Clear();
+        }
+
+        public RecipeComponentItemViewModel? GetSingleComponentOrNull()
+        {
+            bool isComponentSingle = Components.Count == 1;
+            return isComponentSingle ? Components.Single() : null;
+        }
+        #endregion
     }
 }
