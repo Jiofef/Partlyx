@@ -13,23 +13,35 @@ namespace Partlyx.ViewModels.PartsViewModels
             _store = repository;
         }
 
-        public ResourceItemViewModel CreateResourceVM(ResourceDto dto)
+        public ResourceItemViewModel GetOrCreateResourceVM(ResourceDto dto)
         {
-            var resource = CreateViewModelFrom<ResourceItemViewModel>(dto);
+            ResourceItemViewModel? resource = _store.Resources.GetValueOrDefault(dto.Uid);
+            if (resource != null)
+                return resource;
+
+            resource = CreateViewModelFrom<ResourceItemViewModel>(dto);
             _store.Register(resource);
             return resource;
         }
 
-        public RecipeItemViewModel CreateRecipeVM(RecipeDto dto)
+        public RecipeItemViewModel GetOrCreateRecipeVM(RecipeDto dto)
         {
-            var recipe = CreateViewModelFrom<RecipeItemViewModel>(dto);
+            RecipeItemViewModel? recipe = _store.Recipes.GetValueOrDefault(dto.Uid);
+            if (recipe != null)
+                return recipe;
+
+            recipe = CreateViewModelFrom<RecipeItemViewModel>(dto);
             _store.Register(recipe);
             return recipe;
         }
 
-        public RecipeComponentItemViewModel CreateRecipeComponentVM(RecipeComponentDto dto)
+        public RecipeComponentItemViewModel GetOrCreateRecipeComponentVM(RecipeComponentDto dto)
         {
-            var component = CreateViewModelFrom<RecipeComponentItemViewModel>(dto);
+            RecipeComponentItemViewModel? component = _store.RecipeComponents.GetValueOrDefault(dto.Uid);
+            if (component != null)
+                return component;
+
+            component = CreateViewModelFrom<RecipeComponentItemViewModel>(dto);
             _store.Register(component);
             return component;
         }

@@ -11,7 +11,7 @@ namespace Partlyx.Core
             _recipes = new List<Recipe>();
         }
 
-        protected Resource() { Uid = new Guid(); Name = "Resource"; }
+        protected Resource() { Uid = Guid.NewGuid(); Name = "Resource"; }
 
         public Guid Uid { get; private set; }
 
@@ -112,6 +112,14 @@ namespace Partlyx.Core
         public Resource Clone()
         {
             var clone = new Resource();
+            clone.Name = Name;
+            if (Icon is ICloneable cloneableIcon)
+            {
+                var iconClone = (IIcon)cloneableIcon.Clone();
+                var info = new IconInfo(IconType, IconData);
+                clone.SetIcon(iconClone, info);
+            }
+
             foreach (var recipe in _recipes)
             {
                 if (DefaultRecipe != recipe)
@@ -122,7 +130,6 @@ namespace Partlyx.Core
                     clone.SetDefaultRecipe(newDefaultRecipe);
                 }
             }
-
 
             return clone;
         }

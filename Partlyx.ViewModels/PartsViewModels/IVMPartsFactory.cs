@@ -4,8 +4,8 @@ namespace Partlyx.ViewModels.PartsViewModels
 {
     public interface IVMPartsFactory
     {
-        RecipeComponentItemViewModel CreateRecipeComponentVM(RecipeComponentDto dto);
-        RecipeItemViewModel CreateRecipeVM(RecipeDto dto);
-        ResourceItemViewModel CreateResourceVM(ResourceDto dto);
+        RecipeComponentItemViewModel GetOrCreateRecipeComponentVM(RecipeComponentDto dto);
+        RecipeItemViewModel GetOrCreateRecipeVM(RecipeDto dto);
+        ResourceItemViewModel GetOrCreateResourceVM(ResourceDto dto);
     }
 }

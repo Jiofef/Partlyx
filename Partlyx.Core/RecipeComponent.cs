@@ -15,6 +15,7 @@ namespace Partlyx.Core
                 ParentRecipe = parentRecipe,
                 ComponentResource = component,
                 Quantity = quantity,
+                Uid = new Guid()
             };
 
             return recipeComponent;
@@ -48,7 +49,7 @@ namespace Partlyx.Core
         }
 
 
-        protected RecipeComponent() { Uid = new Guid(); }
+        protected RecipeComponent() { Uid = Guid.NewGuid(); }
 
         public Guid Uid { get; private set; }
 
@@ -80,9 +81,9 @@ namespace Partlyx.Core
         }
 
         [NotMapped]
-        private Recipe? _componentSelectedRecipe = null; // null means default value for recipe. See Resource.DefaultRecipe
+        private Recipe? _componentSelectedRecipe = null; // Null means default value for recipe. See Resource.DefaultRecipe
         [NotMapped]
-        public Recipe ComponentSelectedRecipe
+        public Recipe? ComponentSelectedRecipe // Must be null when resource doesn't contain any recipes
         {
             get => _componentSelectedRecipe ?? ComponentResource.DefaultRecipe;
         }
@@ -110,6 +111,8 @@ namespace Partlyx.Core
         public RecipeComponent CopyTo(Recipe recipe)
         {
             var copy = CloneDetached();
+
+            copy.ParentRecipe = recipe;
             recipe.AddRecipeComponentToList(copy);
 
             return copy;

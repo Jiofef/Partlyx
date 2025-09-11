@@ -4,17 +4,19 @@ using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Collections.ObjectModel;
 using System.Xml.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels
 {
-    public class RecipeItemViewModel : UpdatableViewModel<RecipeDto>, IDisposable
+    public class RecipeItemViewModel : UpdatableViewModel<RecipeDto>, IVMPart
     {
         // Services
         private readonly IPartsService _service;
         private readonly IVMPartsStore _store;
         private readonly IVMPartsFactory _partsFactory;
+        private readonly IRecipeItemUiStateService _uiStateService;
 
         // Events
         private readonly IEventBus _bus;
@@ -23,7 +25,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
 
-        public RecipeItemViewModel(RecipeDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus)
+        public RecipeItemViewModel(RecipeDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeItemUiStateService uiStateS)
         {
             Uid = dto.Uid;
 
@@ -32,14 +34,16 @@ namespace Partlyx.ViewModels.PartsViewModels
             _store = store;
             _partsFactory = partsFactory;
             _bus = bus;
+            _uiStateService = uiStateS;
 
             // Info
             _parentResourceUid = dto.ParentResourceUid;
+            _name = dto.Name;
             _craftAmount = dto.CraftAmount;
             
             foreach (var component in dto.Components)
             {
-                var vm = _partsFactory.CreateRecipeComponentVM(component);
+                var vm = _partsFactory.GetOrCreateRecipeComponentVM(component);
                 _components.Add(vm);
             }
 
@@ -57,6 +61,9 @@ namespace Partlyx.ViewModels.PartsViewModels
         public Guid? ParentResourceUid { get => _parentResourceUid; set => SetProperty(ref _parentResourceUid, value); }
         public ResourceItemViewModel? ParentResource => ParentResourceUid != null ? _store.Resources[(Guid)ParentResourceUid] : null;
 
+        private string _name;
+        public string Name { get => _name; set => SetProperty(ref _name, value); }
+
         private double _craftAmount;
         public double CraftAmount { get => _craftAmount; set => SetProperty(ref _craftAmount, value); }
 
@@ -67,6 +74,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         // Info updating
         protected override Dictionary<string, Action<RecipeDto>> ConfigureUpdaters() => new()
         {
+            { nameof(RecipeDto.Name), dto => Name = dto.Name },
             { nameof(RecipeDto.CraftAmount), dto => CraftAmount = dto.CraftAmount },
         };
 
@@ -81,7 +89,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         {
             if (Uid != ev.RecipeComponent.ParentRecipeUid) return;
 
-            var componentVM = _partsFactory.CreateRecipeComponentVM(ev.RecipeComponent);
+            var componentVM = _partsFactory.GetOrCreateRecipeComponentVM(ev.RecipeComponent);
             Components.Add(componentVM);
         }
 
@@ -129,5 +137,8 @@ namespace Partlyx.ViewModels.PartsViewModels
 
             _store.Recipes.Remove(Uid);
         }
+
+        // For UI
+        public RecipeItemUIState Ui => _uiStateService.GetOrCreate(Uid);
     }
 }

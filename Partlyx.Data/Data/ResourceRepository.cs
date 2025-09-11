@@ -2,6 +2,7 @@
 using Partlyx.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -104,9 +105,12 @@ namespace Partlyx.Infrastructure.Data
             if (r == null) throw ResourceNotFound(resourceUid);
 
             var result = await action(r);
+
             await db.SaveChangesAsync();
+
             return result;
         }
+
 
         public Task ExecuteOnResourceAsync(Guid resourceUid, Func<Resource, Task> action)
         {

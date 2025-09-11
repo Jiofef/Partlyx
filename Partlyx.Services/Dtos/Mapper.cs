@@ -20,6 +20,7 @@ namespace Partlyx.Services.Dtos
             return new RecipeDto(
                 recipe.Uid,
                 recipe.ParentResource?.Uid,
+                recipe.Name,
                 recipe.CraftAmount,
                 recipe.Components.Select(c => c.ToDto()).ToList()
                 );

@@ -4,6 +4,7 @@ using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
+using System.Diagnostics;
 
 namespace Partlyx.Services.ServiceImplementations
 {
@@ -26,7 +27,7 @@ namespace Partlyx.Services.ServiceImplementations
             {
                 var recipe = resource.CreateRecipe();
 
-                if (recipe.ParentResource?.DefaultRecipe == recipe)
+                if (recipe.ParentResource?.DefaultRecipe == null)
                 {
                     resource.SetDefaultRecipe(recipe);
                     defaultRecipeChangedEvent = new(resource.ToDto(), ["DefaultRecipeUid"]);
@@ -38,6 +39,7 @@ namespace Partlyx.Services.ServiceImplementations
             var recipe = await GetRecipeAsync(parentResourceUid, result);
             if (recipe != null)
             {
+                Trace.WriteLine("---\n" + new StackTrace() + "\n---");
                 _eventBus.Publish(new RecipeCreatedEvent(recipe));
 
                 if (defaultRecipeChangedEvent != null)
@@ -142,7 +144,7 @@ namespace Partlyx.Services.ServiceImplementations
             var resource = await _repo.GetByUidAsync(parentResourceUid);
             if (resource == null) return null;
 
-            var recipe = resource.Recipes.FirstOrDefault(x => x.Uid == recipeUid);
+            var recipe = resource.GetRecipeByUid(recipeUid);
 
             return recipe != null ? recipe.ToDto() : null;
         }
@@ -158,6 +160,19 @@ namespace Partlyx.Services.ServiceImplementations
             var recipesDto = recipes.Select(r => r.ToDto()).ToList();
 
             return recipesDto;
+        }
+
+        public async Task SetRecipeNameAsync(Guid parentResourceUid, Guid recipeUid, string name)
+        {
+            await _repo.ExecuteOnRecipeAsync(parentResourceUid, recipeUid, recipe =>
+            {
+                recipe.Name = name;
+                return Task.CompletedTask;
+            });
+
+            var recipe = await GetRecipeAsync(parentResourceUid, recipeUid);
+            if (recipe != null)
+                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "Name" }));
         }
 
         public async Task SetRecipeCraftAmountAsync(Guid parentResourceUid, Guid recipeUid, double craftAmount)

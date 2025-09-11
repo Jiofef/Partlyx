@@ -17,6 +17,8 @@ using Partlyx.Services.ServiceImplementations;
 using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
+using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace Partlyx.UI.WPF
 {
@@ -43,7 +45,7 @@ namespace Partlyx.UI.WPF
             // DB
             services.AddSingleton<SqliteConnection>(sp =>
             {
-                var conn = new SqliteConnection("DataSource=:memory:;Cache=Shared");
+                var conn = new SqliteConnection("DataSource=partlyx.db");
                 conn.Open();
                 return conn;
             });
@@ -83,7 +85,7 @@ namespace Partlyx.UI.WPF
 
             services.AddTransient<ResourceListViewModel>();
             services.AddTransient<RecipeListViewModel>();
-            services.AddTransient<RecipeComponentsViewModel>();
+            services.AddTransient<RecipeComponentListViewModel>();
             services.AddTransient<PartsTreeViewModel>();
 
             services.AddTransient<MainWindow>();
@@ -96,8 +98,11 @@ namespace Partlyx.UI.WPF
             services.AddTransient<RecipeComponentItemViewModel>();
 
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
+            services.AddSingleton<ISelectedParts, SelectedParts>();
 
             services.AddTransient<IResourceItemUiStateService, ResourceItemUiStateService>();
+            services.AddTransient<IRecipeItemUiStateService, RecipeItemUiStateService>();
+            services.AddTransient<IRecipeComponentItemUiStateService, RecipeComponentItemUiStateService>();
 
             Services = services.BuildServiceProvider();
         }

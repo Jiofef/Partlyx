@@ -3,22 +3,25 @@ using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.UIServices.Implementations;
+using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels
 {
-    public class RecipeComponentItemViewModel : UpdatableViewModel<RecipeComponentDto>, IDisposable
+    public class RecipeComponentItemViewModel : UpdatableViewModel<RecipeComponentDto>, IVMPart
     {
         // Servicess
         private readonly IPartsService _service;
         private readonly IVMPartsStore _store;
         private readonly IVMPartsFactory _partsFactory;
+        private readonly IRecipeComponentItemUiStateService _uiStateService;
 
         // Events
         private readonly IEventBus _bus;
         private readonly IDisposable _subscription;
 
-        public RecipeComponentItemViewModel(RecipeComponentDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus)
+        public RecipeComponentItemViewModel(RecipeComponentDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS)
         {
             Uid = dto.Uid;
 
@@ -27,6 +30,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             _store = store;
             _partsFactory = partsFactory;
             _bus = bus;
+            _uiStateService = uiStateS;
 
             // Info
             _parentRecipeUid = dto.ParentRecipeUid;
@@ -88,5 +92,8 @@ namespace Partlyx.ViewModels.PartsViewModels
 
             _store.RecipeComponents.Remove(Uid);
         }
+
+        // For UI
+        public RecipeComponentUIState Ui => _uiStateService.GetOrCreate(Uid);
     }
 }

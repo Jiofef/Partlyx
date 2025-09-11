@@ -9,21 +9,21 @@ using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.UIServices.Implementations
 {
-    public class ResourceItemUiStateService : IResourceItemUiStateService
+    public class RecipeItemUiStateService : IRecipeItemUiStateService
     {
         private IServiceProvider _provider { get; }
-        public ResourceItemUiStateService(IServiceProvider provider) 
+        public RecipeItemUiStateService(IServiceProvider provider)
         {
             _provider = provider;
         }
-        private readonly Dictionary<Guid, ResourceItemUIState> _states = new();
+        private readonly Dictionary<Guid, RecipeItemUIState> _states = new();
 
-        public ResourceItemUIState GetOrCreate(Guid uid)
+        public RecipeItemUIState GetOrCreate(Guid uid)
         {
             var state = _states.GetValueOrDefault(uid);
             if (state == null)
             {
-                state = (ResourceItemUIState)ActivatorUtilities.CreateInstance(_provider, typeof(ResourceItemUIState), uid);
+                state = (RecipeItemUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeItemUIState), uid);
                 _states.Add(uid, state);
             }
             return state;

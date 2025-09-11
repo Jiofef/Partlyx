@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Partlyx.ViewModels.PartsViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,21 +9,24 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 {
     public class MainViewModel
     {
+        public ISelectedParts SelectedParts { get; }
         public ResourceListViewModel ResourceList { get; }
-        public RecipeListViewModel RecipeEditor { get; }
-        public RecipeComponentsViewModel RecipeComponents { get; }
+        public RecipeListViewModel RecipeList { get; }
+        public RecipeComponentListViewModel RecipeComponents { get; }
 
         public PartsTreeViewModel PartsTree { get; }
 
         public MainViewModel(
-            ResourceListViewModel resourceList, RecipeListViewModel recipeEditor, 
-            RecipeComponentsViewModel recipeComponents, PartsTreeViewModel partsTree
+            ResourceListViewModel resourceList, RecipeListViewModel recipeList, 
+            RecipeComponentListViewModel recipeComponents, PartsTreeViewModel partsTree,
+            ISelectedParts selectedParts
             )
         {
             ResourceList = resourceList;
-            RecipeEditor = recipeEditor;
+            RecipeList = recipeList;
             RecipeComponents = recipeComponents;
             PartsTree = partsTree;
+            SelectedParts = selectedParts;
         }
     }
 }

@@ -10,11 +10,12 @@ namespace Partlyx.Core
 
         public bool IsDetached => ParentResource == null;
 
-        public static Recipe CreateForResource(Resource parentResource)
+        public static Recipe CreateForResource(Resource parentResource, string name = "Recipe")
         {
             var recipe = new Recipe()
             {
                 ParentResource = parentResource,
+                Name = name,
             };
 
             return recipe;
@@ -48,12 +49,13 @@ namespace Partlyx.Core
 
         internal bool RemoveRecipeComponentFromList(RecipeComponent component) => _components.Remove(component);
 
-        protected Recipe() { Uid = new Guid(); }
+        protected Recipe() { Uid = Guid.NewGuid(); Name = "Recipe"; }
 
         public Guid Uid { get; private set; }
 
         // Main features
-        private List<RecipeComponent> _components { get; set; } = new List<RecipeComponent>();
+        public string Name { get; set; }
+        private readonly List<RecipeComponent> _components = new List<RecipeComponent>();
         public IReadOnlyList<RecipeComponent> Components => _components;
         public double CraftAmount { get; set; } = 1;
 
@@ -149,6 +151,7 @@ namespace Partlyx.Core
         {
             var copy = CloneDetached();
 
+            copy.ParentResource = resource;
             resource.AddRecipeToList(copy);
 
             return copy;
@@ -161,6 +164,8 @@ namespace Partlyx.Core
         public Recipe CloneDetached()
         {
             var clone = CreateDetached();
+            clone.Name = Name;
+            clone.CraftAmount = CraftAmount;
 
             foreach (var component in _components)
                 component.CopyTo(clone);

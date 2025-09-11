@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Partlyx.ViewModels.UIObjectViewModels
+namespace Partlyx.ViewModels.PartsViewModels
 {
-    public class RecipeComponentsViewModel
+    internal interface IVMPart : IDisposable
     {
     }
 }

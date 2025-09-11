@@ -1,8 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Partlyx.Core;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
-using Partlyx.Services.Commands.RecipeCommonCommands;
+using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.UIObjectViewModels
 {
-    public partial class RecipeListViewModel : ObservableObject, IDisposable
+    public partial class RecipeComponentListViewModel : ObservableObject, IDisposable
     {
         private readonly IVMPartsFactory _partsFactory;
         private readonly ICommandFactory _commandFactory;
@@ -27,44 +28,44 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public ISelectedParts SelectedParts { get; }
 
-        public ObservableCollection<RecipeItemViewModel> Recipes { get; } = new();
+        public ObservableCollection<RecipeComponentItemViewModel> Components { get; } = new();
 
-        public RecipeListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, ISelectedParts sp)
+        public RecipeComponentListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, ISelectedParts sp)
         {
             _partsFactory = vmpf;
             _commandFactory = cf;
             _commandDispatcher = cd;
             SelectedParts = sp;
 
-            _childAddSubscription = bus.Subscribe<RecipeCreatedEvent>(OnRecipeCreated, true);
-            _childRemoveSubscription = bus.Subscribe<RecipeDeletedEvent>(OnRecipeDeleted, true);
+            _childAddSubscription = bus.Subscribe<RecipeComponentCreatedEvent>(OnComponentCreated, true);
+            _childRemoveSubscription = bus.Subscribe<RecipeComponentDeletedEvent>(OnComponentDeleted, true);
 
-            Recipes = new ObservableCollection<RecipeItemViewModel>();
+            Components = new ObservableCollection<RecipeComponentItemViewModel>();
         }
 
-        private void AddFromDto(RecipeDto dto)
+        private void AddFromDto(RecipeComponentDto dto)
         {
-            var recipeVM = _partsFactory.GetOrCreateRecipeVM(dto);
-            Recipes.Add(recipeVM);
+            var componentVM = _partsFactory.GetOrCreateRecipeComponentVM(dto);
+            Components.Add(componentVM);
         }
-        private void OnRecipeCreated(RecipeCreatedEvent ev)
+        private void OnComponentCreated(RecipeComponentCreatedEvent ev)
         {
-            AddFromDto(ev.Recipe);
+            AddFromDto(ev.RecipeComponent);
         }
 
-        private void OnRecipeDeleted(RecipeDeletedEvent ev)
+        private void OnComponentDeleted(RecipeComponentDeletedEvent ev)
         {
-            var recipeVM = Recipes.FirstOrDefault(c => c.Uid == ev.RecipeUid);
-            if (recipeVM != null)
+            var componentVM = Components.FirstOrDefault(c => c.Uid == ev.RecipeComponentUid);
+            if (componentVM != null)
             {
-                Recipes.Remove(recipeVM);
-                recipeVM.Dispose();
+                Components.Remove(componentVM);
+                componentVM.Dispose();
             }
         }
 
-        private void OnRecipeBulkLoaded(RecipesBulkLoadedEvent ev)
+        public void OnComponentsBulkLoaded(RecipeComponentsBulkLoadedEvent ev)
         {
-            Recipes.Clear();
+            Components.Clear();
 
             foreach (var dto in ev.Bulk)
                 AddFromDto(dto);
@@ -77,13 +78,13 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         }
 
         [RelayCommand]
-        private async Task CreateRecipeAsync()
+        private async Task CreateComponentAsync()
         {
-            var parent = SelectedParts.GetSingleResourceOrNull();
+            var parent = SelectedParts.GetSingleRecipeOrNull();
             if (parent == null)
                 throw new InvalidOperationException("Create command shouldn't be called when created part's parent isn't selected");
 
-            var command = _commandFactory.Create<CreateRecipeCommand>(parent.Uid);
+            var command = _commandFactory.Create<CreateRecipeComponentCommand>(parent.ParentResource!, parent.Uid);
             await _commandDispatcher.ExcecuteAsync(command);
         }
     }

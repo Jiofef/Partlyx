@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Partlyx.ViewModels.PartsViewModels
 {
-    public class ResourceItemViewModel : UpdatableViewModel<ResourceDto>, IDisposable
+    public class ResourceItemViewModel : UpdatableViewModel<ResourceDto>, IVMPart
     {
         // Services
         private readonly IPartsService _service;
@@ -41,7 +41,7 @@ namespace Partlyx.ViewModels.PartsViewModels
 
             foreach (var recipe in dto.Recipes)
             {
-                var vm = _partsFactory.CreateRecipeVM(recipe);
+                var vm = _partsFactory.GetOrCreateRecipeVM(recipe);
                 _recipes.Add(vm);
             }
 
@@ -84,7 +84,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         {
             if (Uid != ev.Recipe.ParentResourceUid) return;
 
-            var recipeVM = _partsFactory.CreateRecipeVM(ev.Recipe);
+            var recipeVM = _partsFactory.GetOrCreateRecipeVM(ev.Recipe);
             Recipes.Add(recipeVM);
         }
 

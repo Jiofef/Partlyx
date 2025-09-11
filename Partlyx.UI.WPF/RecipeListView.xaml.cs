@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Partlyx.ViewModels.PartsViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,30 @@ namespace Partlyx.UI.WPF
         public RecipeListView()
         {
             InitializeComponent();
+        }
+
+        private void NameBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                if (sender is TextBlock tb && tb.DataContext is RecipeItemViewModel vm)
+                    vm.Ui.IsRenaming = true;
+            }
+        }
+
+        private void NameBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox tb && tb.DataContext is RecipeItemViewModel vm)
+                vm.Ui.IsRenaming = false;
+        }
+
+        private void NameBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (sender is TextBox tb && tb.DataContext is RecipeItemViewModel vm)
+            {
+                if (e.Key == Key.Enter)
+                    vm.Ui.IsRenaming = false;
+            }
         }
     }
 }
