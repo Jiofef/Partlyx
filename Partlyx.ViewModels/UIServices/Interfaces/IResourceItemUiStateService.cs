@@ -1,7 +1,9 @@
-﻿namespace Partlyx.ViewModels.UIServices.Interfaces
+﻿using Partlyx.ViewModels.PartsViewModels;
+
+namespace Partlyx.ViewModels.UIServices.Interfaces
 {
     public interface IResourceItemUiStateService
     {
-        ResourceItemUIState GetOrCreate(Guid id);
+        ResourceItemUIState GetOrCreate(ResourceItemViewModel vm);
     }
 }

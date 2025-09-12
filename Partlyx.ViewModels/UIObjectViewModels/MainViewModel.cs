@@ -9,7 +9,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 {
     public class MainViewModel
     {
-        public ISelectedParts SelectedParts { get; }
+        public IGlobalSelectedParts SelectedParts { get; }
         public ResourceListViewModel ResourceList { get; }
         public RecipeListViewModel RecipeList { get; }
         public RecipeComponentListViewModel RecipeComponents { get; }
@@ -19,7 +19,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public MainViewModel(
             ResourceListViewModel resourceList, RecipeListViewModel recipeList, 
             RecipeComponentListViewModel recipeComponents, PartsTreeViewModel partsTree,
-            ISelectedParts selectedParts
+            IGlobalSelectedParts selectedParts
             )
         {
             ResourceList = resourceList;

@@ -3,7 +3,7 @@
 namespace Partlyx.Services.ServiceImplementations
 {
     /// <summary>
-    /// Facade class for all the parts services
+    /// Container class for all the parts services
     /// </summary>
     public class PartsService : IPartsService
     {

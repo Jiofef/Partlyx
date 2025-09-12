@@ -134,6 +134,6 @@ namespace Partlyx.ViewModels.PartsViewModels
         }
 
         // For UI
-        public ResourceItemUIState Ui => _uiStateService.GetOrCreate(Uid);
+        public ResourceItemUIState Ui => _uiStateService.GetOrCreate(this);
     }
 }

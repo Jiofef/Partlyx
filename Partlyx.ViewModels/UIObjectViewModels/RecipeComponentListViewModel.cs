@@ -26,11 +26,11 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IDisposable _childAddSubscription;
         private readonly IDisposable _childRemoveSubscription;
 
-        public ISelectedParts SelectedParts { get; }
+        public IGlobalSelectedParts SelectedParts { get; }
 
         public ObservableCollection<RecipeComponentItemViewModel> Components { get; } = new();
 
-        public RecipeComponentListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, ISelectedParts sp)
+        public RecipeComponentListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IGlobalSelectedParts sp)
         {
             _partsFactory = vmpf;
             _commandFactory = cf;

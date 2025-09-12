@@ -24,7 +24,7 @@
 
         <UniformGrid Grid.Column="2" Rows="2">
             <local:RecipeListView DataContext="{Binding RecipeList}"/>
-            <local:RecipeListView DataContext="{Binding RecipeList}"/>
+            
         </UniformGrid>
     </Grid>
 </Window>

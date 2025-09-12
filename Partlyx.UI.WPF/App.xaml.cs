@@ -62,9 +62,9 @@ namespace Partlyx.UI.WPF
 
             services.AddTransient<IResourceRepository, ResourceRepository>();
 
-
             // Services
-            services.AddTransient<Services.Commands.ICommandDispatcher, Services.Commands.CommandDispatcher>();
+            services.AddTransient<IServiceProvider, ServiceProvider>();
+
             services.AddTransient<IResourceService, ResourceService>();
             services.AddTransient<IRecipeService, RecipeService>();
             services.AddTransient<IRecipeComponentService, RecipeComponentService>();
@@ -74,9 +74,9 @@ namespace Partlyx.UI.WPF
             services.AddTransient<IResourceFigureIconService, ResourceFigureIconService>();
             services.AddTransient<IResourceImageIconService, ResourceImageIconService>();
 
-            services.AddSingleton<Services.Commands.CommandDispatcher>();
-            services.AddTransient<IServiceProvider, ServiceProvider>();
+            services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
             services.AddTransient<ICommandFactory, DICommandFactory>();
+            services.AddTransient<ICommandServices, CommandServices>();
 
             InitializeCommands(services);
 
@@ -92,13 +92,14 @@ namespace Partlyx.UI.WPF
 
             // Helper viewmodels
             services.AddTransient<IVMPartsFactory, VMPartsFactory>();
+            services.AddSingleton<IVMPartsStore, VMPartsStore>();
 
             services.AddTransient<ResourceItemViewModel>();
             services.AddTransient<RecipeItemViewModel>();
             services.AddTransient<RecipeComponentItemViewModel>();
 
-            services.AddSingleton<IVMPartsStore, VMPartsStore>();
-            services.AddSingleton<ISelectedParts, SelectedParts>();
+            services.AddTransient<IIsolatedSelectedParts, SelectedParts>();
+            services.AddSingleton<IGlobalSelectedParts, SelectedParts>();
 
             services.AddTransient<IResourceItemUiStateService, ResourceItemUiStateService>();
             services.AddTransient<IRecipeItemUiStateService, RecipeItemUiStateService>();

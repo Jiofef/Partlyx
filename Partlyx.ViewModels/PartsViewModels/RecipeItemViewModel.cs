@@ -139,6 +139,6 @@ namespace Partlyx.ViewModels.PartsViewModels
         }
 
         // For UI
-        public RecipeItemUIState Ui => _uiStateService.GetOrCreate(Uid);
+        public RecipeItemUIState Ui => _uiStateService.GetOrCreate(this);
     }
 }

@@ -37,20 +37,5 @@ namespace Partlyx.UI.WPF
                     vm.Ui.IsRenaming = true;
             }
         }
-
-        private void NameBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (sender is TextBox tb && tb.DataContext is ResourceItemViewModel vm)
-                vm.Ui.IsRenaming = false;
-        }
-
-        private void NameBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (sender is TextBox tb && tb.DataContext is ResourceItemViewModel vm)
-            {
-                if (e.Key == Key.Enter)
-                    vm.Ui.IsRenaming = false;
-            }
-        }
     }
 }

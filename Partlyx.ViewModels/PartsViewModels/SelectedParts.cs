@@ -9,8 +9,12 @@ using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.PartsViewModels
 {
-    public class SelectedParts : ObservableObject, ISelectedParts
+    public class SelectedParts : ObservableObject, IGlobalSelectedParts, IIsolatedSelectedParts
     {
+        private bool _isSingleResourceSelected;
+        private bool _isSingleRecipeSelected;
+        private bool _isSingleComponentSelected;
+
         public ObservableCollection<ResourceItemViewModel> Resources { get; }
 
         public ObservableCollection<RecipeItemViewModel> Recipes { get; }
@@ -22,6 +26,35 @@ namespace Partlyx.ViewModels.PartsViewModels
             Resources = new();
             Recipes = new();
             Components = new();
+
+            Resources.CollectionChanged += (obj, evInfo) => 
+            {
+                IsSingleResourceSelected = Resources.Count == 1;
+            };
+            Recipes.CollectionChanged += (obj, evInfo) =>
+            {
+                IsSingleResourceSelected = Recipes.Count == 1;
+            };
+            Components.CollectionChanged += (obj, evInfo) =>
+            {
+                IsSingleResourceSelected = Components.Count == 1;
+            };
+        }
+
+        public bool IsSingleResourceSelected 
+        {
+            get => _isSingleResourceSelected; 
+            private set => SetProperty(ref _isSingleResourceSelected, value); 
+        }
+        public bool IsSingleRecipeSelected
+        {
+            get => _isSingleRecipeSelected;
+            private set => SetProperty(ref _isSingleRecipeSelected, value);
+        }
+        public bool IsSingleComponentSelected
+        {
+            get => _isSingleComponentSelected;
+            private set => SetProperty(ref _isSingleComponentSelected, value);
         }
 
         #region Resource methods

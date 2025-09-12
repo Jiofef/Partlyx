@@ -23,14 +23,18 @@ namespace Partlyx.ViewModels
         private readonly IDisposable _childAddSubscription;
         private readonly IDisposable _childRemoveSubscription;
 
+        public IGlobalSelectedParts SelectedParts { get; }
+
         public ObservableCollection<ResourceItemViewModel> Resources { get; } = new();
 
-        public ResourceListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IResourceService rs)
+        public ResourceListViewModel(IGlobalSelectedParts sp, IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IResourceService rs)
         {
             _partsFactory = vmpf;
             _commandFactory = cf;
             _commandDispatcher = cd;
             _resourceService = rs;
+
+            SelectedParts = sp;
 
             _childAddSubscription = bus.Subscribe<ResourceCreatedEvent>(OnResourceCreated, true);
             _childRemoveSubscription = bus.Subscribe<ResourceDeletedEvent>(OnResourceDeleted, true);
@@ -90,6 +94,15 @@ namespace Partlyx.ViewModels
         {
             var command = _commandFactory.Create<CreateResourceCommand>();
             await _commandDispatcher.ExcecuteAsync(command);
+        }
+
+        [RelayCommand]
+        private void StartRenamingSelected()
+        {
+            var resourceVM = SelectedParts.GetSingleResourceOrNull();
+            if (resourceVM == null) return;
+
+            resourceVM.Ui.IsRenaming = true;
         }
     }
 }

@@ -25,11 +25,13 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IDisposable _childAddSubscription;
         private readonly IDisposable _childRemoveSubscription;
 
-        public ISelectedParts SelectedParts { get; }
+        public IGlobalSelectedParts SelectedParts { get; }
 
         public ObservableCollection<RecipeItemViewModel> Recipes { get; } = new();
 
-        public RecipeListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, ISelectedParts sp)
+        public bool IsSingleResourceSelected() => SelectedParts.GetSingleResourceOrNull() != null;
+
+        public RecipeListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IGlobalSelectedParts sp)
         {
             _partsFactory = vmpf;
             _commandFactory = cf;
@@ -85,6 +87,15 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             var command = _commandFactory.Create<CreateRecipeCommand>(parent.Uid);
             await _commandDispatcher.ExcecuteAsync(command);
+        }
+
+        [RelayCommand]
+        private void StartRenamingSelected()
+        {
+            var recipeVM = SelectedParts.GetSingleRecipeOrNull();
+            if (recipeVM == null) return;
+
+            recipeVM.Ui.IsRenaming = true;
         }
     }
 }

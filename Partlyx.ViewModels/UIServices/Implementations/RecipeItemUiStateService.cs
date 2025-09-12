@@ -18,13 +18,13 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
         private readonly Dictionary<Guid, RecipeItemUIState> _states = new();
 
-        public RecipeItemUIState GetOrCreate(Guid uid)
+        public RecipeItemUIState GetOrCreate(RecipeItemViewModel vm)
         {
-            var state = _states.GetValueOrDefault(uid);
+            var state = _states.GetValueOrDefault(vm.Uid);
             if (state == null)
             {
-                state = (RecipeItemUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeItemUIState), uid);
-                _states.Add(uid, state);
+                state = (RecipeItemUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeItemUIState), vm);
+                _states.Add(vm.Uid, state);
             }
             return state;
         }

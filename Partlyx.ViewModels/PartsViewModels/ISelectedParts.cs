@@ -7,6 +7,9 @@ namespace Partlyx.ViewModels.PartsViewModels
         ObservableCollection<ResourceItemViewModel> Resources { get; }
         ObservableCollection<RecipeItemViewModel> Recipes { get; }
         ObservableCollection<RecipeComponentItemViewModel> Components { get; }
+        bool IsSingleResourceSelected { get; }
+        bool IsSingleRecipeSelected { get; }
+        bool IsSingleComponentSelected { get; }
 
         void AddComponentToSelected(RecipeComponentItemViewModel component);
         void AddRecipeToSelected(RecipeItemViewModel recipe);
@@ -21,4 +24,8 @@ namespace Partlyx.ViewModels.PartsViewModels
         void SelectSingleRecipe(RecipeItemViewModel recipe);
         void SelectSingleResource(ResourceItemViewModel resource);
     }
+
+    public interface IGlobalSelectedParts : ISelectedParts { }
+
+    public interface IIsolatedSelectedParts : ISelectedParts { }
 }

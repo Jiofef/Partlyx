@@ -20,10 +20,14 @@
         </StackPanel>
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource FavsScrollViewer}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource CommonScrollViewer}">
                 <ListView ItemsSource="{Binding Recipes}" beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Recipes,
                             RelativeSource={RelativeSource AncestorType=Window}}"
                           HorizontalContentAlignment="Stretch" Margin="0,0,10,0" Style="{StaticResource CommonListView}" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
+                    <ListView.InputBindings>
+                        <KeyBinding Key="F2" Command="{Binding StartRenamingSelectedCommand}"/>
+                        <KeyBinding Key="Enter" Command="{Binding StartRenamingSelectedCommand}"/>
+                    </ListView.InputBindings>
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
@@ -41,9 +45,19 @@
                                     </Grid.ColumnDefinitions>
                                     <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
                                     <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"
-                                               MouseDown="NameBlock_MouseDown" Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVis}}"/>
-                                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Column="1"
-                                             LostKeyboardFocus="NameBox_LostFocus" KeyDown="NameBox_KeyDown" Visibility="{Binding Ui.IsRenaming, Converter={StaticResource BoolToVis}}">
+                                               MouseDown="NameBlock_MouseDown" Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVis}}">
+                                    </TextBlock>
+                                    <TextBox Text="{Binding Ui.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Column="1"
+                                             Visibility="{Binding Ui.IsRenaming, Converter={StaticResource BoolToVis}}">
+                                        <TextBox.InputBindings>
+                                            <KeyBinding Key="Enter" Command="{Binding Ui.CommitNameChangeCommand}"/>
+                                            <KeyBinding Key="Esc" Command="{Binding Ui.CancelNameChangeCommand}"/>
+                                        </TextBox.InputBindings>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="LostKeyboardFocus">
+                                                <i:InvokeCommandAction Command="{Binding Ui.CommitNameChangeCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
                                         <i:Interaction.Behaviors>
                                             <beh:FocusBehavior IsFocused="{Binding Ui.IsRenaming, Mode=TwoWay}"
                                                                SelectAllOnFocus="True"/>
@@ -62,7 +76,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding CreateRecipeCommand}" Grid.Column="0">
+            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding CreateRecipeCommand}" Grid.Column="0" IsEnabled="{Binding SelectedParts.IsSingleResourceSelected}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
                         <TextBlock Text="Create "/>

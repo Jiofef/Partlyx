@@ -152,6 +152,7 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
         {
             _recipeService = rs;
             _resourceUid = parentResourceUid;
+            _recipeUid = recipeUid;
         }
 
         public async Task ExecuteAsync()
