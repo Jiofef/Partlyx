@@ -25,6 +25,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         private readonly IDisposable _childAddSubscription;
         private readonly IDisposable _childRemoveSubscription;
+        private readonly IDisposable _bulkLoadedSubscription;
 
         public IGlobalSelectedParts SelectedParts { get; }
 
@@ -39,6 +40,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             _childAddSubscription = bus.Subscribe<RecipeComponentCreatedEvent>(OnComponentCreated, true);
             _childRemoveSubscription = bus.Subscribe<RecipeComponentDeletedEvent>(OnComponentDeleted, true);
+            _bulkLoadedSubscription = bus.Subscribe<RecipeComponentsBulkLoadedEvent>(OnComponentsBulkLoaded, true);
 
             Components = new ObservableCollection<RecipeComponentItemViewModel>();
         }

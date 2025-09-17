@@ -1,5 +1,5 @@
 ﻿using Partlyx.Core;
-using Partlyx.Infrastructure.Data;
+using Partlyx.Infrastructure.Data.Interfaces;
 
 namespace Partlyx.Infrastructure
 {

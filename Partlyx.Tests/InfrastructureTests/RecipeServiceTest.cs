@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using Partlyx.Infrastructure.Data;
+using Partlyx.Infrastructure.Data.Implementations;
+using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;

@@ -76,7 +76,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding CreateResourceCommand}" Grid.Column="0" IsEnabled="{Binding IsSingleResourceSelected}">
+            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding CreateResourceCommand}" Grid.Column="0">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
                         <TextBlock Text="Create "/>

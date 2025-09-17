@@ -1,4 +1,6 @@
-﻿using Partlyx.ViewModels.PartsViewModels;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Partlyx.Infrastructure.Data.Interfaces;
+using Partlyx.ViewModels.PartsViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

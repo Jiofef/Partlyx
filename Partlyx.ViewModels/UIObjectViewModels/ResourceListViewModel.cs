@@ -22,6 +22,7 @@ namespace Partlyx.ViewModels
 
         private readonly IDisposable _childAddSubscription;
         private readonly IDisposable _childRemoveSubscription;
+        private readonly IDisposable _bulkLoadedSubscription;
 
         public IGlobalSelectedParts SelectedParts { get; }
 
@@ -38,10 +39,9 @@ namespace Partlyx.ViewModels
 
             _childAddSubscription = bus.Subscribe<ResourceCreatedEvent>(OnResourceCreated, true);
             _childRemoveSubscription = bus.Subscribe<ResourceDeletedEvent>(OnResourceDeleted, true);
+            _bulkLoadedSubscription = bus.Subscribe<ResourcesBulkLoadedEvent>(OnResourceBulkLoaded, true);
 
             Resources = new ObservableCollection<ResourceItemViewModel>();
-
-            _ = UpdateList(); // FIX LATER
         }
 
         private void AddFromDto(ResourceDto dto)

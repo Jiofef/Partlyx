@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core;
-using Partlyx.Infrastructure.Data;
+using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Services.ServiceInterfaces;
 
 namespace Partlyx.Services.Commands.RecipeComponentCommonCommands

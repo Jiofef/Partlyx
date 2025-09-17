@@ -4,8 +4,7 @@
              xmlns:local="clr-namespace:Partlyx.UI.WPF"
              xmlns:conv="clr-namespace:Partlyx.UI.WPF.Converters"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:core="using:Microsoft.Xaml.Behaviors.Core"
-             StartupUri="MainWindow.xaml">
+             xmlns:core="using:Microsoft.Xaml.Behaviors.Core">
     <Application.Resources>
         <ResourceDictionary>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>

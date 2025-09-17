@@ -11,20 +11,52 @@
         MinHeight="640" MinWidth="968"
         Icon="/Images/Partlyx.ico"
         WindowState="Maximized"
-        Background="#eef5ff">
+        Background="{StaticResource PxWhiteBrush}">
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="360"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="360"/>
-        </Grid.ColumnDefinitions>
-        <local:ResourceListView DataContext="{Binding ResourceList}" 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel>
+            <Menu DataContext="{Binding MenuPanel}">
+                <Menu.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </Menu.ItemsPanel>
+                <MenuItem Header="File" DataContext="{Binding FileMenu}">
+                    <MenuItem Header="Save" Command="{Binding SaveProjectCommand}">
+
+                    </MenuItem>
+
+                    <MenuItem Header="Save as..." Command="{Binding SaveProjectAsCommand}">
+
+                    </MenuItem>
+
+                    <MenuItem Header="Open" Command="{Binding OpenProjectCommand}">
+
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+
+        </DockPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="360"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="360"/>
+            </Grid.ColumnDefinitions>
+            <local:ResourceListView DataContext="{Binding ResourceList}" 
                                 Grid.Row="0" Grid.Column="0" />
 
-        <UniformGrid Grid.Column="2" Rows="2">
-            <local:RecipeListView DataContext="{Binding RecipeList}"/>
-            
-        </UniformGrid>
+            <UniformGrid Grid.Column="2" Rows="2">
+                <local:RecipeListView DataContext="{Binding RecipeList}"/>
+
+            </UniformGrid>
+        </Grid>
     </Grid>
+
 </Window>

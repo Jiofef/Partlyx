@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Infrastructure;
-using Partlyx.Infrastructure.Data;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Tests.DataTests;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.Infrastructure.Data.Interfaces;
+using Partlyx.Infrastructure.Data.Implementations;
 
 namespace Partlyx.Tests.InfrastructureTests
 {

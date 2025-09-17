@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace Partlyx.UI.WPF
 {
     /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
+    /// Логика взаимодействия для SexBoy.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class TestWindow : Window
     {
-        public MainWindow()
+        public TestWindow()
         {
             InitializeComponent();
         }

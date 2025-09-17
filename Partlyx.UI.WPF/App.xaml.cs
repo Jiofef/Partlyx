@@ -1,24 +1,21 @@
-﻿using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Infrastructure;
 using Partlyx.Infrastructure.Data;
+using Partlyx.Infrastructure.Data.Implementations;
+using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
+using Partlyx.Services.ServiceImplementations;
+using Partlyx.Services.ServiceInterfaces;
+using Partlyx.UI.WPF.VMImplementations;
 using Partlyx.ViewModels;
 using Partlyx.ViewModels.PartsViewModels;
-using System.Configuration;
-using System.Data;
-using System.Windows;
-using Partlyx.Services.ServiceInterfaces;
-using Partlyx.Services.ServiceImplementations;
 using Partlyx.ViewModels.UIObjectViewModels;
-using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
-using System.Diagnostics;
-using Microsoft.Extensions.Logging;
+using Partlyx.ViewModels.UIServices.Interfaces;
+using System.Windows;
 
 namespace Partlyx.UI.WPF
 {
@@ -27,7 +24,7 @@ namespace Partlyx.UI.WPF
     /// </summary>
     public partial class App : Application
     {
-        public static IServiceProvider Services { get; private set; }
+        public static IServiceProvider Services { get; private set; } = null!;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -37,33 +34,33 @@ namespace Partlyx.UI.WPF
             InitializeDI(services);
             Services = services.BuildServiceProvider();
 
-            InitializeDatabase();
+            var mainVM = Services.GetRequiredService<MainViewModel>();
+            var window = new MainWindow() { DataContext = mainVM };
+            window.Show();
+
+            DirectoryManager.CreatePartlyxFolder();
+            InitializeDatabaseAsync();
         }
 
         private void InitializeDI(IServiceCollection services)
         {
-            // DB
-            services.AddSingleton<SqliteConnection>(sp =>
-            {
-                var conn = new SqliteConnection("DataSource=partlyx.db");
-                conn.Open();
-                return conn;
-            });
-
-            services.AddDbContextFactory<PartlyxDBContext>((sp, opt) =>
-            {
-                var conn = sp.GetRequiredService<SqliteConnection>();
-                opt.UseSqlite(conn);
-            });
-
             // Infrastructure
+            services = services.AddDataServices();
+
+            services.AddTransient<IWriter, Writer>();
+            services.AddTransient<IReader, Reader>();
+            services.AddTransient <ILogger, Logger>();
+
             services.AddTransient<IPartUpdater, PartUpdater>();
             services.AddSingleton<Infrastructure.Events.IEventBus, Infrastructure.Events.EventBus>();
+
 
             services.AddTransient<IResourceRepository, ResourceRepository>();
 
             // Services
             services.AddTransient<IServiceProvider, ServiceProvider>();
+
+            services.AddSingleton<IPartsLoader, PartsLoader>();
 
             services.AddTransient<IResourceService, ResourceService>();
             services.AddTransient<IRecipeService, RecipeService>();
@@ -88,6 +85,9 @@ namespace Partlyx.UI.WPF
             services.AddTransient<RecipeComponentListViewModel>();
             services.AddTransient<PartsTreeViewModel>();
 
+            services.AddTransient<MenuPanelViewModel>();
+            services.AddTransient<MenuPanelFileViewModel>();
+
             services.AddTransient<MainWindow>();
 
             // Helper viewmodels
@@ -104,6 +104,9 @@ namespace Partlyx.UI.WPF
             services.AddTransient<IResourceItemUiStateService, ResourceItemUiStateService>();
             services.AddTransient<IRecipeItemUiStateService, RecipeItemUiStateService>();
             services.AddTransient<IRecipeComponentItemUiStateService, RecipeComponentItemUiStateService>();
+
+            services.AddTransient<IFileDialogService, WpfFileDialogService>();
+            services.AddTransient<INotificationService, WpfNotificationService>();
 
             Services = services.BuildServiceProvider();
         }
@@ -131,13 +134,11 @@ namespace Partlyx.UI.WPF
             services.AddTransient<SetRecipeComponentResourceCommand>();
         }
 
-        private void InitializeDatabase()
+        private async void InitializeDatabaseAsync()
         {
-            using var scope = Services.CreateScope();
-            var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<PartlyxDBContext>>();
-            using var ctx = factory.CreateDbContext();
+            var dbp = Services.GetRequiredService<IDBProvider>();
 
-            ctx.Database.EnsureCreated();
+            await dbp.InitializeAsync(DirectoryManager.DefaultDBPath);
         }
     }
 }

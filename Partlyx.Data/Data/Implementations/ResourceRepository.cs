@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Partlyx.Core;
+using Partlyx.Infrastructure.Data.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace Partlyx.Infrastructure.Data
+namespace Partlyx.Infrastructure.Data.Implementations
 {
     public class ResourceRepository : IResourceRepository
     {
@@ -85,6 +86,24 @@ namespace Partlyx.Infrastructure.Data
             await using var db = _dbFactory.CreateDbContext();
 
             var rl = await db.Resources.ToListAsync();
+
+            return rl;
+        }
+
+        public async Task<List<Recipe>> GetAllTheRecipesAsync()
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            var rl = await db.Recipes.ToListAsync();
+
+            return rl;
+        }
+
+        public async Task<List<RecipeComponent>> GetAllTheRecipeComponentsAsync()
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            var rl = await db.RecipeComponents.ToListAsync();
 
             return rl;
         }
