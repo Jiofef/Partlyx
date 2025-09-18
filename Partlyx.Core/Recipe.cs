@@ -6,7 +6,8 @@ namespace Partlyx.Core
     public class Recipe : ICopiable<Resource>, IPart
     {
         // Hierarchy
-        public Resource? ParentResource { get; private set; }
+        private Resource? _parentResource;
+        public Resource? ParentResource { get => _parentResource; private set => _parentResource = value; }
 
         public bool IsDetached => ParentResource == null;
 
@@ -56,6 +57,7 @@ namespace Partlyx.Core
         // Main features
         public string Name { get; set; }
         private readonly List<RecipeComponent> _components = new List<RecipeComponent>();
+
         public IReadOnlyList<RecipeComponent> Components => _components;
         public double CraftAmount { get; set; } = 1;
 

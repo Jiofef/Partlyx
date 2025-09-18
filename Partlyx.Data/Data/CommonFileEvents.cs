@@ -13,4 +13,6 @@ namespace Partlyx.Infrastructure.Data.CommonFileEvents
     public record SaveCompletedEvent(string destination, Guid correlationUid);
 
     public record SaveFailedEvent(string destination, Guid correlationUid);
+
+    public record FileClearedEvent();
 }

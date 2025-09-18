@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using Partlyx.ViewModels.PartsViewModels;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

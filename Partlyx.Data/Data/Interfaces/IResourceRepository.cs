@@ -20,5 +20,6 @@ namespace Partlyx.Infrastructure.Data.Interfaces
         Task<List<Resource>> GetAllTheResourcesAsync();
         Task<List<Recipe>> GetAllTheRecipesAsync();
         Task<List<RecipeComponent>> GetAllTheRecipeComponentsAsync();
+        Task ClearEverything();
     }
 }

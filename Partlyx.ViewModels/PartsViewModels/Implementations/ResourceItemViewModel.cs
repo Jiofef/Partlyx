@@ -3,11 +3,12 @@ using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 
-namespace Partlyx.ViewModels.PartsViewModels
+namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
     public class ResourceItemViewModel : UpdatableViewModel<ResourceDto>, IVMPart
     {
@@ -19,7 +20,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         
         // Events
         private readonly IEventBus _bus;
-        private readonly IDisposable _subscription;
+        private readonly IDisposable _updatedSubscription;
         private readonly IDisposable _childAddSubscription;
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
@@ -46,7 +47,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             }
 
             // Info updating binding
-            _subscription = _bus.Subscribe<ResourceUpdatedEvent>(OnResourceUpdated, true);
+            _updatedSubscription = _bus.Subscribe<ResourceUpdatedEvent>(OnResourceUpdated, true);
             _childAddSubscription = bus.Subscribe<RecipeCreatedEvent>(OnRecipeCreated, true);
             _childRemoveSubscription = bus.Subscribe<RecipeDeletedEvent>(OnRecipeDeleted, true);
             _childMoveSubscription = bus.Subscribe<RecipeMovedEvent>(OnRecipeMoved, true);
@@ -120,9 +121,15 @@ namespace Partlyx.ViewModels.PartsViewModels
             }
         }
 
+        /// <summary> Used when new DB is initialized and we need to connect created VM parts to each other </summary>
+        internal void InitAddChild(RecipeItemViewModel recipe)
+        {
+            Recipes.Add(recipe);
+        }
+
         public void Dispose()
         {
-            _subscription.Dispose();
+            _updatedSubscription.Dispose();
             _childAddSubscription.Dispose();
             _childRemoveSubscription.Dispose();
             _childMoveSubscription.Dispose();

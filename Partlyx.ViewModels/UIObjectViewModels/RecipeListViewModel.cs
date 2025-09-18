@@ -7,6 +7,8 @@ using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.ViewModels.PartsViewModels;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,66 +20,51 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 {
     public partial class RecipeListViewModel : ObservableObject, IDisposable
     {
-        private readonly IVMPartsFactory _partsFactory;
         private readonly ICommandFactory _commandFactory;
         private readonly ICommandDispatcher _commandDispatcher;
 
-        private readonly IDisposable _childAddSubscription;
-        private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _bulkLoadedSubscription;
+        private readonly IDisposable _selectedParentsChangedSubscription;
 
         public IGlobalSelectedParts SelectedParts { get; }
 
-        public ObservableCollection<RecipeItemViewModel> Recipes { get; } = new();
+        // Recipes in this collection are ALWAYS only a projection of the selected item collection.
+        // Therefore, Set is allowed here and it is not recommended to change the contents of the selected collection by reference.
+        private ObservableCollection<RecipeItemViewModel> _recipes;
+        public ObservableCollection<RecipeItemViewModel> Recipes { get => _recipes; private set => SetProperty(ref _recipes, value); }
 
         public bool IsSingleResourceSelected() => SelectedParts.GetSingleResourceOrNull() != null;
 
         public RecipeListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IGlobalSelectedParts sp)
         {
-            _partsFactory = vmpf;
             _commandFactory = cf;
             _commandDispatcher = cd;
             SelectedParts = sp;
 
-            _childAddSubscription = bus.Subscribe<RecipeCreatedEvent>(OnRecipeCreated, true);
-            _childRemoveSubscription = bus.Subscribe<RecipeDeletedEvent>(OnRecipeDeleted, true);
-            _bulkLoadedSubscription = bus.Subscribe<RecipesBulkLoadedEvent>(OnRecipeBulkLoaded, true);
+            _bulkLoadedSubscription = 
+            _selectedParentsChangedSubscription = bus.Subscribe<GlobalSelectedResourcesChangedEvent>(OnSelectedResourcesChanged, true);
 
-            Recipes = new ObservableCollection<RecipeItemViewModel>();
+            _recipes = new ObservableCollection<RecipeItemViewModel>();
         }
 
-        private void AddFromDto(RecipeDto dto)
+        public void UpdateList()
         {
-            var recipeVM = _partsFactory.GetOrCreateRecipeVM(dto);
-            Recipes.Add(recipeVM);
-        }
-        private void OnRecipeCreated(RecipeCreatedEvent ev)
-        {
-            AddFromDto(ev.Recipe);
-        }
+            Recipes = new();
+            var singleSelectedResource = SelectedParts.GetSingleResourceOrNull();
+            if (singleSelectedResource == null) return;
 
-        private void OnRecipeDeleted(RecipeDeletedEvent ev)
-        {
-            var recipeVM = Recipes.FirstOrDefault(c => c.Uid == ev.RecipeUid);
-            if (recipeVM != null)
-            {
-                Recipes.Remove(recipeVM);
-                recipeVM.Dispose();
-            }
+            Recipes = singleSelectedResource.Recipes;
         }
 
-        private void OnRecipeBulkLoaded(RecipesBulkLoadedEvent ev)
+        public void OnSelectedResourcesChanged(GlobalSelectedResourcesChangedEvent ev)
         {
-            Recipes.Clear();
-
-            foreach (var dto in ev.Bulk)
-                AddFromDto(dto);
+            UpdateList();
         }
 
         public void Dispose()
         {
-            _childAddSubscription.Dispose();
-            _childRemoveSubscription.Dispose();
+            _bulkLoadedSubscription.Dispose();
+            _selectedParentsChangedSubscription.Dispose();
         }
 
         [RelayCommand]
@@ -85,7 +72,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         {
             var parent = SelectedParts.GetSingleResourceOrNull();
             if (parent == null)
-                throw new InvalidOperationException("Create command shouldn't be called when created part's parent isn't selected");
+                throw new InvalidOperationException("Create command shouldn't be called when created part's parent isn't selected or is multiselected");
 
             var command = _commandFactory.Create<CreateRecipeCommand>(parent.Uid);
             await _commandDispatcher.ExcecuteAsync(command);

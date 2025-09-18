@@ -1,6 +1,7 @@
 ﻿using Partlyx.Services.Dtos;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
 
-namespace Partlyx.ViewModels.PartsViewModels
+namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
     public interface IVMPartsFactory
     {

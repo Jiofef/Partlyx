@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Partlyx.ViewModels.PartsViewModels;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System;
 using System.Collections.Generic;

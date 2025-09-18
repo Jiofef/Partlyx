@@ -27,10 +27,14 @@ namespace Partlyx.Services.PartsEventClasses
 
     public record RecipeComponentMovedEvent(Guid OldResourceUid, Guid OldRecipeUid, Guid NewResourceUid, Guid NewRecipeUid, Guid RecipeComponentUid);
 
-    // Bulk loaded events
+    // Parts initialization events
+    public record PartsInitializationStartedEvent();
+
     public record ResourcesBulkLoadedEvent(ResourceDto[] Bulk);
 
     public record RecipesBulkLoadedEvent(RecipeDto[] Bulk);
 
     public record RecipeComponentsBulkLoadedEvent(RecipeComponentDto[] Bulk);
+
+    public record PartsInitializationFinishedEvent();
 }

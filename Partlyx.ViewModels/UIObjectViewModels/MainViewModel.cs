@@ -1,5 +1,5 @@
 ﻿using Partlyx.Services.ServiceInterfaces;
-using Partlyx.ViewModels.PartsViewModels;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,13 +21,15 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public MenuPanelViewModel MenuPanel { get; }
 
         private readonly IPartsLoader _partsLoader;
+        private readonly IPartsInitializeService _partsInitializeService;
 
         public MainViewModel(
             ResourceListViewModel resourceList, RecipeListViewModel recipeList, 
             RecipeComponentListViewModel recipeComponents, PartsTreeViewModel partsTree,
             MenuPanelViewModel menuPanel,
             IGlobalSelectedParts selectedParts,
-            IPartsLoader pl
+            IPartsLoader pl,
+            IPartsInitializeService pis
             )
         {
             ResourceList = resourceList;
@@ -38,6 +40,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             SelectedParts = selectedParts;
 
             _partsLoader = pl;
+            _partsInitializeService = pis;
         }
     }
 }

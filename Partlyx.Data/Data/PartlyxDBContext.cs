@@ -52,6 +52,11 @@ public class PartlyxDBContext : DbContext, IDisposable
                 .HasForeignKey("RecipeUid")
                 .OnDelete(DeleteBehavior.Cascade);
 
+            rb.Metadata.FindNavigation(nameof(Recipe.ParentResource))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+            rb.Metadata.FindNavigation(nameof(Recipe.ParentResource))!
+            .SetField("_parentResource");
+
             rb.Metadata.FindNavigation(nameof(Recipe.Components))!
             .SetPropertyAccessMode(PropertyAccessMode.Field);
             rb.Metadata.FindNavigation(nameof(Recipe.Components))!
@@ -80,7 +85,7 @@ public class PartlyxDBContext : DbContext, IDisposable
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // Since Parts create UIDs in themselves, the BD thinks that the object has already been created. Here we tell the DB that having a set Uid does not mean that the object has already been created.
+        // Since Parts create UIDs in themselves, the DB thinks that the object has already been created. Here we tell the DB that having a set Uid does not mean that the object has already been created.
         foreach (var entry in ChangeTracker.Entries().Where(e => e.Entity is IPart))
         {
             if (entry.State == EntityState.Modified)

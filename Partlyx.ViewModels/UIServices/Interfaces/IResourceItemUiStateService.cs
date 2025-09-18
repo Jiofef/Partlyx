@@ -1,4 +1,4 @@
-﻿using Partlyx.ViewModels.PartsViewModels;
+﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
 
 namespace Partlyx.ViewModels.UIServices.Interfaces
 {

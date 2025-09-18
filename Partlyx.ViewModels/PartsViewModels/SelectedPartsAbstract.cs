@@ -1,15 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Partlyx.Core;
-using System;
-using System.Collections.Generic;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Specialized;
 
 namespace Partlyx.ViewModels.PartsViewModels
 {
-    public class SelectedParts : ObservableObject, IGlobalSelectedParts, IIsolatedSelectedParts
+    public abstract class SelectedPartsAbstract : ObservableObject, ISelectedParts
     {
         private bool _isSingleResourceSelected;
         private bool _isSingleRecipeSelected;
@@ -21,7 +18,7 @@ namespace Partlyx.ViewModels.PartsViewModels
 
         public ObservableCollection<RecipeComponentItemViewModel> Components { get; }
 
-        public SelectedParts()
+        public SelectedPartsAbstract()
         {
             Resources = new();
             Recipes = new();
@@ -30,16 +27,23 @@ namespace Partlyx.ViewModels.PartsViewModels
             Resources.CollectionChanged += (obj, evInfo) => 
             {
                 IsSingleResourceSelected = Resources.Count == 1;
+                SelectedResourcesChangedHandler(obj, evInfo);
             };
             Recipes.CollectionChanged += (obj, evInfo) =>
             {
                 IsSingleResourceSelected = Recipes.Count == 1;
+                SelectedRecipesChangedHandler(obj, evInfo);
             };
             Components.CollectionChanged += (obj, evInfo) =>
             {
                 IsSingleResourceSelected = Components.Count == 1;
+                SelectedComponentsChangedHandler(obj, evInfo);
             };
         }
+
+        protected virtual void SelectedResourcesChangedHandler(object? @object, NotifyCollectionChangedEventArgs args) { }
+        protected virtual void SelectedRecipesChangedHandler(object? @object, NotifyCollectionChangedEventArgs args) { }
+        protected virtual void SelectedComponentsChangedHandler(object? @object, NotifyCollectionChangedEventArgs args) { }
 
         public bool IsSingleResourceSelected 
         {

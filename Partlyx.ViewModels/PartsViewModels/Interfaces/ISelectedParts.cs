@@ -1,6 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
+using System.Collections.ObjectModel;
 
-namespace Partlyx.ViewModels.PartsViewModels
+namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
     public interface ISelectedParts
     {

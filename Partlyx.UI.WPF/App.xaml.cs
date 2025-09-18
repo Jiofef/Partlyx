@@ -12,6 +12,8 @@ using Partlyx.Services.ServiceInterfaces;
 using Partlyx.UI.WPF.VMImplementations;
 using Partlyx.ViewModels;
 using Partlyx.ViewModels.PartsViewModels;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
@@ -61,6 +63,7 @@ namespace Partlyx.UI.WPF
             services.AddTransient<IServiceProvider, ServiceProvider>();
 
             services.AddSingleton<IPartsLoader, PartsLoader>();
+            services.AddSingleton<IFileService, FileService>();
 
             services.AddTransient<IResourceService, ResourceService>();
             services.AddTransient<IRecipeService, RecipeService>();
@@ -93,13 +96,14 @@ namespace Partlyx.UI.WPF
             // Helper viewmodels
             services.AddTransient<IVMPartsFactory, VMPartsFactory>();
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
+            services.AddSingleton<IPartsInitializeService, PartsInitializeService>();
 
             services.AddTransient<ResourceItemViewModel>();
             services.AddTransient<RecipeItemViewModel>();
             services.AddTransient<RecipeComponentItemViewModel>();
 
-            services.AddTransient<IIsolatedSelectedParts, SelectedParts>();
-            services.AddSingleton<IGlobalSelectedParts, SelectedParts>();
+            services.AddTransient<IIsolatedSelectedParts, IsolatedSelectedParts>();
+            services.AddSingleton<IGlobalSelectedParts, GlobalSelectedParts>();
 
             services.AddTransient<IResourceItemUiStateService, ResourceItemUiStateService>();
             services.AddTransient<IRecipeItemUiStateService, RecipeItemUiStateService>();

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Partlyx.Core;
+using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Data.Interfaces;
+using Partlyx.Infrastructure.Events;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +17,12 @@ namespace Partlyx.Infrastructure.Data.Implementations
     public class ResourceRepository : IResourceRepository
     {
         private readonly IDbContextFactory<PartlyxDBContext> _dbFactory;
-        public ResourceRepository(IDbContextFactory<PartlyxDBContext> dbFactory) => _dbFactory = dbFactory;
+        private readonly IEventBus _bus;
+        public ResourceRepository(IDbContextFactory<PartlyxDBContext> dbFactory, IEventBus bus)
+        {
+            _dbFactory = dbFactory;
+            _bus = bus;
+        }
 
 
         public async Task<Guid> AddAsync(Resource resource)
@@ -85,7 +92,10 @@ namespace Partlyx.Infrastructure.Data.Implementations
         {
             await using var db = _dbFactory.CreateDbContext();
 
-            var rl = await db.Resources.ToListAsync();
+            var rl = await db.Resources
+                .Include(r => r.Recipes)
+                .ThenInclude(rc => rc.Components)
+                .ToListAsync();
 
             return rl;
         }
@@ -94,7 +104,10 @@ namespace Partlyx.Infrastructure.Data.Implementations
         {
             await using var db = _dbFactory.CreateDbContext();
 
-            var rl = await db.Recipes.ToListAsync();
+            var rl = await db.Recipes
+                .Include(rc => rc.ParentResource)
+                .Include(rc => rc.Components)
+                .ToListAsync();
 
             return rl;
         }
@@ -103,9 +116,23 @@ namespace Partlyx.Infrastructure.Data.Implementations
         {
             await using var db = _dbFactory.CreateDbContext();
 
-            var rl = await db.RecipeComponents.ToListAsync();
+            var rl = await db.RecipeComponents
+                .Include(c => c.ParentRecipe)
+                .ThenInclude(rc => rc!.ParentResource)
+                .ToListAsync();
 
             return rl;
+        }
+
+        /// <summary>!!!</summary>
+        public async Task ClearEverything()
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            await db.Database.EnsureDeletedAsync();
+            await db.Database.EnsureCreatedAsync();
+
+            _bus.Publish(new FileClearedEvent());
         }
 
         #region ExecuteOnPart methods

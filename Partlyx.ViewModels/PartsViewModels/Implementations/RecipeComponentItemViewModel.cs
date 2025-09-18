@@ -3,11 +3,12 @@ using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Linq;
 
-namespace Partlyx.ViewModels.PartsViewModels
+namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
     public class RecipeComponentItemViewModel : UpdatableViewModel<RecipeComponentDto>, IVMPart
     {
@@ -19,7 +20,7 @@ namespace Partlyx.ViewModels.PartsViewModels
 
         // Events
         private readonly IEventBus _bus;
-        private readonly IDisposable _subscription;
+        private readonly IDisposable _updatedSubscription;
 
         public RecipeComponentItemViewModel(RecipeComponentDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS)
         {
@@ -39,7 +40,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             _selectedRecipeUid = dto.SelectedRecipeUid;
 
             // Info updating binding
-            _subscription = _bus.Subscribe<RecipeComponentUpdatedEvent>(OnRecipeComponentUpdated, true);
+            _updatedSubscription = _bus.Subscribe<RecipeComponentUpdatedEvent>(OnRecipeComponentUpdated, true);
         }
 
         // Recipe component info
@@ -88,7 +89,7 @@ namespace Partlyx.ViewModels.PartsViewModels
 
         public void Dispose()
         {
-            _subscription.Dispose();
+            _updatedSubscription.Dispose();
 
             _store.RecipeComponents.Remove(Uid);
         }

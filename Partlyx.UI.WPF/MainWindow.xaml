@@ -27,17 +27,10 @@
                     </ItemsPanelTemplate>
                 </Menu.ItemsPanel>
                 <MenuItem Header="File" DataContext="{Binding FileMenu}">
-                    <MenuItem Header="Save" Command="{Binding SaveProjectCommand}">
-
-                    </MenuItem>
-
-                    <MenuItem Header="Save as..." Command="{Binding SaveProjectAsCommand}">
-
-                    </MenuItem>
-
-                    <MenuItem Header="Open" Command="{Binding OpenProjectCommand}">
-
-                    </MenuItem>
+                    <MenuItem Header="Create" Command="{Binding NewFileCommand}"/>
+                    <MenuItem Header="Save" Command="{Binding SaveProjectCommand}"/>
+                    <MenuItem Header="Save as..." Command="{Binding SaveProjectAsCommand}"/>
+                    <MenuItem Header="Open" Command="{Binding OpenProjectCommand}"/>
                 </MenuItem>
             </Menu>
 

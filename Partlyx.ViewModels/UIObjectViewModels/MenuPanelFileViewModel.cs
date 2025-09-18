@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Partlyx.Infrastructure.Data;
-using Partlyx.Infrastructure.Data.Interfaces;
+using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -14,27 +14,33 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 {
     public partial class MenuPanelFileViewModel
     {
-        private IDBFileManager _fileManager;
+        private IFileService _fileService;
         private IFileDialogService _dialogService;
         private INotificationService _notificationService;
 
-        public MenuPanelFileViewModel(IDBFileManager dbfm, IFileDialogService fds, INotificationService ns)
+        public MenuPanelFileViewModel(IFileService dbfm, IFileDialogService fds, INotificationService ns)
         {
-            _fileManager = dbfm;
+            _fileService = dbfm;
             _dialogService = fds;
             _notificationService = ns;
         }
 
         [RelayCommand]
+        public async Task NewFileAsync()
+        {
+            await _fileService.ClearCurrentFile();
+        }
+
+        [RelayCommand]
         public async Task SaveProjectAsync()
         {
-            var lastExportDir = _fileManager.CurrentPartreePath;
+            var lastExportDir = _fileService.CurrentPartreePath;
 
             if (lastExportDir == null)
                 await SaveProjectAsAsync();
             else
             {
-                var result = await _fileManager.ExportPartreeAsync(lastExportDir);
+                var result = await _fileService.ExportPartreeAsync(lastExportDir);
 
                 if (!result.Success)
                 {
@@ -57,7 +63,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             if (path == null) return;
 
-            var result = await _fileManager.ExportPartreeAsync(path);
+            var result = await _fileService.ExportPartreeAsync(path);
 
             if (!result.Success)
             {
@@ -78,7 +84,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             if (path == null) return;
 
-            var result = await _fileManager.ImportPartreeAsync(path);
+            var result = await _fileService.ImportPartreeAsync(path);
 
             if (!result.Success)
             {

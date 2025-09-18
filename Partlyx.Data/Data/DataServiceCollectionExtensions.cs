@@ -15,7 +15,6 @@ namespace Partlyx.Infrastructure.Data
 
             services.AddTransient<IDBLoader, DBLoader>();
             services.AddTransient<IDBSaver, DBSaver>();
-            services.AddTransient<IDBFileManager, DBFileManager>();
 
             var dbDefaultPath = DirectoryManager.DefaultDBPath;
             var defaultConnectionString = @$"Data Source={dbDefaultPath}";

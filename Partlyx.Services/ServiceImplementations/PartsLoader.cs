@@ -27,6 +27,8 @@ namespace Partlyx.Services.ServiceImplementations
 
         private async Task OnDBInitialized(PartlyxDBInitializedEvent ev)
         {
+            _bus.Publish(new PartsInitializationStartedEvent());
+
             var resources = await _repo.GetAllTheResourcesAsync();
             var rDtos = resources.Select(x => x.ToDto()).ToArray();
             _bus.Publish(new ResourcesBulkLoadedEvent(rDtos));
@@ -38,6 +40,8 @@ namespace Partlyx.Services.ServiceImplementations
             var components = await _repo.GetAllTheRecipeComponentsAsync();
             var cDtos = components.Select(x => x.ToDto()).ToArray();
             _bus.Publish(new RecipeComponentsBulkLoadedEvent(cDtos));
+
+            _bus.Publish(new PartsInitializationFinishedEvent());
         }
     }
 }

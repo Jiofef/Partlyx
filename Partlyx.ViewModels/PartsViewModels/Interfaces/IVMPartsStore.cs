@@ -1,5 +1,6 @@
-﻿
-namespace Partlyx.ViewModels.PartsViewModels
+﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
+
+namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
     public interface IVMPartsStore
     {

@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Partlyx.Infrastructure.Events;
-using Partlyx.ViewModels.PartsViewModels;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
 using Partlyx.Services.Commands;
@@ -10,6 +9,9 @@ using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.Services.Dtos;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.Infrastructure.Data.CommonFileEvents;
 
 namespace Partlyx.ViewModels
 {
@@ -19,27 +21,31 @@ namespace Partlyx.ViewModels
         private readonly ICommandFactory _commandFactory;
         private readonly ICommandDispatcher _commandDispatcher;
         private readonly IResourceService _resourceService;
+        private readonly IVMPartsStore _store;
 
         private readonly IDisposable _childAddSubscription;
         private readonly IDisposable _childRemoveSubscription;
-        private readonly IDisposable _bulkLoadedSubscription;
+        private readonly IDisposable _initializationFinishedSubscription;
+        private readonly IDisposable _fileClearedSubscription;
 
         public IGlobalSelectedParts SelectedParts { get; }
 
         public ObservableCollection<ResourceItemViewModel> Resources { get; } = new();
 
-        public ResourceListViewModel(IGlobalSelectedParts sp, IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IResourceService rs)
+        public ResourceListViewModel(IGlobalSelectedParts sp, IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IResourceService rs, IVMPartsStore vmps)
         {
             _partsFactory = vmpf;
             _commandFactory = cf;
             _commandDispatcher = cd;
             _resourceService = rs;
+            _store = vmps;
 
             SelectedParts = sp;
 
             _childAddSubscription = bus.Subscribe<ResourceCreatedEvent>(OnResourceCreated, true);
             _childRemoveSubscription = bus.Subscribe<ResourceDeletedEvent>(OnResourceDeleted, true);
-            _bulkLoadedSubscription = bus.Subscribe<ResourcesBulkLoadedEvent>(OnResourceBulkLoaded, true);
+            _initializationFinishedSubscription = bus.Subscribe<PartsVMInitializationFinishedEvent>((ev) => UpdateList(), true);
+            _fileClearedSubscription = bus.Subscribe<FileClearedEvent>((ev) => Resources.Clear(), true);
 
             Resources = new ObservableCollection<ResourceItemViewModel>();
         }
@@ -69,24 +75,16 @@ namespace Partlyx.ViewModels
         {
             _childAddSubscription.Dispose();
             _childRemoveSubscription.Dispose();
+            _initializationFinishedSubscription.Dispose();
+            _fileClearedSubscription.Dispose();
         }
 
-        private void OnResourceBulkLoaded(ResourcesBulkLoadedEvent ev)
+        public void UpdateList()
         {
             Resources.Clear();
 
-            foreach (var dto in ev.Bulk)
-                AddFromDto(dto);
-        }
-
-        public async Task UpdateList()
-        {
-            Resources.Clear();
-
-            var resourceDtos = await _resourceService.GetAllTheResourcesAsync();
-
-            foreach (var dto in resourceDtos)
-                AddFromDto(dto);
+            foreach (var resource in _store.Resources.Values)
+                Resources.Add(resource);
         }
 
         [RelayCommand]

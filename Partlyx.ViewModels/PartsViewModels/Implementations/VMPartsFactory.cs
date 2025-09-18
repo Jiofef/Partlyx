@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Services.Dtos;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 
-namespace Partlyx.ViewModels.PartsViewModels
+namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
     public class VMPartsFactory : IVMPartsFactory
     {

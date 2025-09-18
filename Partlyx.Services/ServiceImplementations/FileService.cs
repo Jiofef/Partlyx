@@ -1,4 +1,5 @@
 ﻿using Partlyx.Infrastructure.Data.Interfaces;
+using Partlyx.Services.ServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,19 +9,26 @@ using System.Threading.Tasks;
 namespace Partlyx.Infrastructure.Data.Implementations
 {
     /// <summary>
-    /// Facade for IDBSaver and IDBLoader
+    /// Facade for IDBSaver, IDBLoader and IResourceRepository
     /// </summary>
-    public class DBFileManager : IDBFileManager
+    public class FileService : IFileService
     {
         private readonly IDBSaver _saver;
         private readonly IDBLoader _loader;
+        private readonly IResourceRepository _repo;
 
         public string? CurrentPartreePath { get; private set; }
 
-        public DBFileManager(IDBSaver dbs, IDBLoader dbl)
+        public FileService(IDBSaver dbs, IDBLoader dbl, IResourceRepository repo)
         {
             _saver = dbs;
             _loader = dbl;
+            _repo = repo;
+        }
+
+        public async Task ClearCurrentFile()
+        {
+            await _repo.ClearEverything();
         }
 
         public async Task<ExportResult> ExportPartreeAsync(string targetPath, CancellationToken cancellationToken = default)
