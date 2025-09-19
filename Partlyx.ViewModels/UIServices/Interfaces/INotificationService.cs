@@ -8,8 +8,10 @@ namespace Partlyx.ViewModels.UIServices.Interfaces
 {
     public interface INotificationService
     {
-        Task ShowErrorAsync(string title, string message, string? details = null, CancellationToken ct = default);
-        Task ShowInfoAsync(string title, string message, CancellationToken ct = default);
-        Task<bool> ShowConfirmAsync(string title, string message, CancellationToken ct = default);
+        Task ShowErrorAsync(NotificationErrorOptions options, CancellationToken ct = default);
+        Task ShowInfoAsync(NotificationInfoOptions options, CancellationToken ct = default);
+        Task<bool> ShowYesNoConfirmAsync(NotificationConfirmOptions options, CancellationToken ct = default);
+        /// <summary> Returns true on Yes, false on No and null on Cancel </summary>
+        Task<bool?> ShowYesNoCancelConfirmAsync(NotificationConfirmOptions options, CancellationToken ct = default);
     }
 }

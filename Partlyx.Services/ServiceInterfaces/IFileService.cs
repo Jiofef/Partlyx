@@ -5,6 +5,7 @@ namespace Partlyx.Services.ServiceInterfaces
     public interface IFileService
     {
         string? CurrentPartreePath { get; }
+        bool IsChangesSaved { get; }
 
         Task ClearCurrentFile();
         Task<ExportResult> ExportPartreeAsync(string targetPath, CancellationToken cancellationToken = default);

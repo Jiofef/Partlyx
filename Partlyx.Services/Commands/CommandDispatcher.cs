@@ -1,13 +1,19 @@
-﻿using System;
+﻿using Partlyx.Infrastructure.Events;
+using Partlyx.Services.OtherEvents;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Partlyx.Services.Commands
 {
     public class CommandDispatcher : ICommandDispatcher
     {
+        private readonly IEventBus _bus;
+        public CommandDispatcher(IEventBus bus) => _bus = bus;
+
         private int maxHistoryLength = 100;
         public int MaxHistoryLength
         {
@@ -50,8 +56,9 @@ namespace Partlyx.Services.Commands
                 if (_commandsHistory.Count > MaxHistoryLength)
                     _commandsHistory.RemoveFirst();
             }
-
             _canceledCommandsHistory.Clear();
+
+            _bus.Publish(new CommandExcecutedEvent(command));
         }
 
         public async Task UndoAsync()
@@ -63,6 +70,9 @@ namespace Partlyx.Services.Commands
 
             await cancelledCommand.UndoAsync();
             _canceledCommandsHistory.AddLast(cancelledCommand);
+
+            var previousCommand = _commandsHistory.Count > 0 ? _commandsHistory.Last.Value : null;
+            _bus.Publish(new CommandUndoedEvent(cancelledCommand, previousCommand));
         }
         public async Task RedoAsync()
         {
@@ -77,6 +87,8 @@ namespace Partlyx.Services.Commands
 
             if (_commandsHistory.Count > MaxHistoryLength)
                 _commandsHistory.RemoveFirst();
+
+            _bus.Publish(new CommandRedoedEvent(command));
         }
     }
 }

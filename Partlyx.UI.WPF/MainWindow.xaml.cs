@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Partlyx.ViewModels.UIObjectViewModels;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +24,19 @@ namespace Partlyx.UI.WPF
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        protected override async void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            if (DataContext is MainViewModel vm)
+            {
+                var confirm = await vm.ConfirmClosingAsync();
+
+                if (!confirm)
+                    e.Cancel = true;
+            }
         }
     }
 }

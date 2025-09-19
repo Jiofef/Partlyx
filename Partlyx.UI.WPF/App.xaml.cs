@@ -81,7 +81,7 @@ namespace Partlyx.UI.WPF
             InitializeCommands(services);
 
             // Viewmodels and windows
-            services.AddTransient<MainViewModel>();
+            services.AddSingleton<MainViewModel>();
 
             services.AddTransient<ResourceListViewModel>();
             services.AddTransient<RecipeListViewModel>();
@@ -110,6 +110,7 @@ namespace Partlyx.UI.WPF
             services.AddTransient<IRecipeComponentItemUiStateService, RecipeComponentItemUiStateService>();
 
             services.AddTransient<IFileDialogService, WpfFileDialogService>();
+            services.AddTransient<IVMFileService, VMFileService>();
             services.AddTransient<INotificationService, WpfNotificationService>();
 
             Services = services.BuildServiceProvider();
