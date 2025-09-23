@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore.InMemory.Query.Internal;
 using Partlyx.Core;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
@@ -10,6 +11,7 @@ using Partlyx.Services.PartsEventClasses;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.UIServices.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,18 +25,22 @@ namespace Partlyx.ViewModels.UIObjectViewModels
     {
         private readonly ICommandFactory _commandFactory;
         private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IDialogService _dialogService;
 
         private readonly IDisposable _selectedParentsChangedSubscription;
 
         public IGlobalSelectedParts SelectedParts { get; }
 
+        // Components in this collection are ALWAYS only a projection of the selected item collection.
+        // Therefore, Set is allowed here and it is not recommended to change the contents of the selected collection by reference.
         private ObservableCollection<RecipeComponentItemViewModel> _components;
         public ObservableCollection<RecipeComponentItemViewModel> Components { get => _components; private set => SetProperty(ref _components, value); }
 
-        public RecipeComponentListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IGlobalSelectedParts sp)
+        public RecipeComponentListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IGlobalSelectedParts sp, IDialogService ds)
         {
             _commandFactory = cf;
             _commandDispatcher = cd;
+            _dialogService = ds;
             SelectedParts = sp;
 
             _selectedParentsChangedSubscription = bus.Subscribe<GlobalSelectedRecipesChangedEvent>(OnSelectedRecipesChanged, true);
@@ -68,8 +74,19 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             if (parent == null)
                 throw new InvalidOperationException("Create command shouldn't be called when created part's parent isn't selected or is multiselected");
 
-            var command = _commandFactory.Create<CreateRecipeComponentCommand>(parent.ParentResource!, parent.Uid);
-            await _commandDispatcher.ExcecuteAsync(command);
+            var result = await _dialogService.ShowDialogAsync<ComponentCreateViewModel>();
+            if (result is not ISelectedParts selected || !selected.IsResourcesSelected) 
+                return;
+
+            var selectedRes = selected.Resources.ToList();
+            var grandParentResUid = parent.ParentResource!.Uid;
+            var parentRecipeUid = parent!.Uid;
+            foreach (var resource in selectedRes)
+            {
+                var componentResUid = resource.Uid;
+                var command = _commandFactory.Create<CreateRecipeComponentCommand>(grandParentResUid, parentRecipeUid, componentResUid);
+                await _commandDispatcher.ExcecuteAsync(command);
+            }
         }
     }
 }

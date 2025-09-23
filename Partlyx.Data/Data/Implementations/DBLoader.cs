@@ -14,10 +14,9 @@ namespace Partlyx.Infrastructure.Data.Implementations
 {
     public record ImportResult(bool Success, string? ErrorMessage = null, string? DiagnosticFile = null);
 
-    public class DBLoader : IDBLoader, IDisposable
+    public class DBLoader : IDBLoader
     {
         private readonly IDBProvider _dbProvider;
-        private bool _disposed;
 
         public DBLoader(IDBProvider dbProvider)
         {
@@ -99,15 +98,6 @@ namespace Partlyx.Infrastructure.Data.Implementations
             {
                 try { if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true); } catch { /* ignore */ }
                 _dbProvider.DBExportLoadSemaphore.Release();
-            }
-        }
-
-        public void Dispose()
-        {
-            if (!_disposed)
-            {
-                _dbProvider.DBExportLoadSemaphore.Release(); // !Can work uncorrectly!
-                _disposed = true;
             }
         }
     }

@@ -69,8 +69,10 @@ namespace Partlyx.Infrastructure.Data.Implementations
         {
             await using var db = _dbFactory.CreateDbContext();
 
-            var r = await db.Resources.Include(x => x.Recipes)
+            var r = await db.Resources
+                .Include(x => x.Recipes)
                 .ThenInclude(rc => rc.Components)
+                .ThenInclude(c => c.ComponentResource)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Uid == uid);
 
@@ -95,6 +97,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             var rl = await db.Resources
                 .Include(r => r.Recipes)
                 .ThenInclude(rc => rc.Components)
+                .ThenInclude(c => c.ComponentResource)
                 .ToListAsync();
 
             return rl;
@@ -107,6 +110,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             var rl = await db.Recipes
                 .Include(rc => rc.ParentResource)
                 .Include(rc => rc.Components)
+                .ThenInclude(c => c.ComponentResource)
                 .ToListAsync();
 
             return rl;
@@ -117,6 +121,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await using var db = _dbFactory.CreateDbContext();
 
             var rl = await db.RecipeComponents
+                .Include(c => c.ComponentResource)
                 .Include(c => c.ParentRecipe)
                 .ThenInclude(rc => rc!.ParentResource)
                 .ToListAsync();

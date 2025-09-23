@@ -4,6 +4,7 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
              xmlns:local="clr-namespace:Partlyx.UI.WPF"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:fa="http://schemas.fontawesome.io/icons/">
     <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
@@ -16,7 +17,9 @@
                 <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
                 <TextBlock Text="Resources" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
             </Grid>
-            
+            <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                     md:HintAssist.Hint="Search..." Background="{StaticResource PxWhiteBrush}" Grid.Row="0"
+                     Text="{Binding Search.SearchText, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">
@@ -24,6 +27,9 @@
                 <ListView ItemsSource="{Binding Resources}" beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Resources,
                             RelativeSource={RelativeSource AncestorType=Window}}"
                           HorizontalContentAlignment="Stretch" Margin="0,0,10,0" Style="{StaticResource CommonListView}" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
+                    <i:Interaction.Behaviors>
+                        <beh:CollectionViewFilterBehavior Predicate="{Binding Search.SearchByName}"/>
+                    </i:Interaction.Behaviors>
                     <ListView.InputBindings>
                         <KeyBinding Key="F2" Command="{Binding StartRenamingSelectedCommand}"/>
                         <KeyBinding Key="Enter" Command="{Binding StartRenamingSelectedCommand}"/>

@@ -15,10 +15,9 @@ namespace Partlyx.Infrastructure.Data.Implementations
     public record ExportResult(bool Success, string? ErrorMessage = null, string? TempBackupPath = null);
 
 
-    public class DBSaver : IDisposable, IDBSaver
+    public class DBSaver : IDBSaver
     {
         private readonly IDBProvider _dbProvider;
-        private bool _disposed;
 
         public DBSaver(IDBProvider dbProvider)
         {
@@ -98,15 +97,6 @@ namespace Partlyx.Infrastructure.Data.Implementations
             {
                 try { if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true); } catch { /* ignore */ }
                 _dbProvider.DBExportLoadSemaphore.Release();
-            }
-        }
-
-        public void Dispose()
-        {
-            if (!_disposed)
-            {
-                _dbProvider.DBExportLoadSemaphore?.Release();  // !Can work uncorrectly!
-                _disposed = true;
             }
         }
     }

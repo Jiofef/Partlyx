@@ -1,14 +1,26 @@
-﻿using Partlyx.Services.Commands;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Partlyx.Infrastructure.Events;
+using Partlyx.Services.Commands;
 
 namespace Partlyx.Tests
 {
     public class CommandDispatcherTest
     {
+        private IServiceProvider _services;
+        public CommandDispatcherTest() 
+        {
+            IServiceCollection services = new ServiceCollection();
+            services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
+            services.AddSingleton<IEventBus, EventBus>();
+            _services = services.BuildServiceProvider();
+        }
+        private ICommandDispatcher GetCommandDispatcher() => _services.GetRequiredService<ICommandDispatcher>();
+
         [Fact]
         public async Task ExcecuteAsync_Add5ToNumber2Times_GetNumber10()
         {
             // Arrange
-            CommandDispatcher dispatcher = new CommandDispatcher();
+            ICommandDispatcher dispatcher = GetCommandDispatcher();
             Number number = new Number();
             NumberAdderCommand command1 = new(number, 5);
             NumberAdderCommand command2 = new(number, 5);
@@ -25,7 +37,7 @@ namespace Partlyx.Tests
         public async Task UndoAsync_Add7ToNumberAndUndo_GetNumber0()
         {
             // Arrange
-            CommandDispatcher dispatcher = new CommandDispatcher();
+            ICommandDispatcher dispatcher = GetCommandDispatcher();
             Number number = new Number();
             NumberAdderCommand command = new(number, 7);
 
@@ -41,7 +53,7 @@ namespace Partlyx.Tests
         public async Task UndoAsync_Add7ToNumber4TimesAndUndoWithHistoryLength2_GetNumber14()
         {
             // Arrange
-            CommandDispatcher dispatcher = new CommandDispatcher();
+            ICommandDispatcher dispatcher = GetCommandDispatcher();
             Number number = new Number();
             NumberAdderCommand command1 = new(number, 7);
             NumberAdderCommand command2 = new(number, 7);
@@ -69,7 +81,7 @@ namespace Partlyx.Tests
         public async Task RedoAsync_Add8ToNumberThenUndoAndRedo_GetNumber8()
         {
             // Arrange
-            CommandDispatcher dispatcher = new CommandDispatcher();
+            ICommandDispatcher dispatcher = GetCommandDispatcher();
             Number number = new Number();
             NumberAdderCommand command = new(number, 8);
 

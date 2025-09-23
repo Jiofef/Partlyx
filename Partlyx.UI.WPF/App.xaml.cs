@@ -11,7 +11,6 @@ using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.UI.WPF.VMImplementations;
 using Partlyx.ViewModels;
-using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIObjectViewModels;
@@ -91,6 +90,8 @@ namespace Partlyx.UI.WPF
             services.AddTransient<MenuPanelViewModel>();
             services.AddTransient<MenuPanelFileViewModel>();
 
+            services.AddTransient<ComponentCreateViewModel>();
+
             services.AddTransient<MainWindow>();
 
             // Helper viewmodels
@@ -104,14 +105,18 @@ namespace Partlyx.UI.WPF
 
             services.AddTransient<IIsolatedSelectedParts, IsolatedSelectedParts>();
             services.AddSingleton<IGlobalSelectedParts, GlobalSelectedParts>();
+            services.AddTransient<IIsolatedResourcesVMContainer, ResourcesVMContainer>();
+            services.AddSingleton<IGlobalResourcesVMContainer, ResourcesVMContainer>();
 
             services.AddTransient<IResourceItemUiStateService, ResourceItemUiStateService>();
             services.AddTransient<IRecipeItemUiStateService, RecipeItemUiStateService>();
             services.AddTransient<IRecipeComponentItemUiStateService, RecipeComponentItemUiStateService>();
+            services.AddTransient<IResourceSearchService, ResourceSearchService>();
 
             services.AddTransient<IFileDialogService, WpfFileDialogService>();
             services.AddTransient<IVMFileService, VMFileService>();
             services.AddTransient<INotificationService, WpfNotificationService>();
+            services.AddTransient<IDialogService, DialogService>();
 
             Services = services.BuildServiceProvider();
         }

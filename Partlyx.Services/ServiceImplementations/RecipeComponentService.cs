@@ -87,13 +87,7 @@ namespace Partlyx.Services.ServiceImplementations
             var resource = await _repo.GetByUidAsync(parentResourceUid);
             if (resource == null) return null;
 
-            // Find a recipe that contains the component
-            var recipe = resource.Recipes.FirstOrDefault(
-                rp => rp.Components.Any(c => c.Uid == componentUid));
-
-            if (recipe == null) return null;
-
-            var component = recipe.Components.First(c => c.Uid == componentUid);
+            var component = resource.GetRecipeComponentByUid(componentUid);
 
             return component != null ? component.ToDto() : null;
         }

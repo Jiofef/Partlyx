@@ -7,6 +7,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
     public record PartsVMInitializationStartedEvent();
     public record PartsVMInitializationFinishedEvent();
 
+    // Previously, this class created recipes and their components by itself, but it turned out to be a bug, since they are created in the constructors of their ancestors during initialization.
+    // So the variables associated with loading recipes and components here are rudimentary, they are left for the sake of the dependency inversion.
     public class PartsInitializeService : IPartsInitializeService
     {
         private readonly IEventBus _bus;
@@ -14,15 +16,15 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IVMPartsStore _store;
 
         private readonly IDisposable _resourcesBulkLoadedSubscription;
-        private readonly IDisposable _recipesBulkLoadedSubscription;
-        private readonly IDisposable _recipeComponentsBulkLoadedSubscription;
 
         private readonly IDisposable _partsInitializationStartedSubscription;
 
+        // At the moment, due to the particularities of the VM parts initialization, all these three fields from below become true simultaneously.
         public bool IsResourcesLoaded { get; private set; }
         public bool IsRecipesLoaded { get; private set; }
         public bool IsRecipeComponentsLoaded { get; private set; }
         private bool _isEverythingLoaded => IsResourcesLoaded && IsRecipesLoaded && IsRecipeComponentsLoaded;
+
         public bool InitializationFinished { get; private set; }
 
         public PartsInitializeService(IEventBus bus, IVMPartsFactory vmpf, IVMPartsStore vmps)
@@ -32,8 +34,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _store = vmps;
 
             _resourcesBulkLoadedSubscription = bus.Subscribe<ResourcesBulkLoadedEvent>(OnResourceBulkLoaded, true);
-            _recipesBulkLoadedSubscription = bus.Subscribe<RecipesBulkLoadedEvent>(OnRecipeBulkLoaded, true);
-            _recipeComponentsBulkLoadedSubscription = bus.Subscribe<RecipeComponentsBulkLoadedEvent>(OnRecipeComponentBulkLoaded, true);
 
             _partsInitializationStartedSubscription = bus.Subscribe<PartsInitializationStartedEvent>(OnInitializationStarted, true);
         }
@@ -46,71 +46,26 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         private void OnResourceBulkLoaded(ResourcesBulkLoadedEvent ev)
         {
+            // Resources and recipes VMs are creating their children by themselves from dto in constructor
             foreach (var dto in ev.Bulk)
                 _factory.GetOrCreateResourceVM(dto);
 
             IsResourcesLoaded = true;
-            if (_isEverythingLoaded)
-                OnLoadFinished();
-        }
-
-        private void OnRecipeBulkLoaded(RecipesBulkLoadedEvent ev)
-        {
-            foreach (var dto in ev.Bulk)
-                _factory.GetOrCreateRecipeVM(dto);
-
             IsRecipesLoaded = true;
-            if (_isEverythingLoaded)
-                OnLoadFinished();
-        }
-
-        private void OnRecipeComponentBulkLoaded(RecipeComponentsBulkLoadedEvent ev)
-        {
-            foreach (var dto in ev.Bulk)
-                _factory.GetOrCreateRecipeComponentVM(dto);
-
             IsRecipeComponentsLoaded = true;
-            if (_isEverythingLoaded)
+
+            if (_isEverythingLoaded || true)
                 OnLoadFinished();
-        }
-
-        private void RebuildTreeConnections()
-        {
-            foreach (var component in _store.RecipeComponents.Values)
-            {
-                var parentUid = component.ParentRecipeUid;
-                if (parentUid == null) continue;
-
-                if (_store.Recipes.TryGetValue((Guid)parentUid, out var parent))
-                {
-                    parent.InitAddChild(component);
-                }
-            }
-
-            foreach (var recipe in _store.Recipes.Values)
-            {
-                var parentUid = recipe.ParentResourceUid;
-                if (parentUid == null) continue;
-
-                if (_store.Resources.TryGetValue((Guid)parentUid, out var parent))
-                {
-                    parent.InitAddChild(recipe);
-                }
-            }
         }
 
         private void OnLoadFinished()
         {
-            RebuildTreeConnections();
-
             InitializationFinished = true;
             _bus.Publish(new PartsVMInitializationFinishedEvent());
         }
 
         public void Dispose()
         {
-            _recipeComponentsBulkLoadedSubscription.Dispose();
-            _recipesBulkLoadedSubscription.Dispose();
             _resourcesBulkLoadedSubscription.Dispose();
 
             _partsInitializationStartedSubscription.Dispose();

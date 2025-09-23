@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
+
 namespace Partlyx.ViewModels
 {
     public partial class ResourceItemUIState : ObservableObject

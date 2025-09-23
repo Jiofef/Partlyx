@@ -19,11 +19,11 @@ using System.Windows.Shapes;
 namespace Partlyx.UI.WPF
 {
     /// <summary>
-    /// Логика взаимодействия для RecipeListView.xaml
+    /// Логика взаимодействия для ComponentListView.xaml
     /// </summary>
-    public partial class RecipeListView : UserControl
+    public partial class ComponentListView : UserControl
     {
-        public RecipeListView()
+        public ComponentListView()
         {
             InitializeComponent();
         }

@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Infrastructure;
+using Partlyx.Infrastructure.Data.Implementations;
+using Partlyx.Infrastructure.Data.Interfaces;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.Services.ServiceImplementations;
-using Partlyx.Tests.DataTests;
 using Partlyx.Services.ServiceInterfaces;
-using Partlyx.Infrastructure.Data.Interfaces;
-using Partlyx.Infrastructure.Data.Implementations;
+using Partlyx.Tests.DataTests;
 
 namespace Partlyx.Tests.InfrastructureTests
 {
@@ -14,16 +15,16 @@ namespace Partlyx.Tests.InfrastructureTests
     public class ResourceCommonCommandsTest : IDisposable
     {
         private readonly ServiceProvider _provider;
-        private readonly CommandDispatcher _dispatcher;
+        private readonly ICommandDispatcher _dispatcher;
         private readonly ICommandFactory _factory;
         private readonly IPartUpdater _updater;
 
         public ResourceCommonCommandsTest(DBFixture fixture) 
         {
-            _dispatcher = new CommandDispatcher();
-
             _provider = fixture.CreateProvider(services =>
             {
+                services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
+                services.AddSingleton<IEventBus, EventBus>();
                 services.AddTransient<IResourceRepository, ResourceRepository>();
                 services.AddTransient<IResourceService, ResourceService>();
                 services.AddTransient<IPartUpdater, PartUpdater>();
@@ -41,6 +42,7 @@ namespace Partlyx.Tests.InfrastructureTests
 
             _factory = _provider.GetRequiredService<ICommandFactory>();
             _updater = _provider.GetRequiredService<IPartUpdater>();
+            _dispatcher = _provider.GetRequiredService<ICommandDispatcher>();
         }
         public void Dispose() => _provider.Dispose();
 

@@ -78,6 +78,16 @@ public class PartlyxDBContext : DbContext, IDisposable
                 .WithMany()
                 .HasForeignKey("ComponentResourceUid")
                 .OnDelete(DeleteBehavior.Restrict);
+
+            cb.Metadata.FindNavigation(nameof(RecipeComponent.ComponentResource))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+            cb.Metadata.FindNavigation(nameof(RecipeComponent.ComponentResource))!
+            .SetField("_componentResource");
+
+            cb.Metadata.FindNavigation(nameof(RecipeComponent.ParentRecipe))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+            cb.Metadata.FindNavigation(nameof(RecipeComponent.ParentRecipe))!
+            .SetField("_parentRecipe");
         });
 
         base.OnModelCreating(modelBuilder);

@@ -1,18 +1,6 @@
 ﻿using Partlyx.ViewModels.UIObjectViewModels;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Partlyx.UI.WPF
 {
@@ -26,17 +14,31 @@ namespace Partlyx.UI.WPF
             InitializeComponent();
         }
 
+        private bool _confirmedClose;
         protected override async void OnClosing(CancelEventArgs e)
         {
-            base.OnClosing(e);
-
-            if (DataContext is MainViewModel vm)
+            if (_confirmedClose)
             {
-                var confirm = await vm.ConfirmClosingAsync();
-
-                if (!confirm)
-                    e.Cancel = true;
+                base.OnClosing(e);
+                return;
             }
+
+            e.Cancel = true;
+
+            try
+            {
+                var vm = DataContext as MainViewModel;
+                if (vm != null)
+                {
+                    _confirmedClose = await vm.ConfirmClosingAsync();
+                    if (!_confirmedClose) return;
+                }
+
+                // If we just call Close(), nothing will happen because of previously used await and threads, so we use Dispatcher
+                _ = Dispatcher.BeginInvoke((Action)(() => Close()),
+                       System.Windows.Threading.DispatcherPriority.Normal);
+            }
+            catch { }
         }
     }
 }

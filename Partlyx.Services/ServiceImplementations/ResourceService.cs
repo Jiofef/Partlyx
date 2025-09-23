@@ -75,6 +75,14 @@ namespace Partlyx.Services.ServiceImplementations
             return resourcesDtoList;
         }
 
+        public async Task<List<Guid>> SearchResourcesUidsAsync(string query)
+        {
+            var resourcesList = await _repo.SearchAsync(query);
+            var resourcesUids = resourcesList.Select(x => x.Uid).ToList();
+
+            return resourcesUids;
+        }
+
         public async Task SetDefaultRecipeAsync(Guid resourceUid, Guid recipeUid)
         {
             await _repo.ExecuteOnRecipeAsync(resourceUid, recipeUid, recipe =>

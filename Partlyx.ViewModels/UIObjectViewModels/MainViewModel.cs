@@ -16,7 +16,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public ResourceListViewModel ResourceList { get; }
         public RecipeListViewModel RecipeList { get; }
-        public RecipeComponentListViewModel RecipeComponents { get; }
+        public RecipeComponentListViewModel ComponentList { get; }
 
         public PartsTreeViewModel PartsTree { get; }
 
@@ -40,7 +40,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         {
             ResourceList = resourceList;
             RecipeList = recipeList;
-            RecipeComponents = recipeComponents;
+            ComponentList = recipeComponents;
             PartsTree = partsTree;
             MenuPanel = menuPanel;
             SelectedParts = selectedParts;

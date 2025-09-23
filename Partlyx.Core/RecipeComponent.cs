@@ -5,7 +5,8 @@ namespace Partlyx.Core
     public class RecipeComponent : ICopiable<Recipe>, IPart
     {
         // Hierarchy
-        public Recipe? ParentRecipe { get; private set; }
+        private Recipe? _parentRecipe;
+        public Recipe? ParentRecipe { get => _parentRecipe; private set => _parentRecipe = value; }
         public bool IsDetached => ParentRecipe == null;
 
         public static RecipeComponent CreateForRecipe(Recipe parentRecipe, Resource component, double quantity)
@@ -14,8 +15,7 @@ namespace Partlyx.Core
             {
                 ParentRecipe = parentRecipe,
                 ComponentResource = component,
-                Quantity = quantity,
-                Uid = new Guid()
+                Quantity = quantity
             };
 
             return recipeComponent;
@@ -54,7 +54,8 @@ namespace Partlyx.Core
         public Guid Uid { get; private set; }
 
         // Main features
-        public Resource ComponentResource { get; private set; }
+        private Resource _componentResource;
+        public Resource ComponentResource { get => _componentResource; private set => _componentResource = value; }
 
         public double Quantity { get; set; }
 
@@ -82,6 +83,7 @@ namespace Partlyx.Core
 
         [NotMapped]
         private Recipe? _componentSelectedRecipe = null; // Null means default value for recipe. See Resource.DefaultRecipe
+
         [NotMapped]
         public Recipe? ComponentSelectedRecipe // Must be null when resource doesn't contain any recipes
         {

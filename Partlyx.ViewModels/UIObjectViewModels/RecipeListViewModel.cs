@@ -33,8 +33,6 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private ObservableCollection<RecipeItemViewModel> _recipes;
         public ObservableCollection<RecipeItemViewModel> Recipes { get => _recipes; private set => SetProperty(ref _recipes, value); }
 
-        public bool IsSingleResourceSelected() => SelectedParts.GetSingleResourceOrNull() != null;
-
         public RecipeListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IGlobalSelectedParts sp)
         {
             _commandFactory = cf;

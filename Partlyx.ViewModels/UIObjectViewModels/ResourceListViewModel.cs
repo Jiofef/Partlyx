@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using System.Diagnostics;
-using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.Services.Dtos;
@@ -20,7 +19,6 @@ namespace Partlyx.ViewModels
         private readonly IVMPartsFactory _partsFactory;
         private readonly ICommandFactory _commandFactory;
         private readonly ICommandDispatcher _commandDispatcher;
-        private readonly IResourceService _resourceService;
         private readonly IVMPartsStore _store;
 
         private readonly IDisposable _childAddSubscription;
@@ -29,25 +27,27 @@ namespace Partlyx.ViewModels
         private readonly IDisposable _fileClearedSubscription;
 
         public IGlobalSelectedParts SelectedParts { get; }
+        public IResourceSearchService Search { get; }
 
-        public ObservableCollection<ResourceItemViewModel> Resources { get; } = new();
+        private IGlobalResourcesVMContainer _resourcesContainer { get; }
+        public ObservableCollection<ResourceItemViewModel> Resources => _resourcesContainer.Resources;
 
-        public ResourceListViewModel(IGlobalSelectedParts sp, IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IResourceService rs, IVMPartsStore vmps)
+        public ResourceListViewModel(IGlobalResourcesVMContainer grvmc, IGlobalSelectedParts sp, IEventBus bus, IVMPartsFactory vmpf,
+                ICommandFactory cf, ICommandDispatcher cd, IResourceService rs, IVMPartsStore vmps, IResourceSearchService rss)
         {
+            _resourcesContainer = grvmc;
             _partsFactory = vmpf;
             _commandFactory = cf;
             _commandDispatcher = cd;
-            _resourceService = rs;
             _store = vmps;
 
             SelectedParts = sp;
+            Search = rss;
 
             _childAddSubscription = bus.Subscribe<ResourceCreatedEvent>(OnResourceCreated, true);
             _childRemoveSubscription = bus.Subscribe<ResourceDeletedEvent>(OnResourceDeleted, true);
             _initializationFinishedSubscription = bus.Subscribe<PartsVMInitializationFinishedEvent>((ev) => UpdateList(), true);
             _fileClearedSubscription = bus.Subscribe<FileClearedEvent>((ev) => Resources.Clear(), true);
-
-            Resources = new ObservableCollection<ResourceItemViewModel>();
         }
 
         private void AddFromDto(ResourceDto dto)

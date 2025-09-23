@@ -6,11 +6,21 @@ using System.Collections.Specialized;
 
 namespace Partlyx.ViewModels.PartsViewModels
 {
-    public abstract class SelectedPartsAbstract : ObservableObject, ISelectedParts
+    public abstract partial class SelectedPartsAbstract : ObservableObject, ISelectedParts
     {
+        [ObservableProperty]
         private bool _isSingleResourceSelected;
+        [ObservableProperty]
         private bool _isSingleRecipeSelected;
+        [ObservableProperty]
         private bool _isSingleComponentSelected;
+
+        [ObservableProperty]
+        private bool _isResourcesSelected;
+        [ObservableProperty]
+        private bool _isRecipesSelected;
+        [ObservableProperty]
+        private bool _isComponentsSelected;
 
         public ObservableCollection<ResourceItemViewModel> Resources { get; }
 
@@ -27,16 +37,19 @@ namespace Partlyx.ViewModels.PartsViewModels
             Resources.CollectionChanged += (obj, evInfo) => 
             {
                 IsSingleResourceSelected = Resources.Count == 1;
+                IsResourcesSelected = Resources.Count > 0;
                 SelectedResourcesChangedHandler(obj, evInfo);
             };
             Recipes.CollectionChanged += (obj, evInfo) =>
             {
-                IsSingleResourceSelected = Recipes.Count == 1;
+                IsSingleRecipeSelected = Recipes.Count == 1;
+                IsRecipesSelected = Recipes.Count > 0;
                 SelectedRecipesChangedHandler(obj, evInfo);
             };
             Components.CollectionChanged += (obj, evInfo) =>
             {
-                IsSingleResourceSelected = Components.Count == 1;
+                IsSingleComponentSelected = Components.Count == 1;
+                IsComponentsSelected = Components.Count > 0;
                 SelectedComponentsChangedHandler(obj, evInfo);
             };
         }
@@ -44,22 +57,6 @@ namespace Partlyx.ViewModels.PartsViewModels
         protected virtual void SelectedResourcesChangedHandler(object? @object, NotifyCollectionChangedEventArgs args) { }
         protected virtual void SelectedRecipesChangedHandler(object? @object, NotifyCollectionChangedEventArgs args) { }
         protected virtual void SelectedComponentsChangedHandler(object? @object, NotifyCollectionChangedEventArgs args) { }
-
-        public bool IsSingleResourceSelected 
-        {
-            get => _isSingleResourceSelected; 
-            private set => SetProperty(ref _isSingleResourceSelected, value); 
-        }
-        public bool IsSingleRecipeSelected
-        {
-            get => _isSingleRecipeSelected;
-            private set => SetProperty(ref _isSingleRecipeSelected, value);
-        }
-        public bool IsSingleComponentSelected
-        {
-            get => _isSingleComponentSelected;
-            private set => SetProperty(ref _isSingleComponentSelected, value);
-        }
 
         #region Resource methods
         public void SelectSingleResource(ResourceItemViewModel resource)
