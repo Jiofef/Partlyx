@@ -16,7 +16,7 @@
                 <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
                 <TextBlock Text="Components" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
             </Grid>
-
+            <TextBlock Text="{Binding SelectedParts.SingleRecipeOrNull.Name}" HorizontalAlignment="Center" Style="{StaticResource CommonTextBlock}"/>
         </StackPanel>
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">
@@ -40,6 +40,7 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                                    <TextBlock Text="{Binding Resource.Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"/>
                                 </Grid>
                             </Grid>
                         </DataTemplate>

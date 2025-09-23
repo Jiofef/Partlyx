@@ -39,7 +39,6 @@ namespace Partlyx.Services.ServiceImplementations
             var recipe = await GetRecipeAsync(parentResourceUid, result);
             if (recipe != null)
             {
-                Trace.WriteLine("---\n" + new StackTrace() + "\n---");
                 _eventBus.Publish(new RecipeCreatedEvent(recipe));
 
                 if (defaultRecipeChangedEvent != null)

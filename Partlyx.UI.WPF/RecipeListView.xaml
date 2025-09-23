@@ -16,7 +16,7 @@
                 <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
                 <TextBlock Text="Recipes" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
             </Grid>
-
+            <TextBlock Text="{Binding SelectedParts.SingleResourceOrNull.Name}" HorizontalAlignment="Center" Style="{StaticResource CommonTextBlock}"/>
         </StackPanel>
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">
@@ -24,6 +24,12 @@
                 <ListView ItemsSource="{Binding Recipes}" beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Recipes,
                             RelativeSource={RelativeSource AncestorType=Window}}"
                           HorizontalContentAlignment="Stretch" Margin="0,0,10,0" Style="{StaticResource CommonListView}" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
+                    <i:Interaction.Behaviors>
+                        <beh:ListViewAutoSelectBehavior 
+                            Watch="{Binding DataContext.SelectedParts.SingleResourceOrNull, RelativeSource={RelativeSource AncestorType=Window}}"
+                            ValueToSelect="{Binding DataContext.SelectedParts.SingleResourceOrNull.DefaultRecipe, RelativeSource={RelativeSource AncestorType=Window}}"
+                            AutoScrollIntoView="True"/>
+                    </i:Interaction.Behaviors>
                     <ListView.InputBindings>
                         <KeyBinding Key="F2" Command="{Binding StartRenamingSelectedCommand}"/>
                         <KeyBinding Key="Enter" Command="{Binding StartRenamingSelectedCommand}"/>

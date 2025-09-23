@@ -11,6 +11,7 @@ using Partlyx.Services.Dtos;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.Infrastructure.Data.CommonFileEvents;
+using Partlyx.Services.Commands.RecipeCommonCommands;
 
 namespace Partlyx.ViewModels
 {
@@ -90,8 +91,26 @@ namespace Partlyx.ViewModels
         [RelayCommand]
         private async Task CreateResourceAsync()
         {
-            var command = _commandFactory.Create<CreateResourceCommand>();
-            await _commandDispatcher.ExcecuteAsync(command);
+            // It must be executed on a single thread so that recipients respond to events immediately after they are sent
+            await Task.Run(async() =>
+            {
+                await _commandDispatcher.ExcecuteComplexAsync(async complexDispatcher =>
+                {
+                    // Resource creating
+                    var createResourceCommand = _commandFactory.Create<CreateResourceCommand>();
+                    await complexDispatcher.ExcecuteAsync(createResourceCommand);
+                    var resourseUid = createResourceCommand.ResourceUid;
+
+                    // Default recipe creating
+                    var defaultRecipeCreateCommand = _commandFactory.Create<CreateRecipeCommand>(resourseUid);
+                    await complexDispatcher.ExcecuteAsync(defaultRecipeCreateCommand);
+
+                    var recipeUid = defaultRecipeCreateCommand.RecipeUid;
+                    var recipeName = "Default recipe";
+                    var defaultRecipeSetNameCommand = await _commandFactory.CreateAsync<SetRecipeNameCommand>(resourseUid, recipeUid, recipeName);
+                    await complexDispatcher.ExcecuteAsync(defaultRecipeSetNameCommand);
+                });
+            });
         }
 
         [RelayCommand]

@@ -1,4 +1,5 @@
-﻿using Partlyx.Infrastructure.Events;
+﻿using Partlyx.Core;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.OtherEvents;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,12 @@ namespace Partlyx.Services.Commands
     public class CommandDispatcher : ICommandDispatcher
     {
         private readonly IEventBus _bus;
-        public CommandDispatcher(IEventBus bus) => _bus = bus;
+        private readonly CommandDispatcherUndoableComplexHelper _complexHelper;
+        public CommandDispatcher(IEventBus bus)
+        {
+            _bus = bus;
+            _complexHelper = new CommandDispatcherUndoableComplexHelper();
+        }
 
         private int maxHistoryLength = 100;
         public int MaxHistoryLength
@@ -48,17 +54,16 @@ namespace Partlyx.Services.Commands
         public async Task ExcecuteAsync(ICommand command)
         {
             await command.ExecuteAsync();
-
-            if (command is IUndoableCommand uCommand)
-            {
-                _commandsHistory.AddLast(uCommand);
-
-                if (_commandsHistory.Count > MaxHistoryLength)
-                    _commandsHistory.RemoveFirst();
-            }
-            _canceledCommandsHistory.Clear();
-
+            OnCommandExcecuted(command);
             _bus.Publish(new CommandExcecutedEvent(command));
+        }
+
+        public async Task ExcecuteComplexAsync(Func<ICommandDispatcherComplexHelper, Task> complexAction)
+        {
+            await complexAction(_complexHelper);
+            var complex = _complexHelper.GetComplex();
+            _complexHelper.ClearComplex();
+            OnCommandExcecuted(complex);
         }
 
         public async Task UndoAsync()
@@ -89,6 +94,18 @@ namespace Partlyx.Services.Commands
                 _commandsHistory.RemoveFirst();
 
             _bus.Publish(new CommandRedoedEvent(command));
+        }
+
+        private void OnCommandExcecuted(ICommand command)
+        {
+            if (command is IUndoableCommand uCommand)
+            {
+                _commandsHistory.AddLast(uCommand);
+
+                if (_commandsHistory.Count > MaxHistoryLength)
+                    _commandsHistory.RemoveFirst();
+            }
+            _canceledCommandsHistory.Clear();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿
+
 namespace Partlyx.Services.Commands
 {
     public interface ICommandDispatcher
@@ -6,6 +7,7 @@ namespace Partlyx.Services.Commands
         int MaxHistoryLength { get; set; }
 
         Task ExcecuteAsync(ICommand command);
+        Task ExcecuteComplexAsync(Func<ICommandDispatcherComplexHelper, Task> complex);
         Task RedoAsync();
         Task UndoAsync();
     }

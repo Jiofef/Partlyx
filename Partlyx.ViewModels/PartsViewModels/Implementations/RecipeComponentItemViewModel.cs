@@ -1,4 +1,5 @@
-﻿using Partlyx.Infrastructure.Events;
+﻿using Partlyx.Core;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
@@ -21,6 +22,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         // Events
         private readonly IEventBus _bus;
         private readonly IDisposable _updatedSubscription;
+        private readonly IDisposable _childAddSubscription;
+        private readonly IDisposable _childRemoveSubscription;
 
         public RecipeComponentItemViewModel(RecipeComponentDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS)
         {
@@ -35,12 +38,14 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             // Info
             _parentRecipeUid = dto.ParentRecipeUid;
-            _resourceUid = dto.ResourceUid;
+            ResourceUid = dto.ResourceUid;
             _quantity = dto.Quantity;
             _selectedRecipeUid = dto.SelectedRecipeUid;
 
             // Info updating binding
             _updatedSubscription = _bus.Subscribe<RecipeComponentUpdatedEvent>(OnRecipeComponentUpdated, true);
+            _childAddSubscription = bus.Subscribe<ResourceCreatedEvent>(OnResourceCreated, true);
+            _childRemoveSubscription = bus.Subscribe<ResourceDeletedEvent>(OnResourceDeleted, true);
         }
 
         // Recipe component info
@@ -51,13 +56,23 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public RecipeItemViewModel? ParentRecipe => ParentRecipeUid != null ? _store.Recipes[(Guid)ParentRecipeUid] : null;
 
         private Guid _resourceUid;
-        public Guid ResourceUid { get => _resourceUid; set => SetProperty(ref _resourceUid, value); }
-        public ResourceItemViewModel? Resource => _store.Resources[ResourceUid];
+        public Guid ResourceUid 
+        { 
+            get => _resourceUid;
+            set
+            {
+                SetProperty(ref _resourceUid, value);
+                Resource = _store.Resources.GetValueOrDefault(value);
+            }
+        }
+        private ResourceItemViewModel? _resource;
+        public ResourceItemViewModel? Resource { get => _resource; private set => SetProperty(ref _resource, value); }
 
         private double _quantity;
         public double Quantity { get => _quantity; set => SetProperty(ref _quantity, value); }
 
         private Guid? _selectedRecipeUid;
+
         public Guid? SelectedRecipeUid { get => _selectedRecipeUid; set => SetProperty(ref _selectedRecipeUid, value); }
         public RecipeItemViewModel? SelectedRecipe
         {
@@ -86,10 +101,26 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             Update(ev.RecipeComponent, ev.ChangedProperties);
         }
+        private void OnResourceDeleted(ResourceDeletedEvent ev)
+        {
+            if (ev.ResourceUid == ResourceUid)
+            {
+                Resource = null;
+            }
+        }
+        private void OnResourceCreated(ResourceCreatedEvent ev)
+        {
+            if (ev.Resource.Uid == ResourceUid)
+            {
+                Resource = _partsFactory.GetOrCreateResourceVM(ev.Resource);
+            }
+        }
 
         public void Dispose()
         {
             _updatedSubscription.Dispose();
+            _childAddSubscription.Dispose();
+            _childRemoveSubscription.Dispose();
 
             _store.RecipeComponents.Remove(Uid);
         }

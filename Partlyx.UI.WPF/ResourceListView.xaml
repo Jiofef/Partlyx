@@ -24,8 +24,8 @@
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource FavsScrollViewer}">
-                <ListView ItemsSource="{Binding Resources}" beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Resources,
-                            RelativeSource={RelativeSource AncestorType=Window}}"
+                <ListView ItemsSource="{Binding Resources}" 
+                          beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Resources, RelativeSource={RelativeSource AncestorType=Window}}"
                           HorizontalContentAlignment="Stretch" Margin="0,0,10,0" Style="{StaticResource CommonListView}" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
                     <i:Interaction.Behaviors>
                         <beh:CollectionViewFilterBehavior Predicate="{Binding Search.SearchByName}"/>

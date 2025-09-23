@@ -12,6 +12,10 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
         bool IsSingleRecipeSelected { get; }
         bool IsSingleComponentSelected { get; }
 
+        RecipeComponentItemViewModel? SingleComponentOrNull { get; }
+        RecipeItemViewModel? SingleRecipeOrNull { get; }
+        ResourceItemViewModel? SingleResourceOrNull { get; }
+
         bool IsResourcesSelected { get; }
         bool IsRecipesSelected { get; }
         bool IsComponentsSelected { get; }

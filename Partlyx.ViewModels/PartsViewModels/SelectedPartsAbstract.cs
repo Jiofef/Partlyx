@@ -22,6 +22,13 @@ namespace Partlyx.ViewModels.PartsViewModels
         [ObservableProperty]
         private bool _isComponentsSelected;
 
+        [ObservableProperty]
+        private ResourceItemViewModel? _singleResourceOrNull;
+        [ObservableProperty]
+        private RecipeItemViewModel? _singleRecipeOrNull;
+        [ObservableProperty]
+        private RecipeComponentItemViewModel? _singleComponentOrNull;
+
         public ObservableCollection<ResourceItemViewModel> Resources { get; }
 
         public ObservableCollection<RecipeItemViewModel> Recipes { get; }
@@ -37,18 +44,24 @@ namespace Partlyx.ViewModels.PartsViewModels
             Resources.CollectionChanged += (obj, evInfo) => 
             {
                 IsSingleResourceSelected = Resources.Count == 1;
+                SingleResourceOrNull = GetSingleResourceOrNull();
+
                 IsResourcesSelected = Resources.Count > 0;
                 SelectedResourcesChangedHandler(obj, evInfo);
             };
             Recipes.CollectionChanged += (obj, evInfo) =>
             {
                 IsSingleRecipeSelected = Recipes.Count == 1;
+                SingleRecipeOrNull = GetSingleRecipeOrNull();
+
                 IsRecipesSelected = Recipes.Count > 0;
                 SelectedRecipesChangedHandler(obj, evInfo);
             };
             Components.CollectionChanged += (obj, evInfo) =>
             {
                 IsSingleComponentSelected = Components.Count == 1;
+                SingleComponentOrNull = GetSingleComponentOrNull();
+
                 IsComponentsSelected = Components.Count > 0;
                 SelectedComponentsChangedHandler(obj, evInfo);
             };

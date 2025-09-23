@@ -3,14 +3,6 @@ using Partlyx.Core;
 using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Partlyx.Infrastructure.Data.Implementations
 {
@@ -84,8 +76,9 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await using var db = _dbFactory.CreateDbContext();
 
             var rl = await db.Resources.
-                Where(r => EF.Functions.Like(r.Name, $"%{query}")).
-                ToListAsync();
+                Where(r => EF.Functions.Like(r.Name, $"%{query}"))
+                .AsNoTracking()
+                .ToListAsync();
 
             return rl;
         }
@@ -98,6 +91,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
                 .Include(r => r.Recipes)
                 .ThenInclude(rc => rc.Components)
                 .ThenInclude(c => c.ComponentResource)
+                .AsNoTracking()
                 .ToListAsync();
 
             return rl;
@@ -111,6 +105,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
                 .Include(rc => rc.ParentResource)
                 .Include(rc => rc.Components)
                 .ThenInclude(c => c.ComponentResource)
+                .AsNoTracking()
                 .ToListAsync();
 
             return rl;
@@ -124,6 +119,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
                 .Include(c => c.ComponentResource)
                 .Include(c => c.ParentRecipe)
                 .ThenInclude(rc => rc!.ParentResource)
+                .AsNoTracking()
                 .ToListAsync();
 
             return rl;

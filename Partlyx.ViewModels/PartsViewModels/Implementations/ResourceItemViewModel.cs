@@ -1,4 +1,5 @@
-﻿using Partlyx.Infrastructure.Events;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
@@ -10,7 +11,7 @@ using System.Runtime.CompilerServices;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public class ResourceItemViewModel : UpdatableViewModel<ResourceDto>, IVMPart
+    public partial class ResourceItemViewModel : UpdatableViewModel<ResourceDto>, IVMPart
     {
         // Services
         private readonly IPartsService _service;
@@ -46,6 +47,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 _recipes.Add(vm);
             }
 
+            _defaultRecipe = _defaultRecipeUid != null ? _store.Recipes.GetValueOrDefault((Guid)_defaultRecipeUid) : null;
+
             // Info updating binding
             _updatedSubscription = _bus.Subscribe<ResourceUpdatedEvent>(OnResourceUpdated, true);
             _childAddSubscription = bus.Subscribe<RecipeCreatedEvent>(OnRecipeCreated, true);
@@ -64,8 +67,18 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public ObservableCollection<RecipeItemViewModel> Recipes { get => _recipes; } // Updates locally when recipe is created/removed
 
         private Guid? _defaultRecipeUid;
-        public Guid? DefaultRecipeUid { get => _defaultRecipeUid; set => SetProperty(ref _defaultRecipeUid, value); }
-        public RecipeItemViewModel? DefaultRecipe => DefaultRecipeUid != null ? _store.Recipes[(Guid)DefaultRecipeUid] : null;
+        public Guid? DefaultRecipeUid 
+        {
+            get => _defaultRecipeUid;
+            set
+            {
+                SetProperty(ref _defaultRecipeUid, value);
+                DefaultRecipe = value != null ? _store.Recipes.GetValueOrDefault((Guid)value) : null;
+            }
+        }
+
+        [ObservableProperty]
+        private RecipeItemViewModel? _defaultRecipe;
 
         // Info updating
         protected override Dictionary<string, Action<ResourceDto>> ConfigureUpdaters() => new()
@@ -87,6 +100,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             var recipeVM = _partsFactory.GetOrCreateRecipeVM(ev.Recipe);
             Recipes.Add(recipeVM);
+
+            if (ev.Recipe.Uid == DefaultRecipeUid)
+                DefaultRecipe = recipeVM;
         }
 
         private void OnRecipeDeleted(RecipeDeletedEvent ev)
@@ -98,6 +114,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 Recipes.Remove(recipeVM);
                 recipeVM.Dispose();
+
+                if (ev.RecipeUid == DefaultRecipeUid)
+                    DefaultRecipe = null;
             }
         }
 

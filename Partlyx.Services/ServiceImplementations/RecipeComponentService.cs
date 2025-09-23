@@ -21,11 +21,11 @@ namespace Partlyx.Services.ServiceImplementations
         {
             var result = await _repo.ExecuteOnRecipeAsync(grandParentResourceUid, parentRecipeUid, async recipe =>
             {
-                var componentResource = await _repo.GetByUidAsync(componentResourceUid);
-                if (componentResource == null)
-                    throw new InvalidOperationException("Component resource not found with Uid: " + componentResourceUid);
-
-                var component = recipe.CreateComponent(componentResource, 1);
+                var component = await _repo.ExecuteOnResourceAsync(componentResourceUid, resource =>
+                {
+                    var component = recipe.CreateComponent(resource, 1);
+                    return Task.FromResult(component);
+                });
                 return component.Uid;
             });
 
