@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:Partlyx.UI.WPF"
+             xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
              xmlns:fa="http://schemas.fontawesome.io/icons/">
     <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
@@ -21,8 +23,10 @@
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource CommonScrollViewer}">
-                <ListView ItemsSource="{Binding Components}" beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Components,
-                            RelativeSource={RelativeSource AncestorType=Window}}"
+                <ListView ItemsSource="{Binding Components}" 
+                          dd:DragDrop.IsDragSource="True"
+                          dd:DragDrop.IsDropTarget="True"
+                          beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Components, RelativeSource={RelativeSource AncestorType=Window}}"
                           HorizontalContentAlignment="Stretch" Margin="0,0,10,0" Style="{StaticResource CommonListView}" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -31,16 +35,33 @@
                     </ListView.ItemsPanel>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="32">
-                                <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                                <Grid HorizontalAlignment="Stretch">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
-                                    <TextBlock Text="{Binding Resource.Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"/>
+                            <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="Auto">
+                                <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid HorizontalAlignment="Stretch" Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                                        <TextBlock Text="{Binding Resource.Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"/>
+                                    </Grid>
+                                    <Grid Grid.Row="1" Height="32">
+                                        <md:NumericUpDown Value="{Binding Quantity}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="ValueChanged">
+                                                    <i:InvokeCommandAction
+                                                        Command="{Binding SetQuantityCommand}"
+                                                        CommandParameter="{Binding Quantity}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </md:NumericUpDown>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </DataTemplate>

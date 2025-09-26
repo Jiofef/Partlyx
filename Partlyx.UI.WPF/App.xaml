@@ -8,6 +8,7 @@
              xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
              xmlns:core="using:Microsoft.Xaml.Behaviors.Core">
     
     <Application.Resources>
@@ -18,9 +19,10 @@
             </DataTemplate>
             
             <!-- Converters -->
-            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-            <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis"/>
-            
+            <BooleanToVisibilityConverter x:Key="BoolToVisConv"/>
+            <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConv"/>
+            <conv:SelectedEqualsConverter x:Key="SelectedEqualsConv"/>
+
             <!-- XAML resources -->
             <ResourceDictionary.MergedDictionaries>
                 <!-- External resources -->

@@ -26,6 +26,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IPartsInitializeService _partsInitializeService;
         private readonly IVMFileService _fileService;
         private readonly INotificationService _notificationService;
+        private readonly IVMPartsStoreCleaner _cleaner;
 
         public MainViewModel(
             ResourceListViewModel resourceList, RecipeListViewModel recipeList, 
@@ -35,7 +36,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             IPartsLoader pl,
             IPartsInitializeService pis,
             IVMFileService vmfs,
-            INotificationService ns
+            INotificationService ns,
+            IVMPartsStoreCleaner vmpsc
             )
         {
             ResourceList = resourceList;
@@ -49,6 +51,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _partsInitializeService = pis;
             _fileService = vmfs;
             _notificationService = ns;
+            _cleaner = vmpsc;
         }
 
         public async Task<bool> ConfirmClosingAsync()

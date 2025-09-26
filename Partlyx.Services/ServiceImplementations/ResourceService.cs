@@ -95,7 +95,7 @@ namespace Partlyx.Services.ServiceImplementations
 
             var resource = await GetResourceAsync(resourceUid);
             if (resource != null)
-                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[] { "DefaultRecipe" }));
+                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[] { "DefaultRecipeUid" }));
         }
 
         public async Task SetNameAsync(Guid resourceUid, string name)

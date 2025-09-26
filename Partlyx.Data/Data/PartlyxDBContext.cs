@@ -61,6 +61,8 @@ public class PartlyxDBContext : DbContext, IDisposable
             .SetPropertyAccessMode(PropertyAccessMode.Field);
             rb.Metadata.FindNavigation(nameof(Recipe.Components))!
                 .SetField("_components");
+
+            
         });
 
         modelBuilder.Entity<RecipeComponent>(cb =>

@@ -1,5 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Partlyx.Infrastructure.Events;
+using Partlyx.Services.Commands;
+using Partlyx.Services.Commands.RecipeComponentCommonCommands;
+using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
@@ -18,7 +22,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IVMPartsStore _store;
         private readonly IVMPartsFactory _partsFactory;
         private readonly IResourceItemUiStateService _uiStateService;
-        
+        private readonly ICommandServices _commands;
+
         // Events
         private readonly IEventBus _bus;
         private readonly IDisposable _updatedSubscription;
@@ -26,7 +31,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
 
-        public ResourceItemViewModel(ResourceDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS)
+        public ResourceItemViewModel(ResourceDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS, ICommandServices cs)
         {
             Uid = dto.Uid;
 
@@ -36,6 +41,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _partsFactory = partsFactory;
             _bus = bus;
             _uiStateService = uiStateS;
+            _commands = cs;
 
             // Info
             _name = dto.Name;
@@ -44,6 +50,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             foreach (var recipe in dto.Recipes)
             {
                 var vm = _partsFactory.GetOrCreateRecipeVM(recipe);
+                vm.ParentResource = this;
                 _recipes.Add(vm);
             }
 
@@ -73,12 +80,19 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             set
             {
                 SetProperty(ref _defaultRecipeUid, value);
-                DefaultRecipe = value != null ? _store.Recipes.GetValueOrDefault((Guid)value) : null;
+                UpdateDefaultRecipe();
             }
         }
 
-        [ObservableProperty]
+        
         private RecipeItemViewModel? _defaultRecipe;
+        public RecipeItemViewModel? DefaultRecipe 
+        { 
+            get => _defaultRecipe;
+            private set => SetProperty(ref _defaultRecipe, value); 
+        }
+        private void UpdateDefaultRecipe() 
+            => DefaultRecipe = _defaultRecipeUid != null ? _store.Recipes.GetValueOrDefault((Guid)_defaultRecipeUid) : null;
 
         // Info updating
         protected override Dictionary<string, Action<ResourceDto>> ConfigureUpdaters() => new()
@@ -102,7 +116,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             Recipes.Add(recipeVM);
 
             if (ev.Recipe.Uid == DefaultRecipeUid)
-                DefaultRecipe = recipeVM;
+                UpdateDefaultRecipe();
         }
 
         private void OnRecipeDeleted(RecipeDeletedEvent ev)
@@ -116,7 +130,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 recipeVM.Dispose();
 
                 if (ev.RecipeUid == DefaultRecipeUid)
-                    DefaultRecipe = null;
+                    UpdateDefaultRecipe();
             }
         }
 
@@ -126,17 +140,19 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 var recipeVM = Recipes.FirstOrDefault(c => c.Uid == ev.RecipeUid);
                 if (recipeVM != null)
-                {
                     Recipes.Remove(recipeVM);
-                }
+
+                if (ev.RecipeUid == DefaultRecipeUid)
+                    UpdateDefaultRecipe();
             }
             else if (Uid == ev.NewResourceUid)
             {
                 var recipeVM = _store.Recipes.GetValueOrDefault(ev.RecipeUid);
                 if (recipeVM != null)
-                {
                     Recipes.Add(recipeVM);
-                }
+
+                if (ev.RecipeUid == DefaultRecipeUid)
+                    UpdateDefaultRecipe();
             }
         }
 
@@ -157,6 +173,13 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 recipe.Dispose();
 
             _store.Resources.Remove(Uid);
+        }
+
+        // Commands
+        [RelayCommand]
+        public async Task SetDefaultRecipeUidAsync(Guid recipeUid)
+        {
+            await _commands.CreateAsyncEndExcecuteAsync<SetDefaultRecipeToResourceCommand>(Uid, recipeUid);
         }
 
         // For UI

@@ -98,6 +98,7 @@ namespace Partlyx.UI.WPF
             services.AddTransient<IVMPartsFactory, VMPartsFactory>();
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
             services.AddSingleton<IPartsInitializeService, PartsInitializeService>();
+            services.AddSingleton<IVMPartsStoreCleaner, VMPartsStoreCleaner>();
 
             services.AddTransient<ResourceItemViewModel>();
             services.AddTransient<RecipeItemViewModel>();

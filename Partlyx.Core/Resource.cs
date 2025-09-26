@@ -38,19 +38,22 @@ namespace Partlyx.Core
         public IReadOnlyList<Recipe> Recipes => _recipes;
 
         private Guid? _defaultRecipeUid;
-        public Guid? DefaultRecipeUid
-        {
-            get => _defaultRecipeUid;
-            set
-            {
-                _defaultRecipeUid = value;
-                // Trying to resolve DefaultRecipe if recipes already loaded
-                DefaultRecipe = value.HasValue ? _recipes.FirstOrDefault(r => r.Uid == value.Value) : null;
-            }
-        }
+        public Guid? DefaultRecipeUid { get => _defaultRecipeUid; set => _defaultRecipeUid = value; }
 
+        private Recipe? _defaultRecipeCached;
         [NotMapped]
-        public Recipe? DefaultRecipe { get; private set; }
+        public Recipe? DefaultRecipe 
+        {
+            get => GetActualDefaultRecipe();
+            private set => DefaultRecipeUid = value?.Uid;
+        }
+        private Recipe? GetActualDefaultRecipe()
+        {
+            if (_defaultRecipeCached?.Uid != _defaultRecipeUid)
+                _defaultRecipeCached = _defaultRecipeUid != null ? GetRecipeByUid((Guid)_defaultRecipeUid) : null;
+
+            return _defaultRecipeCached;
+        }
 
         // Secondary features
         public Recipe CreateRecipe()
@@ -85,7 +88,6 @@ namespace Partlyx.Core
                 throw new ArgumentException($"Attempt to set the default recipe that is not in the resource. Name of the resource: {Name}");
 
             DefaultRecipe = recipe;
-            _defaultRecipeUid = recipe != null ? recipe.Uid : null;
         }
 
         public void DetachAllRecipes()

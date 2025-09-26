@@ -15,47 +15,49 @@
         Background="{StaticResource PxWhiteBrush}">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <DockPanel>
-            <Menu DataContext="{Binding MenuPanel}">
-                <Menu.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center"/>
-                    </ItemsPanelTemplate>
-                </Menu.ItemsPanel>
-                <MenuItem Header="File" DataContext="{Binding FileMenu}" Height="32">
-                    <MenuItem Header="Create" Command="{Binding NewFileCommand}" Style="{StaticResource CommonMenuItem}"/>
-                    <MenuItem Header="Save" Command="{Binding SaveProjectCommand}" Style="{StaticResource CommonMenuItem}"/>
-                    <MenuItem Header="Save as..." Command="{Binding SaveProjectAsCommand}" Style="{StaticResource CommonMenuItem}"/>
-                    <MenuItem Header="Open" Command="{Binding OpenProjectCommand}" Style="{StaticResource CommonMenuItem}"/>
-                </MenuItem>
-            </Menu>
+            <DockPanel>
+                <Menu DataContext="{Binding MenuPanel}" Background="{StaticResource PxBlue0Brush}">
+                    <Menu.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"/>
+                        </ItemsPanelTemplate>
+                    </Menu.ItemsPanel>
+                    <MenuItem Header="File" DataContext="{Binding FileMenu}" Height="32">
+                        <MenuItem Header="Create" Command="{Binding NewFileCommand}" Style="{StaticResource CommonMenuItem}"/>
+                        <MenuItem Header="Save" Command="{Binding SaveProjectCommand}" Style="{StaticResource CommonMenuItem}"/>
+                        <MenuItem Header="Save as..." Command="{Binding SaveProjectAsCommand}" Style="{StaticResource CommonMenuItem}"/>
+                        <MenuItem Header="Open" Command="{Binding OpenProjectCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    </MenuItem>
+                </Menu>
 
-        </DockPanel>
+            </DockPanel>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="360"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="360"/>
-            </Grid.ColumnDefinitions>
-            <local:ResourceListView DataContext="{Binding ResourceList}" 
+            <Grid Grid.Row="1" Grid.RowSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="360"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="360"/>
+                </Grid.ColumnDefinitions>
+                <local:ResourceListView DataContext="{Binding ResourceList}" 
                                 Grid.Row="0" Grid.Column="0" />
 
-            <UniformGrid Grid.Column="2" Rows="2">
-                <local:RecipeListView DataContext="{Binding RecipeList}"/>
-                <local:ComponentListView DataContext="{Binding ComponentList}"/>
-            </UniformGrid>
+                <UniformGrid Grid.Column="2" Rows="2">
+                    <local:RecipeListView DataContext="{Binding RecipeList}"/>
+                    <local:ComponentListView DataContext="{Binding ComponentList}"/>
+                </UniformGrid>
+            </Grid>
         </Grid>
-        
+
         <md:DialogHost Identifier="RootDialog" CloseOnClickAway="False">
         </md:DialogHost>
     </Grid>
-    
-    
+
+
 
 </Window>

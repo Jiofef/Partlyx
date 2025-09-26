@@ -1,4 +1,5 @@
-﻿using Partlyx.Core;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Partlyx.Core;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
@@ -11,7 +12,7 @@ using System.Xml.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public class RecipeItemViewModel : UpdatableViewModel<RecipeDto>, IVMPart
+    public partial class RecipeItemViewModel : UpdatableViewModel<RecipeDto>, IVMPart
     {
         // Services
         private readonly IPartsService _service;
@@ -45,8 +46,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             foreach (var component in dto.Components)
             {
                 var vm = _partsFactory.GetOrCreateRecipeComponentVM(component);
+                vm.ParentRecipe = this;
                 _components.Add(vm);
             }
+
+            _parentResource = _parentResourceUid != null ? _store.Resources.GetValueOrDefault((Guid)_parentResourceUid) : null;
 
             // Info updating binding
             _updatedSubscription = bus.Subscribe<RecipeUpdatedEvent>(OnRecipeUpdated, true);
@@ -59,8 +63,19 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public Guid Uid { get; }
 
         private Guid? _parentResourceUid;
-        public Guid? ParentResourceUid { get => _parentResourceUid; set => SetProperty(ref _parentResourceUid, value); }
-        public ResourceItemViewModel? ParentResource => ParentResourceUid != null ? _store.Resources[(Guid)ParentResourceUid] : null;
+        public Guid? ParentResourceUid 
+        { 
+            get => _parentResourceUid; 
+            set 
+            {
+                SetProperty(ref _parentResourceUid, value);
+                ParentResource = value != null ? _store.Resources.GetValueOrDefault((Guid)value) : null;
+            } 
+        }
+
+        private ResourceItemViewModel? _parentResource;
+        // It's better to make the setter here private in future 
+        public ResourceItemViewModel? ParentResource { get => _parentResource; set => SetProperty(ref _parentResource, value); }
 
         private string _name;
         public string Name { get => _name; set => SetProperty(ref _name, value); }
@@ -69,6 +84,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public double CraftAmount { get => _craftAmount; set => SetProperty(ref _craftAmount, value); }
 
         private ObservableCollection<RecipeComponentItemViewModel> _components = new();
+
         public ObservableCollection<RecipeComponentItemViewModel> Components { get => _components; } // Updates locally when component is created/removed
 
 

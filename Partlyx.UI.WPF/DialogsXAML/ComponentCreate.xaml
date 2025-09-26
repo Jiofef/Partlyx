@@ -17,7 +17,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" md:HintAssist.Hint="Search..." Background="{StaticResource PxWhiteBrush}" Grid.Row="0"/>
+            <TextBox Style="{StaticResource CommonSearchTextBox}" md:HintAssist.Hint="Search..." Background="{StaticResource PxWhiteBrush}" Grid.Row="0"/>
             <ListView ItemsSource="{Binding Search.Resources}"
                             HorizontalContentAlignment="Stretch" Margin="0,0,10,0" Style="{StaticResource CommonListView}"
                             BorderThickness="0" Background="{StaticResource PxBlue0Brush}"

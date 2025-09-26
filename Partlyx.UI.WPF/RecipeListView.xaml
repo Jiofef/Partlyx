@@ -4,7 +4,9 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
              xmlns:local="clr-namespace:Partlyx.UI.WPF"
-             xmlns:fa="http://schemas.fontawesome.io/icons/">
+             xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
     <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -21,8 +23,10 @@
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource CommonScrollViewer}">
-                <ListView ItemsSource="{Binding Recipes}" beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Recipes,
-                            RelativeSource={RelativeSource AncestorType=Window}}"
+                <ListView ItemsSource="{Binding Recipes}" 
+                          dd:DragDrop.IsDragSource="True"
+                          dd:DragDrop.IsDropTarget="True"
+                          beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Recipes,RelativeSource={RelativeSource AncestorType=Window}}"
                           HorizontalContentAlignment="Stretch" Margin="0,0,10,0" Style="{StaticResource CommonListView}" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
                     <i:Interaction.Behaviors>
                         <beh:ListViewAutoSelectBehavior 
@@ -51,10 +55,10 @@
                                     </Grid.ColumnDefinitions>
                                     <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
                                     <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"
-                                               MouseDown="NameBlock_MouseDown" Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVis}}">
+                                               MouseDown="NameBlock_MouseDown" Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVisConv}}">
                                     </TextBlock>
                                     <TextBox Text="{Binding Ui.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Column="1"
-                                             Visibility="{Binding Ui.IsRenaming, Converter={StaticResource BoolToVis}}">
+                                             Visibility="{Binding Ui.IsRenaming, Converter={StaticResource BoolToVisConv}}">
                                         <TextBox.InputBindings>
                                             <KeyBinding Key="Enter" Command="{Binding Ui.CommitNameChangeCommand}"/>
                                             <KeyBinding Key="Esc" Command="{Binding Ui.CancelNameChangeCommand}"/>
@@ -69,6 +73,20 @@
                                                                SelectAllOnFocus="True"/>
                                         </i:Interaction.Behaviors>
                                     </TextBox>
+                                    <ToggleButton Grid.Column="2" Style="{StaticResource StarToggleButtonStyle}" Margin="4"
+                                                  Command="{Binding ParentResource.SetDefaultRecipeUidCommand}"
+                                                  CommandParameter="{Binding Uid}">
+                                        <ToggleButton.IsChecked>
+                                            <MultiBinding Converter="{StaticResource SelectedEqualsConv}" Mode="OneWay">
+                                                <Binding Path="ParentResource.DefaultRecipeUid"/>
+                                                <Binding Path="Uid" Mode="OneWay"/>
+                                            </MultiBinding>
+                                        </ToggleButton.IsChecked>
+
+                                        <i:Interaction.Behaviors>
+                                            <beh:PreventUncheckBehavior PreventUncheck="True"/>
+                                        </i:Interaction.Behaviors>
+                                    </ToggleButton>
                                 </Grid>
                             </Grid>
                         </DataTemplate>
