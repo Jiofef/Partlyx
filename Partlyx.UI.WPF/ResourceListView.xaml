@@ -56,7 +56,11 @@
                                     </Grid.ColumnDefinitions>
                                     <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
                                     <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"
-                                               MouseDown="NameBlock_MouseDown" Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVisConv}}">
+                                               Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVisConv}}">
+                                        <TextBlock.InputBindings>
+                                            <MouseBinding Gesture="LeftDoubleClick"
+                                                          Command="{Binding Ui.StartRenamingCommand}"/>
+                                        </TextBlock.InputBindings>
                                     </TextBlock>
                                     <TextBox Text="{Binding Ui.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Column="1"
                                              Visibility="{Binding Ui.IsRenaming, Converter={StaticResource BoolToVisConv}}">

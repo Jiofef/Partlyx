@@ -30,9 +30,9 @@ namespace Partlyx.ViewModels
         [RelayCommand]
         public async Task CommitNameChangeAsync()
         {
-            if (!IsRenaming || _recipeVM.ParentResourceUid == null) return;
+            if (!IsRenaming || _recipeVM.LinkedParentResource == null) return;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeNameCommand>(_recipeVM.ParentResourceUid, _recipeVM.Uid, UnConfirmedName);
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeNameCommand>(_recipeVM.LinkedParentResource.Uid, _recipeVM.Uid, UnConfirmedName);
             IsRenaming = false;
         }
 
@@ -42,5 +42,9 @@ namespace Partlyx.ViewModels
             UnConfirmedName = _recipeVM.Name;
             IsRenaming = false;
         }
+
+        [RelayCommand]
+        public void StartRenaming()
+                => IsRenaming = true;
     }
 }

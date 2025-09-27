@@ -79,7 +79,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 return;
 
             var selectedRes = selected.Resources.ToList();
-            var grandParentResUid = parent.ParentResource!.Uid;
+            var grandParentResUid = parent.LinkedParentResource!.Uid;
             var parentRecipeUid = parent!.Uid;
             foreach (var resource in selectedRes)
             {

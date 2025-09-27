@@ -17,6 +17,7 @@ using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace Partlyx.UI.WPF
 {
@@ -99,6 +100,8 @@ namespace Partlyx.UI.WPF
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
             services.AddSingleton<IPartsInitializeService, PartsInitializeService>();
             services.AddSingleton<IVMPartsStoreCleaner, VMPartsStoreCleaner>();
+            services.AddSingleton<IGuidLinkedPartFactory, GuidLinkedPartFactory>();
+            services.AddSingleton<ILinkedPartsManager, LinkedPartsManager>();
 
             services.AddTransient<ResourceItemViewModel>();
             services.AddTransient<RecipeItemViewModel>();
@@ -118,6 +121,8 @@ namespace Partlyx.UI.WPF
             services.AddTransient<IVMFileService, VMFileService>();
             services.AddTransient<INotificationService, WpfNotificationService>();
             services.AddTransient<IDialogService, DialogService>();
+
+            services.AddSingleton<IDispatcherInvoker, WPFDispatcherInvoker>(sp => new WPFDispatcherInvoker(Dispatcher.CurrentDispatcher));
 
             Services = services.BuildServiceProvider();
         }

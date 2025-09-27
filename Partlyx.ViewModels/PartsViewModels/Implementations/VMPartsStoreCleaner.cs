@@ -36,7 +36,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             foreach (var recipe in resource.Recipes)
                 RemoveRecipe(recipe.Uid);
 
-            _store.Resources.Remove(uid);
+            _store.RemoveResource(uid);
         }
         private void RemoveRecipe(Guid uid)
         {
@@ -46,11 +46,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             foreach (var component in recipe.Components)
                 RemoveComponent(component.Uid);
 
-            _store.Recipes.Remove(uid);
+            _store.RemoveRecipe(uid);
         }
         private void RemoveComponent(Guid uid)
         {
-            _store.RecipeComponents.Remove(uid);
+            _store.RemoveRecipeComponent(uid);
         }
 
         public void Dispose()

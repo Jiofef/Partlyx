@@ -6,6 +6,7 @@ using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Collections.ObjectModel;
 using System.Xml.Linq;
@@ -19,6 +20,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IVMPartsStore _store;
         private readonly IVMPartsFactory _partsFactory;
         private readonly IRecipeItemUiStateService _uiStateService;
+        private readonly ILinkedPartsManager _linkedPartsManager;
 
         // Events
         private readonly IEventBus _bus;
@@ -27,7 +29,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
 
-        public RecipeItemViewModel(RecipeDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeItemUiStateService uiStateS)
+        public RecipeItemViewModel(RecipeDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
@@ -37,20 +39,23 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _partsFactory = partsFactory;
             _bus = bus;
             _uiStateService = uiStateS;
+            _linkedPartsManager = lpm;
 
             // Info
-            _parentResourceUid = dto.ParentResourceUid;
+            if (dto.ParentResourceUid is Guid parentUid)
+            {
+                var parentLinked = _linkedPartsManager.CreateAndRegisterLinkedResourceVM(parentUid);
+                _parentResource = parentLinked;
+            }
+
             _name = dto.Name;
             _craftAmount = dto.CraftAmount;
             
             foreach (var component in dto.Components)
             {
                 var vm = _partsFactory.GetOrCreateRecipeComponentVM(component);
-                vm.ParentRecipe = this;
                 _components.Add(vm);
             }
-
-            _parentResource = _parentResourceUid != null ? _store.Resources.GetValueOrDefault((Guid)_parentResourceUid) : null;
 
             // Info updating binding
             _updatedSubscription = bus.Subscribe<RecipeUpdatedEvent>(OnRecipeUpdated, true);
@@ -62,20 +67,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         // Recipe info
         public Guid Uid { get; }
 
-        private Guid? _parentResourceUid;
-        public Guid? ParentResourceUid 
-        { 
-            get => _parentResourceUid; 
-            set 
-            {
-                SetProperty(ref _parentResourceUid, value);
-                ParentResource = value != null ? _store.Resources.GetValueOrDefault((Guid)value) : null;
-            } 
-        }
-
-        private ResourceItemViewModel? _parentResource;
-        // It's better to make the setter here private in future 
-        public ResourceItemViewModel? ParentResource { get => _parentResource; set => SetProperty(ref _parentResource, value); }
+        private GuidLinkedPart<ResourceItemViewModel>? _parentResource;
+        public GuidLinkedPart<ResourceItemViewModel>? LinkedParentResource { get => _parentResource; set => SetProperty(ref _parentResource, value); }
 
         private string _name;
         public string Name { get => _name; set => SetProperty(ref _name, value); }
@@ -158,7 +151,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             foreach(var component in Components)
                 component.Dispose();
 
-            _store.Recipes.Remove(Uid);
+            _store.RemoveRecipe(Uid);
         }
 
         // For UI

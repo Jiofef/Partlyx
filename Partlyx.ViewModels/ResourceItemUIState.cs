@@ -42,5 +42,9 @@ namespace Partlyx.ViewModels
             UnConfirmedName = _resourceVM.Name;
             IsRenaming = false;
         }
+
+        [RelayCommand]
+        public void StartRenaming()
+            => IsRenaming = true;
     }
 }

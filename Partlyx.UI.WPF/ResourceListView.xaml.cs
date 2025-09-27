@@ -28,14 +28,5 @@ namespace Partlyx.UI.WPF
         {
             InitializeComponent();
         }
-
-        private void NameBlock_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                if (sender is TextBlock tb && tb.DataContext is ResourceItemViewModel vm)
-                    vm.Ui.IsRenaming = true;
-            }
-        }
     }
 }

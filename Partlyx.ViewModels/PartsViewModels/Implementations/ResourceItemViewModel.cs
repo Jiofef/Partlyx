@@ -9,6 +9,7 @@ using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
@@ -23,6 +24,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IVMPartsFactory _partsFactory;
         private readonly IResourceItemUiStateService _uiStateService;
         private readonly ICommandServices _commands;
+        private readonly ILinkedPartsManager _linkedPartsManager;
 
         // Events
         private readonly IEventBus _bus;
@@ -31,7 +33,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
 
-        public ResourceItemViewModel(ResourceDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS, ICommandServices cs)
+        public ResourceItemViewModel(ResourceDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
@@ -42,22 +44,21 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _bus = bus;
             _uiStateService = uiStateS;
             _commands = cs;
+            _linkedPartsManager = lpm;
 
             // Info
             _name = dto.Name;
-            _defaultRecipeUid = dto.DefaultRecipeUid;
+            if (dto.DefaultRecipeUid is Guid dRecipeUid)
+                _defaultRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(dRecipeUid);
 
             foreach (var recipe in dto.Recipes)
             {
                 var vm = _partsFactory.GetOrCreateRecipeVM(recipe);
-                vm.ParentResource = this;
                 _recipes.Add(vm);
             }
 
-            _defaultRecipe = _defaultRecipeUid != null ? _store.Recipes.GetValueOrDefault((Guid)_defaultRecipeUid) : null;
-
             // Info updating binding
-            _updatedSubscription = _bus.Subscribe<ResourceUpdatedEvent>(OnResourceUpdated, true);
+            _updatedSubscription = bus.Subscribe<ResourceUpdatedEvent>(OnResourceUpdated, true);
             _childAddSubscription = bus.Subscribe<RecipeCreatedEvent>(OnRecipeCreated, true);
             _childRemoveSubscription = bus.Subscribe<RecipeDeletedEvent>(OnRecipeDeleted, true);
             _childMoveSubscription = bus.Subscribe<RecipeMovedEvent>(OnRecipeMoved, true);
@@ -73,32 +74,19 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public ObservableCollection<RecipeItemViewModel> Recipes { get => _recipes; } // Updates locally when recipe is created/removed
 
-        private Guid? _defaultRecipeUid;
-        public Guid? DefaultRecipeUid 
-        {
-            get => _defaultRecipeUid;
-            set
-            {
-                SetProperty(ref _defaultRecipeUid, value);
-                UpdateDefaultRecipe();
-            }
-        }
 
-        
-        private RecipeItemViewModel? _defaultRecipe;
-        public RecipeItemViewModel? DefaultRecipe 
-        { 
-            get => _defaultRecipe;
-            private set => SetProperty(ref _defaultRecipe, value); 
-        }
-        private void UpdateDefaultRecipe() 
-            => DefaultRecipe = _defaultRecipeUid != null ? _store.Recipes.GetValueOrDefault((Guid)_defaultRecipeUid) : null;
+        private GuidLinkedPart<RecipeItemViewModel>? _defaultRecipe;
+        public GuidLinkedPart<RecipeItemViewModel>? LinkedDefaultRecipe { get => _defaultRecipe; set => SetProperty(ref _defaultRecipe, value); }
 
         // Info updating
         protected override Dictionary<string, Action<ResourceDto>> ConfigureUpdaters() => new()
         {
             { nameof(ResourceDto.Name), dto => Name = dto.Name },
-            { nameof(ResourceDto.DefaultRecipeUid), dto => DefaultRecipeUid = dto.DefaultRecipeUid },
+            { nameof(ResourceDto.DefaultRecipeUid),
+                dto => LinkedDefaultRecipe =
+                dto.DefaultRecipeUid is Guid dRecipeUid
+                ? _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(dRecipeUid)
+                : null},
         };
 
         private void OnResourceUpdated(ResourceUpdatedEvent ev)
@@ -114,9 +102,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             var recipeVM = _partsFactory.GetOrCreateRecipeVM(ev.Recipe);
             Recipes.Add(recipeVM);
-
-            if (ev.Recipe.Uid == DefaultRecipeUid)
-                UpdateDefaultRecipe();
         }
 
         private void OnRecipeDeleted(RecipeDeletedEvent ev)
@@ -128,9 +113,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 Recipes.Remove(recipeVM);
                 recipeVM.Dispose();
-
-                if (ev.RecipeUid == DefaultRecipeUid)
-                    UpdateDefaultRecipe();
             }
         }
 
@@ -141,18 +123,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 var recipeVM = Recipes.FirstOrDefault(c => c.Uid == ev.RecipeUid);
                 if (recipeVM != null)
                     Recipes.Remove(recipeVM);
-
-                if (ev.RecipeUid == DefaultRecipeUid)
-                    UpdateDefaultRecipe();
             }
             else if (Uid == ev.NewResourceUid)
             {
                 var recipeVM = _store.Recipes.GetValueOrDefault(ev.RecipeUid);
                 if (recipeVM != null)
                     Recipes.Add(recipeVM);
-
-                if (ev.RecipeUid == DefaultRecipeUid)
-                    UpdateDefaultRecipe();
             }
         }
 
@@ -172,7 +148,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             foreach (var recipe in  Recipes)
                 recipe.Dispose();
 
-            _store.Resources.Remove(Uid);
+            _store.RemoveResource(Uid);
         }
 
         // Commands

@@ -23,15 +23,13 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IVMPartsFactory _partsFactory;
         private readonly IRecipeComponentItemUiStateService _uiStateService;
         private readonly ICommandServices _commands;
+        private readonly ILinkedPartsManager _linkedPartsManager;
 
         // Events
         private readonly IEventBus _bus;
         private readonly IDisposable _updatedSubscription;
-        private readonly IDisposable _childAddSubscription;
-        private readonly IDisposable _childRemoveSubscription;
-        private readonly IDisposable _parentRemoveSubscription;
 
-        public RecipeComponentItemViewModel(RecipeComponentDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs)
+        public RecipeComponentItemViewModel(RecipeComponentDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
@@ -42,78 +40,50 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _bus = bus;
             _uiStateService = uiStateS;
             _commands = cs;
+            _linkedPartsManager = lpm;
 
             // Info
-            _parentRecipeUid = dto.ParentRecipeUid;
-            ResourceUid = dto.ResourceUid;
+            if (dto.ParentRecipeUid is Guid parentUid)
+                LinkedParentRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(parentUid);
+            LinkedResource = _linkedPartsManager.CreateAndRegisterLinkedResourceVM(dto.ResourceUid);
             _quantity = dto.Quantity;
-            _selectedRecipeUid = dto.SelectedRecipeUid;
-            _parentRecipe = _selectedRecipeUid != null ? _store.Recipes.GetValueOrDefault((Guid)_selectedRecipeUid) : null;
+            if (dto.SelectedRecipeUid is Guid selectedUid)
+                LinkedSelectedRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(selectedUid);
 
             // Info updating binding
-            _updatedSubscription = _bus.Subscribe<RecipeComponentUpdatedEvent>(OnRecipeComponentUpdated, true);
-            _childAddSubscription = bus.Subscribe<ResourceCreatedEvent>(OnResourceCreated, true);
-            _childRemoveSubscription = bus.Subscribe<ResourceDeletedEvent>(OnResourceDeleted, true);
+            _updatedSubscription = bus.Subscribe<RecipeComponentUpdatedEvent>(OnRecipeComponentUpdated, true);
         }
 
         // Recipe component info
         public Guid Uid { get; }
 
-        private Guid? _parentRecipeUid;
-        public Guid? ParentRecipeUid
-        {
-            get => _parentRecipeUid;
-            set
-            {
-                SetProperty(ref _parentRecipeUid, value);
-                ParentRecipe = value != null ? _store.Recipes.GetValueOrDefault((Guid)value) : null;
-            }
-        }
+        private GuidLinkedPart<RecipeItemViewModel>? _parentRecipe;
+        public GuidLinkedPart<RecipeItemViewModel>? LinkedParentRecipe { get => _parentRecipe; private set => SetProperty(ref _parentRecipe, value); }
 
-        private RecipeItemViewModel? _parentRecipe;
-        // It's better to make the setter here private in future 
-        public RecipeItemViewModel? ParentRecipe { get => _parentRecipe; set => SetProperty(ref _parentRecipe, value); }
-        private void UpdateParentRecipe() =>
-            ParentRecipe = _parentRecipeUid != null ? _store.Recipes.GetValueOrDefault((Guid)_parentRecipeUid) : null;
-
-        private Guid _resourceUid;
-        public Guid ResourceUid 
-        { 
-            get => _resourceUid;
-            set
-            {
-                SetProperty(ref _resourceUid, value);
-                Resource = _store.Resources.GetValueOrDefault(value);
-            }
-        }
-        private ResourceItemViewModel? _resource;
-        public ResourceItemViewModel? Resource { get => _resource; private set => SetProperty(ref _resource, value); }
+        private GuidLinkedPart<ResourceItemViewModel>? _resource;
+        public GuidLinkedPart<ResourceItemViewModel>? LinkedResource { get => _resource; private set => SetProperty(ref _resource, value); }
 
         private double _quantity;
         public double Quantity { get => _quantity; set => SetProperty(ref _quantity, value); }
 
-        private Guid? _selectedRecipeUid;
-
-        public Guid? SelectedRecipeUid { get => _selectedRecipeUid; set => SetProperty(ref _selectedRecipeUid, value); }
-        public RecipeItemViewModel? SelectedRecipe
-        {
-            get
-            {
-                if (SelectedRecipeUid == null || Resource == null) return null;
-
-                var recipe = _store.Recipes[(Guid)SelectedRecipeUid];
-                if (!Resource.Recipes.Contains(recipe)) return null;
-
-                return recipe;
-            }
-        }
+        private GuidLinkedPart<RecipeItemViewModel>? _selectedRecipe;
+        public GuidLinkedPart<RecipeItemViewModel>? LinkedSelectedRecipe { get => _selectedRecipe; private set => SetProperty(ref _selectedRecipe, value); }
             
 
         // Info updating
         protected override Dictionary<string, Action<RecipeComponentDto>> ConfigureUpdaters() => new()
         {
             { nameof(RecipeComponentDto.Quantity), dto => Quantity = dto.Quantity },
-            { nameof(RecipeComponentDto.SelectedRecipeUid), dto => SelectedRecipeUid = dto.SelectedRecipeUid },
+            { nameof(RecipeComponentDto.SelectedRecipeUid), 
+                dto => LinkedSelectedRecipe = 
+                dto.SelectedRecipeUid is Guid sRecipeUid 
+                ? _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(sRecipeUid) 
+                : null},
+            { nameof(RecipeComponentDto.ResourceUid),
+                dto => LinkedResource =
+                dto.ResourceUid is Guid resourceUid
+                ? _linkedPartsManager.CreateAndRegisterLinkedResourceVM(resourceUid)
+                : null},
         };
 
         private void OnRecipeComponentUpdated(RecipeComponentUpdatedEvent ev)
@@ -122,35 +92,19 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             Update(ev.RecipeComponent, ev.ChangedProperties);
         }
-        private void OnResourceDeleted(ResourceDeletedEvent ev)
-        {
-            if (ev.ResourceUid == ResourceUid)
-            {
-                Resource = null;
-            }
-        }
-        private void OnResourceCreated(ResourceCreatedEvent ev)
-        {
-            if (ev.Resource.Uid == ResourceUid)
-            {
-                Resource = _partsFactory.GetOrCreateResourceVM(ev.Resource);
-            }
-        }
 
         public void Dispose()
         {
             _updatedSubscription.Dispose();
-            _childAddSubscription.Dispose();
-            _childRemoveSubscription.Dispose();
 
-            _store.RecipeComponents.Remove(Uid);
+            _store.RemoveRecipeComponent(Uid);
         }
 
         // Commands
         [RelayCommand]
         public async Task SetQuantityAsync(double value)
         {
-            var grandParentUid = ParentRecipe!.ParentResourceUid!;
+            var grandParentUid = LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
             var uid = Uid;
             await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentQuantityCommand>(grandParentUid, uid, value);
         }

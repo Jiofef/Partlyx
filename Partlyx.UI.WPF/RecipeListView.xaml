@@ -31,7 +31,7 @@
                     <i:Interaction.Behaviors>
                         <beh:ListViewAutoSelectBehavior 
                             Watch="{Binding DataContext.SelectedParts.SingleResourceOrNull, RelativeSource={RelativeSource AncestorType=Window}}"
-                            ValueToSelect="{Binding DataContext.SelectedParts.SingleResourceOrNull.DefaultRecipe, RelativeSource={RelativeSource AncestorType=Window}}"
+                            ValueToSelect="{Binding DataContext.SelectedParts.SingleResourceOrNull.LinkedDefaultRecipe.Value, RelativeSource={RelativeSource AncestorType=Window}}"
                             AutoScrollIntoView="True"/>
                     </i:Interaction.Behaviors>
                     <ListView.InputBindings>
@@ -55,7 +55,11 @@
                                     </Grid.ColumnDefinitions>
                                     <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
                                     <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"
-                                               MouseDown="NameBlock_MouseDown" Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVisConv}}">
+                                               Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVisConv}}">
+                                        <TextBlock.InputBindings>
+                                            <MouseBinding Gesture="LeftDoubleClick"
+                                                          Command="{Binding Ui.StartRenamingCommand}"/>
+                                        </TextBlock.InputBindings>
                                     </TextBlock>
                                     <TextBox Text="{Binding Ui.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Column="1"
                                              Visibility="{Binding Ui.IsRenaming, Converter={StaticResource BoolToVisConv}}">
@@ -74,11 +78,11 @@
                                         </i:Interaction.Behaviors>
                                     </TextBox>
                                     <ToggleButton Grid.Column="2" Style="{StaticResource StarToggleButtonStyle}" Margin="4"
-                                                  Command="{Binding ParentResource.SetDefaultRecipeUidCommand}"
+                                                  Command="{Binding LinkedParentResource.Value.SetDefaultRecipeUidCommand}"
                                                   CommandParameter="{Binding Uid}">
                                         <ToggleButton.IsChecked>
                                             <MultiBinding Converter="{StaticResource SelectedEqualsConv}" Mode="OneWay">
-                                                <Binding Path="ParentResource.DefaultRecipeUid"/>
+                                                <Binding Path="LinkedParentResource.Value.LinkedDefaultRecipe.Uid"/>
                                                 <Binding Path="Uid" Mode="OneWay"/>
                                             </MultiBinding>
                                         </ToggleButton.IsChecked>
