@@ -4,7 +4,9 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
              xmlns:local="clr-namespace:Partlyx.UI.WPF"
+             xmlns:help="clr-namespace:Partlyx.UI.WPF.Helpers"
              xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+             xmlns:ddlocal="clr-namespace:Partlyx.UI.WPF.DragAndDrop"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
     <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
@@ -35,8 +37,8 @@
                             AutoScrollIntoView="True"/>
                     </i:Interaction.Behaviors>
                     <ListView.InputBindings>
-                        <KeyBinding Key="F2" Command="{Binding StartRenamingSelectedCommand}"/>
-                        <KeyBinding Key="Enter" Command="{Binding StartRenamingSelectedCommand}"/>
+                        <KeyBinding Key="F2" Command="{Binding Service.StartRenamingSelectedCommand}"/>
+                        <KeyBinding Key="Enter" Command="{Binding Service.StartRenamingSelectedCommand}"/>
                     </ListView.InputBindings>
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -104,7 +106,8 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding CreateRecipeCommand}" Grid.Column="0" IsEnabled="{Binding SelectedParts.IsSingleResourceSelected}">
+            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding Service.CreateRecipeCommand}"
+                    Grid.Column="0" IsEnabled="{Binding SelectedParts.IsSingleResourceSelected}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
                         <TextBlock Text="Create "/>

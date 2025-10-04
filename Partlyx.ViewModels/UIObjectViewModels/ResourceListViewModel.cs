@@ -12,14 +12,13 @@ using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Services.Commands.RecipeCommonCommands;
+using Partlyx.ViewModels.UIServices.Implementations;
 
 namespace Partlyx.ViewModels
 {
     public partial class ResourceListViewModel : ObservableObject, IDisposable
     {
         private readonly IVMPartsFactory _partsFactory;
-        private readonly ICommandFactory _commandFactory;
-        private readonly ICommandDispatcher _commandDispatcher;
         private readonly IVMPartsStore _store;
 
         private readonly IDisposable _childAddSubscription;
@@ -29,21 +28,21 @@ namespace Partlyx.ViewModels
 
         public IGlobalSelectedParts SelectedParts { get; }
         public IResourceSearchService Search { get; }
+        public ResourceServiceViewModel Service { get; }
 
         private IGlobalResourcesVMContainer _resourcesContainer { get; }
         public ObservableCollection<ResourceItemViewModel> Resources => _resourcesContainer.Resources;
 
         public ResourceListViewModel(IGlobalResourcesVMContainer grvmc, IGlobalSelectedParts sp, IEventBus bus, IVMPartsFactory vmpf,
-                ICommandFactory cf, ICommandDispatcher cd, IResourceService rs, IVMPartsStore vmps, IResourceSearchService rss)
+                IResourceService rs, IVMPartsStore vmps, IResourceSearchService rss, ResourceServiceViewModel service)
         {
             _resourcesContainer = grvmc;
             _partsFactory = vmpf;
-            _commandFactory = cf;
-            _commandDispatcher = cd;
             _store = vmps;
 
             SelectedParts = sp;
             Search = rss;
+            Service = service;
 
             _childAddSubscription = bus.Subscribe<ResourceCreatedEvent>(OnResourceCreated, true);
             _childRemoveSubscription = bus.Subscribe<ResourceDeletedEvent>(OnResourceDeleted, true);
@@ -86,40 +85,6 @@ namespace Partlyx.ViewModels
 
             foreach (var resource in _store.Resources.Values)
                 Resources.Add(resource);
-        }
-
-        [RelayCommand]
-        private async Task CreateResourceAsync()
-        {
-            // It must be executed on a single thread so that recipients respond to events immediately after they are sent
-            await Task.Run(async() =>
-            {
-                await _commandDispatcher.ExcecuteComplexAsync(async complexDispatcher =>
-                {
-                    // Resource creating
-                    var createResourceCommand = _commandFactory.Create<CreateResourceCommand>();
-                    await complexDispatcher.ExcecuteAsync(createResourceCommand);
-                    var resourseUid = createResourceCommand.ResourceUid;
-
-                    // Default recipe creating
-                    var defaultRecipeCreateCommand = _commandFactory.Create<CreateRecipeCommand>(resourseUid);
-                    await complexDispatcher.ExcecuteAsync(defaultRecipeCreateCommand);
-
-                    var recipeUid = defaultRecipeCreateCommand.RecipeUid;
-                    var recipeName = "Default recipe";
-                    var defaultRecipeSetNameCommand = await _commandFactory.CreateAsync<SetRecipeNameCommand>(resourseUid, recipeUid, recipeName);
-                    await complexDispatcher.ExcecuteAsync(defaultRecipeSetNameCommand);
-                });
-            });
-        }
-
-        [RelayCommand]
-        private void StartRenamingSelected()
-        {
-            var resourceVM = SelectedParts.GetSingleResourceOrNull();
-            if (resourceVM == null) return;
-
-            resourceVM.Ui.IsRenaming = true;
         }
     }
 }

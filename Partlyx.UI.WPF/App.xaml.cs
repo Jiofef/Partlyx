@@ -9,6 +9,7 @@ using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.UI.WPF.DragAndDrop;
 using Partlyx.UI.WPF.VMImplementations;
 using Partlyx.ViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
@@ -95,6 +96,9 @@ namespace Partlyx.UI.WPF
 
             services.AddTransient<MainWindow>();
 
+            // Other view classes
+            services.AddTransient<RecipeComponentsListDropHandler>();
+
             // Helper viewmodels
             services.AddTransient<IVMPartsFactory, VMPartsFactory>();
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
@@ -106,6 +110,11 @@ namespace Partlyx.UI.WPF
             services.AddTransient<ResourceItemViewModel>();
             services.AddTransient<RecipeItemViewModel>();
             services.AddTransient<RecipeComponentItemViewModel>();
+
+            services.AddTransient<ResourceServiceViewModel>();
+            services.AddTransient<RecipeServiceViewModel>();
+            services.AddTransient<RecipeComponentServiceViewModel>();
+            services.AddTransient<PartsServiceViewModel>();
 
             services.AddTransient<IIsolatedSelectedParts, IsolatedSelectedParts>();
             services.AddSingleton<IGlobalSelectedParts, GlobalSelectedParts>();

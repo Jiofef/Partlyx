@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Infrastructure.Data.Interfaces;
+using Partlyx.UI.WPF.DragAndDrop;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static MaterialDesignThemes.Wpf.Theme;
 
 namespace Partlyx.UI.WPF
 {
@@ -26,15 +28,14 @@ namespace Partlyx.UI.WPF
         public ComponentListView()
         {
             InitializeComponent();
+
+            Loaded += OnLoaded;
         }
 
-        private void NameBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        private void OnLoaded(object s, RoutedEventArgs e)
         {
-            if (e.ClickCount == 2)
-            {
-                if (sender is TextBlock tb && tb.DataContext is RecipeItemViewModel vm)
-                    vm.Ui.IsRenaming = true;
-            }
+            var handler = App.Services.GetRequiredService<RecipeComponentsListDropHandler>();
+            GongSolutions.Wpf.DragDrop.DragDrop.SetDropHandler(ListViewControl, handler);
         }
     }
 }

@@ -11,6 +11,7 @@ using Partlyx.Services.PartsEventClasses;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -23,25 +24,20 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 {
     public partial class RecipeComponentListViewModel : ObservableObject, IDisposable
     {
-        private readonly ICommandFactory _commandFactory;
-        private readonly ICommandDispatcher _commandDispatcher;
-        private readonly IDialogService _dialogService;
-
         private readonly IDisposable _selectedParentsChangedSubscription;
 
         public IGlobalSelectedParts SelectedParts { get; }
+        public RecipeComponentServiceViewModel Service { get; }
 
         // Components in this collection are ALWAYS only a projection of the selected item collection.
         // Therefore, Set is allowed here and it is not recommended to change the contents of the selected collection by reference.
         private ObservableCollection<RecipeComponentItemViewModel> _components;
         public ObservableCollection<RecipeComponentItemViewModel> Components { get => _components; private set => SetProperty(ref _components, value); }
 
-        public RecipeComponentListViewModel(IEventBus bus, IVMPartsFactory vmpf, ICommandFactory cf, ICommandDispatcher cd, IGlobalSelectedParts sp, IDialogService ds)
+        public RecipeComponentListViewModel(IEventBus bus, IGlobalSelectedParts sp, RecipeComponentServiceViewModel service)
         {
-            _commandFactory = cf;
-            _commandDispatcher = cd;
-            _dialogService = ds;
             SelectedParts = sp;
+            Service = service;
 
             _selectedParentsChangedSubscription = bus.Subscribe<GlobalSelectedRecipesChangedEvent>(OnSelectedRecipesChanged, true);
 
@@ -65,28 +61,6 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public void Dispose()
         {
             _selectedParentsChangedSubscription.Dispose();
-        }
-
-        [RelayCommand]
-        private async Task CreateComponentAsync()
-        {
-            var parent = SelectedParts.GetSingleRecipeOrNull();
-            if (parent == null)
-                throw new InvalidOperationException("Create command shouldn't be called when created part's parent isn't selected or is multiselected");
-
-            var result = await _dialogService.ShowDialogAsync<ComponentCreateViewModel>();
-            if (result is not ISelectedParts selected || !selected.IsResourcesSelected) 
-                return;
-
-            var selectedRes = selected.Resources.ToList();
-            var grandParentResUid = parent.LinkedParentResource!.Uid;
-            var parentRecipeUid = parent!.Uid;
-            foreach (var resource in selectedRes)
-            {
-                var componentResUid = resource.Uid;
-                var command = _commandFactory.Create<CreateRecipeComponentCommand>(grandParentResUid, parentRecipeUid, componentResUid);
-                await _commandDispatcher.ExcecuteAsync(command);
-            }
         }
     }
 }

@@ -34,10 +34,11 @@
                     
                     <i:Interaction.Behaviors>
                         <beh:CollectionViewFilterBehavior Predicate="{Binding Search.SearchByName}"/>
+                        <beh:SelectOnMouseUpBehavior/>
                     </i:Interaction.Behaviors>
                     <ListView.InputBindings>
-                        <KeyBinding Key="F2" Command="{Binding StartRenamingSelectedCommand}"/>
-                        <KeyBinding Key="Enter" Command="{Binding StartRenamingSelectedCommand}"/>
+                        <KeyBinding Key="F2" Command="{Binding Service.StartRenamingSelectedCommand}"/>
+                        <KeyBinding Key="Enter" Command="{Binding Service.StartRenamingSelectedCommand}"/>
                     </ListView.InputBindings>
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -91,7 +92,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding CreateResourceCommand}" Grid.Column="0">
+            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding Service.CreateResourceCommand}" Grid.Column="0">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
                         <TextBlock Text="Create "/>
