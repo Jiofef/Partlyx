@@ -18,23 +18,23 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
     public partial class RecipeComponentItemViewModel : UpdatableViewModel<RecipeComponentDto>, IVMPart
     {
         // Servicess
-        private readonly IPartsService _service;
         private readonly IVMPartsStore _store;
         private readonly IVMPartsFactory _partsFactory;
         private readonly IRecipeComponentItemUiStateService _uiStateService;
         private readonly ICommandServices _commands;
         private readonly ILinkedPartsManager _linkedPartsManager;
+        public PartsServiceViewModel Services { get; }
 
         // Events
         private readonly IEventBus _bus;
         private readonly IDisposable _updatedSubscription;
 
-        public RecipeComponentItemViewModel(RecipeComponentDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
+        public RecipeComponentItemViewModel(RecipeComponentDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
             // Services
-            _service = service;
+            Services = service;
             _store = store;
             _partsFactory = partsFactory;
             _bus = bus;
@@ -58,7 +58,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public Guid Uid { get; }
 
         private GuidLinkedPart<RecipeItemViewModel>? _parentRecipe;
-        public GuidLinkedPart<RecipeItemViewModel>? LinkedParentRecipe { get => _parentRecipe; private set => SetProperty(ref _parentRecipe, value); }
+        public GuidLinkedPart<RecipeItemViewModel>? LinkedParentRecipe { get => _parentRecipe; set => SetProperty(ref _parentRecipe, value); }
 
         private GuidLinkedPart<ResourceItemViewModel>? _resource;
         public GuidLinkedPart<ResourceItemViewModel>? LinkedResource { get => _resource; private set => SetProperty(ref _resource, value); }

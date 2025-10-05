@@ -84,9 +84,6 @@ namespace Partlyx.UI.WPF
             // Viewmodels and windows
             services.AddSingleton<MainViewModel>();
 
-            services.AddTransient<ResourceListViewModel>();
-            services.AddTransient<RecipeListViewModel>();
-            services.AddTransient<RecipeComponentListViewModel>();
             services.AddTransient<PartsTreeViewModel>();
 
             services.AddTransient<MenuPanelViewModel>();
@@ -97,7 +94,7 @@ namespace Partlyx.UI.WPF
             services.AddTransient<MainWindow>();
 
             // Other view classes
-            services.AddTransient<RecipeComponentsListDropHandler>();
+            services.AddTransient<PartsTreeDropHandler>();
 
             // Helper viewmodels
             services.AddTransient<IVMPartsFactory, VMPartsFactory>();

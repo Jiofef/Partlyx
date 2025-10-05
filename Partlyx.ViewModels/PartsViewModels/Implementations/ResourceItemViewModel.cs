@@ -9,18 +9,19 @@ using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
     public partial class ResourceItemViewModel : UpdatableViewModel<ResourceDto>, IVMPart
     {
         // Services
-        private readonly IPartsService _service;
         private readonly IVMPartsStore _store;
         private readonly IVMPartsFactory _partsFactory;
         private readonly IResourceItemUiStateService _uiStateService;
         private readonly ICommandServices _commands;
         private readonly ILinkedPartsManager _linkedPartsManager;
+        public PartsServiceViewModel Services { get; }
 
         // Events
         private readonly IEventBus _bus;
@@ -29,12 +30,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
 
-        public ResourceItemViewModel(ResourceDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
+        public ResourceItemViewModel(ResourceDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
             // Services
-            _service = service;
+            Services = service;
             _store = store;
             _partsFactory = partsFactory;
             _bus = bus;
@@ -124,7 +125,10 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 var recipeVM = _store.Recipes.GetValueOrDefault(ev.RecipeUid);
                 if (recipeVM != null)
+                {
                     Recipes.Add(recipeVM);
+                    recipeVM.LinkedParentResource = _linkedPartsManager.CreateAndRegisterLinkedResourceVM(Uid);
+                }
             }
         }
 

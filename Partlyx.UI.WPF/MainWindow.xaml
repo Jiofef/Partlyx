@@ -44,12 +44,10 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="360"/>
                 </Grid.ColumnDefinitions>
-                <local:ResourceListView DataContext="{Binding ResourceList}" 
+                <local:PartsTree DataContext="{Binding PartsTree}" 
                                 Grid.Row="0" Grid.Column="0" />
 
                 <UniformGrid Grid.Column="2" Rows="2">
-                    <local:RecipeListView DataContext="{Binding RecipeList}"/>
-                    <local:ComponentListView DataContext="{Binding ComponentList}"/>
                 </UniformGrid>
             </Grid>
         </Grid>

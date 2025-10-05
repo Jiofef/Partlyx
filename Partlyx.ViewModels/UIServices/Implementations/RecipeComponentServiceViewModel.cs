@@ -23,14 +23,14 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        public async Task CreateComponentAsync()
+        public async Task CreateComponentAsync(RecipeItemViewModel parent)
         {
             var result = await _dialogService.ShowDialogAsync<ComponentCreateViewModel>();
             if (result is not ISelectedParts selected || !selected.IsResourcesSelected)
                 return;
 
             var selectedResources = selected.Resources.ToList();
-            await CreateComponentsFromAsync(selectedResources);
+            await CreateComponentsFromAsync(parent, selectedResources);
         }
 
         [RelayCommand]
@@ -38,15 +38,6 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             var parent = info.Target;
             var resources = info.Parts;
-
-            await CreateComponentsFromAsync(parent, resources);
-        }
-
-        public async Task CreateComponentsFromAsync(List<ResourceItemViewModel> resources)
-        {
-            var parent = _selectedParts.GetSingleRecipeOrNull();
-            if (parent == null)
-                return;
 
             await CreateComponentsFromAsync(parent, resources);
         }
@@ -60,6 +51,23 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 var componentResUid = resource.Uid;
                 var command = _commands.Factory.Create<CreateRecipeComponentCommand>(grandParentResUid, parentRecipeUid, componentResUid);
                 await _commands.Dispatcher.ExcecuteAsync(command);
+            }
+        }
+
+        [RelayCommand]
+        public async Task MoveComponentsAsync(PartsTargetInteractionInfo<RecipeComponentItemViewModel, RecipeItemViewModel> info)
+        {
+            var components = info.Parts;
+            var targetRecipe = info.Target;
+
+            foreach (var component in components)
+            {
+                var previousGrandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Value!.Uid;
+                var newGrandParentUid = targetRecipe.LinkedParentResource!.Value!.Uid;
+                var previousParentUid = component.LinkedParentRecipe.Uid;
+                var newParentUid = targetRecipe.Uid;
+
+                await _commands.CreateSyncAndExcecuteAsync<MoveRecipeComponentCommand>(previousGrandParentUid, newGrandParentUid, previousParentUid, newParentUid, component.Uid);
             }
         }
     }

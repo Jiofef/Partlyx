@@ -16,11 +16,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
     public partial class RecipeItemViewModel : UpdatableViewModel<RecipeDto>, IVMPart
     {
         // Services
-        private readonly IPartsService _service;
         private readonly IVMPartsStore _store;
         private readonly IVMPartsFactory _partsFactory;
         private readonly IRecipeItemUiStateService _uiStateService;
         private readonly ILinkedPartsManager _linkedPartsManager;
+        public PartsServiceViewModel Services { get; }
 
         // Events
         private readonly IEventBus _bus;
@@ -29,12 +29,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
 
-        public RecipeItemViewModel(RecipeDto dto, IPartsService service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm)
+        public RecipeItemViewModel(RecipeDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
             // Services
-            _service = service;
+            Services = service;
             _store = store;
             _partsFactory = partsFactory;
             _bus = bus;
@@ -131,6 +131,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 if (componentVM != null)
                 {
                     Components.Add(componentVM);
+                    componentVM.LinkedParentRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(Uid);
                 }
             }
         }

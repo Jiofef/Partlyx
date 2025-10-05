@@ -36,6 +36,29 @@
         </Setter>
     </Style>
 
+    <Style TargetType="Button" x:Key="BaseButtonStyleDarkerFocus" BasedOn="{StaticResource BaseButtonStyle}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4" RenderTransformOrigin="0.5 0.5"/>
+                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                                <Condition Property="IsPressed" Value="False"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" Value="{StaticResource PxBlue0Brush}"/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="Button" x:Key="SelectableItemStyle" BasedOn="{StaticResource BaseButtonStyle}">
         <Setter Property="Background" Value="{StaticResource PxWhiteBrush}"/>
         <Setter Property="Template">

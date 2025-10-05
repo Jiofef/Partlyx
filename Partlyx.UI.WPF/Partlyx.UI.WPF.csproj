@@ -21,10 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="ComponentsListView.xaml.cs">
+    <Compile Update="Legacy\ComponentsListView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="RecipeListView.xaml.cs">
+    <Compile Update="Legacy\RecipeListView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

@@ -65,7 +65,7 @@
                 <Thumb
                     Style="{StaticResource ScrollBarThumb}"
                     Margin="2,0,2,0"
-                    Background="{DynamicResource PxBlue2Brush}" />
+                    Background="{DynamicResource PxWhiteBrush}" />
             </Track.Thumb>
             <Track.IncreaseRepeatButton>
                 <RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageDownCommand" />
@@ -84,7 +84,7 @@
                 <Thumb
                     Style="{StaticResource ScrollBarThumbHor}"
                     Margin="0,2,0,2"
-                    Background="{DynamicResource PxBlue2Brush}" />
+                    Background="{DynamicResource PxWhiteBrush}" />
             </Track.Thumb>
             <Track.IncreaseRepeatButton>
                 <RepeatButton Style="{StaticResource ScrollBarPageButton}" Command="ScrollBar.PageRightCommand" />

@@ -20,12 +20,8 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        private async Task CreateRecipeAsync()
+        private async Task CreateRecipeAsync(ResourceItemViewModel parent)
         {
-            var parent = _selectedParts.GetSingleResourceOrNull();
-            if (parent == null)
-                throw new InvalidOperationException("Create command shouldn't be called when created part's parent isn't selected or is multiselected");
-
             await _commands.CreateSyncAndExcecuteAsync<CreateRecipeCommand>(parent.Uid);
         }
 
@@ -39,19 +35,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        private async Task MoveComponentsAsync(PartsTargetInteractionInfo<RecipeComponentItemViewModel, RecipeItemViewModel> info)
+        public async Task MoveRecipesAsync(PartsTargetInteractionInfo<RecipeItemViewModel, ResourceItemViewModel> info)
         {
-            var components = info.Parts;
-            var targetRecipe = info.Target;
+            var recipes = info.Parts;
+            var targetResource = info.Target;
 
-            foreach (var component in components)
+            foreach (var recipe in recipes)
             {
-                var previousGrandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Value!.Uid;
-                var newGrandParentUid = targetRecipe.LinkedParentResource!.Value!.Uid;
-                var previousParentUid = component.LinkedParentRecipe.Uid;
-                var newParentUid = targetRecipe.Uid;
+                var previousParentUid = recipe.LinkedParentResource!.Uid;
+                var newParentUid = targetResource.Uid;
 
-                await _commands.CreateSyncAndExcecuteAsync<MoveRecipeComponentCommand>(previousGrandParentUid, newGrandParentUid, previousParentUid, newParentUid, component.Uid);
+                await _commands.CreateSyncAndExcecuteAsync<MoveRecipeCommand>(previousParentUid, newParentUid, recipe.Uid);
             }
         }
     }

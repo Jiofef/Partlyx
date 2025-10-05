@@ -1,0 +1,159 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:viewmodel="clr-namespace:Partlyx.ViewModels;assembly=Partlyx.ViewModels"
+                    xmlns:viewmodelparts="clr-namespace:Partlyx.ViewModels.PartsViewModels.Implementations;assembly=Partlyx.ViewModels"
+                    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
+                    xmlns:conv="clr-namespace:Partlyx.UI.WPF.Converters"
+                    xmlns:vmo="clr-namespace:Partlyx.ViewModels.UIObjectViewModels;assembly=Partlyx.ViewModels"
+                    xmlns:dialogs="clr-namespace:Partlyx.UI.WPF.DialogsXAML"
+                    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:fa="http://schemas.fontawesome.io/icons/">
+
+    <DataTemplate DataType="{x:Type vmo:ComponentCreateViewModel}">
+        <dialogs:ComponentCreate/>
+    </DataTemplate>
+
+    <!-- Parts tree hierarchy: Resource -> Recipe -> Components -->
+    <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:ResourceItemViewModel}" ItemsSource="{Binding Recipes}">
+        <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
+            <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            <Grid HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"
+                   Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVisConv}}">
+                    <TextBlock.InputBindings>
+                        <MouseBinding Gesture="LeftDoubleClick"
+                              Command="{Binding Ui.StartRenamingCommand}"/>
+                    </TextBlock.InputBindings>
+                </TextBlock>
+                <TextBox Text="{Binding Ui.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Column="1"
+                 Visibility="{Binding Ui.IsRenaming, Converter={StaticResource BoolToVisConv}}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding Ui.CommitNameChangeCommand}"/>
+                        <KeyBinding Key="Esc" Command="{Binding Ui.CancelNameChangeCommand}"/>
+                    </TextBox.InputBindings>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="LostKeyboardFocus">
+                            <i:InvokeCommandAction Command="{Binding Ui.CommitNameChangeCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <i:Interaction.Behaviors>
+                        <beh:FocusBehavior IsFocused="{Binding Ui.IsRenaming, Mode=TwoWay}"
+                                   SelectAllOnFocus="True"/>
+                    </i:Interaction.Behaviors>
+                </TextBox>
+
+                <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyleDarkerFocus}" 
+                        Command="{Binding Services.RecipeService.CreateRecipeCommand}" Grid.Column="2"
+                        CommandParameter="{Binding}"
+                        Width="32"
+                        Height="32">
+                    <Button.Content>
+                        <fa:ImageAwesome Icon="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
+                    </Button.Content>
+                </Button>
+            </Grid>
+        </Grid>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:RecipeItemViewModel}" ItemsSource="{Binding Components}">
+        <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
+            <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            <Grid HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"
+                                               Visibility="{Binding Ui.IsRenaming, Converter = {StaticResource InverseBoolToVisConv}}">
+                    <TextBlock.InputBindings>
+                        <MouseBinding Gesture="LeftDoubleClick"
+                                                          Command="{Binding Ui.StartRenamingCommand}"/>
+                    </TextBlock.InputBindings>
+                </TextBlock>
+                <TextBox Text="{Binding Ui.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Column="1"
+                                             Visibility="{Binding Ui.IsRenaming, Converter={StaticResource BoolToVisConv}}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding Ui.CommitNameChangeCommand}"/>
+                        <KeyBinding Key="Esc" Command="{Binding Ui.CancelNameChangeCommand}"/>
+                    </TextBox.InputBindings>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="LostKeyboardFocus">
+                            <i:InvokeCommandAction Command="{Binding Ui.CommitNameChangeCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <i:Interaction.Behaviors>
+                        <beh:FocusBehavior IsFocused="{Binding Ui.IsRenaming, Mode=TwoWay}"
+                                                               SelectAllOnFocus="True"/>
+                    </i:Interaction.Behaviors>
+                </TextBox>
+                <ToggleButton Grid.Column="2" Style="{StaticResource StarToggleButtonStyle}" Margin="4"
+                                                  Command="{Binding LinkedParentResource.Value.SetDefaultRecipeUidCommand}"
+                                                  CommandParameter="{Binding Uid}">
+                    <ToggleButton.IsChecked>
+                        <MultiBinding Converter="{StaticResource SelectedEqualsConv}" Mode="OneWay">
+                            <Binding Path="LinkedParentResource.Value.LinkedDefaultRecipe.Uid"/>
+                            <Binding Path="Uid" Mode="OneWay"/>
+                        </MultiBinding>
+                    </ToggleButton.IsChecked>
+
+                    <i:Interaction.Behaviors>
+                        <beh:PreventUncheckBehavior PreventUncheck="True"/>
+                    </i:Interaction.Behaviors>
+                </ToggleButton>
+                
+                <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyleDarkerFocus}" 
+                        Command="{Binding Services.ComponentService.CreateComponentCommand}" Grid.Column="3"
+                        CommandParameter="{Binding}"
+                        Width="32"
+                        Height="32">
+                    <Button.Content>
+                        <fa:ImageAwesome Icon="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
+                    </Button.Content>
+                </Button>
+            </Grid>
+        </Grid>
+    </HierarchicalDataTemplate>
+
+    <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:RecipeComponentItemViewModel}" ItemsSource="{x:Null}" >
+        <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="Auto">
+            <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid HorizontalAlignment="Stretch" Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                    <TextBlock Text="{Binding LinkedResource.Value.Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"/>
+                </Grid>
+                <Grid Grid.Row="1" Height="32">
+                    <md:NumericUpDown Value="{Binding Quantity}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="ValueChanged">
+                                <i:InvokeCommandAction
+                                                        Command="{Binding SetQuantityCommand}"
+                                                        CommandParameter="{Binding Quantity}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </md:NumericUpDown>
+                </Grid>
+            </Grid>
+        </Grid>
+    </HierarchicalDataTemplate>
+</ResourceDictionary>

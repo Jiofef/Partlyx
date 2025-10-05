@@ -8,35 +8,26 @@
              xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
              xmlns:ddlocal="clr-namespace:Partlyx.UI.WPF.DragAndDrop"
              xmlns:core="using:Microsoft.Xaml.Behaviors.Core">
     
     <Application.Resources>
         <ResourceDictionary>
-            <!-- DataTemplates -->
-            <DataTemplate DataType="{x:Type vmo:ComponentCreateViewModel}">
-                <dialogs:ComponentCreate/>
-            </DataTemplate>
-            
-            <!-- Converters -->
-            <BooleanToVisibilityConverter x:Key="BoolToVisConv"/>
-            <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConv"/>
-            <conv:SelectedEqualsConverter x:Key="SelectedEqualsConv"/>
-
             <!-- XAML resources -->
             <ResourceDictionary.MergedDictionaries>
                 <!-- External resources -->
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml"/>
                 
                 <!-- Partlyx resources -->
-                <ResourceDictionary Source="/Styles/Colors.xaml"/>
-                <ResourceDictionary Source="/Styles/DefaultResources.xaml"/>
-                <ResourceDictionary Source="/Styles/CommonStylesDictionary.xaml"/>
-                <ResourceDictionary Source="/Styles/FavsScrollViewer.xaml"/>
-
-
-                
+                <ResourceDictionary Source="/Resources/Converters.xaml"/>
+                <ResourceDictionary Source="/Resources/Colors.xaml"/>
+                <ResourceDictionary Source="/Resources/DefaultResources.xaml"/>
+                <ResourceDictionary Source="/Resources/Styles/DefaultStylesDictionary.xaml"/>
+                <ResourceDictionary Source="/Resources/Styles/CommonStylesDictionary.xaml"/>
+                <ResourceDictionary Source="/Resources/Styles/FavsScrollViewer.xaml"/>
+                <ResourceDictionary Source="/Resources/DataTemplates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
 

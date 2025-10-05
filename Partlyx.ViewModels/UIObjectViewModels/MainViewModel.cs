@@ -14,10 +14,6 @@ namespace Partlyx.ViewModels.UIObjectViewModels
     {
         public IGlobalSelectedParts SelectedParts { get; }
 
-        public ResourceListViewModel ResourceList { get; }
-        public RecipeListViewModel RecipeList { get; }
-        public RecipeComponentListViewModel ComponentList { get; }
-
         public PartsTreeViewModel PartsTree { get; }
 
         public MenuPanelViewModel MenuPanel { get; }
@@ -29,8 +25,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IVMPartsStoreCleaner _cleaner;
 
         public MainViewModel(
-            ResourceListViewModel resourceList, RecipeListViewModel recipeList, 
-            RecipeComponentListViewModel recipeComponents, PartsTreeViewModel partsTree,
+            PartsTreeViewModel partsTree,
             MenuPanelViewModel menuPanel,
             IGlobalSelectedParts selectedParts,
             IPartsLoader pl,
@@ -40,9 +35,6 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             IVMPartsStoreCleaner vmpsc
             )
         {
-            ResourceList = resourceList;
-            RecipeList = recipeList;
-            ComponentList = recipeComponents;
             PartsTree = partsTree;
             MenuPanel = menuPanel;
             SelectedParts = selectedParts;

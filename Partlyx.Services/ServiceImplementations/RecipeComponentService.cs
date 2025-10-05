@@ -67,10 +67,11 @@ namespace Partlyx.Services.ServiceImplementations
         public async Task MoveComponentAsync(Guid grandParentResourceUid, Guid newGrandParentResourceUid, Guid parentRecipeUid, Guid newParentRecipeUid, Guid componentUid)
         {
             RecipeComponent? component = null;
-            await _repo.ExecuteOnComponentAsync(grandParentResourceUid, componentUid, _component =>
+            await _repo.ExecuteOnComponentAsync(grandParentResourceUid, componentUid, async _component  =>
             {
                 _component.Detach();
                 component = _component;
+
                 return Task.CompletedTask;
             });
             await _repo.ExecuteOnRecipeAsync(newGrandParentResourceUid, newParentRecipeUid, recipe =>
