@@ -85,6 +85,7 @@ namespace Partlyx.UI.WPF
             services.AddSingleton<MainViewModel>();
 
             services.AddTransient<PartsTreeViewModel>();
+            services.AddTransient<PartsGraphViewModel>();
 
             services.AddTransient<MenuPanelViewModel>();
             services.AddTransient<MenuPanelFileViewModel>();

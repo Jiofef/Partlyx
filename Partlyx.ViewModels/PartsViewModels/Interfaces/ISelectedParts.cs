@@ -27,13 +27,16 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
         void ClearSelectedComponents();
         void ClearSelectedRecipes();
         void ClearSelectedResources();
-
+        void ClearSelection();
         RecipeComponentItemViewModel? GetSingleComponentOrNull();
         RecipeItemViewModel? GetSingleRecipeOrNull();
         ResourceItemViewModel? GetSingleResourceOrNull();
 
         void SelectSingleComponent(RecipeComponentItemViewModel component);
+        void SelectSingleComponentAncestors(RecipeComponentItemViewModel component);
+        void SelectSinglePart(IVMPart part);
         void SelectSingleRecipe(RecipeItemViewModel recipe);
+        void SelectSingleRecipeAncestor(RecipeItemViewModel recipe);
         void SelectSingleResource(ResourceItemViewModel resource);
     }
 

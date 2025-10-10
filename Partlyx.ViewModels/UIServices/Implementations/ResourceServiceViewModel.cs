@@ -2,6 +2,7 @@
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 
 namespace Partlyx.ViewModels.UIServices.Implementations
@@ -18,7 +19,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        private async Task CreateResourceAsync()
+        public async Task CreateResourceAsync()
         {
             // It must be executed on a single thread so that recipients respond to events immediately after they are sent
             await Task.Run(async () =>
@@ -43,12 +44,18 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        private void StartRenamingSelected()
+        public void StartRenamingSelected()
         {
             var resourceVM = _selectedParts.GetSingleResourceOrNull();
             if (resourceVM == null) return;
 
             resourceVM.Ui.IsRenaming = true;
+        }
+
+        [RelayCommand]
+        public async Task RemoveAsync(ResourceItemViewModel resource)
+        {
+            await _commands.CreateSyncAndExcecuteAsync<DeleteResourceCommand>(resource.Uid);
         }
     }
 }

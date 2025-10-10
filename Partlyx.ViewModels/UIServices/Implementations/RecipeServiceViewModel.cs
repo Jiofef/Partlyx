@@ -2,6 +2,7 @@
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
+using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -20,13 +21,13 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        private async Task CreateRecipeAsync(ResourceItemViewModel parent)
+        public async Task CreateRecipeAsync(ResourceItemViewModel parent)
         {
             await _commands.CreateSyncAndExcecuteAsync<CreateRecipeCommand>(parent.Uid);
         }
 
         [RelayCommand]
-        private void StartRenamingSelected()
+        public void StartRenamingSelected()
         {
             var recipeVM = _selectedParts.GetSingleRecipeOrNull();
             if (recipeVM == null) return;
@@ -47,6 +48,12 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
                 await _commands.CreateSyncAndExcecuteAsync<MoveRecipeCommand>(previousParentUid, newParentUid, recipe.Uid);
             }
+        }
+
+        [RelayCommand]
+        public async Task RemoveAsync(RecipeItemViewModel recipe)
+        {
+            await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeCommand>(recipe.LinkedParentResource!.Uid, recipe.Uid);
         }
     }
 }

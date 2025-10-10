@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="ReactiveUI" Version="22.0.1" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.ComponentModel" Version="4.3.0" />
   </ItemGroup>

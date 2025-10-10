@@ -30,7 +30,7 @@
                           Name="ListViewControl"
                           dd:DragDrop.IsDragSource="True"
                           dd:DragDrop.IsDropTarget="True"
-                          beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Components, RelativeSource={RelativeSource AncestorType=Window}}"
+                          beh:ListViewSelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Components, RelativeSource={RelativeSource AncestorType=Window}}"
                           HorizontalContentAlignment="Stretch" Margin="0,0,10,0" Style="{StaticResource CommonListView}" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>

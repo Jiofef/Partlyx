@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Partlyx.Services.Commands;
+using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
@@ -69,6 +70,15 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
                 await _commands.CreateSyncAndExcecuteAsync<MoveRecipeComponentCommand>(previousGrandParentUid, newGrandParentUid, previousParentUid, newParentUid, component.Uid);
             }
+        }
+
+        [RelayCommand]
+        public async Task RemoveAsync(RecipeComponentItemViewModel component)
+        {
+
+            var grandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
+            var parentUid = component.LinkedParentRecipe!.Uid;
+            await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeComponentCommand>(grandParentUid, parentUid, component.Uid);
         }
     }
 }

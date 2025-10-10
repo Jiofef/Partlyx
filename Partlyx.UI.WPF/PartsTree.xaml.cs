@@ -2,6 +2,7 @@
 using Partlyx.UI.WPF.DragAndDrop;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,8 @@ namespace Partlyx.UI.WPF
 
         private void OnLoaded(object s, RoutedEventArgs e)
         {
+            if (DesignerProperties.GetIsInDesignMode(this)) return;
+
             var handler = App.Services.GetRequiredService<PartsTreeDropHandler>();
             GongSolutions.Wpf.DragDrop.DragDrop.SetDropHandler(TreeViewControl, handler);
         }

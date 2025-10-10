@@ -11,6 +11,8 @@ using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using ReactiveUI;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
@@ -28,6 +30,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         // Events
         private readonly IEventBus _bus;
         private readonly IDisposable _updatedSubscription;
+        private readonly IDisposable _childComponentsDefaultRecipeUpdateSubscribe;
+        private readonly IDisposable _childComponentsSelectedRecipeUpdateSubscribe;
 
         public RecipeComponentItemViewModel(RecipeComponentDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
@@ -46,6 +50,19 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             if (dto.ParentRecipeUid is Guid parentUid)
                 LinkedParentRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(parentUid);
             LinkedResource = _linkedPartsManager.CreateAndRegisterLinkedResourceVM(dto.ResourceUid);
+
+            // SelectedRecipeComponents is a helper property for fast switching from one component to its child components in the tree.
+            // His calculation requires two property chains to be taken into account, and this is carried out in two compact subscriptions
+            _childComponentsDefaultRecipeUpdateSubscribe = this
+                .WhenAnyValue(x => x.LinkedResource!.Value!.LinkedDefaultRecipe!.Value)
+                .Subscribe(v => UpdateSelectedComponents());
+
+            _childComponentsSelectedRecipeUpdateSubscribe = this
+                .WhenAnyValue(x => x.LinkedSelectedRecipe!.Value)
+                .Subscribe(v => UpdateSelectedComponents());
+            UpdateSelectedComponents();
+
+
             _quantity = dto.Quantity;
             if (dto.SelectedRecipeUid is Guid selectedUid)
                 LinkedSelectedRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(selectedUid);
@@ -68,7 +85,10 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         private GuidLinkedPart<RecipeItemViewModel>? _selectedRecipe;
         public GuidLinkedPart<RecipeItemViewModel>? LinkedSelectedRecipe { get => _selectedRecipe; private set => SetProperty(ref _selectedRecipe, value); }
-            
+
+        private ObservableCollection<RecipeComponentItemViewModel>? _selectedRecipeComponents;
+        public ObservableCollection<RecipeComponentItemViewModel>? SelectedRecipeComponents { get => _selectedRecipeComponents; private set => SetProperty(ref _selectedRecipeComponents, value); }
+
 
         // Info updating
         protected override Dictionary<string, Action<RecipeComponentDto>> ConfigureUpdaters() => new()
@@ -95,7 +115,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public void Dispose()
         {
-            _updatedSubscription.Dispose();
+            _updatedSubscription.Dispose(); 
+            _childComponentsDefaultRecipeUpdateSubscribe.Dispose();
+            _childComponentsSelectedRecipeUpdateSubscribe.Dispose();
 
             _store.RemoveRecipeComponent(Uid);
         }
@@ -111,5 +133,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         // For UI
         public RecipeComponentUIState Ui => _uiStateService.GetOrCreate(this);
+
+        private void UpdateSelectedComponents()
+        {
+            SelectedRecipeComponents =
+                LinkedSelectedRecipe?.Value?.Components ??
+                LinkedResource?.Value?.LinkedDefaultRecipe?.Value?.Components;
+        }
     }
 }

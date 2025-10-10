@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Partlyx.UI.WPF"
+        xmlns:localother="clr-namespace:Partlyx.UI.WPF.OtherControls"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:viewmodel="clr-namespace:Partlyx.ViewModels;assembly=Partlyx.ViewModels"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -46,6 +47,8 @@
                 </Grid.ColumnDefinitions>
                 <local:PartsTree DataContext="{Binding PartsTree}" 
                                 Grid.Row="0" Grid.Column="0" />
+
+                <localother:PartsGraph Grid.Column="1" DataContext="{Binding PartsGraph}"/>
 
                 <UniformGrid Grid.Column="2" Rows="2">
                 </UniformGrid>

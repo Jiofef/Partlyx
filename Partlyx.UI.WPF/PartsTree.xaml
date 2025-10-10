@@ -31,7 +31,6 @@
                           ItemsSource="{Binding Resources}" 
                           dd:DragDrop.IsDragSource="True"
                           dd:DragDrop.IsDropTarget="True"
-                          beh:SelectionBehavior.BindableSelectedItems="{Binding DataContext.SelectedParts.Resources, RelativeSource={RelativeSource AncestorType=Window}}"
                           HorizontalContentAlignment="Stretch" Margin="0,0,10,0" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
                     <TreeView.Template>
                         <ControlTemplate TargetType="TreeView">
@@ -42,6 +41,7 @@
                     </TreeView.Template>
                     <i:Interaction.Behaviors>
                         <beh:CollectionViewFilterBehavior Predicate="{Binding Search.SearchByName}"/>
+                        <beh:TreeViewPartSelectionBehavior SelectedParts="{Binding SelectedParts}" AutoSetAncestorParts="True"/>
                     </i:Interaction.Behaviors>
                     <TreeView.InputBindings>
                         <KeyBinding Key="F2" Command="{Binding Service.StartRenamingSelectedCommand}"/>

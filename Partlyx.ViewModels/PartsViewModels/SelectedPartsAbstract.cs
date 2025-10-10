@@ -3,6 +3,7 @@ using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Partlyx.ViewModels.PartsViewModels
 {
@@ -41,35 +42,35 @@ namespace Partlyx.ViewModels.PartsViewModels
             Recipes = new();
             Components = new();
 
-            Resources.CollectionChanged += (obj, evInfo) => 
+            Resources.CollectionChanged += (sender, evInfo) => 
             {
                 IsSingleResourceSelected = Resources.Count == 1;
                 SingleResourceOrNull = GetSingleResourceOrNull();
 
                 IsResourcesSelected = Resources.Count > 0;
-                SelectedResourcesChangedHandler(obj, evInfo);
+                SelectedResourcesChangedHandler(sender, evInfo);
             };
-            Recipes.CollectionChanged += (obj, evInfo) =>
+            Recipes.CollectionChanged += (sender, evInfo) =>
             {
                 IsSingleRecipeSelected = Recipes.Count == 1;
                 SingleRecipeOrNull = GetSingleRecipeOrNull();
 
                 IsRecipesSelected = Recipes.Count > 0;
-                SelectedRecipesChangedHandler(obj, evInfo);
+                SelectedRecipesChangedHandler(sender, evInfo);
             };
-            Components.CollectionChanged += (obj, evInfo) =>
+            Components.CollectionChanged += (sender, evInfo) =>
             {
                 IsSingleComponentSelected = Components.Count == 1;
                 SingleComponentOrNull = GetSingleComponentOrNull();
 
                 IsComponentsSelected = Components.Count > 0;
-                SelectedComponentsChangedHandler(obj, evInfo);
+                SelectedComponentsChangedHandler(sender, evInfo);
             };
         }
 
-        protected virtual void SelectedResourcesChangedHandler(object? @object, NotifyCollectionChangedEventArgs args) { }
-        protected virtual void SelectedRecipesChangedHandler(object? @object, NotifyCollectionChangedEventArgs args) { }
-        protected virtual void SelectedComponentsChangedHandler(object? @object, NotifyCollectionChangedEventArgs args) { }
+        protected virtual void SelectedResourcesChangedHandler(object? sender, NotifyCollectionChangedEventArgs args) { }
+        protected virtual void SelectedRecipesChangedHandler(object? sender, NotifyCollectionChangedEventArgs args) { }
+        protected virtual void SelectedComponentsChangedHandler(object? sender, NotifyCollectionChangedEventArgs args) { }
 
         #region Resource methods
         public void SelectSingleResource(ResourceItemViewModel resource)
@@ -90,7 +91,6 @@ namespace Partlyx.ViewModels.PartsViewModels
         public void ClearSelectedResources()
         {
             Resources.Clear();
-            ClearSelectedRecipes();
         }
 
         public ResourceItemViewModel? GetSingleResourceOrNull()
@@ -110,6 +110,14 @@ namespace Partlyx.ViewModels.PartsViewModels
             Recipes.Add(recipe);
         }
 
+        public void SelectSingleRecipeAncestor(RecipeItemViewModel recipe)
+        {
+            if (recipe.LinkedParentResource?.Value is ResourceItemViewModel parentResource)
+                SelectSingleResource(parentResource);
+            else
+                ClearSelectedResources();
+        }
+
         public void AddRecipeToSelected(RecipeItemViewModel recipe)
         {
             if (Recipes.Contains(recipe!)) return;
@@ -118,8 +126,7 @@ namespace Partlyx.ViewModels.PartsViewModels
 
         public void ClearSelectedRecipes()
         {
-            Resources.Clear();
-            ClearSelectedComponents();
+            Recipes.Clear();
         }
 
         public RecipeItemViewModel? GetSingleRecipeOrNull()
@@ -138,6 +145,21 @@ namespace Partlyx.ViewModels.PartsViewModels
 
             Components.Add(component);
         }
+
+        public void SelectSingleComponentAncestors(RecipeComponentItemViewModel component)
+        {
+            if (component.LinkedParentRecipe?.Value is RecipeItemViewModel parentRecipe)
+            {
+                SelectSingleRecipe(parentRecipe);
+                SelectSingleRecipeAncestor(parentRecipe);
+            }
+            else
+            {
+                ClearSelectedRecipes();
+                ClearSelectedResources();
+            }
+        }
+
         public void AddComponentToSelected(RecipeComponentItemViewModel component)
         {
             if (Components.Contains(component!)) return;
@@ -153,6 +175,30 @@ namespace Partlyx.ViewModels.PartsViewModels
         {
             bool isComponentSingle = Components.Count == 1;
             return isComponentSingle ? Components.Single() : null;
+        }
+        #endregion
+
+        #region Generic / any parts
+        public void SelectSinglePart(IVMPart part)
+        {
+            if (part is ResourceItemViewModel resource)
+            {
+                SelectSingleResource(resource);
+            }
+            else if (part is RecipeItemViewModel recipe)
+            {
+                SelectSingleRecipe(recipe);
+            }
+            else if (part is RecipeComponentItemViewModel component)
+            {
+                SelectSingleComponent(component);
+            }
+        }
+        public void ClearSelection()
+        {
+            ClearSelectedResources();
+            ClearSelectedRecipes();
+            ClearSelectedComponents();
         }
         #endregion
     }

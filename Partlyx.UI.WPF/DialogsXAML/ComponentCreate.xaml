@@ -22,7 +22,7 @@
                             HorizontalContentAlignment="Stretch" Margin="0,0,10,0" Style="{StaticResource CommonListView}"
                             BorderThickness="0" Background="{StaticResource PxBlue0Brush}"
                             Grid.Row="1"
-                            beh:SelectionBehavior.BindableSelectedItems="{Binding SelectedParts.Resources}">
+                            beh:ListViewSelectionBehavior.BindableSelectedItems="{Binding SelectedParts.Resources}">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>

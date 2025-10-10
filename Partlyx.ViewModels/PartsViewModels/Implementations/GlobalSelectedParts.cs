@@ -12,7 +12,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _bus = bus;
         }
 
-        protected override void SelectedResourcesChangedHandler(object? @object, NotifyCollectionChangedEventArgs args)
+        protected override void SelectedResourcesChangedHandler(object? sender, NotifyCollectionChangedEventArgs args)
         {
             if (IsSingleResourceSelected)
             {
@@ -21,7 +21,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             }
             else if (Resources.Count > 1) // Multiselect
             {
-                var addedSelected = (ResourceItemViewModel)@object!;
+                var addedSelected = (ResourceItemViewModel)sender!;
                 var @event = new GlobalResourceAddedToSelectedEvent(addedSelected.Uid);
                 _bus.Publish(@event);
             }
@@ -31,18 +31,20 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _bus.Publish(@changedEvent);
         }
 
-        protected override void SelectedRecipesChangedHandler(object? @object, NotifyCollectionChangedEventArgs args)
+        protected override void SelectedRecipesChangedHandler(object? sender, NotifyCollectionChangedEventArgs args)
         {
             if (IsSingleRecipeSelected)
             {
                 var @event = new GlobalSingleRecipeSelectedEvent(GetSingleRecipeOrNull()!.Uid);
                 _bus.Publish(@event);
             }
-            else if (Recipes.Count > 1) // Multiselect
+            else if (Recipes.Count > 1 && args.NewItems != null) // Multiselect
             {
-                var addedSelected = (RecipeItemViewModel)@object!;
-                var @event = new GlobalRecipeAddedToSelectedEvent(addedSelected.Uid);
-                _bus.Publish(@event);
+                foreach (RecipeItemViewModel added in args.NewItems)
+                {
+                    var @event = new GlobalRecipeAddedToSelectedEvent(added.Uid);
+                    _bus.Publish(@event);
+                }
             }
 
             var selectedRecipeUids = Recipes.Select(r => r.Uid).ToArray();
@@ -50,18 +52,20 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _bus.Publish(@changedEvent);
         }
 
-        protected override void SelectedComponentsChangedHandler(object? @object, NotifyCollectionChangedEventArgs args)
+        protected override void SelectedComponentsChangedHandler(object? sender, NotifyCollectionChangedEventArgs args)
         {
             if (IsSingleComponentSelected)
             {
                 var @event = new GlobalSingleComponentSelectedEvent(GetSingleComponentOrNull()!.Uid);
                 _bus.Publish(@event);
             }
-            else if (Components.Count > 1) // Multiselect
+            else if (Components.Count > 1 && args.NewItems != null) // Multiselect
             {
-                var addedSelected = (RecipeComponentItemViewModel)@object!;
-                var @event = new GlobalComponentAddedToSelectedEvent(addedSelected.Uid);
-                _bus.Publish(@event);
+                foreach (RecipeComponentItemViewModel added in args.NewItems)
+                {
+                    var @event = new GlobalComponentAddedToSelectedEvent(added.Uid);
+                    _bus.Publish(@event);
+                }
             }
 
             var selectedComponentsUids = Components.Select(c => c.Uid).ToArray();

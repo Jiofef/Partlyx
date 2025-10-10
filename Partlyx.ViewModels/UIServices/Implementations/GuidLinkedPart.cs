@@ -20,7 +20,22 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         public Guid Uid { get => _uid; set => SetProperty(ref _uid, value); }
 
         private TPart? _value;
-        public TPart? Value { get => _value; set => SetProperty(ref _value, value); }
+        public TPart? Value 
+        { 
+            get => _value; 
+            set 
+            { 
+                bool isValueChanging = !EqualityComparer<TPart>.Default.Equals(_value, value);
+
+                if (isValueChanging)
+                {
+                    SetProperty(ref _value, value);
+                    ValueChanged?.Invoke();
+                }
+            } 
+        }
+
+        public event Action ValueChanged = delegate { };
 
         public event Action Disposed = delegate { };
         public void Dispose()

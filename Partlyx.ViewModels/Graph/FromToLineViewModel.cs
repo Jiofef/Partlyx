@@ -1,0 +1,14 @@
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Numerics;
+
+namespace Partlyx.ViewModels.Graph
+{
+    public class FromToLineViewModel : ObservableObject
+    {
+        private Vector2 _from;
+        public Vector2 From { get => _from; set => SetProperty(ref _from, value); }
+
+        private Vector2 _to;
+        public Vector2 To { get => _to; set => SetProperty(ref _to, value); }
+    }
+}

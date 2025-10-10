@@ -7,13 +7,13 @@ using System.Windows.Controls;
 
 namespace Partlyx.UI.WPF.Behaviors;
 
-public static class SelectionBehavior
+public static class ListViewSelectionBehavior
 {
     public static readonly DependencyProperty BindableSelectedItemsProperty =
         DependencyProperty.RegisterAttached(
             "BindableSelectedItems",
             typeof(IList),
-            typeof(SelectionBehavior),
+            typeof(ListViewSelectionBehavior),
             new PropertyMetadata(null, OnBindableSelectedItemsChanged));
 
     public static void SetBindableSelectedItems(DependencyObject o, IList value) => o.SetValue(BindableSelectedItemsProperty, value);
@@ -54,7 +54,7 @@ public static class SelectionBehavior
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine("SelectionBehavior error: " + ex);
+            System.Diagnostics.Debug.WriteLine("ListViewSelectionBehavior error: " + ex);
         }
     }
 

@@ -17,6 +17,11 @@
     <!-- Parts tree hierarchy: Resource -> Recipe -> Components -->
     <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:ResourceItemViewModel}" ItemsSource="{Binding Recipes}">
         <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
+            <Grid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Delete" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}"/>
+                </ContextMenu>
+            </Grid.ContextMenu>
             <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
             <Grid HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
@@ -65,6 +70,11 @@
 
     <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:RecipeItemViewModel}" ItemsSource="{Binding Components}">
         <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
+            <Grid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Delete" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}"/>
+                </ContextMenu>
+            </Grid.ContextMenu>
             <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
             <Grid HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
@@ -127,6 +137,11 @@
 
     <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:RecipeComponentItemViewModel}" ItemsSource="{x:Null}" >
         <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="Auto">
+            <Grid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Delete" Command="{Binding Services.ComponentService.RemoveCommand}" CommandParameter="{Binding}"/>
+                </ContextMenu>
+            </Grid.ContextMenu>
             <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
             <Grid>
                 <Grid.RowDefinitions>
