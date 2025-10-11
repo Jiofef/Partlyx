@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Numerics;
 
-namespace Partlyx.ViewModels.Graph
+namespace Partlyx.ViewModels.GraphicsViewModels
 {
     public class FromToLineViewModel : ObservableObject
     {

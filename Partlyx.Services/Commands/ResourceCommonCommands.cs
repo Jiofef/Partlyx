@@ -8,13 +8,13 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
     public class CreateResourceCommand : IUndoableCommand
     {
         private IResourceService _resourceService;
-        private IResourceRepository _resourceRepository;
+        private IPartsRepository _resourceRepository;
 
         public Guid ResourceUid { get; private set; }
 
         private Resource? _createdResource;
 
-        public CreateResourceCommand(IResourceService rs, IResourceRepository rr)
+        public CreateResourceCommand(IResourceService rs, IPartsRepository rr)
         {
             _resourceService = rs;
             _resourceRepository = rr;
@@ -44,13 +44,13 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
     public class DeleteResourceCommand : IUndoableCommand
     {
         private IResourceService _resourceService;
-        private IResourceRepository _resourceRepository;
+        private IPartsRepository _resourceRepository;
 
         public Guid DeletedResourceUid { get; private set; }
 
         private Resource? _deletedResource;
 
-        public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IResourceRepository rr)
+        public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IPartsRepository rr)
         {
             DeletedResourceUid = resourceUid;
             _resourceService = rs;

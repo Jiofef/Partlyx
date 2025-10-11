@@ -8,8 +8,8 @@ namespace Partlyx.Infrastructure
     /// </summary>
     public class PartUpdater : IPartUpdater
     {
-        private IResourceRepository _repo;
-        public PartUpdater(IResourceRepository rr) => _repo = rr;
+        private IPartsRepository _repo;
+        public PartUpdater(IPartsRepository rr) => _repo = rr;
 
         public async Task<Resource?> Update(Resource resource)
         {

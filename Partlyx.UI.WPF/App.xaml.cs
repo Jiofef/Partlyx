@@ -58,7 +58,7 @@ namespace Partlyx.UI.WPF
             services.AddSingleton<Infrastructure.Events.IEventBus, Infrastructure.Events.EventBus>();
 
 
-            services.AddTransient<IResourceRepository, ResourceRepository>();
+            services.AddTransient<IPartsRepository, PartsRepository>();
 
             // Services
             services.AddTransient<IServiceProvider, ServiceProvider>();

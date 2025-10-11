@@ -4,14 +4,15 @@ using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.Infrastructure.Data.Implementations;
 
 namespace Partlyx.Services.ServiceImplementations
 {
     public class RecipeComponentService : IRecipeComponentService
     {
-        private readonly IResourceRepository _repo;
+        private readonly IPartsRepository _repo;
         private readonly IEventBus _eventBus;
-        public RecipeComponentService(IResourceRepository repo, IEventBus bus)
+        public RecipeComponentService(IPartsRepository repo, IEventBus bus)
         {
             _repo = repo;
             _eventBus = bus;
@@ -19,14 +20,17 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task<Guid> CreateComponentAsync(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid)
         {
-            var result = await _repo.ExecuteOnRecipeAsync(grandParentResourceUid, parentRecipeUid, async recipe =>
+            var batchOptions = new PartsRepository.BatchIncludeOptions() { };
+            var result = await _repo.ExecuteWithBatchAsync(
+                [componentResourceUid], [parentRecipeUid], [], batchOptions,
+                batch =>
             {
-                var component = await _repo.ExecuteOnResourceAsync(componentResourceUid, resource =>
-                {
-                    var component = recipe.CreateComponent(resource, 1);
-                    return Task.FromResult(component);
-                });
-                return component.Uid;
+                var recipe = batch.Recipes[parentRecipeUid];
+                var resource = batch.Resources[componentResourceUid];
+
+                var component = recipe.CreateComponent(resource, 1);
+
+                return Task.FromResult(component.Uid);
             });
 
             var component = await GetComponentAsync(grandParentResourceUid, result);
@@ -60,6 +64,7 @@ namespace Partlyx.Services.ServiceImplementations
                 component.Detach();
                 return Task.CompletedTask;
             });
+            await _repo.DeleteComponentAsync(componentUid);
 
             _eventBus.Publish(new RecipeComponentDeletedEvent(parentResourceUid, componentParentRecipeGuid, componentUid));
         }

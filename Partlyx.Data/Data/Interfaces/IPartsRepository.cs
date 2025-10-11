@@ -1,11 +1,12 @@
 ﻿using Partlyx.Core;
+using Partlyx.Infrastructure.Data.Implementations;
 
 namespace Partlyx.Infrastructure.Data.Interfaces
 {
-    public interface IResourceRepository
+    public interface IPartsRepository
     {
         Task<Guid> AddAsync(Resource resource);
-        Task DeleteAsync(Guid uid);
+        Task DeleteResourceAsync(Guid uid);
         Task<Guid> DuplicateAsync(Guid uid);
         Task ExecuteOnResourceAsync(Guid resourceUid, Func<Resource, Task> action);
         Task<Resource?> GetByUidAsync(Guid uid);
@@ -21,5 +22,9 @@ namespace Partlyx.Infrastructure.Data.Interfaces
         Task<List<Recipe>> GetAllTheRecipesAsync();
         Task<List<RecipeComponent>> GetAllTheRecipeComponentsAsync();
         Task ClearEverything();
+        Task<PartsRepository.BatchLoadResult> LoadBatchAsync(IEnumerable<Guid> resourceUids, IEnumerable<Guid> recipeUids, IEnumerable<Guid> componentUids, CancellationToken ct = default);
+        Task<TResult> ExecuteWithBatchAsync<TResult>(IEnumerable<Guid>? resourceUids, IEnumerable<Guid>? recipeUids, IEnumerable<Guid>? componentUids, PartsRepository.BatchIncludeOptions? options, Func<PartsRepository.BatchLoadResult, Task<TResult>> action, CancellationToken ct = default);
+        Task DeleteRecipeAsync(Guid uid);
+        Task DeleteComponentAsync(Guid uid);
     }
 }

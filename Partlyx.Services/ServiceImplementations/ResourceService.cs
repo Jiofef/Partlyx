@@ -10,10 +10,10 @@ namespace Partlyx.Services.ServiceImplementations
 {
     public class ResourceService : IResourceService
     {
-        private readonly IResourceRepository _repo;
+        private readonly IPartsRepository _repo;
         private readonly IEventBus _eventBus;
         private readonly IIconInfoProvider _infoProvider;
-        public ResourceService(IResourceRepository repo, IEventBus bus, IIconInfoProvider iip)
+        public ResourceService(IPartsRepository repo, IEventBus bus, IIconInfoProvider iip)
         {
             _repo = repo;
             _eventBus = bus;
@@ -46,7 +46,7 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task DeleteResourceAsync(Guid uid)
         {
-            await _repo.DeleteAsync(uid);
+            await _repo.DeleteResourceAsync(uid);
 
             _eventBus.Publish(new ResourceDeletedEvent(uid));
         }

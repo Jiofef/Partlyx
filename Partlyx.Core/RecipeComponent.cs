@@ -51,6 +51,7 @@ namespace Partlyx.Core
 
         protected RecipeComponent() { Uid = Guid.NewGuid(); }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Guid Uid { get; private set; }
 
         // Main features

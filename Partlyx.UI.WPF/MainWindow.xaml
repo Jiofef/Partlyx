@@ -39,7 +39,7 @@
 
             </DockPanel>
 
-            <Grid Grid.Row="1" Grid.RowSpan="2">
+            <Grid Grid.Row="1" Grid.RowSpan="2" Background="{StaticResource PxBlue0Brush}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="360"/>
                     <ColumnDefinition Width="*"/>

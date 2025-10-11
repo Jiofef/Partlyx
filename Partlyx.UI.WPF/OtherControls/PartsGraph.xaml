@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:graphvm="clr-namespace:Partlyx.ViewModels.Graph;assembly=Partlyx.ViewModels"
              xmlns:local="clr-namespace:Partlyx.UI.WPF.OtherControls"
              xmlns:zoom="https://github.com/Moravuscz/WPFZoomPanel"
              mc:Ignorable="d" 
@@ -11,7 +12,7 @@
     <zoom:ZoomPanelScrollViewer ScrollZoomModifier="" ZoomAndPanInitialPosition="FitScreen" PanningMode="Both" Background="Transparent" ViewportZoom="0.9" BorderBrush="Transparent">
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <!-- edges behind -->
-            <ItemsControl ItemsSource="{Binding Edges}" Height="10000" Width="10000">
+            <ItemsControl ItemsSource="{Binding Edges}" Height="2000" Width="2000">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas />
@@ -25,6 +26,24 @@
             </ItemsControl>
             <!-- nodes on top -->
             <ItemsControl ItemsSource="{Binding Nodes}">
+                <ItemsControl.Resources>
+                    <DataTemplate DataType="{x:Type graphvm:RecipeGraphNodeViewModel}">
+                        <Border Width="{Binding Width}" Height="{Binding Height}" CornerRadius="4" Padding="6" Background="{StaticResource PxWhiteBrush}"
+                            BorderBrush="{StaticResource PxBlue1Brush}" BorderThickness="8">
+                            <StackPanel>
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.Name}"/>
+                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.LinkedParentResource.Value.Name}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type graphvm:ComponentGraphNodeViewModel}">
+                        <Border Width="{Binding Width}" Height="{Binding Height}" CornerRadius="4" Padding="6" Background="{StaticResource PxWhiteBrush}"
+                            BorderBrush="{StaticResource PxBlue1Brush}" BorderThickness="8">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.LinkedResource.Value.Name}"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.Resources>
+                
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas />
@@ -37,14 +56,6 @@
                         <Setter Property="Canvas.Top"  Value="{Binding Y}" />
                     </Style>
                 </ItemsControl.ItemContainerStyle>
-
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Width="{Binding Width}" Height="{Binding Height}" CornerRadius="4" Padding="6" Background="{StaticResource PxWhiteBrush}"
-                            BorderBrush="{StaticResource PxBlue1Brush}" BorderThickness="8">
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Grid>
     </zoom:ZoomPanelScrollViewer>

@@ -45,7 +45,7 @@ public class PartlyxDBContext : DbContext, IDisposable
             rb.Property(x => x.Uid)
             .HasColumnName("Uid")
             .HasColumnType("BLOB")
-            .ValueGeneratedOnAdd();
+            .ValueGeneratedNever();
             rb.Property<Guid?>("ResourceUid").HasColumnType("BLOB");
             rb.HasMany(x => x.Components)
                 .WithOne(x => x.ParentRecipe)
@@ -72,7 +72,7 @@ public class PartlyxDBContext : DbContext, IDisposable
             cb.Property(x => x.Uid)
             .HasColumnName("Uid")
             .HasColumnType("BLOB")
-            .ValueGeneratedOnAdd();
+            .ValueGeneratedNever();
             cb.Property<Guid?>("RecipeUid").HasColumnType("BLOB");
             cb.Property<Guid?>("ComponentResourceUid").HasColumnType("BLOB");
 
@@ -94,25 +94,4 @@ public class PartlyxDBContext : DbContext, IDisposable
 
         base.OnModelCreating(modelBuilder);
     }
-
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        // Since Parts create UIDs in themselves, the DB thinks that the object has already been created. Here we tell the DB that having a set Uid does not mean that the object has already been created.
-        foreach (var entry in ChangeTracker.Entries().Where(e => e.Entity is IPart))
-        {
-            if (entry.State == EntityState.Modified)
-            {
-                var key = entry.Properties.FirstOrDefault(p => p.Metadata.IsPrimaryKey())?.CurrentValue;
-                if (key != null)
-                {
-                    var dbValues = await entry.GetDatabaseValuesAsync(cancellationToken);
-                    if (dbValues == null)
-                        entry.State = EntityState.Added;
-                }
-            }
-        }
-
-        return await base.SaveChangesAsync(cancellationToken);
-    }
-
 }

@@ -20,11 +20,6 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 {
     public partial class PartsGraphViewModel : ObservableObject, IDisposable
     {
-        // consts
-        private const float StandardNodeDistanceX = 24;
-        private const float StandardNodeDistanceY = 48;
-        private const float StandardBranchDistanceX = StandardNodeDistanceX * 2;
-
         private IEventBus _bus;
         public IGlobalSelectedParts SelectedParts { get; }
 
@@ -37,9 +32,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IDisposable _componentMovedSubscription;
 
         // Collections
-        public ObservableCollection<EdgeViewModel> Edges { get; } = new();
-        public ObservableCollection<GraphNodeViewModel> Nodes { get; } = new();
-        private readonly Dictionary<Guid, GraphNodeViewModel> _nodesDictionary = new();
+        public ObservableCollection<TwoObjectsLineViewModel> Edges { get; } = new();
+        public ObservableCollection<GraphTreeNodeViewModel> Nodes { get; } = new();
+        private readonly Dictionary<Guid, GraphTreeNodeViewModel> _nodesDictionary = new();
 
         public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IEventBus bus)
         {
@@ -53,54 +48,6 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _componentMovedSubscription = bus.Subscribe<RecipeComponentMovedEvent>((ev) => UpdateTree());
         }
 
-        private Vector2 GetChildrenSize(GraphNodeViewModel node)
-        {
-            if (node.ChildrenUids == null) return Vector2.Zero;
-
-            int childrenCount = node.ChildrenUids.Count;
-            float widthSum = 0;
-            float height = 0;
-            for (int i = 0; i < node.ChildrenUids.Count; i++)
-            {
-                var size = node.GetChildSize(i);
-
-                widthSum += size.X;
-
-                if (height < size.Y)
-                    height = size.Y;
-            }
-                
-            float width = widthSum + (childrenCount - 1) * StandardNodeDistanceX;
-            return new Vector2(width, height);
-        }
-
-        private Vector2[] GetChildrenLocalPositions(GraphNodeViewModel node)
-        {
-            if (node.ChildrenUids == null) return [];
-
-            Vector2 childrenSize = GetChildrenSize(node);
-            float edgePointsDistanceX = childrenSize.X - childrenSize.X / node.ChildrenUids.Count;
-            float commonOffsetX = -edgePointsDistanceX / 2;
-
-            Vector2[] positions = new Vector2[node.ChildrenUids.Count];
-            Vector2 lastPosition = default;
-            float lastNodeWidth = default;
-            for(int i = 0; i < node.ChildrenUids.Count; i++)
-            {
-                var size = node.GetChildSize(i);
-
-                float positionX = lastPosition == default || lastNodeWidth == default 
-                    ? commonOffsetX : lastPosition.X + lastNodeWidth + StandardNodeDistanceX;
-                float positionY = node.Height + StandardNodeDistanceY;
-
-                var position = new Vector2(positionX, positionY);
-                positions[i] = position;
-                lastPosition = position;
-                lastNodeWidth = size.X;
-            }
-            return positions;
-        }
-
         private void UpdateTree()
         {
             Nodes.Clear();
@@ -111,15 +58,14 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             if (selectedRecipe == null) return;
 
             var mainNode = new RecipeGraphNodeViewModel(selectedRecipe);
-            mainNode.XCentered = 5000;
-            mainNode.YCentered = 5000;
+            mainNode.XCentered = 1000;
+            mainNode.YCentered = 1000;
             AddNode(mainNode);
 
             LoadChildComponentsFrom(selectedRecipe.Components, mainNode);
 
-            void LoadChildComponentsFrom(IList<RecipeComponentItemViewModel> components, GraphNodeViewModel parentNode)
+            void LoadChildComponentsFrom(IList<RecipeComponentItemViewModel> components, GraphTreeNodeViewModel parentNode)
             {
-                var childPositions = GetChildrenLocalPositions(parentNode);
                 for (int i = 0; i < components.Count; i++)
                 {
                     var component = components[i];
@@ -127,45 +73,42 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     var node = new ComponentGraphNodeViewModel(component);
                     AddNode(node);
 
-                    var localPos = childPositions[i];
-                    var globalPosX = localPos.X + parentNode.XCentered;
-                    var globalPosY = localPos.Y + parentNode.YCentered;
+                    parentNode.AddChild(node);
 
-                    node.XCentered = globalPosX;
-                    node.YCentered = globalPosY;
-
-                    var edge = new EdgeViewModel(parentNode, node);
+                    var edge = new TwoObjectsLineViewModel(parentNode, node);
                     AddEdge(edge);
 
                     if (component.SelectedRecipeComponents != null)
                         LoadChildComponentsFrom(component.SelectedRecipeComponents, node);
                 }
             }
+
+            mainNode.UpdateChildrenPositions();
         }
 
-        private void AddNode(GraphNodeViewModel node)
+        private void AddNode(GraphTreeNodeViewModel node)
         {
             Nodes.Add(node);
             _nodesDictionary.Add(node.Uid, node);
         }
 
-        private void RemoveNode(GraphNodeViewModel node)
+        private void RemoveNode(GraphTreeNodeViewModel node)
         {
             Nodes.Remove(node);
             _nodesDictionary.Remove(node.Uid);
         }
 
-        private void AddEdge(EdgeViewModel edge)
+        private void AddEdge(TwoObjectsLineViewModel edge)
         {
             Edges.Add(edge);
         }
 
-        private void RemoveEdge(EdgeViewModel edge)
+        private void RemoveEdge(TwoObjectsLineViewModel edge)
         {
             Edges.Remove(edge);
         }
 
-        private GraphNodeViewModel? GetNodeByUid(Guid uid) => _nodesDictionary.GetValueOrDefault(uid);
+        private GraphTreeNodeViewModel? GetNodeByUid(Guid uid) => _nodesDictionary.GetValueOrDefault(uid);
 
         public void Dispose()
         {

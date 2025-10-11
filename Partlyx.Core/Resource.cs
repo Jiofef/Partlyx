@@ -13,6 +13,7 @@ namespace Partlyx.Core
 
         protected Resource() { Uid = Guid.NewGuid(); Name = "Resource"; }
 
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public Guid Uid { get; private set; }
 
         // Main features

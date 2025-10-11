@@ -10,9 +10,9 @@ namespace Partlyx.Services.ServiceImplementations
 {
     public class RecipeService : IRecipeService
     {
-        private readonly IResourceRepository _repo;
+        private readonly IPartsRepository _repo;
         private readonly IEventBus _eventBus;
-        public RecipeService(IResourceRepository repo, IEventBus bus)
+        public RecipeService(IPartsRepository repo, IEventBus bus)
         {
             _repo = repo;
             _eventBus = bus;
@@ -81,6 +81,7 @@ namespace Partlyx.Services.ServiceImplementations
 
                 return Task.CompletedTask;
             });
+            await _repo.DeleteRecipeAsync(recipeUid);
 
             _eventBus.Publish(new RecipeDeletedEvent(parentResourceUid, recipeUid));
             if (defaultRecipeChangedEvent != null)

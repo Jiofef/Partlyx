@@ -8,7 +8,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
     public class CreateRecipeComponentCommand : IUndoableCommand
     {
         private IRecipeComponentService _recipeComponentService;
-        private IResourceRepository _resourceRepository;
+        private IPartsRepository _resourceRepository;
 
         private Guid _resourceUid;
         private Guid _recipeUid;
@@ -19,7 +19,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         private RecipeComponent? _createdRecipeComponent;
 
         public CreateRecipeComponentCommand(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid, 
-            IRecipeComponentService rcs, IResourceRepository rr)
+            IRecipeComponentService rcs, IPartsRepository rr)
         {
             _recipeComponentService = rcs;
             _resourceRepository = rr;
@@ -62,7 +62,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
     public class DeleteRecipeComponentCommand : IUndoableCommand
     {
         private IRecipeComponentService _recipeComponentService;
-        private IResourceRepository _resourceRepository;
+        private IPartsRepository _resourceRepository;
 
         private Guid _resourceUid;
         private Guid _recipeUid;
@@ -71,7 +71,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         private RecipeComponent? _deletedRecipeComponent;
 
         public DeleteRecipeComponentCommand(Guid grandParentResourceUid, Guid parentRecipeUid, Guid recipeComponentUid,
-            IRecipeComponentService rcs, IResourceRepository rr)
+            IRecipeComponentService rcs, IPartsRepository rr)
         {
             _recipeComponentService = rcs;
             _resourceRepository = rr;

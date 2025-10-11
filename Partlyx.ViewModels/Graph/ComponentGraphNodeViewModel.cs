@@ -10,7 +10,7 @@ using UJL.CSharp.Collections;
 
 namespace Partlyx.ViewModels.Graph
 {
-    public class ComponentGraphNodeViewModel : GraphNodeViewModel
+    public class ComponentGraphNodeViewModel : GraphTreeNodeViewModel
     {
         public ComponentGraphNodeViewModel(RecipeComponentItemViewModel value) 
             : base(value.Uid,

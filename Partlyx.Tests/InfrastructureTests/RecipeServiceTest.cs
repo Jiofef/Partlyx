@@ -20,7 +20,7 @@ namespace Partlyx.Tests
                 {
                     services.AddTransient<IResourceService, ResourceService>();
                     services.AddTransient<IRecipeService, RecipeService>();
-                    services.AddTransient<IResourceRepository, ResourceRepository>();
+                    services.AddTransient<IPartsRepository, PartsRepository>();
                     services.AddTransient<IIconInfoProvider, IconInfoProvider>();
                     services.AddTransient<IEventBus, EventBus>();
                     services.AddSingleton<Infrastructure.Events.IEventBus, Infrastructure.Events.EventBus>();
@@ -32,7 +32,7 @@ namespace Partlyx.Tests
         public async void CreateAndGetRecipeAsync_CreateEmptyRecipe_CheckItsExistence()
         {
             // Arrange
-            var resourceRepo = _provider.GetRequiredService<IResourceRepository>();
+            var resourceRepo = _provider.GetRequiredService<IPartsRepository>();
             var resourceService = _provider.GetRequiredService<IResourceService>();
             var recipeService = _provider.GetRequiredService<IRecipeService>();
 
