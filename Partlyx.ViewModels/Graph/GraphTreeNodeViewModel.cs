@@ -1,6 +1,7 @@
 ﻿using Partlyx.ViewModels.GraphicsViewModels;
 using System.Collections.ObjectModel;
 using System.Numerics;
+using UJL.CSharp.Collections;
 
 namespace Partlyx.ViewModels.Graph
 {
@@ -43,15 +44,41 @@ namespace Partlyx.ViewModels.Graph
         private float _branchesDistanceX;
         public float BranchesDistanceX { get => _branchesDistanceX; protected set => SetProperty(ref _branchesDistanceX, value); }
 
+        /// <summary> Although the node itself does not contain logic for creating connected lines, it contains a collection for ease of storage when created externally</summary>
+        public ObservableCollection<FromToLineViewModel> ConnectedLines { get; } = new();
+
+        public ObservableMultiCollection<FromToLineViewModel> GetBranchLinesMultiCollection()
+        {
+            var collections = GetBranchLinesCollections().ToArray();
+
+            var multiCollection = new ObservableMultiCollection<FromToLineViewModel>(collections);
+            return multiCollection;
+        }
+        public ObservableCollection<FromToLineViewModel>[] GetBranchLinesCollections()
+        {
+            List<ObservableCollection<FromToLineViewModel>> collections = new();
+            AddBranchLinesCollectionsToList(collections);
+
+            return collections.ToArray();
+        }
+        private void AddBranchLinesCollectionsToList(List<ObservableCollection<FromToLineViewModel>> collections)
+        {
+            collections.Add(ConnectedLines);
+
+            foreach (GraphTreeNodeViewModel child in Children)
+                child.AddBranchLinesCollectionsToList(collections);
+        }
+
         public void UpdateChildrenPositions()
         {
             BuildBranchAndGetItsWidth();
             UpdateGlobalPositionOfTree();
         }
 
+        // This method works almost without errors, but requires rework and removal of workarounds (for example adding Width to branchOffset)
         private float BuildBranchAndGetItsWidth()
         {
-            if (Children.Count == 0) 
+            if (Children.Count == 0)
                 return this.Width;
 
             // Finding branch width
@@ -65,26 +92,26 @@ namespace Partlyx.ViewModels.Graph
                 childrenBranchWidths[i] = childBranchWidth;
                 branchWidth += childBranchWidth;
 
-                
                 branchWidth += child.Children.Count == 0 ? BranchesDistanceX : SingleChildrenDistanceX;
             }
 
-            if (Children.Count >= 2)
-            {
-                // Additional position correct
-                branchWidth -= branchWidth / Children.Count;
-            }
-
             // Setting children positions
-            float nextChildOffsetX = -branchWidth / 2;
+            float branchOffset = -branchWidth / 2 + Width / 4 + Width / 8;
+
+            float nextChildOffsetX = branchOffset;
             for (int i = 0; i < Children.Count; i++)
             {
+                float currentBranchWidth = childrenBranchWidths[i];
                 var child = (GraphTreeNodeViewModel)Children[i];
                 child.SetYLocalSilent(Height + SingleChildrenDistanceY);
-                child.SetXLocalSilent(nextChildOffsetX);
+                // Adding currentBranchWidth / 2 to move the parent node to its branch center
+                child.SetXLocalSilent(nextChildOffsetX + currentBranchWidth / 2);
 
                 nextChildOffsetX += childrenBranchWidths[i] + SingleChildrenDistanceX;
             }
+
+            if (Children.Count == 1)
+                ((GraphTreeNodeViewModel)Children[0]).SetXLocalSilent(0);
 
             return branchWidth;
         }

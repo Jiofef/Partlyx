@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.GraphicsViewModels;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -20,7 +21,6 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 {
     public partial class PartsGraphViewModel : ObservableObject, IDisposable
     {
-        private IEventBus _bus;
         public IGlobalSelectedParts SelectedParts { get; }
 
         // Subscriptions
@@ -32,13 +32,16 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IDisposable _componentMovedSubscription;
 
         // Collections
-        public ObservableCollection<TwoObjectsLineViewModel> Edges { get; } = new();
+        private ObservableMultiCollection<FromToLineViewModel> _edges = new();
+        public ObservableMultiCollection<FromToLineViewModel> Edges { get => _edges; private set => SetProperty(ref _edges, value); } 
+
         public ObservableCollection<GraphTreeNodeViewModel> Nodes { get; } = new();
+
         private readonly Dictionary<Guid, GraphTreeNodeViewModel> _nodesDictionary = new();
+
 
         public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IEventBus bus)
         {
-            _bus = bus;
             SelectedParts = selectedParts;
             _recipeChangedSubscription = bus.Subscribe<GlobalSingleRecipeSelectedEvent>((ev) => UpdateTree());
             _recipeRemovedSubscription = bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => UpdateTree());
@@ -52,7 +55,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         {
             Nodes.Clear();
             _nodesDictionary.Clear();
-            Edges.Clear();
+            Edges.ClearCollections();
 
             var selectedRecipe = SelectedParts.GetSingleRecipeOrNull();
             if (selectedRecipe == null) return;
@@ -76,14 +79,71 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     parentNode.AddChild(node);
 
                     var edge = new TwoObjectsLineViewModel(parentNode, node);
-                    AddEdge(edge);
 
                     if (component.SelectedRecipeComponents != null)
                         LoadChildComponentsFrom(component.SelectedRecipeComponents, node);
                 }
             }
-
+            
             mainNode.UpdateChildrenPositions();
+
+            Edges = mainNode.GetBranchLinesMultiCollection();
+
+            BuildEdgesFor(mainNode);
+        }
+
+        private Vector2 GetChildPositionFromParentPosition(GraphTreeNodeViewModel child, Vector2 parentPosition) 
+            => new Vector2(parentPosition.X + child.XLocal, parentPosition.Y + child.YLocal); 
+
+        private void BuildEdgesFor(GraphTreeNodeViewModel node)
+        {
+            var nodePosition = node.GetPositionCentered();
+            BuildEdgesFor(node, nodePosition);
+        }
+        // To avoid unnecesarry global position chain calculations
+        private void BuildEdgesFor(GraphTreeNodeViewModel node, Vector2 nodePositionCentered)
+        {
+            node.ConnectedLines.Clear();
+            if (node.Children.Count == 0) return;
+
+            if (node.Children.Count == 1)
+            {
+                var child = (GraphTreeNodeViewModel)node.Children.First();
+                var childPosition = GetChildPositionFromParentPosition(child, nodePositionCentered);
+
+                var line = new FromToLineViewModel(nodePositionCentered, childPosition);
+                node.ConnectedLines.Add(line);
+
+                BuildEdgesFor(child, childPosition);
+            }
+            else // if children is two or more
+            {
+                var firstChildPosition = GetChildPositionFromParentPosition((GraphTreeNodeViewModel)node.Children.First(), nodePositionCentered);
+                var lastChildPosition = GetChildPositionFromParentPosition((GraphTreeNodeViewModel)node.Children.Last(), nodePositionCentered);
+                float middleHorizontalLineYOffset = nodePositionCentered.Y + node.Height / 2 + node.SingleChildrenDistanceY / 2;
+
+                var lineToHorizontalLine = new FromToLineViewModel(
+                    nodePositionCentered,
+                    new Vector2(nodePositionCentered.X, middleHorizontalLineYOffset));
+                node.ConnectedLines.Add(lineToHorizontalLine);
+
+                var horizontalLine = new FromToLineViewModel(
+                    new Vector2(firstChildPosition.X, middleHorizontalLineYOffset),
+                    new Vector2(lastChildPosition.X, middleHorizontalLineYOffset));
+                node.ConnectedLines.Add(horizontalLine);
+
+                foreach (GraphTreeNodeViewModel child in node.Children)
+                {
+                    var childPosition = GetChildPositionFromParentPosition(child, nodePositionCentered);
+
+                    var lineFromHorizontalLine = new FromToLineViewModel(
+                        new Vector2(childPosition.X, middleHorizontalLineYOffset),
+                        childPosition);
+                    node.ConnectedLines.Add(lineFromHorizontalLine);
+
+                    BuildEdgesFor(child, childPosition);
+                }
+            }
         }
 
         private void AddNode(GraphTreeNodeViewModel node)
@@ -96,16 +156,6 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         {
             Nodes.Remove(node);
             _nodesDictionary.Remove(node.Uid);
-        }
-
-        private void AddEdge(TwoObjectsLineViewModel edge)
-        {
-            Edges.Add(edge);
-        }
-
-        private void RemoveEdge(TwoObjectsLineViewModel edge)
-        {
-            Edges.Remove(edge);
         }
 
         private GraphTreeNodeViewModel? GetNodeByUid(Guid uid) => _nodesDictionary.GetValueOrDefault(uid);

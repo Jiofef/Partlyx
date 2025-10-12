@@ -30,8 +30,12 @@ namespace Partlyx.ViewModels.GraphicsViewModels
             }
         }
 
+        public Vector2 GetPosition() => new Vector2(X, Y);
+
         public float XCentered { get => X + Width / 2; set => X = value - Width / 2; }
         public float YCentered { get => Y + Height / 2; set => Y = value - Height / 2; }
+
+        public Vector2 GetPositionCentered() => new Vector2(XCentered, YCentered);
 
         private float _xLocal, _yLocal;
         public float XLocal { get => _xLocal; set { _xLocal = value; NotifyPositionXChanged(); NotifyChildrenPositionXChange(); } }
