@@ -25,13 +25,14 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IDisposable _fileClearedSubscription;
 
         public IGlobalSelectedParts SelectedParts { get; }
+        public IGlobalFocusedPart FocusedPart { get; }
         public IResourceSearchService Search { get; }
         public ResourceServiceViewModel Service { get; }
 
         private IGlobalResourcesVMContainer _resourcesContainer { get; }
         public ObservableCollection<ResourceItemViewModel> Resources => _resourcesContainer.Resources;
 
-        public PartsTreeViewModel(IGlobalResourcesVMContainer grvmc, IGlobalSelectedParts sp, IEventBus bus, IVMPartsFactory vmpf,
+        public PartsTreeViewModel(IGlobalResourcesVMContainer grvmc, IGlobalSelectedParts sp, IGlobalFocusedPart fp, IEventBus bus, IVMPartsFactory vmpf,
                 IVMPartsStore vmps, IResourceSearchService rss, ResourceServiceViewModel service)
         {
             _resourcesContainer = grvmc;
@@ -39,6 +40,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _store = vmps;
 
             SelectedParts = sp;
+            FocusedPart = fp;
             Search = rss;
             Service = service;
 

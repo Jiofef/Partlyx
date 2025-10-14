@@ -65,6 +65,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
 
         // Recipe info
+        public PartTypeEnumVM PartType { get => PartTypeEnumVM.Recipe; }
+
         public Guid Uid { get; }
 
         private GuidLinkedPart<ResourceItemViewModel>? _parentResource;
@@ -156,6 +158,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
 
         // For UI
-        public RecipeItemUIState Ui => _uiStateService.GetOrCreate(this);
+        public RecipeItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
+        public RecipeNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
     }
 }

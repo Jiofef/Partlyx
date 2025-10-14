@@ -2,6 +2,7 @@
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
+using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 
@@ -49,13 +50,22 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             var resourceVM = _selectedParts.GetSingleResourceOrNull();
             if (resourceVM == null) return;
 
-            resourceVM.Ui.IsRenaming = true;
+            resourceVM.UiItem.IsRenaming = true;
         }
 
         [RelayCommand]
         public async Task RemoveAsync(ResourceItemViewModel resource)
         {
             await _commands.CreateSyncAndExcecuteAsync<DeleteResourceCommand>(resource.Uid);
+        }
+
+        [RelayCommand]
+        public async Task RenameResource(PartSetValueInfo<ResourceItemViewModel, string> info)
+        {
+            string newName = info.Value;
+            var resource = info.Part;
+
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeNameCommand>(resource.Uid, newName);
         }
     }
 }

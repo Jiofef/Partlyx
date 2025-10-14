@@ -3,6 +3,7 @@ using Partlyx.Infrastructure.Data.Implementations;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using Partlyx.ViewModels.UIStates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,15 +19,27 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             _provider = provider;
         }
-        private readonly Dictionary<Guid, RecipeComponentUIState> _states = new();
+        private readonly Dictionary<Guid, RecipeComponentUIState> _itemStates = new();
+        private readonly Dictionary<Guid, RecipeComponentNodeUIState> _nodeStates = new();
 
-        public RecipeComponentUIState GetOrCreate(RecipeComponentItemViewModel vm)
+        public RecipeComponentUIState GetOrCreateItemUi(RecipeComponentItemViewModel vm)
         {
-            var state = _states.GetValueOrDefault(vm.Uid);
+            var state = _itemStates.GetValueOrDefault(vm.Uid);
             if (state == null)
             {
                 state = (RecipeComponentUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeComponentUIState), vm);
-                _states.Add(vm.Uid, state);
+                _itemStates.Add(vm.Uid, state);
+            }
+            return state;
+        }
+
+        public RecipeComponentNodeUIState GetOrCreateNodeUi(RecipeComponentItemViewModel vm)
+        {
+            var state = _nodeStates.GetValueOrDefault(vm.Uid);
+            if (state == null)
+            {
+                state = (RecipeComponentNodeUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeComponentNodeUIState), vm);
+                _nodeStates.Add(vm.Uid, state);
             }
             return state;
         }

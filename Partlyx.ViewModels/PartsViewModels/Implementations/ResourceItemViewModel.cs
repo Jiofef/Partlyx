@@ -62,6 +62,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
 
         // Resource info
+        public PartTypeEnumVM PartType { get => PartTypeEnumVM.Resource; }
+
         public Guid Uid { get; }
 
         private string _name;
@@ -159,6 +161,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
 
         // For UI
-        public ResourceItemUIState Ui => _uiStateService.GetOrCreate(this);
+        public ResourceItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
     }
 }

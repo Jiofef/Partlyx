@@ -18,17 +18,28 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 var @event = new GlobalSingleResourceSelectedEvent(GetSingleResourceOrNull()!.Uid);
                 _bus.Publish(@event);
+
+                var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Resource, GetSingleResourceOrNull()!.Uid);
+                _bus.Publish(@commonEvent);
             }
-            else if (Resources.Count > 1) // Multiselect
+            else if (Resources.Count > 1 && args.NewItems != null) // Multiselect
             {
-                var addedSelected = (ResourceItemViewModel)sender!;
-                var @event = new GlobalResourceAddedToSelectedEvent(addedSelected.Uid);
-                _bus.Publish(@event);
+                foreach (ResourceItemViewModel added in args.NewItems)
+                {
+                    var @event = new GlobalResourceAddedToSelectedEvent(added.Uid);
+                    _bus.Publish(@event);
+
+                    var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Resource, added.Uid);
+                    _bus.Publish(@commonEvent);
+                }
             }
 
             var selectedResourcesUids = Resources.Select(r => r.Uid).ToArray();
             var @changedEvent = new GlobalSelectedResourcesChangedEvent(selectedResourcesUids);
             _bus.Publish(@changedEvent);
+
+            var @commonChangedEvent = new GlobalPartsSelectedChangedEvent(PartTypeEnumVM.Resource, selectedResourcesUids);
+            _bus.Publish(@commonChangedEvent);
         }
 
         protected override void SelectedRecipesChangedHandler(object? sender, NotifyCollectionChangedEventArgs args)
@@ -37,6 +48,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 var @event = new GlobalSingleRecipeSelectedEvent(GetSingleRecipeOrNull()!.Uid);
                 _bus.Publish(@event);
+
+                var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Recipe, GetSingleResourceOrNull()!.Uid);
+                _bus.Publish(@commonEvent);
             }
             else if (Recipes.Count > 1 && args.NewItems != null) // Multiselect
             {
@@ -44,12 +58,18 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 {
                     var @event = new GlobalRecipeAddedToSelectedEvent(added.Uid);
                     _bus.Publish(@event);
+
+                    var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Recipe, added.Uid);
+                    _bus.Publish(@commonEvent);
                 }
             }
 
             var selectedRecipeUids = Recipes.Select(r => r.Uid).ToArray();
             var @changedEvent = new GlobalSelectedRecipesChangedEvent(selectedRecipeUids);
             _bus.Publish(@changedEvent);
+
+            var @commonChangedEvent = new GlobalPartsSelectedChangedEvent(PartTypeEnumVM.Recipe, selectedRecipeUids);
+            _bus.Publish(@commonChangedEvent);
         }
 
         protected override void SelectedComponentsChangedHandler(object? sender, NotifyCollectionChangedEventArgs args)
@@ -58,6 +78,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 var @event = new GlobalSingleComponentSelectedEvent(GetSingleComponentOrNull()!.Uid);
                 _bus.Publish(@event);
+
+                var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Component, GetSingleResourceOrNull()!.Uid);
+                _bus.Publish(@commonEvent);
             }
             else if (Components.Count > 1 && args.NewItems != null) // Multiselect
             {
@@ -65,12 +88,18 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 {
                     var @event = new GlobalComponentAddedToSelectedEvent(added.Uid);
                     _bus.Publish(@event);
+
+                    var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Component, added.Uid);
+                    _bus.Publish(@commonEvent);
                 }
             }
 
             var selectedComponentsUids = Components.Select(c => c.Uid).ToArray();
             var @changedEvent = new GlobalSelectedComponentsChangedEvent(selectedComponentsUids);
             _bus.Publish(@changedEvent);
+
+            var @commonChangedEvent = new GlobalPartsSelectedChangedEvent(PartTypeEnumVM.Component, selectedComponentsUids);
+            _bus.Publish(@commonChangedEvent);
         }
     }
 }

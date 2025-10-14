@@ -8,6 +8,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
     public interface IVMPart : IDisposable
     {
+        PartTypeEnumVM PartType { get; }
         Guid Uid { get; }
     }
+
+    public enum PartTypeEnumVM { Resource, Recipe, Component }
 }

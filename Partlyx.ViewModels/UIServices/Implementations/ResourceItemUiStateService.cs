@@ -18,7 +18,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
         private readonly Dictionary<Guid, ResourceItemUIState> _states = new();
 
-        public ResourceItemUIState GetOrCreate(ResourceItemViewModel vm)
+        public ResourceItemUIState GetOrCreateItemUi(ResourceItemViewModel vm)
         {
             var state = _states.GetValueOrDefault(vm.Uid);
             if (state == null)

@@ -7,4 +7,7 @@ namespace Partlyx.ViewModels.PartsViewModels
 
     public record PartsMultipleTargetsInteractionInfo<TPart, TTargetPart>(List<TPart> Parts, List<TTargetPart> Targets)
         where TPart : IVMPart where TTargetPart : IVMPart;
+
+    public record PartSetValueInfo<TPart, TValue>(TPart Part, TValue Value)
+        where TPart : IVMPart;
 }

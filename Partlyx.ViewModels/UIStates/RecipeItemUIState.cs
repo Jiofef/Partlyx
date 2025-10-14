@@ -1,21 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Partlyx.Services.Commands;
-using Partlyx.Services.Commands.ResourceCommonCommands;
+using Partlyx.Services.Commands.RecipeCommonCommands;
+using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.UIServices.Implementations;
 
 namespace Partlyx.ViewModels
 {
-    public partial class ResourceItemUIState : ObservableObject
+    public partial class RecipeItemUIState : ObservableObject
     {
-        private readonly ICommandServices _commands;
-        private readonly ResourceItemViewModel _resourceVM;
+        private readonly PartsServiceViewModel _services;
+        private readonly RecipeItemViewModel _recipeVM;
 
-        public ResourceItemUIState(ResourceItemViewModel vm, ICommandServices cs)
+        public RecipeItemUIState(RecipeItemViewModel vm, PartsServiceViewModel cvm) 
         {
-            _commands = cs;
+            _services = cvm;
 
-            _resourceVM = vm;
+            _recipeVM = vm;
             _unConfirmedName = vm.Name;
         }
 
@@ -32,19 +34,21 @@ namespace Partlyx.ViewModels
         {
             if (!IsRenaming) return;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetNameToResourceCommand>(_resourceVM.Uid, UnConfirmedName);
+            var args = new PartSetValueInfo<RecipeItemViewModel, string>(_recipeVM, UnConfirmedName);
+            await _services.RecipeService.RenameRecipe(args);
+
             IsRenaming = false;
         }
 
         [RelayCommand]
         public void CancelNameChange()
         {
-            UnConfirmedName = _resourceVM.Name;
+            UnConfirmedName = _recipeVM.Name;
             IsRenaming = false;
         }
 
         [RelayCommand]
         public void StartRenaming()
-            => IsRenaming = true;
+                => IsRenaming = true;
     }
 }

@@ -32,7 +32,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             var recipeVM = _selectedParts.GetSingleRecipeOrNull();
             if (recipeVM == null) return;
 
-            recipeVM.Ui.IsRenaming = true;
+            recipeVM.UiItem.IsRenaming = true;
+        }
+
+        [RelayCommand]
+        public async Task RenameRecipe(PartSetValueInfo<RecipeItemViewModel, string> info)
+        {
+            string newName = info.Value;
+            var recipe = info.Part;
+            if (recipe.LinkedParentResource == null) return;
+
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeNameCommand>(recipe.LinkedParentResource!.Uid, recipe.Uid, newName);
         }
 
         [RelayCommand]

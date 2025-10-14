@@ -21,18 +21,15 @@
     <ProjectReference Include="..\Partlyx.ViewModels\Partlyx.ViewModels.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Legacy\ComponentsListView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Legacy\RecipeListView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
 	<ItemGroup>
 		<Folder Include="Images\" />
 		<Resource Include="Images/Partlyx.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="PartProperties.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
 	</ItemGroup>
 
 </Project>

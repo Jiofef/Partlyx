@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using Partlyx.ViewModels.UIStates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,15 +17,26 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             _provider = provider;
         }
-        private readonly Dictionary<Guid, RecipeItemUIState> _states = new();
+        private readonly Dictionary<Guid, RecipeItemUIState> _itemStates = new();
+        private readonly Dictionary<Guid, RecipeNodeUIState> _nodeStates = new();
 
-        public RecipeItemUIState GetOrCreate(RecipeItemViewModel vm)
+        public RecipeItemUIState GetOrCreateItemUi(RecipeItemViewModel vm)
         {
-            var state = _states.GetValueOrDefault(vm.Uid);
+            var state = _itemStates.GetValueOrDefault(vm.Uid);
             if (state == null)
             {
                 state = (RecipeItemUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeItemUIState), vm);
-                _states.Add(vm.Uid, state);
+                _itemStates.Add(vm.Uid, state);
+            }
+            return state;
+        }
+        public RecipeNodeUIState GetOrCreateNodeUi(RecipeItemViewModel vm)
+        {
+            var state = _nodeStates.GetValueOrDefault(vm.Uid);
+            if (state == null)
+            {
+                state = (RecipeNodeUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeNodeUIState), vm);
+                _nodeStates.Add(vm.Uid, state);
             }
             return state;
         }

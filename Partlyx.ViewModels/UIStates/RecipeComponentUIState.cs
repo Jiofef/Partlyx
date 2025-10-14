@@ -3,23 +3,24 @@ using CommunityToolkit.Mvvm.Input;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
-namespace Partlyx.ViewModels
+using Partlyx.ViewModels.UIServices.Implementations;
+namespace Partlyx.ViewModels.UIStates
 {
     public partial class RecipeComponentUIState : ObservableObject
     {
-        private readonly ICommandServices _commands;
+        private readonly PartsServiceViewModel _services;
 
         private readonly RecipeComponentItemViewModel _componentVM;
 
-        public RecipeComponentUIState(RecipeComponentItemViewModel vm, ICommandServices cs)
+        public RecipeComponentUIState(RecipeComponentItemViewModel vm, PartsServiceViewModel svm)
         {
-            _commands = cs;
+            _services = svm;
 
             _componentVM = vm;
         }
 
-        private bool isSelected;
+        private bool _isSelected;
 
-        public bool IsSelected { get => isSelected; set => SetProperty(ref isSelected, value); }
+        public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
     }
 }

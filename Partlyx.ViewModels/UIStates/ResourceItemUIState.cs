@@ -1,21 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Partlyx.Services.Commands;
-using Partlyx.Services.Commands.RecipeCommonCommands;
+using Partlyx.Services.Commands.ResourceCommonCommands;
+using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.UIServices.Implementations;
 
 namespace Partlyx.ViewModels
 {
-    public partial class RecipeItemUIState : ObservableObject
+    public partial class ResourceItemUIState : ObservableObject
     {
-        private readonly ICommandServices _commands;
-        private readonly RecipeItemViewModel _recipeVM;
+        private readonly PartsServiceViewModel _services;
+        private readonly ResourceItemViewModel _resourceVM;
 
-        public RecipeItemUIState(RecipeItemViewModel vm, ICommandServices cs) 
+        public ResourceItemUIState(ResourceItemViewModel vm, PartsServiceViewModel svm)
         {
-            _commands = cs;
+            _services = svm;
 
-            _recipeVM = vm;
+            _resourceVM = vm;
             _unConfirmedName = vm.Name;
         }
 
@@ -30,21 +32,23 @@ namespace Partlyx.ViewModels
         [RelayCommand]
         public async Task CommitNameChangeAsync()
         {
-            if (!IsRenaming || _recipeVM.LinkedParentResource == null) return;
+            if (!IsRenaming) return;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeNameCommand>(_recipeVM.LinkedParentResource.Uid, _recipeVM.Uid, UnConfirmedName);
+            var args = new PartSetValueInfo<ResourceItemViewModel, string>(_resourceVM, UnConfirmedName);
+            await _services.ResourceService.RenameResource(args);
+
             IsRenaming = false;
         }
 
         [RelayCommand]
         public void CancelNameChange()
         {
-            UnConfirmedName = _recipeVM.Name;
+            UnConfirmedName = _resourceVM.Name;
             IsRenaming = false;
         }
 
         [RelayCommand]
         public void StartRenaming()
-                => IsRenaming = true;
+            => IsRenaming = true;
     }
 }

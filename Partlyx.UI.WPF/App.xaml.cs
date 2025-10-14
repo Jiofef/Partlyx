@@ -86,6 +86,7 @@ namespace Partlyx.UI.WPF
 
             services.AddTransient<PartsTreeViewModel>();
             services.AddTransient<PartsGraphViewModel>();
+            services.AddTransient<ItemPropertiesViewModel>();
 
             services.AddTransient<MenuPanelViewModel>();
             services.AddTransient<MenuPanelFileViewModel>();
@@ -116,6 +117,8 @@ namespace Partlyx.UI.WPF
 
             services.AddTransient<IIsolatedSelectedParts, IsolatedSelectedParts>();
             services.AddSingleton<IGlobalSelectedParts, GlobalSelectedParts>();
+            services.AddTransient<IIsolatedFocusedPart, IsolatedFocusedPart>();
+            services.AddSingleton<IGlobalFocusedPart, GlobalFocusedPart>();
             services.AddTransient<IIsolatedResourcesVMContainer, ResourcesVMContainer>();
             services.AddSingleton<IGlobalResourcesVMContainer, ResourcesVMContainer>();
 

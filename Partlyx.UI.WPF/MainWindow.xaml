@@ -48,10 +48,9 @@
                 <local:PartsTree DataContext="{Binding PartsTree}" 
                                 Grid.Row="0" Grid.Column="0" />
 
-                <localother:PartsGraph Grid.Column="1" DataContext="{Binding PartsGraph}"/>
+                <local:PartsGraph Grid.Column="1" DataContext="{Binding PartsGraph}"/>
 
-                <UniformGrid Grid.Column="2" Rows="2">
-                </UniformGrid>
+                <local:PartProperties Grid.Column="2" DataContext="{Binding ItemProperties}"/>
             </Grid>
         </Grid>
 

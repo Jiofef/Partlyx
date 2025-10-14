@@ -18,6 +18,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public PartsGraphViewModel PartsGraph { get; }
 
+        public ItemPropertiesViewModel ItemProperties { get; }
+
         public MenuPanelViewModel MenuPanel { get; }
 
         private readonly IPartsLoader _partsLoader;
@@ -29,6 +31,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public MainViewModel(
             PartsTreeViewModel partsTree,
             PartsGraphViewModel partsGraph,
+            ItemPropertiesViewModel itemProperties,
             MenuPanelViewModel menuPanel,
             IGlobalSelectedParts selectedParts,
             IPartsLoader pl,
@@ -40,6 +43,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         {
             PartsTree = partsTree;
             PartsGraph = partsGraph;
+            ItemProperties = itemProperties;
             MenuPanel = menuPanel;
             SelectedParts = selectedParts;
 

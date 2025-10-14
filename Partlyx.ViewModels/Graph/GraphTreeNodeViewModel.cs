@@ -12,7 +12,7 @@ namespace Partlyx.ViewModels.Graph
         private const float StandardBranchDistanceX = StandardNodeDistanceX * 2;
 
         public const float StandardNodeWidth = 96;
-        public const float StandardNodeHeight = 64;
+        public const float StandardNodeHeight = 96;
 
         public GraphTreeNodeViewModel(Guid valueUid, ReadOnlyObservableCollection<Guid>? childrenUids = null, object? value = null)
         {
@@ -92,11 +92,12 @@ namespace Partlyx.ViewModels.Graph
                 childrenBranchWidths[i] = childBranchWidth;
                 branchWidth += childBranchWidth;
 
-                branchWidth += child.Children.Count == 0 ? BranchesDistanceX : SingleChildrenDistanceX;
+                if (i < Children.Count - 1)
+                    branchWidth += child.Children.Count == 0 ? BranchesDistanceX : SingleChildrenDistanceX;
             }
 
             // Setting children positions
-            float branchOffset = -branchWidth / 2 + Width / 4 + Width / 8;
+            float branchOffset = -branchWidth / 2;
 
             float nextChildOffsetX = branchOffset;
             for (int i = 0; i < Children.Count; i++)
@@ -104,10 +105,10 @@ namespace Partlyx.ViewModels.Graph
                 float currentBranchWidth = childrenBranchWidths[i];
                 var child = (GraphTreeNodeViewModel)Children[i];
                 child.SetYLocalSilent(Height + SingleChildrenDistanceY);
-                // Adding currentBranchWidth / 2 to move the parent node to its branch center
                 child.SetXLocalSilent(nextChildOffsetX + currentBranchWidth / 2);
 
-                nextChildOffsetX += childrenBranchWidths[i] + SingleChildrenDistanceX;
+                float dist = child.Children.Count == 0 ? BranchesDistanceX : SingleChildrenDistanceX;
+                nextChildOffsetX += currentBranchWidth + dist;
             }
 
             if (Children.Count == 1)

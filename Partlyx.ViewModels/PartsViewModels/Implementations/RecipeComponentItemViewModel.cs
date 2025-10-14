@@ -11,6 +11,7 @@ using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using Partlyx.ViewModels.UIStates;
 using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -72,6 +73,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
 
         // Recipe component info
+        public PartTypeEnumVM PartType { get => PartTypeEnumVM.Component; }
+
         public Guid Uid { get; }
 
         private GuidLinkedPart<RecipeItemViewModel>? _parentRecipe;
@@ -132,7 +135,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
 
         // For UI
-        public RecipeComponentUIState Ui => _uiStateService.GetOrCreate(this);
+        public RecipeComponentUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
+        public RecipeComponentNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
 
         private void UpdateSelectedComponents()
         {

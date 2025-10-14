@@ -1,9 +1,11 @@
 ﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.UIStates;
 
 namespace Partlyx.ViewModels.UIServices.Interfaces
 {
     public interface IRecipeComponentItemUiStateService
     {
-        RecipeComponentUIState GetOrCreate(RecipeComponentItemViewModel vm);
+        RecipeComponentUIState GetOrCreateItemUi(RecipeComponentItemViewModel vm);
+        RecipeComponentNodeUIState GetOrCreateNodeUi(RecipeComponentItemViewModel vm);
     }
 }

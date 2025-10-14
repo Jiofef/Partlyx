@@ -41,7 +41,8 @@
                     </TreeView.Template>
                     <i:Interaction.Behaviors>
                         <beh:CollectionViewFilterBehavior Predicate="{Binding Search.SearchByName}"/>
-                        <beh:TreeViewPartSelectionBehavior SelectedParts="{Binding SelectedParts}" AutoSetAncestorParts="True"/>
+                        <beh:TreeViewPartSelectionBehavior SelectedPartsContainer="{Binding SelectedParts}" AutoSetAncestorParts="True"
+                                                           FocusSelectedPart="True" FocusedPartContainer="{Binding FocusedPart}"/>
                     </i:Interaction.Behaviors>
                     <TreeView.InputBindings>
                         <KeyBinding Key="F2" Command="{Binding Service.StartRenamingSelectedCommand}"/>

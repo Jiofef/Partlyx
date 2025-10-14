@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Partlyx.Infrastructure.Data.Interfaces;
-using Partlyx.UI.WPF.DragAndDrop;
-using Partlyx.ViewModels.PartsViewModels.Implementations;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,16 +12,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using static MaterialDesignThemes.Wpf.Theme;
 
 namespace Partlyx.UI.WPF
 {
     /// <summary>
-    /// Логика взаимодействия для ComponentListView.xaml
+    /// Логика взаимодействия для PartsGraph.xaml
     /// </summary>
-    public partial class ComponentListView : UserControl
+    public partial class PartsGraph : UserControl
     {
-        public ComponentListView()
+        public PartsGraph()
         {
             InitializeComponent();
         }
