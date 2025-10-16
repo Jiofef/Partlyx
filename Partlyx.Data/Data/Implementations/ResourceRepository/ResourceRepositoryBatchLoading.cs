@@ -24,6 +24,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             public bool IncludeRecipeParentResource { get; set; } = false;   // Recipe -> ParentResource
             public bool IncludeComponentParentRecipe { get; set; } = false;  // Component -> ParentRecipe
             public bool IncludeComponentParentResource { get; set; } = false;// Component -> ParentRecipe -> ParentResource
+            public bool IncludeComponentChildResource { get; set; } = false; // Component -> ChildResource
         }
 
         public async Task<BatchLoadResult> LoadBatchAsync(
@@ -112,6 +113,8 @@ namespace Partlyx.Infrastructure.Data.Implementations
                 compsQ = compsQ.Include(c => c.ParentRecipe);
             if (options.IncludeComponentParentResource)
                 compsQ = compsQ.Include(c => c.ParentRecipe).ThenInclude(r => r.ParentResource);
+            if (options.IncludeComponentChildResource)
+                compsQ = compsQ.Include(c => c.ComponentResource);
             var components = compUids.Length > 0 ? await compsQ.Where(c => compUids.Contains(c.Uid)).ToListAsync(ct) : new List<RecipeComponent>();
 
             // Build result
@@ -136,6 +139,21 @@ namespace Partlyx.Infrastructure.Data.Implementations
             var result = await action(batch);
             await db.SaveChangesAsync(ct);
             return result;
+        }
+
+        public async Task ExecuteWithBatchAsync(
+            IEnumerable<Guid>? resourceUids,
+            IEnumerable<Guid>? recipeUids,
+            IEnumerable<Guid>? componentUids,
+            BatchIncludeOptions? options,
+            Func<BatchLoadResult, Task> action,
+            CancellationToken ct = default)
+        {
+            await ExecuteWithBatchAsync<bool>(resourceUids, recipeUids, componentUids, options, async r =>
+            {
+                await action(r);
+                return true;
+            }, ct);
         }
 
     }

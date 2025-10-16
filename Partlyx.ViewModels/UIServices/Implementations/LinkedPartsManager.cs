@@ -35,44 +35,44 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             _bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.componentUid, _linkedResourcesDic));
         }
 
-        private List<WeakReference<GuidLinkedPart<ResourceItemViewModel>>> _linkedResourcesDisorderedList = new();
-        private List<WeakReference<GuidLinkedPart<RecipeItemViewModel>>> _linkedRecipesDisorderedList = new();
-        private List<WeakReference<GuidLinkedPart<RecipeComponentItemViewModel>>> _linkedRecipeComponentsDisorderedList = new();
+        private List<WeakReference<GuidLinkedPart<ResourceViewModel>>> _linkedResourcesDisorderedList = new();
+        private List<WeakReference<GuidLinkedPart<RecipeViewModel>>> _linkedRecipesDisorderedList = new();
+        private List<WeakReference<GuidLinkedPart<RecipeComponentViewModel>>> _linkedRecipeComponentsDisorderedList = new();
 
-        private ConcurrentDictionary<Guid, List<WeakReference<GuidLinkedPart<ResourceItemViewModel>>>> _linkedResourcesDic = new();
-        private ConcurrentDictionary<Guid, List<WeakReference<GuidLinkedPart<RecipeItemViewModel>>>> _linkedRecipesDic = new();
-        private ConcurrentDictionary<Guid, List<WeakReference<GuidLinkedPart<RecipeComponentItemViewModel>>>> _linkedComponentsDic = new();
+        private ConcurrentDictionary<Guid, List<WeakReference<GuidLinkedPart<ResourceViewModel>>>> _linkedResourcesDic = new();
+        private ConcurrentDictionary<Guid, List<WeakReference<GuidLinkedPart<RecipeViewModel>>>> _linkedRecipesDic = new();
+        private ConcurrentDictionary<Guid, List<WeakReference<GuidLinkedPart<RecipeComponentViewModel>>>> _linkedComponentsDic = new();
 
-        public GuidLinkedPart<ResourceItemViewModel> CreateAndRegisterLinkedResourceVM(Guid uid)
-            => CreateAndRegisterLinkedPart<ResourceItemViewModel>(uid);
+        public GuidLinkedPart<ResourceViewModel> CreateAndRegisterLinkedResourceVM(Guid uid)
+            => CreateAndRegisterLinkedPart<ResourceViewModel>(uid);
 
-        public GuidLinkedPart<RecipeItemViewModel> CreateAndRegisterLinkedRecipeVM(Guid uid)
-            => CreateAndRegisterLinkedPart<RecipeItemViewModel>(uid);
+        public GuidLinkedPart<RecipeViewModel> CreateAndRegisterLinkedRecipeVM(Guid uid)
+            => CreateAndRegisterLinkedPart<RecipeViewModel>(uid);
 
-        public GuidLinkedPart<RecipeComponentItemViewModel> CreateAndRegisterLinkedRecipeComponentVM(Guid uid)
-            => CreateAndRegisterLinkedPart<RecipeComponentItemViewModel>(uid);
+        public GuidLinkedPart<RecipeComponentViewModel> CreateAndRegisterLinkedRecipeComponentVM(Guid uid)
+            => CreateAndRegisterLinkedPart<RecipeComponentViewModel>(uid);
 
         private GuidLinkedPart<TPart> CreateAndRegisterLinkedPart<TPart>(Guid uid) where TPart : IVMPart
         {
             var linkedPart = _factory.CreateLinkedPart<TPart>(uid);
 
-            if (linkedPart is GuidLinkedPart<ResourceItemViewModel> rl)
+            if (linkedPart is GuidLinkedPart<ResourceViewModel> rl)
                 Register(rl);
-            else if (linkedPart is GuidLinkedPart<RecipeItemViewModel> rcl)
+            else if (linkedPart is GuidLinkedPart<RecipeViewModel> rcl)
                 Register(rcl);
-            else if (linkedPart is GuidLinkedPart<RecipeComponentItemViewModel> cl)
+            else if (linkedPart is GuidLinkedPart<RecipeComponentViewModel> cl)
                 Register(cl);
 
             return linkedPart;
         }
 
-        public void Register(GuidLinkedPart<ResourceItemViewModel> linkedPart)
+        public void Register(GuidLinkedPart<ResourceViewModel> linkedPart)
             => Register(linkedPart, _linkedResourcesDic, _linkedResourcesDisorderedList);
 
-        public void Register(GuidLinkedPart<RecipeItemViewModel> linkedPart)
+        public void Register(GuidLinkedPart<RecipeViewModel> linkedPart)
             => Register(linkedPart, _linkedRecipesDic, _linkedRecipesDisorderedList);
 
-        public void Register(GuidLinkedPart<RecipeComponentItemViewModel> linkedPart)
+        public void Register(GuidLinkedPart<RecipeComponentViewModel> linkedPart)
             => Register(linkedPart, _linkedComponentsDic, _linkedRecipeComponentsDisorderedList);
 
         private void Register<TPart>(

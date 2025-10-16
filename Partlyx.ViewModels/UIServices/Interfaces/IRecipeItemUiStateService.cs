@@ -4,7 +4,7 @@ namespace Partlyx.ViewModels.UIServices.Interfaces
 {
     public interface IRecipeItemUiStateService
     {
-        RecipeItemUIState GetOrCreateItemUi(RecipeItemViewModel vm);
-        RecipeNodeUIState GetOrCreateNodeUi(RecipeItemViewModel vm);
+        RecipeItemUIState GetOrCreateItemUi(RecipeViewModel vm);
+        RecipeNodeUIState GetOrCreateNodeUi(RecipeViewModel vm);
     }
 }

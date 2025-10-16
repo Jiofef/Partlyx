@@ -11,9 +11,9 @@ namespace Partlyx.ViewModels
     public partial class RecipeItemUIState : ObservableObject
     {
         private readonly PartsServiceViewModel _services;
-        private readonly RecipeItemViewModel _recipeVM;
+        private readonly RecipeViewModel _recipeVM;
 
-        public RecipeItemUIState(RecipeItemViewModel vm, PartsServiceViewModel cvm) 
+        public RecipeItemUIState(RecipeViewModel vm, PartsServiceViewModel cvm) 
         {
             _services = cvm;
 
@@ -34,7 +34,7 @@ namespace Partlyx.ViewModels
         {
             if (!IsRenaming) return;
 
-            var args = new PartSetValueInfo<RecipeItemViewModel, string>(_recipeVM, UnConfirmedName);
+            var args = new PartSetValueInfo<RecipeViewModel, string>(_recipeVM, UnConfirmedName);
             await _services.RecipeService.RenameRecipe(args);
 
             IsRenaming = false;

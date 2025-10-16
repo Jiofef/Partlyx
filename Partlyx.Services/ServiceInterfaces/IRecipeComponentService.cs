@@ -11,6 +11,6 @@ namespace Partlyx.Services.ServiceInterfaces
         Task MoveComponentAsync(Guid grandParentResourceUid, Guid newGrandParentResourceUid, Guid parentRecipeUid, Guid newParentRecipeUid, Guid componentUid);
         Task SetComponentResourceAsync(Guid parentResourceUid, Guid componentUid, Guid resourceToSelectUid);
         Task SetQuantityAsync(Guid parentResourceUid, Guid componentUid, double quantity);
-        Task SetResourceSelectedRecipeAsync(Guid parentResourceUid, Guid componentUid, Guid resourceToSelectUid);
+        Task SetResourceSelectedRecipeAsync(Guid parentResourceUid, Guid componentUid, Guid? recipeToSelectUid);
     }
 }

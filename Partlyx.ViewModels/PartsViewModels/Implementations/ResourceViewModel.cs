@@ -13,7 +13,7 @@ using System.ComponentModel;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public partial class ResourceItemViewModel : UpdatableViewModel<ResourceDto>, IVMPart
+    public partial class ResourceViewModel : UpdatableViewModel<ResourceDto>, IVMPart
     {
         // Services
         private readonly IVMPartsStore _store;
@@ -30,7 +30,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
 
-        public ResourceItemViewModel(ResourceDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
+        public ResourceViewModel(ResourceDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
@@ -69,13 +69,13 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private string _name;
         public string Name { get => _name; set => SetProperty(ref _name, value); }
 
-        private ObservableCollection<RecipeItemViewModel> _recipes = new();
+        private ObservableCollection<RecipeViewModel> _recipes = new();
 
-        public ObservableCollection<RecipeItemViewModel> Recipes { get => _recipes; } // Updates locally when recipe is created/removed
+        public ObservableCollection<RecipeViewModel> Recipes { get => _recipes; } // Updates locally when recipe is created/removed
 
 
-        private GuidLinkedPart<RecipeItemViewModel>? _defaultRecipe;
-        public GuidLinkedPart<RecipeItemViewModel>? LinkedDefaultRecipe { get => _defaultRecipe; set => SetProperty(ref _defaultRecipe, value); }
+        private GuidLinkedPart<RecipeViewModel>? _defaultRecipe;
+        public GuidLinkedPart<RecipeViewModel>? LinkedDefaultRecipe { get => _defaultRecipe; set => SetProperty(ref _defaultRecipe, value); }
 
         // Info updating
         protected override Dictionary<string, Action<ResourceDto>> ConfigureUpdaters() => new()
@@ -135,7 +135,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
 
         /// <summary> Used when new DB is initialized and we need to connect created VM parts to each other </summary>
-        internal void InitAddChild(RecipeItemViewModel recipe)
+        internal void InitAddChild(RecipeViewModel recipe)
         {
             Recipes.Add(recipe);
         }

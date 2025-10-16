@@ -5,39 +5,40 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
     public interface ISelectedParts
     {
-        ObservableCollection<ResourceItemViewModel> Resources { get; }
-        ObservableCollection<RecipeItemViewModel> Recipes { get; }
-        ObservableCollection<RecipeComponentItemViewModel> Components { get; }
+        ObservableCollection<ResourceViewModel> Resources { get; }
+        ObservableCollection<RecipeViewModel> Recipes { get; }
+        ObservableCollection<RecipeComponentViewModel> Components { get; }
         bool IsSingleResourceSelected { get; }
         bool IsSingleRecipeSelected { get; }
         bool IsSingleComponentSelected { get; }
+        bool IsPartsSelected { get; }
 
-        RecipeComponentItemViewModel? SingleComponentOrNull { get; }
-        RecipeItemViewModel? SingleRecipeOrNull { get; }
-        ResourceItemViewModel? SingleResourceOrNull { get; }
+        RecipeComponentViewModel? SingleComponentOrNull { get; }
+        RecipeViewModel? SingleRecipeOrNull { get; }
+        ResourceViewModel? SingleResourceOrNull { get; }
 
         bool IsResourcesSelected { get; }
         bool IsRecipesSelected { get; }
         bool IsComponentsSelected { get; }
 
-        void AddComponentToSelected(RecipeComponentItemViewModel component);
-        void AddRecipeToSelected(RecipeItemViewModel recipe);
-        void AddResourceToSelected(ResourceItemViewModel resource);
+        void AddComponentToSelected(RecipeComponentViewModel component);
+        void AddRecipeToSelected(RecipeViewModel recipe);
+        void AddResourceToSelected(ResourceViewModel resource);
 
         void ClearSelectedComponents();
         void ClearSelectedRecipes();
         void ClearSelectedResources();
         void ClearSelection();
-        RecipeComponentItemViewModel? GetSingleComponentOrNull();
-        RecipeItemViewModel? GetSingleRecipeOrNull();
-        ResourceItemViewModel? GetSingleResourceOrNull();
+        RecipeComponentViewModel? GetSingleComponentOrNull();
+        RecipeViewModel? GetSingleRecipeOrNull();
+        ResourceViewModel? GetSingleResourceOrNull();
 
-        void SelectSingleComponent(RecipeComponentItemViewModel component);
-        void SelectSingleComponentAncestors(RecipeComponentItemViewModel component);
+        void SelectSingleComponent(RecipeComponentViewModel component);
+        void SelectSingleComponentAncestors(RecipeComponentViewModel component);
         void SelectSinglePart(IVMPart part);
-        void SelectSingleRecipe(RecipeItemViewModel recipe);
-        void SelectSingleRecipeAncestor(RecipeItemViewModel recipe);
-        void SelectSingleResource(ResourceItemViewModel resource);
+        void SelectSingleRecipe(RecipeViewModel recipe);
+        void SelectSingleRecipeAncestor(RecipeViewModel recipe);
+        void SelectSingleResource(ResourceViewModel resource);
     }
 
     public interface IGlobalSelectedParts : ISelectedParts { }

@@ -33,7 +33,7 @@ namespace Partlyx.Services.Dtos
                 c.ParentRecipe?.Uid,
                 c.ComponentResource.Uid,
                 c.Quantity,
-                c.ComponentSelectedRecipe?.Uid
+                c.ComponentSelectedRecipeUid
                 );
         }
     }

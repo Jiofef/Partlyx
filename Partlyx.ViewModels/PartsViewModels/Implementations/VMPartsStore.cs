@@ -13,13 +13,13 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
     {
         private readonly IEventBus _bus;
 
-        private Dictionary<Guid, ResourceItemViewModel> _resources { get; }
-        private Dictionary<Guid, RecipeItemViewModel> _recipes { get; }
-        private Dictionary<Guid, RecipeComponentItemViewModel> _recipeComponents { get; }
+        private Dictionary<Guid, ResourceViewModel> _resources { get; }
+        private Dictionary<Guid, RecipeViewModel> _recipes { get; }
+        private Dictionary<Guid, RecipeComponentViewModel> _recipeComponents { get; }
 
-        public IReadOnlyDictionary<Guid, ResourceItemViewModel> Resources => _resources;
-        public IReadOnlyDictionary<Guid, RecipeItemViewModel> Recipes => _recipes;
-        public IReadOnlyDictionary<Guid, RecipeComponentItemViewModel> RecipeComponents => _recipeComponents;
+        public IReadOnlyDictionary<Guid, ResourceViewModel> Resources => _resources;
+        public IReadOnlyDictionary<Guid, RecipeViewModel> Recipes => _recipes;
+        public IReadOnlyDictionary<Guid, RecipeComponentViewModel> RecipeComponents => _recipeComponents;
 
         public VMPartsStore(IEventBus bus)
         {
@@ -33,7 +33,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             bus.Subscribe<FileClearedEvent>((ev) => ClearStore(), true);
         }
 
-        public void Register(ResourceItemViewModel resource)
+        public void Register(ResourceViewModel resource)
         {
             if (!_resources.ContainsKey(resource.Uid))
             {
@@ -42,7 +42,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             }
         }
 
-        public void Register(RecipeItemViewModel recipe)
+        public void Register(RecipeViewModel recipe)
         {
             if (!_resources.ContainsKey(recipe.Uid))
             {
@@ -51,7 +51,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             }
         }
 
-        public void Register(RecipeComponentItemViewModel component)
+        public void Register(RecipeComponentViewModel component)
         {
             if (!_resources.ContainsKey(component.Uid))
             {

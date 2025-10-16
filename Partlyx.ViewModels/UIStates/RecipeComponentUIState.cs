@@ -10,9 +10,9 @@ namespace Partlyx.ViewModels.UIStates
     {
         private readonly PartsServiceViewModel _services;
 
-        private readonly RecipeComponentItemViewModel _componentVM;
+        private readonly RecipeComponentViewModel _componentVM;
 
-        public RecipeComponentUIState(RecipeComponentItemViewModel vm, PartsServiceViewModel svm)
+        public RecipeComponentUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm)
         {
             _services = svm;
 

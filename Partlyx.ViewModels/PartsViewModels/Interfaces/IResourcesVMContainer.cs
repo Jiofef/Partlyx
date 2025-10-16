@@ -5,7 +5,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
     public interface IResourcesVMContainer
     {
-        ObservableCollection<ResourceItemViewModel> Resources { get; }
+        ObservableCollection<ResourceViewModel> Resources { get; }
     }
 
     public interface IIsolatedResourcesVMContainer : IResourcesVMContainer { }

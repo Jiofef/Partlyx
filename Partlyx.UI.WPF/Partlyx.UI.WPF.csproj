@@ -14,7 +14,6 @@
     <PackageReference Include="MaterialDesignColors" Version="5.2.1" />
     <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageReference Include="Moravuscz.WPFZoomPanel" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +26,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="DialogsXAML\PartsSelectionWindow.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
 	  <Compile Update="PartProperties.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>

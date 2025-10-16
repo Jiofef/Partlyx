@@ -54,7 +54,7 @@
             </Grid>
         </Grid>
 
-        <md:DialogHost Identifier="RootDialog" CloseOnClickAway="False">
+        <md:DialogHost Identifier="RootDialog" CloseOnClickAway="False" DialogContentTemplateSelector="{StaticResource WindowDialogsTemplateSelector}">
         </md:DialogHost>
     </Grid>
 

@@ -22,19 +22,21 @@ namespace Partlyx.ViewModels.PartsViewModels
         private bool _isRecipesSelected;
         [ObservableProperty]
         private bool _isComponentsSelected;
+        [ObservableProperty]
+        private bool _isPartsSelected;
 
         [ObservableProperty]
-        private ResourceItemViewModel? _singleResourceOrNull;
+        private ResourceViewModel? _singleResourceOrNull;
         [ObservableProperty]
-        private RecipeItemViewModel? _singleRecipeOrNull;
+        private RecipeViewModel? _singleRecipeOrNull;
         [ObservableProperty]
-        private RecipeComponentItemViewModel? _singleComponentOrNull;
+        private RecipeComponentViewModel? _singleComponentOrNull;
 
-        public ObservableCollection<ResourceItemViewModel> Resources { get; }
+        public ObservableCollection<ResourceViewModel> Resources { get; }
 
-        public ObservableCollection<RecipeItemViewModel> Recipes { get; }
+        public ObservableCollection<RecipeViewModel> Recipes { get; }
 
-        public ObservableCollection<RecipeComponentItemViewModel> Components { get; }
+        public ObservableCollection<RecipeComponentViewModel> Components { get; }
 
         public SelectedPartsAbstract()
         {
@@ -48,6 +50,7 @@ namespace Partlyx.ViewModels.PartsViewModels
                 SingleResourceOrNull = GetSingleResourceOrNull();
 
                 IsResourcesSelected = Resources.Count > 0;
+                IsPartsSelected = IsResourcesSelected || IsRecipesSelected || IsComponentsSelected;
                 SelectedResourcesChangedHandler(sender, evInfo);
             };
             Recipes.CollectionChanged += (sender, evInfo) =>
@@ -56,6 +59,7 @@ namespace Partlyx.ViewModels.PartsViewModels
                 SingleRecipeOrNull = GetSingleRecipeOrNull();
 
                 IsRecipesSelected = Recipes.Count > 0;
+                IsPartsSelected = IsResourcesSelected || IsRecipesSelected || IsComponentsSelected;
                 SelectedRecipesChangedHandler(sender, evInfo);
             };
             Components.CollectionChanged += (sender, evInfo) =>
@@ -64,6 +68,7 @@ namespace Partlyx.ViewModels.PartsViewModels
                 SingleComponentOrNull = GetSingleComponentOrNull();
 
                 IsComponentsSelected = Components.Count > 0;
+                IsPartsSelected = IsResourcesSelected || IsRecipesSelected || IsComponentsSelected;
                 SelectedComponentsChangedHandler(sender, evInfo);
             };
         }
@@ -73,7 +78,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         protected virtual void SelectedComponentsChangedHandler(object? sender, NotifyCollectionChangedEventArgs args) { }
 
         #region Resource methods
-        public void SelectSingleResource(ResourceItemViewModel resource)
+        public void SelectSingleResource(ResourceViewModel resource)
         {
             if (Resources.Count == 1 && Resources.Contains(resource)) return;
 
@@ -82,7 +87,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             Resources.Add(resource);
         }
 
-        public void AddResourceToSelected(ResourceItemViewModel resource)
+        public void AddResourceToSelected(ResourceViewModel resource)
         {
             if (Resources.Contains(resource!)) return;
             Resources.Add(resource);
@@ -93,7 +98,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             Resources.Clear();
         }
 
-        public ResourceItemViewModel? GetSingleResourceOrNull()
+        public ResourceViewModel? GetSingleResourceOrNull()
         {
             bool isResourceSingle = Resources.Count == 1;
             return isResourceSingle ? Resources.Single() : null;
@@ -101,7 +106,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         #endregion
 
         #region Recipe methods
-        public void SelectSingleRecipe(RecipeItemViewModel recipe)
+        public void SelectSingleRecipe(RecipeViewModel recipe)
         {
             if (Recipes.Count == 1 && Recipes.Contains(recipe)) return;
 
@@ -110,15 +115,15 @@ namespace Partlyx.ViewModels.PartsViewModels
             Recipes.Add(recipe);
         }
 
-        public void SelectSingleRecipeAncestor(RecipeItemViewModel recipe)
+        public void SelectSingleRecipeAncestor(RecipeViewModel recipe)
         {
-            if (recipe.LinkedParentResource?.Value is ResourceItemViewModel parentResource)
+            if (recipe.LinkedParentResource?.Value is ResourceViewModel parentResource)
                 SelectSingleResource(parentResource);
             else
                 ClearSelectedResources();
         }
 
-        public void AddRecipeToSelected(RecipeItemViewModel recipe)
+        public void AddRecipeToSelected(RecipeViewModel recipe)
         {
             if (Recipes.Contains(recipe!)) return;
             Recipes.Add(recipe);
@@ -129,7 +134,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             Recipes.Clear();
         }
 
-        public RecipeItemViewModel? GetSingleRecipeOrNull()
+        public RecipeViewModel? GetSingleRecipeOrNull()
         {
             bool isRecipeSingle = Recipes.Count == 1;
             return isRecipeSingle ? Recipes.Single() : null;
@@ -137,7 +142,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         #endregion
 
         #region Component methods
-        public void SelectSingleComponent(RecipeComponentItemViewModel component)
+        public void SelectSingleComponent(RecipeComponentViewModel component)
         {
             if (Components.Count == 1 && Components.Contains(component)) return;
 
@@ -146,9 +151,9 @@ namespace Partlyx.ViewModels.PartsViewModels
             Components.Add(component);
         }
 
-        public void SelectSingleComponentAncestors(RecipeComponentItemViewModel component)
+        public void SelectSingleComponentAncestors(RecipeComponentViewModel component)
         {
-            if (component.LinkedParentRecipe?.Value is RecipeItemViewModel parentRecipe)
+            if (component.LinkedParentRecipe?.Value is RecipeViewModel parentRecipe)
             {
                 SelectSingleRecipe(parentRecipe);
                 SelectSingleRecipeAncestor(parentRecipe);
@@ -160,7 +165,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             }
         }
 
-        public void AddComponentToSelected(RecipeComponentItemViewModel component)
+        public void AddComponentToSelected(RecipeComponentViewModel component)
         {
             if (Components.Contains(component!)) return;
             Components.Add(component);
@@ -171,7 +176,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             Components.Clear();
         }
 
-        public RecipeComponentItemViewModel? GetSingleComponentOrNull()
+        public RecipeComponentViewModel? GetSingleComponentOrNull()
         {
             bool isComponentSingle = Components.Count == 1;
             return isComponentSingle ? Components.Single() : null;
@@ -181,15 +186,15 @@ namespace Partlyx.ViewModels.PartsViewModels
         #region Generic / any parts
         public void SelectSinglePart(IVMPart part)
         {
-            if (part is ResourceItemViewModel resource)
+            if (part is ResourceViewModel resource)
             {
                 SelectSingleResource(resource);
             }
-            else if (part is RecipeItemViewModel recipe)
+            else if (part is RecipeViewModel recipe)
             {
                 SelectSingleRecipe(recipe);
             }
-            else if (part is RecipeComponentItemViewModel component)
+            else if (part is RecipeComponentViewModel component)
             {
                 SelectSingleComponent(component);
             }

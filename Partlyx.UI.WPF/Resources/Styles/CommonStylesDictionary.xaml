@@ -89,6 +89,11 @@
         <Setter Property="Foreground" Value="{StaticResource PxBlackBrush}"/>
     </Style>
 
+    <Style TargetType="TextBox" x:Key="CommonTextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
+        <Setter Property="Foreground" Value="{StaticResource PxBlackBrush}"/>
+    </Style>
+    
     <Style TargetType="ListView" x:Key="CommonListView">
         <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
     </Style>

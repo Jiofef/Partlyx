@@ -4,7 +4,9 @@
                     xmlns:viewmodelparts="clr-namespace:Partlyx.ViewModels.PartsViewModels.Implementations;assembly=Partlyx.ViewModels"
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                     xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
+                    xmlns:help="clr-namespace:Partlyx.UI.WPF.Helpers"
                     xmlns:conv="clr-namespace:Partlyx.UI.WPF.Converters"
+                    xmlns:dts="clr-namespace:Partlyx.UI.WPF.DataTemplateSelectors"
                     xmlns:vmo="clr-namespace:Partlyx.ViewModels.UIObjectViewModels;assembly=Partlyx.ViewModels"
                     xmlns:dialogs="clr-namespace:Partlyx.UI.WPF.DialogsXAML"
                     xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -14,15 +16,24 @@
         <dialogs:ComponentCreate/>
     </DataTemplate>
 
+    <DataTemplate x:Key="PartsSelectionWindowTemplate">
+        <dialogs:PartsSelectionWindow/>
+    </DataTemplate>
+
+
+
+    <dts:WindowDialogsTemplateSelector x:Key="WindowDialogsTemplateSelector"
+                                       PartsSelectionWindowTemplate="{StaticResource PartsSelectionWindowTemplate}"/>
+
     <!-- Parts tree hierarchy: Resource -> Recipe -> Components -->
-    <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:ResourceItemViewModel}" ItemsSource="{Binding Recipes}">
+    <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:ResourceViewModel}" ItemsSource="{Binding Recipes}">
         <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
             <Grid.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Delete" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}"/>
+                <ContextMenu Style="{StaticResource MaterialDesignMenu}">
+                    <MenuItem Header="Delete" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
-            <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
             <Grid HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -39,7 +50,7 @@
                     </TextBlock.InputBindings>
                 </TextBlock>
                 <TextBox Text="{Binding UiItem.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Column="1"
-                 Visibility="{Binding UiItem.IsRenaming, Converter={StaticResource BoolToVisConv}}">
+                 Visibility="{Binding UiItem.IsRenaming, Converter={StaticResource BoolToVisConv}}" Style="{StaticResource CommonTextBox}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding UiItem.CommitNameChangeCommand}"/>
                         <KeyBinding Key="Esc" Command="{Binding UiItem.CancelNameChangeCommand}"/>
@@ -68,14 +79,14 @@
         </Grid>
     </HierarchicalDataTemplate>
 
-    <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:RecipeItemViewModel}" ItemsSource="{Binding Components}">
+    <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:RecipeViewModel}" ItemsSource="{Binding Components}">
         <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
             <Grid.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Delete" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}"/>
+                <ContextMenu Style="{StaticResource MaterialDesignMenu}">
+                    <MenuItem Header="Delete" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
-            <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
             <Grid HorizontalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -85,14 +96,14 @@
                 </Grid.ColumnDefinitions>
                 <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
                 <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"
-                                               Visibility="{Binding UiItem.IsRenaming, Converter = {StaticResource InverseBoolToVisConv}}">
+                           Visibility="{Binding UiItem.IsRenaming, Converter = {StaticResource InverseBoolToVisConv}}">
                     <TextBlock.InputBindings>
                         <MouseBinding Gesture="LeftDoubleClick"
                                                           Command="{Binding UiItem.StartRenamingCommand}"/>
                     </TextBlock.InputBindings>
                 </TextBlock>
                 <TextBox Text="{Binding UiItem.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Column="1"
-                                             Visibility="{Binding UiItem.IsRenaming, Converter={StaticResource BoolToVisConv}}">
+                                             Visibility="{Binding UiItem.IsRenaming, Converter={StaticResource BoolToVisConv}}" Style="{StaticResource CommonTextBox}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding UiItem.CommitNameChangeCommand}"/>
                         <KeyBinding Key="Esc" Command="{Binding UiItem.CancelNameChangeCommand}"/>
@@ -135,14 +146,14 @@
         </Grid>
     </HierarchicalDataTemplate>
 
-    <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:RecipeComponentItemViewModel}" ItemsSource="{x:Null}" >
+    <HierarchicalDataTemplate DataType="{x:Type viewmodelparts:RecipeComponentViewModel}" ItemsSource="{x:Null}" >
         <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="Auto">
             <Grid.ContextMenu>
-                <ContextMenu>
+                <ContextMenu Style="{StaticResource MaterialDesignMenu}">
                     <MenuItem Header="Delete" Command="{Binding Services.ComponentService.RemoveCommand}" CommandParameter="{Binding}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
-            <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+            <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

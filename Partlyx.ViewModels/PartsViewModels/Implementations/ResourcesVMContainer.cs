@@ -12,6 +12,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
     {
         public ResourcesVMContainer() { }
 
-        public ObservableCollection<ResourceItemViewModel> Resources { get; } = new();
+        public ObservableCollection<ResourceViewModel> Resources { get; } = new();
     }
 }

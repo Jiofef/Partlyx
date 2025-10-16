@@ -3,4 +3,6 @@
                     xmlns:local="clr-namespace:Partlyx.UI.WPF">
 
     <FontFamily x:Key="DefaultFont">Cascadia Code</FontFamily>
+    
+    
 </ResourceDictionary>

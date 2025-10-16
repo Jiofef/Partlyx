@@ -4,6 +4,6 @@ namespace Partlyx.ViewModels.UIServices.Interfaces
 {
     public interface IResourceItemUiStateService
     {
-        ResourceItemUIState GetOrCreateItemUi(ResourceItemViewModel vm);
+        ResourceItemUIState GetOrCreateItemUi(ResourceViewModel vm);
     }
 }

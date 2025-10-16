@@ -4,13 +4,13 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
     public interface IVMPartsStore
     {
-        IReadOnlyDictionary<Guid, ResourceItemViewModel> Resources { get; }
-        IReadOnlyDictionary<Guid, RecipeItemViewModel> Recipes { get; }
-        IReadOnlyDictionary<Guid, RecipeComponentItemViewModel> RecipeComponents { get; }
+        IReadOnlyDictionary<Guid, ResourceViewModel> Resources { get; }
+        IReadOnlyDictionary<Guid, RecipeViewModel> Recipes { get; }
+        IReadOnlyDictionary<Guid, RecipeComponentViewModel> RecipeComponents { get; }
 
-        void Register(ResourceItemViewModel resource);
-        void Register(RecipeItemViewModel recipe);
-        void Register(RecipeComponentItemViewModel component);
+        void Register(ResourceViewModel resource);
+        void Register(RecipeViewModel recipe);
+        void Register(RecipeComponentViewModel component);
         void RemoveRecipe(Guid uid);
         void RemoveRecipeComponent(Guid uid);
         void RemoveResource(Guid uid);

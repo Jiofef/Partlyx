@@ -24,7 +24,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             }
             else if (Resources.Count > 1 && args.NewItems != null) // Multiselect
             {
-                foreach (ResourceItemViewModel added in args.NewItems)
+                foreach (ResourceViewModel added in args.NewItems)
                 {
                     var @event = new GlobalResourceAddedToSelectedEvent(added.Uid);
                     _bus.Publish(@event);
@@ -49,12 +49,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 var @event = new GlobalSingleRecipeSelectedEvent(GetSingleRecipeOrNull()!.Uid);
                 _bus.Publish(@event);
 
-                var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Recipe, GetSingleResourceOrNull()!.Uid);
+                var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Recipe, GetSingleRecipeOrNull()!.Uid);
                 _bus.Publish(@commonEvent);
             }
             else if (Recipes.Count > 1 && args.NewItems != null) // Multiselect
             {
-                foreach (RecipeItemViewModel added in args.NewItems)
+                foreach (RecipeViewModel added in args.NewItems)
                 {
                     var @event = new GlobalRecipeAddedToSelectedEvent(added.Uid);
                     _bus.Publish(@event);
@@ -79,12 +79,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 var @event = new GlobalSingleComponentSelectedEvent(GetSingleComponentOrNull()!.Uid);
                 _bus.Publish(@event);
 
-                var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Component, GetSingleResourceOrNull()!.Uid);
+                var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Component, GetSingleComponentOrNull()!.Uid);
                 _bus.Publish(@commonEvent);
             }
             else if (Components.Count > 1 && args.NewItems != null) // Multiselect
             {
-                foreach (RecipeComponentItemViewModel added in args.NewItems)
+                foreach (RecipeComponentViewModel added in args.NewItems)
                 {
                     var @event = new GlobalComponentAddedToSelectedEvent(added.Uid);
                     _bus.Publish(@event);

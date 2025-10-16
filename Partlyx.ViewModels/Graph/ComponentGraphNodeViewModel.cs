@@ -12,10 +12,10 @@ namespace Partlyx.ViewModels.Graph
 {
     public class ComponentGraphNodeViewModel : GraphTreeNodeViewModel
     {
-        public ComponentGraphNodeViewModel(RecipeComponentItemViewModel value) 
+        public ComponentGraphNodeViewModel(RecipeComponentViewModel value) 
             : base(value.Uid,
                   (value.SelectedRecipeComponents != null 
-                  ? new ObservableCollectionProjection<Guid, RecipeComponentItemViewModel>(value.SelectedRecipeComponents, (component => component.Uid)) 
+                  ? new ObservableCollectionProjection<Guid, RecipeComponentViewModel>(value.SelectedRecipeComponents, (component => component.Uid)) 
                   : null),
                   value) { }
     }

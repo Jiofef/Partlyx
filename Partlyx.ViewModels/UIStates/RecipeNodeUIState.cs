@@ -12,25 +12,26 @@ namespace Partlyx.ViewModels
     public partial class RecipeNodeUIState : ObservableObject, IDisposable
     {
         private readonly PartsServiceViewModel _services;
-        private readonly RecipeItemViewModel _recipeVM;
+        private readonly RecipeViewModel _recipeVM;
 
-        private readonly IDisposable _columnTextUpdateSubscription;
-        private readonly IDisposable _secondaryColumnTextUpdateSubscription;
+        private readonly List<IDisposable> _subscriptions = new();
 
 
-        public RecipeNodeUIState(RecipeItemViewModel vm, PartsServiceViewModel svm) 
+        public RecipeNodeUIState(RecipeViewModel vm, PartsServiceViewModel svm) 
         {
             _services = svm;
 
             _recipeVM = vm;
 
-            _columnTextUpdateSubscription = _recipeVM
+            var columnTextUpdateSubscription = _recipeVM
                 .WhenValueChanged(rc => rc.Name)
                 .Subscribe(n => UpdateColumnText());
+            _subscriptions.Add(columnTextUpdateSubscription);
 
-            _secondaryColumnTextUpdateSubscription = _recipeVM
+            var secondaryColumnTextUpdateSubscription = _recipeVM
                 .WhenAnyValue(rc => rc.LinkedParentResource!.Value!.Name)
                 .Subscribe(n => UpdateSecondaryColumnText());
+            _subscriptions.Add(secondaryColumnTextUpdateSubscription);
 
             UpdateColumnText();
             UpdateSecondaryColumnText();
@@ -69,8 +70,8 @@ namespace Partlyx.ViewModels
 
         public void Dispose()
         {
-            _columnTextUpdateSubscription.Dispose();
-            _secondaryColumnTextUpdateSubscription.Dispose();
+            foreach(var subscription in _subscriptions)
+                subscription.Dispose();
         }
     }
 }

@@ -26,6 +26,8 @@ namespace Partlyx.Services.ServiceImplementations
             var result = await _repo.ExecuteOnResourceAsync(parentResourceUid, resource =>
             {
                 var recipe = resource.CreateRecipe();
+                string recipeName = $"Recipe {resource.Recipes.Count}";
+                recipe.Name = recipeName;
 
                 if (recipe.ParentResource?.DefaultRecipe == null)
                 {

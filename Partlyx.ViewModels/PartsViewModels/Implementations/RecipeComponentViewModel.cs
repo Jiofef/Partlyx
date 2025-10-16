@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public partial class RecipeComponentItemViewModel : UpdatableViewModel<RecipeComponentDto>, IVMPart
+    public partial class RecipeComponentViewModel : UpdatableViewModel<RecipeComponentDto>, IVMPart
     {
         // Servicess
         private readonly IVMPartsStore _store;
@@ -34,7 +34,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childComponentsDefaultRecipeUpdateSubscribe;
         private readonly IDisposable _childComponentsSelectedRecipeUpdateSubscribe;
 
-        public RecipeComponentItemViewModel(RecipeComponentDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
+        public RecipeComponentViewModel(RecipeComponentDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
@@ -77,20 +77,20 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public Guid Uid { get; }
 
-        private GuidLinkedPart<RecipeItemViewModel>? _parentRecipe;
-        public GuidLinkedPart<RecipeItemViewModel>? LinkedParentRecipe { get => _parentRecipe; set => SetProperty(ref _parentRecipe, value); }
+        private GuidLinkedPart<RecipeViewModel>? _parentRecipe;
+        public GuidLinkedPart<RecipeViewModel>? LinkedParentRecipe { get => _parentRecipe; set => SetProperty(ref _parentRecipe, value); }
 
-        private GuidLinkedPart<ResourceItemViewModel>? _resource;
-        public GuidLinkedPart<ResourceItemViewModel>? LinkedResource { get => _resource; private set => SetProperty(ref _resource, value); }
+        private GuidLinkedPart<ResourceViewModel>? _resource;
+        public GuidLinkedPart<ResourceViewModel>? LinkedResource { get => _resource; private set => SetProperty(ref _resource, value); }
 
         private double _quantity;
         public double Quantity { get => _quantity; set => SetProperty(ref _quantity, value); }
 
-        private GuidLinkedPart<RecipeItemViewModel>? _selectedRecipe;
-        public GuidLinkedPart<RecipeItemViewModel>? LinkedSelectedRecipe { get => _selectedRecipe; private set => SetProperty(ref _selectedRecipe, value); }
+        private GuidLinkedPart<RecipeViewModel>? _selectedRecipe;
+        public GuidLinkedPart<RecipeViewModel>? LinkedSelectedRecipe { get => _selectedRecipe; private set => SetProperty(ref _selectedRecipe, value); }
 
-        private ObservableCollection<RecipeComponentItemViewModel>? _selectedRecipeComponents;
-        public ObservableCollection<RecipeComponentItemViewModel>? SelectedRecipeComponents { get => _selectedRecipeComponents; private set => SetProperty(ref _selectedRecipeComponents, value); }
+        private ObservableCollection<RecipeComponentViewModel>? _selectedRecipeComponents;
+        public ObservableCollection<RecipeComponentViewModel>? SelectedRecipeComponents { get => _selectedRecipeComponents; private set => SetProperty(ref _selectedRecipeComponents, value); }
 
 
         // Info updating

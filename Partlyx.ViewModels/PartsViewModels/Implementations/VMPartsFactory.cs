@@ -14,35 +14,35 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _store = repository;
         }
 
-        public ResourceItemViewModel GetOrCreateResourceVM(ResourceDto dto)
+        public ResourceViewModel GetOrCreateResourceVM(ResourceDto dto)
         {
-            ResourceItemViewModel? resource = _store.Resources.GetValueOrDefault(dto.Uid);
+            ResourceViewModel? resource = _store.Resources.GetValueOrDefault(dto.Uid);
             if (resource != null)
                 return resource;
 
-            resource = CreateViewModelFrom<ResourceItemViewModel>(dto);
+            resource = CreateViewModelFrom<ResourceViewModel>(dto);
             _store.Register(resource);
             return resource;
         }
 
-        public RecipeItemViewModel GetOrCreateRecipeVM(RecipeDto dto)
+        public RecipeViewModel GetOrCreateRecipeVM(RecipeDto dto)
         {
-            RecipeItemViewModel? recipe = _store.Recipes.GetValueOrDefault(dto.Uid);
+            RecipeViewModel? recipe = _store.Recipes.GetValueOrDefault(dto.Uid);
             if (recipe != null)
                 return recipe;
 
-            recipe = CreateViewModelFrom<RecipeItemViewModel>(dto);
+            recipe = CreateViewModelFrom<RecipeViewModel>(dto);
             _store.Register(recipe);
             return recipe;
         }
 
-        public RecipeComponentItemViewModel GetOrCreateRecipeComponentVM(RecipeComponentDto dto)
+        public RecipeComponentViewModel GetOrCreateRecipeComponentVM(RecipeComponentDto dto)
         {
-            RecipeComponentItemViewModel? component = _store.RecipeComponents.GetValueOrDefault(dto.Uid);
+            RecipeComponentViewModel? component = _store.RecipeComponents.GetValueOrDefault(dto.Uid);
             if (component != null)
                 return component;
 
-            component = CreateViewModelFrom<RecipeComponentItemViewModel>(dto);
+            component = CreateViewModelFrom<RecipeComponentViewModel>(dto);
             _store.Register(component);
             return component;
         }

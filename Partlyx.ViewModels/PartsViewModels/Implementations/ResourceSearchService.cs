@@ -7,7 +7,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
     public partial class ResourceSearchService : ObservableObject, IResourceSearchService
     {
         private readonly IGlobalResourcesVMContainer _resourcesContainer;
-        public ObservableCollection<ResourceItemViewModel> Resources => _resourcesContainer.Resources;
+        public ObservableCollection<ResourceViewModel> Resources => _resourcesContainer.Resources;
 
         public ResourceSearchService(IGlobalResourcesVMContainer grvmc)
         {
@@ -19,7 +19,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public Predicate<object> SearchByName => o =>
         {
-            if (o is not ResourceItemViewModel rItem) return false;
+            if (o is not ResourceViewModel rItem) return false;
             if (string.IsNullOrWhiteSpace(SearchText)) return true;
             return rItem.Name?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) == true;
         };

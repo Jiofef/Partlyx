@@ -127,23 +127,39 @@ namespace Partlyx.Services.ServiceImplementations
                 _eventBus.Publish(new RecipeComponentUpdatedEvent(component, new[] { "Quantity" }));
         }
 
-        public async Task SetResourceSelectedRecipeAsync(Guid parentResourceUid, Guid componentUid, Guid recipeToSelectUid)
+        public async Task SetResourceSelectedRecipeAsync(Guid parentResourceUid, Guid componentUid, Guid? recipeToSelectUid)
         {
-            await _repo.ExecuteOnComponentAsync(parentResourceUid, componentUid, component =>
+            var batchOptions = new PartsRepository.BatchIncludeOptions() { IncludeComponentChildResource = true, IncludeResourcesRecipes = true };
+
+            if (recipeToSelectUid == null)
             {
-                var componentResource = component.ComponentResource;
-                var recipeToSelect = componentResource.Recipes.FirstOrDefault(x => x.Uid == recipeToSelectUid);
+                await _repo.ExecuteWithBatchAsync(
+                [], [], [componentUid], batchOptions,
+                batch =>
+                {
+                    var component = batch.Components[componentUid];
 
-                if (recipeToSelect == null)
-                    throw new InvalidOperationException("Recipe not found with Uid: " + recipeToSelectUid);
+                    component.SetSelectedRecipe(null);
+                    return Task.CompletedTask;
+                });
+            }
+            else
+            {
+                await _repo.ExecuteWithBatchAsync(
+                [], [(Guid)recipeToSelectUid!], [componentUid], batchOptions,
+                batch =>
+                {
+                    var component = batch.Components[componentUid];
+                    var recipeToSelect = batch.Recipes[(Guid)recipeToSelectUid];
 
-                component.SetSelectedRecipe(recipeToSelect);
-                return Task.CompletedTask;
-            });
+                    component.SetSelectedRecipe(recipeToSelect);
+                    return Task.CompletedTask;
+                });
+            }
 
             var component = await GetComponentAsync(parentResourceUid, componentUid);
             if (component != null)
-                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, new[] { "ComponentSelectedRecipe" }));
+                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, new[] { "SelectedRecipeUid" }));
         }
 
         public async Task SetComponentResourceAsync(Guid parentResourceUid, Guid componentUid, Guid resourceToSelectUid)

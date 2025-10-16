@@ -5,11 +5,11 @@ namespace Partlyx.ViewModels.UIServices.Interfaces
 {
     public interface ILinkedPartsManager
     {
-        GuidLinkedPart<RecipeComponentItemViewModel> CreateAndRegisterLinkedRecipeComponentVM(Guid uid);
-        GuidLinkedPart<RecipeItemViewModel> CreateAndRegisterLinkedRecipeVM(Guid uid);
-        GuidLinkedPart<ResourceItemViewModel> CreateAndRegisterLinkedResourceVM(Guid uid);
-        void Register(GuidLinkedPart<RecipeComponentItemViewModel> linkedPart);
-        void Register(GuidLinkedPart<RecipeItemViewModel> linkedPart);
-        void Register(GuidLinkedPart<ResourceItemViewModel> linkedPart);
+        GuidLinkedPart<RecipeComponentViewModel> CreateAndRegisterLinkedRecipeComponentVM(Guid uid);
+        GuidLinkedPart<RecipeViewModel> CreateAndRegisterLinkedRecipeVM(Guid uid);
+        GuidLinkedPart<ResourceViewModel> CreateAndRegisterLinkedResourceVM(Guid uid);
+        void Register(GuidLinkedPart<RecipeComponentViewModel> linkedPart);
+        void Register(GuidLinkedPart<RecipeViewModel> linkedPart);
+        void Register(GuidLinkedPart<ResourceViewModel> linkedPart);
     }
 }

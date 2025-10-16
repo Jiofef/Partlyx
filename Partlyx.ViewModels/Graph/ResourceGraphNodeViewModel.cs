@@ -12,8 +12,8 @@ namespace Partlyx.ViewModels.Graph
 {
     public class ResourceGraphNodeViewModel : GraphTreeNodeViewModel
     {
-        public ResourceGraphNodeViewModel(ResourceItemViewModel value) : base(value.Uid,
-                  new ObservableCollectionProjection<Guid, RecipeComponentItemViewModel>(value.LinkedDefaultRecipe!.Value!.Components, (component => component.Uid)),
+        public ResourceGraphNodeViewModel(ResourceViewModel value) : base(value.Uid,
+                  new ObservableCollectionProjection<Guid, RecipeComponentViewModel>(value.LinkedDefaultRecipe!.Value!.Components, (component => component.Uid)),
                   value) { }
     }
 }

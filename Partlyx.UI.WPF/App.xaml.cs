@@ -15,6 +15,7 @@ using Partlyx.ViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIObjectViewModels;
+using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Windows;
@@ -106,14 +107,16 @@ namespace Partlyx.UI.WPF
             services.AddSingleton<IGuidLinkedPartFactory, GuidLinkedPartFactory>();
             services.AddSingleton<ILinkedPartsManager, LinkedPartsManager>();
 
-            services.AddTransient<ResourceItemViewModel>();
-            services.AddTransient<RecipeItemViewModel>();
-            services.AddTransient<RecipeComponentItemViewModel>();
+            services.AddTransient<ResourceViewModel>();
+            services.AddTransient<RecipeViewModel>();
+            services.AddTransient<RecipeComponentViewModel>();
 
             services.AddTransient<ResourceServiceViewModel>();
             services.AddTransient<RecipeServiceViewModel>();
             services.AddTransient<RecipeComponentServiceViewModel>();
             services.AddTransient<PartsServiceViewModel>();
+
+            services.AddTransient<PanAndZoomControllerViewModel>();
 
             services.AddTransient<IIsolatedSelectedParts, IsolatedSelectedParts>();
             services.AddSingleton<IGlobalSelectedParts, GlobalSelectedParts>();

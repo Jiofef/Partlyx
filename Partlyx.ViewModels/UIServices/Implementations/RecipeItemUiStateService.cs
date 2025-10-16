@@ -20,7 +20,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         private readonly Dictionary<Guid, RecipeItemUIState> _itemStates = new();
         private readonly Dictionary<Guid, RecipeNodeUIState> _nodeStates = new();
 
-        public RecipeItemUIState GetOrCreateItemUi(RecipeItemViewModel vm)
+        public RecipeItemUIState GetOrCreateItemUi(RecipeViewModel vm)
         {
             var state = _itemStates.GetValueOrDefault(vm.Uid);
             if (state == null)
@@ -30,7 +30,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             }
             return state;
         }
-        public RecipeNodeUIState GetOrCreateNodeUi(RecipeItemViewModel vm)
+        public RecipeNodeUIState GetOrCreateNodeUi(RecipeViewModel vm)
         {
             var state = _nodeStates.GetValueOrDefault(vm.Uid);
             if (state == null)

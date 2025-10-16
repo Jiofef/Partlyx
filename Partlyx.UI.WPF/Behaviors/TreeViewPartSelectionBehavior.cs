@@ -120,7 +120,7 @@ namespace Partlyx.UI.WPF.Behaviors
             var selectedParts = SelectedPartsContainer;
             if (selectedParts != null)
             {
-                if (part is ResourceItemViewModel resource)
+                if (part is ResourceViewModel resource)
                 {
                     selectedParts.ClearSelection();
                     selectedParts.SelectSingleResource(resource);
@@ -128,7 +128,7 @@ namespace Partlyx.UI.WPF.Behaviors
                     if (AutoSelectDefaultResourceRecipe && resource.LinkedDefaultRecipe?.Value != null)
                         selectedParts.SelectSingleRecipe(resource.LinkedDefaultRecipe.Value);
                 }
-                else if (part is RecipeItemViewModel recipe)
+                else if (part is RecipeViewModel recipe)
                 {
                     selectedParts.ClearSelection();
                     selectedParts.SelectSingleRecipe(recipe);
@@ -136,7 +136,7 @@ namespace Partlyx.UI.WPF.Behaviors
                     if (AutoSetAncestorParts)
                         selectedParts.SelectSingleRecipeAncestor(recipe);
                 }
-                else if (part is RecipeComponentItemViewModel component)
+                else if (part is RecipeComponentViewModel component)
                 {
                     selectedParts.ClearSelection();
                     selectedParts.SelectSingleComponent(component);

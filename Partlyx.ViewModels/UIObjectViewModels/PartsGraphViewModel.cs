@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using CommunityToolkit.Mvvm.Input;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.ViewModels.Graph;
@@ -7,14 +7,10 @@ using Partlyx.ViewModels.GraphicsViewModels;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
-using System;
-using System.Collections.Generic;
+using Partlyx.ViewModels.UIServices;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using UJL.CSharp.Collections;
 
 namespace Partlyx.ViewModels.UIObjectViewModels
@@ -33,25 +29,38 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         // Collections
         private ObservableMultiCollection<FromToLineViewModel> _edges = new();
+
         public ObservableMultiCollection<FromToLineViewModel> Edges { get => _edges; private set => SetProperty(ref _edges, value); } 
 
         public ObservableCollection<GraphTreeNodeViewModel> Nodes { get; } = new();
 
         private readonly Dictionary<Guid, GraphTreeNodeViewModel> _nodesDictionary = new();
 
+        // Pan/zoom
+        public PanAndZoomControllerViewModel PanAndZoomController { get; }
 
-        public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IEventBus bus)
+        public Point RootNodeDefaultPosition { get; } = new Point(0, 0);
+
+        public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IEventBus bus, PanAndZoomControllerViewModel pazc)
         {
             SelectedParts = selectedParts;
-            _recipeChangedSubscription = bus.Subscribe<GlobalSingleRecipeSelectedEvent>((ev) => UpdateTree());
-            _recipeRemovedSubscription = bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => UpdateTree());
+            PanAndZoomController = pazc;
 
-            _componentAddedSubscription = bus.Subscribe<RecipeComponentVMAddedToStoreEvent>((ev) => UpdateTree());
-            _componentRemovedSubscription = bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>((ev) => UpdateTree());
-            _componentMovedSubscription = bus.Subscribe<RecipeComponentMovedEvent>((ev) => UpdateTree());
+            _recipeChangedSubscription = bus.Subscribe<GlobalSingleRecipeSelectedEvent>((ev) => OnSelectedTreeChanged());
+            _recipeRemovedSubscription = bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => UpdateGraph());
+
+            _componentAddedSubscription = bus.Subscribe<RecipeComponentVMAddedToStoreEvent>((ev) => UpdateGraph());
+            _componentRemovedSubscription = bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>((ev) => UpdateGraph());
+            _componentMovedSubscription = bus.Subscribe<RecipeComponentMovedEvent>((ev) => UpdateGraph());
         }
 
-        private void UpdateTree()
+        private void OnSelectedTreeChanged()
+        {
+            CenterizePanPosition();
+            UpdateGraph();
+        }
+
+        private void UpdateGraph()
         {
             Nodes.Clear();
             _nodesDictionary.Clear();
@@ -61,13 +70,13 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             if (selectedRecipe == null) return;
 
             var mainNode = new RecipeGraphNodeViewModel(selectedRecipe);
-            mainNode.XCentered = 1000;
-            mainNode.YCentered = 1000;
+            mainNode.XCentered = RootNodeDefaultPosition.X;
+            mainNode.YCentered = RootNodeDefaultPosition.Y;
             AddNode(mainNode);
 
             LoadChildComponentsFrom(selectedRecipe.Components, mainNode);
 
-            void LoadChildComponentsFrom(IList<RecipeComponentItemViewModel> components, GraphTreeNodeViewModel parentNode)
+            void LoadChildComponentsFrom(IList<RecipeComponentViewModel> components, GraphTreeNodeViewModel parentNode)
             {
                 for (int i = 0; i < components.Count; i++)
                 {
@@ -144,6 +153,12 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     BuildEdgesFor(child, childPosition);
                 }
             }
+        }
+
+        [RelayCommand]
+        public void CenterizePanPosition()
+        {
+            PanAndZoomController.CenterizePanPosition(RootNodeDefaultPosition);
         }
 
         private void AddNode(GraphTreeNodeViewModel node)

@@ -32,15 +32,15 @@ namespace Partlyx.UI.WPF.DragAndDrop
             var target = dropInfo.TargetItem;
 
             // Handle resource drag over
-            if (DropInfoHelpers.TryGetItemsOfType<ResourceItemViewModel>(dropInfo, out var items1))
+            if (DropInfoHelpers.TryGetItemsOfType<ResourceViewModel>(dropInfo, out var items1))
             {
                 // Resource moving
-                if (targetCollection is ObservableCollection<ResourceItemViewModel>)
+                if (targetCollection is ObservableCollection<ResourceViewModel>)
                 {
                     _defaultHandler.DragOver(dropInfo);
                 }
                 // Create component from resources
-                else if (targetCollection is ObservableCollection<RecipeComponentItemViewModel>)
+                else if (targetCollection is ObservableCollection<RecipeComponentViewModel>)
                 {
                     dropInfo.Effects = DragDropEffects.Copy;
                     dropInfo.DropTargetHintAdorner = DropTargetAdorners.Highlight;
@@ -49,20 +49,20 @@ namespace Partlyx.UI.WPF.DragAndDrop
                 return;
             }
             // Handle recipe drag over
-            else if (DropInfoHelpers.TryGetItemsOfType<RecipeItemViewModel>(dropInfo, out var items2))
+            else if (DropInfoHelpers.TryGetItemsOfType<RecipeViewModel>(dropInfo, out var items2))
             {
                 // Recipe moving
-                if (targetCollection is ObservableCollection<RecipeItemViewModel>)
+                if (targetCollection is ObservableCollection<RecipeViewModel>)
                 {
                     _defaultHandler.DragOver(dropInfo);
                 }
                 return;
             }
             // Handle component drag over
-            else if (DropInfoHelpers.TryGetItemsOfType<RecipeComponentItemViewModel>(dropInfo, out var items3))
+            else if (DropInfoHelpers.TryGetItemsOfType<RecipeComponentViewModel>(dropInfo, out var items3))
             {
                 // component moving
-                if (targetCollection is ObservableCollection<RecipeComponentItemViewModel>)
+                if (targetCollection is ObservableCollection<RecipeComponentViewModel>)
                 {
                     _defaultHandler.DragOver(dropInfo);
                 }
@@ -85,22 +85,22 @@ namespace Partlyx.UI.WPF.DragAndDrop
             bool dropInsideDragSource = targetCollection == sourceCollection;
 
             // Handle resource drop
-            if (DropInfoHelpers.TryGetItemsOfType<ResourceItemViewModel>(dropInfo, out var items))
+            if (DropInfoHelpers.TryGetItemsOfType<ResourceViewModel>(dropInfo, out var items))
             {
                 // Resource moving
-                if (targetCollection is ICollection<ResourceItemViewModel>)
+                if (targetCollection is ICollection<ResourceViewModel>)
                 {
                     _defaultHandler.Drop(dropInfo);
                 }
                 // Create component from resources
-                else if (targetCollection is ObservableCollection<RecipeComponentItemViewModel> componentsCollection)
+                else if (targetCollection is ObservableCollection<RecipeComponentViewModel> componentsCollection)
                 {
                     if (!dropInsideDragSource)
                     {
-                        RecipeItemViewModel parent;
-                        if (target is RecipeItemViewModel)
-                            parent = (RecipeItemViewModel)target;
-                        else if (target is RecipeComponentItemViewModel component)
+                        RecipeViewModel parent;
+                        if (target is RecipeViewModel)
+                            parent = (RecipeViewModel)target;
+                        else if (target is RecipeComponentViewModel component)
                             parent = component.LinkedParentRecipe!.Value!;
                         else return;
 
@@ -112,21 +112,21 @@ namespace Partlyx.UI.WPF.DragAndDrop
                 return;
             }
             // Handle recipe drop
-            else if (DropInfoHelpers.TryGetItemsOfType<RecipeItemViewModel>(dropInfo, out var items2))
+            else if (DropInfoHelpers.TryGetItemsOfType<RecipeViewModel>(dropInfo, out var items2))
             {
                 // Recipe moving
-                if (targetCollection is ICollection<RecipeItemViewModel>)
+                if (targetCollection is ICollection<RecipeViewModel>)
                 {
                     if (!dropInsideDragSource)
                     {
-                        ResourceItemViewModel parent;
-                        if (target is ResourceItemViewModel)
-                            parent = (ResourceItemViewModel)target;
-                        else if (target is RecipeItemViewModel recipe)
+                        ResourceViewModel parent;
+                        if (target is ResourceViewModel)
+                            parent = (ResourceViewModel)target;
+                        else if (target is RecipeViewModel recipe)
                             parent = recipe.LinkedParentResource!.Value!;
                         else return;
 
-                        var moveInfo = new PartsTargetInteractionInfo<RecipeItemViewModel, ResourceItemViewModel>(items2, parent);
+                        var moveInfo = new PartsTargetInteractionInfo<RecipeViewModel, ResourceViewModel>(items2, parent);
                         await _partsService.RecipeService.MoveRecipesAsync(moveInfo);
                     }
                     else
@@ -135,21 +135,21 @@ namespace Partlyx.UI.WPF.DragAndDrop
                 return;
             }
             // Handle component drop
-            else if (DropInfoHelpers.TryGetItemsOfType<RecipeComponentItemViewModel>(dropInfo, out var items3))
+            else if (DropInfoHelpers.TryGetItemsOfType<RecipeComponentViewModel>(dropInfo, out var items3))
             {
                 // component moving
-                if (targetCollection is ICollection<RecipeComponentItemViewModel>)
+                if (targetCollection is ICollection<RecipeComponentViewModel>)
                 {
                     if (!dropInsideDragSource)
                     {
-                        RecipeItemViewModel parent;
-                        if (target is RecipeItemViewModel)
-                            parent = (RecipeItemViewModel)target;
-                        else if (target is RecipeComponentItemViewModel component)
+                        RecipeViewModel parent;
+                        if (target is RecipeViewModel)
+                            parent = (RecipeViewModel)target;
+                        else if (target is RecipeComponentViewModel component)
                             parent = component.LinkedParentRecipe!.Value!;
                         else return;
 
-                        var moveInfo = new PartsTargetInteractionInfo<RecipeComponentItemViewModel, RecipeItemViewModel>(items3, parent);
+                        var moveInfo = new PartsTargetInteractionInfo<RecipeComponentViewModel, RecipeViewModel>(items3, parent);
                         await _partsService.ComponentService.MoveComponentsAsync(moveInfo);
                     }
                     else

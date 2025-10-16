@@ -7,6 +7,7 @@ using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using System.ComponentModel;
 
 namespace Partlyx.ViewModels.UIServices.Implementations
 {
@@ -24,7 +25,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        public async Task CreateComponentAsync(RecipeItemViewModel parent)
+        public async Task CreateComponentAsync(RecipeViewModel parent)
         {
             var result = await _dialogService.ShowDialogAsync<ComponentCreateViewModel>();
             if (result is not ISelectedParts selected || !selected.IsResourcesSelected)
@@ -35,7 +36,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        public async Task CreateComponentsFromAsync(PartsTargetInteractionInfo<ResourceItemViewModel, RecipeItemViewModel> info)
+        public async Task CreateComponentsFromAsync(PartsTargetInteractionInfo<ResourceViewModel, RecipeViewModel> info)
         {
             var parent = info.Target;
             var resources = info.Parts;
@@ -43,7 +44,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             await CreateComponentsFromAsync(parent, resources);
         }
 
-        public async Task CreateComponentsFromAsync(RecipeItemViewModel parent, List<ResourceItemViewModel> resources)
+        public async Task CreateComponentsFromAsync(RecipeViewModel parent, List<ResourceViewModel> resources)
         {
             var grandParentResUid = parent.LinkedParentResource!.Uid;
             var parentRecipeUid = parent!.Uid;
@@ -56,7 +57,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        public async Task MoveComponentsAsync(PartsTargetInteractionInfo<RecipeComponentItemViewModel, RecipeItemViewModel> info)
+        public async Task MoveComponentsAsync(PartsTargetInteractionInfo<RecipeComponentViewModel, RecipeViewModel> info)
         {
             var components = info.Parts;
             var targetRecipe = info.Target;
@@ -73,12 +74,24 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        public async Task RemoveAsync(RecipeComponentItemViewModel component)
+        public async Task RemoveAsync(RecipeComponentViewModel component)
         {
-
             var grandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
             var parentUid = component.LinkedParentRecipe!.Uid;
             await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeComponentCommand>(grandParentUid, parentUid, component.Uid);
+        }
+
+        [RelayCommand]
+        public async Task SetSelectedRecipe(PartSetValueInfo<RecipeComponentViewModel, RecipeViewModel?> info)
+        {
+            if (info == null || info.Part == null || info.Value == null) return;
+
+            var component = info.Part;
+            var targetRecipe = info.Value;
+
+            var grandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
+
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentSelectedRecipe>(grandParentUid, component.Uid, targetRecipe?.Uid!);
         }
     }
 }

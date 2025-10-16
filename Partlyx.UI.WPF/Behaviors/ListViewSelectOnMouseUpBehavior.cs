@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace Partlyx.UI.WPF.Behaviors
 {
-    public class SelectOnMouseUpBehavior : Behavior<ListView>
+    public class ListViewSelectOnMouseUpBehavior : Behavior<ListView>
     {
         // pixel distance after which we think drag started
         public double DragThreshold { get; set; } = 4.0;

@@ -11,9 +11,9 @@ namespace Partlyx.ViewModels
     public partial class ResourceItemUIState : ObservableObject
     {
         private readonly PartsServiceViewModel _services;
-        private readonly ResourceItemViewModel _resourceVM;
+        private readonly ResourceViewModel _resourceVM;
 
-        public ResourceItemUIState(ResourceItemViewModel vm, PartsServiceViewModel svm)
+        public ResourceItemUIState(ResourceViewModel vm, PartsServiceViewModel svm)
         {
             _services = svm;
 
@@ -34,7 +34,7 @@ namespace Partlyx.ViewModels
         {
             if (!IsRenaming) return;
 
-            var args = new PartSetValueInfo<ResourceItemViewModel, string>(_resourceVM, UnConfirmedName);
+            var args = new PartSetValueInfo<ResourceViewModel, string>(_resourceVM, UnConfirmedName);
             await _services.ResourceService.RenameResource(args);
 
             IsRenaming = false;

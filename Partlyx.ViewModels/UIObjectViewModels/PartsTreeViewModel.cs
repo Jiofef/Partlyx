@@ -30,7 +30,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public ResourceServiceViewModel Service { get; }
 
         private IGlobalResourcesVMContainer _resourcesContainer { get; }
-        public ObservableCollection<ResourceItemViewModel> Resources => _resourcesContainer.Resources;
+        public ObservableCollection<ResourceViewModel> Resources => _resourcesContainer.Resources;
 
         public PartsTreeViewModel(IGlobalResourcesVMContainer grvmc, IGlobalSelectedParts sp, IGlobalFocusedPart fp, IEventBus bus, IVMPartsFactory vmpf,
                 IVMPartsStore vmps, IResourceSearchService rss, ResourceServiceViewModel service)

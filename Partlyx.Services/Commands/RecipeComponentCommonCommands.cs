@@ -209,4 +209,23 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
             });
         }
     }
+
+    public class SetRecipeComponentSelectedRecipe : SetValueUndoableCommand<Guid?>
+    {
+        private SetRecipeComponentSelectedRecipe(Guid? newRecipe, Guid? previousRecipe, Func<Guid?, Task> setter)
+            : base(newRecipe, previousRecipe, setter) { }
+
+        public static async Task<SetRecipeComponentSelectedRecipe?> CreateAsync(IServiceProvider serviceProvider, Guid grandParentResourceUid, Guid recipeComponentUid, Guid? newSelectedRecipeUid)
+        {
+            var recipeComponentService = serviceProvider.GetRequiredService<IRecipeComponentService>();
+            var component = await recipeComponentService.GetComponentAsync(grandParentResourceUid, recipeComponentUid);
+            if (component == null)
+                throw new ArgumentException("Component not found with Uid: " + recipeComponentUid);
+
+            return new SetRecipeComponentSelectedRecipe(newSelectedRecipeUid, component.ResourceUid, async (value) =>
+            {
+                await recipeComponentService.SetResourceSelectedRecipeAsync(grandParentResourceUid, recipeComponentUid, value);
+            });
+        }
+    }
 }

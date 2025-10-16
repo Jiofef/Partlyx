@@ -26,5 +26,6 @@ namespace Partlyx.Infrastructure.Data.Interfaces
         Task<TResult> ExecuteWithBatchAsync<TResult>(IEnumerable<Guid>? resourceUids, IEnumerable<Guid>? recipeUids, IEnumerable<Guid>? componentUids, PartsRepository.BatchIncludeOptions? options, Func<PartsRepository.BatchLoadResult, Task<TResult>> action, CancellationToken ct = default);
         Task DeleteRecipeAsync(Guid uid);
         Task DeleteComponentAsync(Guid uid);
+        Task ExecuteWithBatchAsync(IEnumerable<Guid>? resourceUids, IEnumerable<Guid>? recipeUids, IEnumerable<Guid>? componentUids, PartsRepository.BatchIncludeOptions? options, Func<PartsRepository.BatchLoadResult, Task> action, CancellationToken ct = default);
     }
 }

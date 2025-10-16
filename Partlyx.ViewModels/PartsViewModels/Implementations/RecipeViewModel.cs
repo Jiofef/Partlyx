@@ -13,7 +13,7 @@ using System.Xml.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public partial class RecipeItemViewModel : UpdatableViewModel<RecipeDto>, IVMPart
+    public partial class RecipeViewModel : UpdatableViewModel<RecipeDto>, IVMPart
     {
         // Services
         private readonly IVMPartsStore _store;
@@ -29,7 +29,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
 
-        public RecipeItemViewModel(RecipeDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm)
+        public RecipeViewModel(RecipeDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
@@ -69,8 +69,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public Guid Uid { get; }
 
-        private GuidLinkedPart<ResourceItemViewModel>? _parentResource;
-        public GuidLinkedPart<ResourceItemViewModel>? LinkedParentResource { get => _parentResource; set => SetProperty(ref _parentResource, value); }
+        private GuidLinkedPart<ResourceViewModel>? _parentResource;
+        public GuidLinkedPart<ResourceViewModel>? LinkedParentResource { get => _parentResource; set => SetProperty(ref _parentResource, value); }
 
         private string _name;
         public string Name { get => _name; set => SetProperty(ref _name, value); }
@@ -78,9 +78,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private double _craftAmount;
         public double CraftAmount { get => _craftAmount; set => SetProperty(ref _craftAmount, value); }
 
-        private ObservableCollection<RecipeComponentItemViewModel> _components = new();
+        private ObservableCollection<RecipeComponentViewModel> _components = new();
 
-        public ObservableCollection<RecipeComponentItemViewModel> Components { get => _components; } // Updates locally when component is created/removed
+        public ObservableCollection<RecipeComponentViewModel> Components { get => _components; } // Updates locally when component is created/removed
 
 
         // Info updating
@@ -139,7 +139,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
 
         /// <summary> Used when new DB is initialized and we need to connect created VM parts to each other </summary>
-        internal void InitAddChild(RecipeComponentItemViewModel component)
+        internal void InitAddChild(RecipeComponentViewModel component)
         {
             Components.Add(component);
         }

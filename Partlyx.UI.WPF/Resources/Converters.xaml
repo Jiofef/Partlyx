@@ -3,6 +3,7 @@
                     xmlns:conv="clr-namespace:Partlyx.UI.WPF.Converters">
     
     <BooleanToVisibilityConverter x:Key="BoolToVisConv"/>
+    <conv:InverseBooleanToVisibilityConverter x:Key="BoolToSelectionModeConv"/>
     <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConv"/>
     <conv:SelectedEqualsConverter x:Key="SelectedEqualsConv"/>
 </ResourceDictionary>

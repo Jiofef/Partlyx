@@ -18,6 +18,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             var r = await db.Resources
                 .Include(x => x.Recipes)
                 .ThenInclude(rc => rc.Components)
+                .ThenInclude(c => c.ComponentResource)
                 .FirstOrDefaultAsync(x => x.Uid == resourceUid);
 
             if (r == null) throw ResourceNotFound(resourceUid);
@@ -47,6 +48,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             var resource = await db.Resources
                 .Include(r => r.Recipes)
                 .ThenInclude(rc => rc.Components)
+                .ThenInclude(c => c.ComponentResource)
                 .FirstOrDefaultAsync(r => r.Uid == resourceUid);
 
             if (resource == null) throw ResourceNotFound(resourceUid);
@@ -79,6 +81,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             var resource = await db.Resources
                 .Include(r => r.Recipes)
                 .ThenInclude(rc => rc.Components)
+                .ThenInclude(c => c.ComponentResource)
                 .FirstOrDefaultAsync(r => r.Uid == resourceUid);
 
             if (resource == null) throw ResourceNotFound(resourceUid);

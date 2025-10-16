@@ -2,61 +2,91 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
+             xmlns:help="clr-namespace:Partlyx.UI.WPF.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:graphvm="clr-namespace:Partlyx.ViewModels.Graph;assembly=Partlyx.ViewModels"
-             xmlns:local="clr-namespace:Partlyx.UI.WPF.OtherControls"
+             xmlns:local="clr-namespace:Partlyx.UI.WPF"
+             xmlns:localo="clr-namespace:Partlyx.UI.WPF.OtherControls"
              xmlns:zoom="https://github.com/Moravuscz/WPFZoomPanel"
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{StaticResource PxWhiteBrush}">
-    <zoom:ZoomPanelScrollViewer ScrollZoomModifier="" ZoomAndPanInitialPosition="FitScreen" PanningMode="Both" Background="Transparent" ViewportZoom="0.9" BorderBrush="Transparent">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <!-- edges behind -->
-            <ItemsControl ItemsSource="{Binding Edges}" Height="2000" Width="2000">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <local:FromToLineControl From="{Binding From}" To="{Binding To}" Brush="{StaticResource PxBlackBrush}" LineThickness="2"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <!-- nodes on top -->
-            <ItemsControl ItemsSource="{Binding Nodes}">
-                <ItemsControl.Resources>
-                    <DataTemplate DataType="{x:Type graphvm:RecipeGraphNodeViewModel}">
-                        <Border Width="{Binding Width}" Height="{Binding Height}" CornerRadius="4" Padding="2" Background="{StaticResource PxWhiteBrush}"
-                            BorderBrush="{StaticResource PxGrayBrush}" BorderThickness="3">
-                            <StackPanel VerticalAlignment="Center" Orientation="Vertical">
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.ColumnText}"/>
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.SecondaryColumnText}"/>
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type graphvm:ComponentGraphNodeViewModel}">
-                        <Border Width="{Binding Width}" Height="{Binding Height}" CornerRadius="4" Padding="2" Background="{StaticResource PxWhiteBrush}"
-                            BorderBrush="{StaticResource PxGrayBrush}" BorderThickness="3">
-                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.ColumnText}"/>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.Resources>
-                
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+             Background="{StaticResource PxWhiteBrush}"
+             x:Name="Root">
+    <Grid help:SizeObserver.Observe="True" help:SizeObserver.BindableWidth="{Binding PanAndZoomController.ElementWidth}" help:SizeObserver.BindableHeight="{Binding PanAndZoomController.ElementHeight}"
+          help:SizeObserver.SizeChangedCommand="{Binding CenterizePanPositionCommand}"
+          help:SizeObserver.OneShotCommand="True">
+        <localo:ZoomPanControl PanPositionX="{Binding PanAndZoomController.PanPositionX, Mode=TwoWay}" PanPositionY="{Binding PanAndZoomController.PanPositionY, Mode=TwoWay}" 
+                               ZoomLevel="{Binding PanAndZoomController.ZoomLevel, Mode=TwoWay}">
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <!-- edges behind -->
+                <ItemsControl ItemsSource="{Binding Edges}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <localo:FromToLineControl From="{Binding From}" To="{Binding To}" Brush="{StaticResource PxBlackBrush}" LineThickness="2"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <!-- nodes on top -->
+                <ItemsControl ItemsSource="{Binding Nodes}">
+                    <ItemsControl.Resources>
+                        <DataTemplate DataType="{x:Type graphvm:RecipeGraphNodeViewModel}">
+                            <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
+                            BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2" VerticalContentAlignment="Stretch">
+                                <Grid VerticalAlignment="Stretch">
+                                    <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
+                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.ColumnText}"/>
+                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.SecondaryColumnText}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type graphvm:ComponentGraphNodeViewModel}">
+                            <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
+                                BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2"
+                                    Command="{Binding Value.UiNode.SetNextSelectedRecipeCommand }" VerticalContentAlignment="Stretch">
+                                <Grid VerticalAlignment="Stretch">
+                                    <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
+                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.BottomColumnText}"/>
+                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.ColumnText}"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Button.ContextMenu>
+                                    <ContextMenu Style="{StaticResource MaterialDesignMenu}">
+                                        <MenuItem Header="Select in tree" Style="{StaticResource CommonMenuItem}"/>
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.Resources>
 
-                <ItemsControl.ItemContainerStyle>
-                    <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left" Value="{Binding X}" />
-                        <Setter Property="Canvas.Top"  Value="{Binding Y}" />
-                    </Style>
-                </ItemsControl.ItemContainerStyle>
-            </ItemsControl>
-        </Grid>
-    </zoom:ZoomPanelScrollViewer>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left" Value="{Binding X}" />
+                            <Setter Property="Canvas.Top"  Value="{Binding Y}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+            </Grid>
+        </localo:ZoomPanControl>
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
+            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding CenterizePanPositionCommand}">
+                <fa:ImageAwesome Icon="Home" Foreground="{StaticResource PxBlackBrush}" Width="32" Height="32" Margin="4"/>
+            </Button>
+        </StackPanel>
+    </Grid>
 </UserControl>
