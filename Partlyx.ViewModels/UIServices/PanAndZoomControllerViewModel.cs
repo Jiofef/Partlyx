@@ -31,7 +31,13 @@ namespace Partlyx.ViewModels.UIServices
         }
 
         private double _zoomLevel;
-        public double ZoomLevel { get => _zoomLevel; set => SetProperty(ref _zoomLevel, value); }
+        public double ZoomLevel { get => _zoomLevel; set => SetProperty(ref _zoomLevel, Math.Clamp(value, _minZoom, _maxZoom)); }
+
+        private double _minZoom = 0.1;
+        public double MinZoom { get => _minZoom; set => SetProperty(ref _minZoom, value); }
+
+        private double _maxZoom = 10;
+        public double MaxZoom { get => _maxZoom; set => SetProperty(ref _maxZoom, value); }
 
         public void CenterizePanPosition(Point where)
         {

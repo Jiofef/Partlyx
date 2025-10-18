@@ -10,10 +10,10 @@ namespace Partlyx.Services.ServiceImplementations
 {
     public class ResourceService : IResourceService
     {
-        private readonly IPartsRepository _repo;
+        private readonly IPartlyxRepository _repo;
         private readonly IEventBus _eventBus;
         private readonly IIconInfoProvider _infoProvider;
-        public ResourceService(IPartsRepository repo, IEventBus bus, IIconInfoProvider iip)
+        public ResourceService(IPartlyxRepository repo, IEventBus bus, IIconInfoProvider iip)
         {
             _repo = repo;
             _eventBus = bus;
@@ -27,7 +27,7 @@ namespace Partlyx.Services.ServiceImplementations
             var iconInfo = _infoProvider.GetInfo(icon);
             resource.SetIcon(icon, iconInfo);
             
-            var Uid = await _repo.AddAsync(resource);
+            var Uid = await _repo.AddResourceAsync(resource);
 
             _eventBus.Publish(new ResourceCreatedEvent(resource.ToDto()));
 
@@ -35,7 +35,7 @@ namespace Partlyx.Services.ServiceImplementations
         }
         public async Task<Guid> DuplicateResourceAsync(Guid uid)
         {
-            var duplicateUid = await _repo.DuplicateAsync(uid);
+            var duplicateUid = await _repo.DuplicateResourceAsync(uid);
 
             var resource = await GetResourceAsync(uid);
             if (resource != null)
@@ -53,7 +53,7 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task<ResourceDto?> GetResourceAsync(Guid uid)
         {
-            var resource = await _repo.GetByUidAsync(uid);
+            var resource = await _repo.GetResourceByUidAsync(uid);
 
             return resource == null ? null : resource.ToDto();
         }
@@ -69,7 +69,7 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task<List<ResourceDto>> SearchResourcesAsync(string query)
         {
-            var resourcesList = await _repo.SearchAsync(query);
+            var resourcesList = await _repo.SearchResourcesAsync(query);
             var resourcesDtoList = resourcesList.Select(x => x.ToDto()).ToList();
 
             return resourcesDtoList;
@@ -77,7 +77,7 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task<List<Guid>> SearchResourcesUidsAsync(string query)
         {
-            var resourcesList = await _repo.SearchAsync(query);
+            var resourcesList = await _repo.SearchResourcesAsync(query);
             var resourcesUids = resourcesList.Select(x => x.Uid).ToList();
 
             return resourcesUids;

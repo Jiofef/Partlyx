@@ -111,5 +111,14 @@ namespace Partlyx.ViewModels.UIStates
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();
         }
+
+        [RelayCommand]
+        public void FindResourceInTree()
+        {
+            var resource = _componentVM.LinkedResource?.Value;
+            if (resource == null) return;
+
+            resource.UiItem.FindInTree();
+        }
     }
 }

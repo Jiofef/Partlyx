@@ -8,7 +8,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
     public class CreateRecipeComponentCommand : IUndoableCommand
     {
         private IRecipeComponentService _recipeComponentService;
-        private IPartsRepository _resourceRepository;
+        private IPartlyxRepository _resourceRepository;
 
         private Guid _resourceUid;
         private Guid _recipeUid;
@@ -19,7 +19,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         private RecipeComponent? _createdRecipeComponent;
 
         public CreateRecipeComponentCommand(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid, 
-            IRecipeComponentService rcs, IPartsRepository rr)
+            IRecipeComponentService rcs, IPartlyxRepository rr)
         {
             _recipeComponentService = rcs;
             _resourceRepository = rr;
@@ -33,7 +33,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
             Guid uid = await _recipeComponentService.CreateComponentAsync(_resourceUid, _recipeUid, _componentResourceUid);
             RecipeComponentUid = uid;
 
-            var resource = await _resourceRepository.GetByUidAsync(_resourceUid);
+            var resource = await _resourceRepository.GetResourceByUidAsync(_resourceUid);
             var recipe = resource?.GetRecipeByUid(_recipeUid);
             _createdRecipeComponent = recipe?.GetRecipeComponentByUid(RecipeComponentUid);
         }
@@ -62,7 +62,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
     public class DeleteRecipeComponentCommand : IUndoableCommand
     {
         private IRecipeComponentService _recipeComponentService;
-        private IPartsRepository _resourceRepository;
+        private IPartlyxRepository _resourceRepository;
 
         private Guid _resourceUid;
         private Guid _recipeUid;
@@ -71,7 +71,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         private RecipeComponent? _deletedRecipeComponent;
 
         public DeleteRecipeComponentCommand(Guid grandParentResourceUid, Guid parentRecipeUid, Guid recipeComponentUid,
-            IRecipeComponentService rcs, IPartsRepository rr)
+            IRecipeComponentService rcs, IPartlyxRepository rr)
         {
             _recipeComponentService = rcs;
             _resourceRepository = rr;
@@ -83,7 +83,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
 
         public async Task ExecuteAsync()
         {
-            var resource = await _resourceRepository.GetByUidAsync(_resourceUid);
+            var resource = await _resourceRepository.GetResourceByUidAsync(_resourceUid);
 
             if (resource == null)
                 throw new ArgumentNullException(nameof(resource));

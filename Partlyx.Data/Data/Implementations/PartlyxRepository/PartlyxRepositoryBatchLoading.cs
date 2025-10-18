@@ -6,7 +6,7 @@ using Partlyx.Infrastructure.Events;
 
 namespace Partlyx.Infrastructure.Data.Implementations
 {
-    public partial class PartsRepository : IPartsRepository
+    public partial class PartlyxRepository : IPartlyxRepository
     {
         // Returns the found entities, as well as a list of not found uid
         public record BatchLoadResult

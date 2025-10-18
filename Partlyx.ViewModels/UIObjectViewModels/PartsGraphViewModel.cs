@@ -155,18 +155,6 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             }
         }
 
-        [RelayCommand]
-        public void CenterizePanPosition()
-        {
-            PanAndZoomController.CenterizePanPosition(RootNodeDefaultPosition);
-        }
-
-        [RelayCommand]
-        public void CallSearchFromPart(IVMPart part)
-        {
-
-        }
-
         private void AddNode(GraphTreeNodeViewModel node)
         {
             Nodes.Add(node);
@@ -189,6 +177,25 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _componentAddedSubscription.Dispose();
             _componentRemovedSubscription.Dispose();
             _componentMovedSubscription.Dispose();
+        }
+
+        // Commands
+        [RelayCommand]
+        public void CenterizePanPosition()
+        {
+            PanAndZoomController.CenterizePanPosition(RootNodeDefaultPosition);
+        }
+
+        [RelayCommand]
+        public void ZoomIn()
+        {
+            PanAndZoomController.ZoomLevel *= 1.5;
+        }
+
+        [RelayCommand]
+        public void ZoomOut()
+        {
+            PanAndZoomController.ZoomLevel /= 1.5;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Partlyx.Tests.InfrastructureTests
             {
                 services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
                 services.AddSingleton<IEventBus, EventBus>();
-                services.AddTransient<IPartsRepository, PartsRepository>();
+                services.AddTransient<IPartlyxRepository, PartlyxRepository>();
                 services.AddTransient<IResourceService, ResourceService>();
                 services.AddTransient<IPartUpdater, PartUpdater>();
 

@@ -15,6 +15,11 @@
         WindowState="Maximized"
         Background="{StaticResource PxWhiteBrush}">
 
+    <Window.InputBindings>
+        <KeyBinding Gesture="CTRL+S" Command="{Binding MenuPanel.FileMenu.SaveProjectCommand}"/>
+        <KeyBinding Gesture="CTRL+SHIFT+S" Command="{Binding MenuPanel.FileMenu.SaveProjectAsCommand}"/>
+    </Window.InputBindings>
+
     <Grid>
         <Grid>
             <Grid.RowDefinitions>
@@ -57,7 +62,4 @@
         <md:DialogHost Identifier="RootDialog" CloseOnClickAway="False" DialogContentTemplateSelector="{StaticResource WindowDialogsTemplateSelector}">
         </md:DialogHost>
     </Grid>
-
-
-
 </Window>

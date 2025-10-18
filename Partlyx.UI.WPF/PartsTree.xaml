@@ -19,7 +19,20 @@
                 <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
                 <TextBlock Text="Parts tree" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
             </Grid>
-            <StackPanel Orientation="Horizontal" Margin="4, 2, 4, 2">
+            <Grid Margin="8, 2, 4, 2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Style="{StaticResource CommonSearchTextBox}"
+                     md:HintAssist.Hint="Search..." Grid.Row="0"
+                     Text="{Binding Search.SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Grid.Column="1" Style="{StaticResource BaseButtonStyle}" Width="32" Height="32" Command="{Binding ClearSearchCommand}" 
+                        ToolTip="Clear search text">
+                    <fa:ImageAwesome Icon="Remove" Style="{StaticResource BaseImageAwesomeStyle}" Height="16"/>
+                </Button>
+            </Grid>
+            <StackPanel Orientation="Horizontal" Margin="8, 2, 4, 2">
                 <Button Style="{StaticResource BaseButtonStyle}" Width="32" ToolTip="Expand all" Command="{Binding ExpandAllCommand}">
                     <fa:ImageAwesome Icon="AngleDoubleDown" Foreground="{StaticResource PxBlackBrush}" Width="16"/>
                 </Button>
@@ -27,10 +40,6 @@
                     <fa:ImageAwesome Icon="AngleDoubleUp" Foreground="{StaticResource PxBlackBrush}" Width="16"/>
                 </Button>
             </StackPanel>
-            <TextBox Style="{StaticResource CommonSearchTextBox}"
-                     md:HintAssist.Hint="Search..." Grid.Row="0"
-                     Text="{Binding Search.SearchText, UpdateSourceTrigger=PropertyChanged}"
-                     Margin="8, 4, 8, 4"/>
         </StackPanel>
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">

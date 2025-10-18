@@ -12,14 +12,14 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
     {
         private readonly IRecipeService _recipeService;
         private readonly IResourceService _resourceService;
-        private readonly IPartsRepository _resourceRepository;
+        private readonly IPartlyxRepository _resourceRepository;
 
         private Guid _resourceUid;
         public Guid RecipeUid { get; private set; }
 
         private Recipe? _createdRecipe;
 
-        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceService rs2, IPartsRepository rr)
+        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceService rs2, IPartlyxRepository rr)
         {
             _recipeService = rs;
             _resourceService = rs2;
@@ -31,7 +31,7 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
         {
             Guid uid = await _recipeService.CreateRecipeAsync(_resourceUid);
             RecipeUid = uid;
-            var resource = await _resourceRepository.GetByUidAsync(_resourceUid);
+            var resource = await _resourceRepository.GetResourceByUidAsync(_resourceUid);
             _createdRecipe = resource?.GetRecipeByUid(uid);
         }
 
@@ -63,14 +63,14 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
     {
         private readonly IRecipeService _recipeService;
         private readonly IResourceService _resourceService;
-        private readonly IPartsRepository _resourceRepository;
+        private readonly IPartlyxRepository _resourceRepository;
 
         private Guid _resourceUid;
         public Guid RecipeUid { get; private set; }
 
         private Recipe? _deletedRecipe;
 
-        public DeleteRecipeCommand(Guid parentResourceUid, Guid recipeUid, IRecipeService rs, IResourceService rs2, IPartsRepository rr)
+        public DeleteRecipeCommand(Guid parentResourceUid, Guid recipeUid, IRecipeService rs, IResourceService rs2, IPartlyxRepository rr)
         {
             _recipeService = rs;
             _resourceService = rs2;
@@ -82,7 +82,7 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
 
         public async Task ExecuteAsync()
         {
-            var resource = await _resourceRepository.GetByUidAsync(_resourceUid);
+            var resource = await _resourceRepository.GetResourceByUidAsync(_resourceUid);
 
             if (resource == null) 
                 throw new ArgumentNullException(nameof(resource));

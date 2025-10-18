@@ -8,13 +8,13 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
     public class CreateResourceCommand : IUndoableCommand
     {
         private IResourceService _resourceService;
-        private IPartsRepository _resourceRepository;
+        private IPartlyxRepository _resourceRepository;
 
         public Guid ResourceUid { get; private set; }
 
         private Resource? _createdResource;
 
-        public CreateResourceCommand(IResourceService rs, IPartsRepository rr)
+        public CreateResourceCommand(IResourceService rs, IPartlyxRepository rr)
         {
             _resourceService = rs;
             _resourceRepository = rr;
@@ -24,7 +24,7 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
         {
             Guid uid = await _resourceService.CreateResourceAsync();
             ResourceUid = uid;
-            _createdResource = await _resourceRepository.GetByUidAsync(uid);
+            _createdResource = await _resourceRepository.GetResourceByUidAsync(uid);
         }
 
         public async Task UndoAsync()
@@ -37,20 +37,20 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
         {
             if (_createdResource == null) return;
 
-            await _resourceRepository.AddAsync(_createdResource);
+            await _resourceRepository.AddResourceAsync(_createdResource);
         }
     }
 
     public class DeleteResourceCommand : IUndoableCommand
     {
         private IResourceService _resourceService;
-        private IPartsRepository _resourceRepository;
+        private IPartlyxRepository _resourceRepository;
 
         public Guid DeletedResourceUid { get; private set; }
 
         private Resource? _deletedResource;
 
-        public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IPartsRepository rr)
+        public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IPartlyxRepository rr)
         {
             DeletedResourceUid = resourceUid;
             _resourceService = rs;
@@ -59,7 +59,7 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
 
         public async Task ExecuteAsync()
         {
-            _deletedResource = await _resourceRepository.GetByUidAsync(DeletedResourceUid);
+            _deletedResource = await _resourceRepository.GetResourceByUidAsync(DeletedResourceUid);
             await _resourceService.DeleteResourceAsync(DeletedResourceUid);
         }
 
@@ -67,7 +67,7 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
         {
             if (_deletedResource == null) return;
 
-            await _resourceRepository.AddAsync(_deletedResource);
+            await _resourceRepository.AddResourceAsync(_deletedResource);
             _deletedResource = null;
         }
     }

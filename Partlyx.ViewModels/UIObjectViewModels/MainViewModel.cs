@@ -1,6 +1,7 @@
 ﻿using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices;
+using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -54,8 +55,10 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _cleaner = vmpsc;
         }
 
+        private const bool DISABLE_DB_DELETE_ON_EXIT = true; // During development, it is inconvenient to reopen the file every time you restart. However, don't forget to disable this when releasing the application.
         public async Task<bool> ConfirmClosingAsync()
         {
+            // Saving changes notification
             if (!_fileService.IsChangesSaved)
             {
                 bool? questionResult = await _notificationService.ShowYesNoCancelConfirmAsync(NotificationPresets.ExitingFileSaveConfirm);
@@ -69,10 +72,14 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 else if (questionResult == null)// If answer is Cancel
                     return false;
 
-                // If answer is No, we just close the app
+                // If answer is No, we delete DB and close the app
+                if (!DISABLE_DB_DELETE_ON_EXIT)
+                    await _fileService.DeleteWorkingDBAsync();
                 return true;
             }
 
+            if (!DISABLE_DB_DELETE_ON_EXIT)
+                await _fileService.DeleteWorkingDBAsync();
             return true;
         }
         public Task OnAppClosingAsync()

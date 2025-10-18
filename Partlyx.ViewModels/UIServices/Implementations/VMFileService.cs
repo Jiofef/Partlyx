@@ -46,6 +46,11 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             await _fileService.ClearCurrentFile();
         }
 
+        public async Task DeleteWorkingDBAsync()
+        {
+            await _fileService.DeleteWorkingDB();
+        }
+
         public async Task<bool> SaveProjectAsync()
         {
             var lastExportDir = _fileService.CurrentPartreePath;

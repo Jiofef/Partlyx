@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.UIObjectViewModels
 {
-    public record TreeSearchQueryEvent(string queryText);
+    public record TreeSearchQueryEvent(string queryText, PartTypeEnumVM? searchablePartType = null);
 
     public partial class PartsTreeViewModel
     {
@@ -98,6 +98,16 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         private void SearchQueryHandler(TreeSearchQueryEvent ev)
         {
+            switch (ev.searchablePartType)
+            {
+                case PartTypeEnumVM.Recipe:
+                    ExpandAllTheResources();
+                    break;
+                default:
+                    ExpandAll();
+                    break;
+            }
+
             Search.SearchText = ev.queryText;
         }
 
@@ -105,6 +115,41 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public void CallSearch(string queryText)
         {
             Search.SearchText = queryText;
+        }
+
+        [RelayCommand]
+        public void ClearSearch()
+        {
+            if (Search.SearchText == string.Empty) return;
+
+            CollapseAll();
+            Search.SearchText = string.Empty;
+        }
+
+        [RelayCommand]
+        public void ExpandAllTheResources()
+        {
+            var ev = new SetAllTheResourceItemsExpandedEvent(true);
+            _bus.Publish(ev);
+        }
+        [RelayCommand]
+        public void CollapseAllTheResources()
+        {
+            var ev = new SetAllTheResourceItemsExpandedEvent(false);
+            _bus.Publish(ev);
+        }
+
+        [RelayCommand]
+        public void ExpandAllTheRecipes()
+        {
+            var ev = new SetAllTheRecipeItemsExpandedEvent(true);
+            _bus.Publish(ev);
+        }
+        [RelayCommand]
+        public void CollapseAllTheRecipes()
+        {
+            var ev = new SetAllTheRecipeItemsExpandedEvent(false);
+            _bus.Publish(ev);
         }
 
         [RelayCommand]

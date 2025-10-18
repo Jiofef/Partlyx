@@ -17,7 +17,7 @@ namespace Partlyx.Tests
         {
             _provider = fixture.CreateProvider( services =>
             {
-                services.AddTransient<IPartsRepository, PartsRepository>();
+                services.AddTransient<IPartlyxRepository, PartlyxRepository>();
             });
         }
         public void Dispose() => _provider.Dispose();
@@ -26,12 +26,12 @@ namespace Partlyx.Tests
         public async Task CreateAndGetResourceAsync_CreateEmptyResource_GetItFromDBAndCheckCorrectness()
         {
             // Arrange
-            var resourceRepo = _provider.GetRequiredService<IPartsRepository>();
+            var resourceRepo = _provider.GetRequiredService<IPartlyxRepository>();
             var resource = new Resource("SomeResource");
 
             // Act
-            Guid resourceUid = await resourceRepo.AddAsync(resource);
-            var dbResource = await resourceRepo.GetByUidAsync(resourceUid);
+            Guid resourceUid = await resourceRepo.AddResourceAsync(resource);
+            var dbResource = await resourceRepo.GetResourceByUidAsync(resourceUid);
 
             // Assert
             Assert.NotNull(dbResource);

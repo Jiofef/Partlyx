@@ -13,7 +13,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
     {
         private readonly IDBSaver _saver;
         private readonly IDBLoader _loader;
-        private readonly IPartsRepository _repo;
+        private readonly IPartlyxRepository _repo;
 
         private readonly IEventBus _bus;
 
@@ -23,7 +23,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
         // Will be needed if we need to return the IsChangesSaved when Undo until saved
         private ICommand? _lastExcecutedCommand;
 
-        public FileService(IDBSaver dbs, IDBLoader dbl, IPartsRepository repo, IEventBus bus)
+        public FileService(IDBSaver dbs, IDBLoader dbl, IPartlyxRepository repo, IEventBus bus)
         {
             _saver = dbs;
             _loader = dbl;
@@ -58,6 +58,11 @@ namespace Partlyx.Infrastructure.Data.Implementations
             IsChangesSaved = false;
 
             OnSelectedFileChanged(null);
+        }
+
+        public async Task DeleteWorkingDB()
+        {
+            await _repo.DeleteWorkingDBFile();
         }
 
         public async Task<ExportResult> ExportPartreeAsync(string targetPath, CancellationToken cancellationToken = default)

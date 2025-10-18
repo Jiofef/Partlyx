@@ -8,6 +8,7 @@ namespace Partlyx.Services.ServiceInterfaces
         bool IsChangesSaved { get; }
 
         Task ClearCurrentFile();
+        Task DeleteWorkingDB();
         Task<ExportResult> ExportPartreeAsync(string targetPath, CancellationToken cancellationToken = default);
         Task<ImportResult> ImportPartreeAsync(string partreePath, CancellationToken cancellationToken = default);
     }

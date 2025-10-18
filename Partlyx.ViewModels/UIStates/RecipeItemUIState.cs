@@ -5,18 +5,22 @@ using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIStates;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 
 namespace Partlyx.ViewModels
 {
     public partial class RecipeItemUIState : PartItemUIState
     {
+        private readonly IEventBus _bus;
         private readonly PartsServiceViewModel _services;
         private readonly RecipeViewModel _recipeVM;
 
         public RecipeItemUIState(RecipeViewModel vm, PartsServiceViewModel cvm, IEventBus bus) 
         {
+            _bus = bus;
             _services = cvm;
 
             _recipeVM = vm;
@@ -66,6 +70,14 @@ namespace Partlyx.ViewModels
         public void CollapseBranch()
         {
             IsExpanded = false;
+        }
+
+        [RelayCommand]
+        public void FindInTree()
+        {
+            var query = _recipeVM.Name;
+            var ev = new TreeSearchQueryEvent(query, PartTypeEnumVM.Recipe);
+            _bus.Publish(ev);
         }
     }
 }

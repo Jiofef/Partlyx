@@ -5,6 +5,8 @@ using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIStates;
 
@@ -12,11 +14,13 @@ namespace Partlyx.ViewModels
 {
     public partial class ResourceItemUIState : PartItemUIState
     {
+        private readonly IEventBus _bus;
         private readonly PartsServiceViewModel _services;
         private readonly ResourceViewModel _resourceVM;
 
         public ResourceItemUIState(ResourceViewModel vm, PartsServiceViewModel svm, IEventBus bus)
         {
+            _bus = bus;
             _services = svm;
 
             _resourceVM = vm;
@@ -72,6 +76,14 @@ namespace Partlyx.ViewModels
 
             foreach (var child in _resourceVM.Recipes)
                 child.UiItem.CollapseBranch();
+        }
+
+        [RelayCommand]
+        public void FindInTree()
+        {
+            var query = _resourceVM.Name;
+            var ev = new TreeSearchQueryEvent(query, PartTypeEnumVM.Resource);
+            _bus.Publish(ev);
         }
     }
 }

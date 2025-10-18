@@ -4,6 +4,7 @@ using DynamicData.Binding;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices.Implementations;
 using ReactiveUI;
 
@@ -72,6 +73,21 @@ namespace Partlyx.ViewModels
         {
             foreach(var subscription in _subscriptions)
                 subscription.Dispose();
+        }
+
+        [RelayCommand]
+        public void FindInTree()
+        {
+            _recipeVM.UiItem.FindInTree();
+        }
+
+        [RelayCommand]
+        public void FindResourceInTree()
+        {
+            var resource = _recipeVM.LinkedParentResource?.Value;
+            if (resource == null) return;
+
+            resource.UiItem.FindInTree();
         }
     }
 }

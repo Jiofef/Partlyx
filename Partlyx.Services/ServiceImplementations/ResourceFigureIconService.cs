@@ -9,10 +9,10 @@ namespace Partlyx.Services.ServiceImplementations
 {
     public class ResourceFigureIconService : IResourceFigureIconService
     {
-        private readonly IPartsRepository _repo;
+        private readonly IPartlyxRepository _repo;
         private readonly IEventBus _eventBus;
         private readonly IIconInfoProvider _infoProvider;
-        public ResourceFigureIconService(IPartsRepository repo, IEventBus bus, IIconInfoProvider iip)
+        public ResourceFigureIconService(IPartlyxRepository repo, IEventBus bus, IIconInfoProvider iip)
         {
             _repo = repo;
             _eventBus = bus;

@@ -9,11 +9,14 @@ namespace Partlyx.ViewModels.UIStates
 {
     public partial class RecipeComponentItemUIState : PartItemUIState
     {
+        private readonly IEventBus _bus;
         private readonly PartsServiceViewModel _services;
+
         private readonly RecipeComponentViewModel _componentVM;
 
         public RecipeComponentItemUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm, IEventBus bus)
         {
+            _bus = bus;
             _services = svm;
 
             _componentVM = vm;
@@ -22,6 +25,15 @@ namespace Partlyx.ViewModels.UIStates
             Subscriptions.Add(expandAllPartItemsSubscription);
             var expandAllRecipeComponentItemsSubscription = bus.Subscribe<SetAllTheRecipeComponentItemsExpandedEvent>(ev => SetExpanded(ev.expand));
             Subscriptions.Add(expandAllRecipeComponentItemsSubscription);
+        }
+
+        [RelayCommand]
+        public void FindResourceInTree()
+        {
+            var resource = _componentVM.LinkedResource?.Value;
+            if (resource == null) return;
+
+            resource.UiItem.FindInTree();
         }
     }
 }

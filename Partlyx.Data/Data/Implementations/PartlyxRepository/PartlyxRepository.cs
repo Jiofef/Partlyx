@@ -6,18 +6,18 @@ using Partlyx.Infrastructure.Events;
 
 namespace Partlyx.Infrastructure.Data.Implementations
 {
-    public partial class PartsRepository : IPartsRepository
+    public partial class PartlyxRepository : IPartlyxRepository
     {
         private readonly IDbContextFactory<PartlyxDBContext> _dbFactory;
         private readonly IEventBus _bus;
-        public PartsRepository(IDbContextFactory<PartlyxDBContext> dbFactory, IEventBus bus)
+        public PartlyxRepository(IDbContextFactory<PartlyxDBContext> dbFactory, IEventBus bus)
         {
             _dbFactory = dbFactory;
             _bus = bus;
         }
 
 
-        public async Task<Guid> AddAsync(Resource resource)
+        public async Task<Guid> AddResourceAsync(Resource resource)
         {
             await using var db = _dbFactory.CreateDbContext();
 
@@ -26,7 +26,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             return resource.Uid;
         }
 
-        public async Task<Guid> DuplicateAsync(Guid uid)
+        public async Task<Guid> DuplicateResourceAsync(Guid uid)
         {
             await using var db = _dbFactory.CreateDbContext();
 
@@ -90,7 +90,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
         /// <summary>
         /// Important note. If you want to change the state of the received Resource or its descendants, use one of "ExecuteOn___Async" instead so that your changes are saved correctly.
         /// </summary>
-        public async Task<Resource?> GetByUidAsync(Guid uid)
+        public async Task<Resource?> GetResourceByUidAsync(Guid uid)
         {
             await using var db = _dbFactory.CreateDbContext();
 
@@ -104,7 +104,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             return r;
         }
 
-        public async Task<List<Resource>> SearchAsync(string query)
+        public async Task<List<Resource>> SearchResourcesAsync(string query)
         {
             await using var db = _dbFactory.CreateDbContext();
 
@@ -167,6 +167,15 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await db.Database.EnsureCreatedAsync();
 
             _bus.Publish(new FileClearedEvent());
+        }
+
+        /// <summary>!!!!!</summary>
+        public async Task DeleteWorkingDBFile()
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            // Closing connection
+            await db.Database.EnsureDeletedAsync();
         }
     }
 }

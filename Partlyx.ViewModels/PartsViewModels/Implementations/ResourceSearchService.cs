@@ -21,7 +21,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             if (o is not ResourceViewModel rItem) return false;
             if (string.IsNullOrWhiteSpace(SearchText)) return true;
-            return rItem.Name?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) == true;
+            return rItem.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) == true
+                || rItem.Recipes.Any(rc => rc.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) == true)
+                || rItem.Recipes.Any(rc => rc.Components.Any(c => c.LinkedResource?.Value != null && c.LinkedResource.Value.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)));
         };
 
         partial void OnSearchTextChanged(string? oldValue, string newValue)

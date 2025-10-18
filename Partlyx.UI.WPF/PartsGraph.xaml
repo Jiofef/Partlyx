@@ -19,7 +19,9 @@
           help:SizeObserver.SizeChangedCommand="{Binding CenterizePanPositionCommand}"
           help:SizeObserver.OneShotCommand="True">
         <localo:ZoomPanControl PanPositionX="{Binding PanAndZoomController.PanPositionX, Mode=TwoWay}" PanPositionY="{Binding PanAndZoomController.PanPositionY, Mode=TwoWay}" 
-                               ZoomLevel="{Binding PanAndZoomController.ZoomLevel, Mode=TwoWay}">
+                               ZoomLevel="{Binding PanAndZoomController.ZoomLevel, Mode=TwoWay}"
+                               MinZoom="{Binding PanAndZoomController.MinZoom}"
+                               MaxZoom="{Binding PanAndZoomController.MaxZoom}">
             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <!-- edges behind -->
                 <ItemsControl ItemsSource="{Binding Edges}">
@@ -46,6 +48,13 @@
                                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.SecondaryColumnText}"/>
                                     </StackPanel>
                                 </Grid>
+
+                                <Button.ContextMenu>
+                                    <ContextMenu Style="{StaticResource MaterialDesignMenu}">
+                                        <MenuItem Header="Find recipe in tree" Command="{Binding Value.UiNode.FindInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
+                                        <MenuItem Header="Find resource in tree" Command="{Binding Value.UiNode.FindResourceInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
+                                    </ContextMenu>
+                                </Button.ContextMenu>
                             </Button>
                         </DataTemplate>
                         <DataTemplate DataType="{x:Type graphvm:ComponentGraphNodeViewModel}">
@@ -58,9 +67,10 @@
                                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.ColumnText}"/>
                                     </StackPanel>
                                 </Grid>
+                                
                                 <Button.ContextMenu>
                                     <ContextMenu Style="{StaticResource MaterialDesignMenu}">
-                                        <MenuItem Header="Find in tree" Style="{StaticResource CommonMenuItem}"/>
+                                        <MenuItem Header="Find in tree" Command="{Binding Value.UiNode.FindResourceInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
                                     </ContextMenu>
                                 </Button.ContextMenu>
                             </Button>
@@ -83,9 +93,16 @@
             </Grid>
         </localo:ZoomPanControl>
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right">
             <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding CenterizePanPositionCommand}" ToolTip="Return to tree root">
-                <fa:ImageAwesome Icon="Home" Foreground="{StaticResource PxBlackBrush}" Width="32" Height="32" Margin="4"/>
+                <fa:ImageAwesome Icon="Home" Foreground="{StaticResource PxBlackBrush}" Width="24" Height="24" Margin="4"/>
+            </Button>
+            <Separator Style="{StaticResource MaterialDesignDarkSeparator}" Height="8"/>
+            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding ZoomInCommand}" ToolTip="Return to tree root">
+                <fa:ImageAwesome Icon="Plus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
+            </Button>
+            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding ZoomOutCommand}" ToolTip="Return to tree root">
+                <fa:ImageAwesome Icon="Minus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
             </Button>
         </StackPanel>
     </Grid>

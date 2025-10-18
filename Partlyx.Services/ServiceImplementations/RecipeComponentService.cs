@@ -10,9 +10,9 @@ namespace Partlyx.Services.ServiceImplementations
 {
     public class RecipeComponentService : IRecipeComponentService
     {
-        private readonly IPartsRepository _repo;
+        private readonly IPartlyxRepository _repo;
         private readonly IEventBus _eventBus;
-        public RecipeComponentService(IPartsRepository repo, IEventBus bus)
+        public RecipeComponentService(IPartlyxRepository repo, IEventBus bus)
         {
             _repo = repo;
             _eventBus = bus;
@@ -20,7 +20,7 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task<Guid> CreateComponentAsync(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid)
         {
-            var batchOptions = new PartsRepository.BatchIncludeOptions() { };
+            var batchOptions = new PartlyxRepository.BatchIncludeOptions() { };
             var result = await _repo.ExecuteWithBatchAsync(
                 [componentResourceUid], [parentRecipeUid], [], batchOptions,
                 batch =>
@@ -90,7 +90,7 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task<RecipeComponentDto?> GetComponentAsync(Guid parentResourceUid, Guid componentUid)
         {
-            var resource = await _repo.GetByUidAsync(parentResourceUid);
+            var resource = await _repo.GetResourceByUidAsync(parentResourceUid);
             if (resource == null) return null;
 
             var component = resource.GetRecipeComponentByUid(componentUid);
@@ -100,7 +100,7 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task<List<RecipeComponentDto>> GetAllTheComponentsAsync(Guid grandParentResourceUid, Guid parentRecipeUid)
         {
-            var resource = await _repo.GetByUidAsync(grandParentResourceUid);
+            var resource = await _repo.GetResourceByUidAsync(grandParentResourceUid);
             if (resource == null) 
                 throw new InvalidOperationException("Resource not found with Uid: " + grandParentResourceUid); ;
 
@@ -129,7 +129,7 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task SetResourceSelectedRecipeAsync(Guid parentResourceUid, Guid componentUid, Guid? recipeToSelectUid)
         {
-            var batchOptions = new PartsRepository.BatchIncludeOptions() { IncludeComponentChildResource = true, IncludeResourcesRecipes = true };
+            var batchOptions = new PartlyxRepository.BatchIncludeOptions() { IncludeComponentChildResource = true, IncludeResourcesRecipes = true };
 
             if (recipeToSelectUid == null)
             {
@@ -166,7 +166,7 @@ namespace Partlyx.Services.ServiceImplementations
         {
             await _repo.ExecuteOnComponentAsync(parentResourceUid, componentUid, async component =>
             {
-                var newComponentResource = await _repo.GetByUidAsync(resourceToSelectUid);
+                var newComponentResource = await _repo.GetResourceByUidAsync(resourceToSelectUid);
 
                 if (newComponentResource == null)
                     throw new InvalidOperationException("Resource not found with Uid: " + resourceToSelectUid);

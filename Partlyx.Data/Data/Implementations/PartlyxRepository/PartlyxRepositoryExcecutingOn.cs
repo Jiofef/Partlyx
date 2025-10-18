@@ -6,7 +6,7 @@ using Partlyx.Infrastructure.Events;
 
 namespace Partlyx.Infrastructure.Data.Implementations
 {
-    public partial class PartsRepository : IPartsRepository
+    public partial class PartlyxRepository : IPartlyxRepository
     {
         InvalidOperationException ResourceNotFound(Guid resourceUid)
              => new InvalidOperationException("Resource not found with Uid: " + resourceUid);

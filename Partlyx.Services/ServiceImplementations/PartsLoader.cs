@@ -16,8 +16,8 @@ namespace Partlyx.Services.ServiceImplementations
     public class PartsLoader : IPartsLoader
     {
         private readonly IEventBus _bus;
-        private readonly IPartsRepository _repo;
-        public PartsLoader(IEventBus bus, IPartsRepository repo)
+        private readonly IPartlyxRepository _repo;
+        public PartsLoader(IEventBus bus, IPartlyxRepository repo)
         {
             _bus = bus;
             _repo = repo;

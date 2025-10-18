@@ -18,7 +18,7 @@ namespace Partlyx.Tests
                 services =>
                 {
                     services.AddTransient<IResourceService, ResourceService>();
-                    services.AddTransient<IPartsRepository, PartsRepository>();
+                    services.AddTransient<IPartlyxRepository, PartlyxRepository>();
                     services.AddSingleton<Infrastructure.Events.IEventBus, Infrastructure.Events.EventBus>();
                 });
         }
@@ -28,7 +28,7 @@ namespace Partlyx.Tests
         public async void CreateAndGetResourceAsync_CreateEmptyResource_CheckItsExistence()
         {
             // Arrange
-            var resourceRepo = _provider.GetRequiredService<IPartsRepository>();
+            var resourceRepo = _provider.GetRequiredService<IPartlyxRepository>();
             var resourceService = _provider.GetRequiredService<IResourceService>();
 
             // Act
@@ -43,7 +43,7 @@ namespace Partlyx.Tests
         public async void GetAllTheResourcesAsync_CreateThreeResources_GetResourcesCountEquals3()
         {
             // Arrange
-            var resourceRepo = _provider.GetRequiredService<IPartsRepository>();
+            var resourceRepo = _provider.GetRequiredService<IPartlyxRepository>();
             var resourceService = _provider.GetRequiredService<IResourceService>();
 
             // Act
@@ -59,7 +59,7 @@ namespace Partlyx.Tests
         public async void SetNameAsync_CreateResourceAndSetNameAsTestObject_GetNameTestObject()
         {
             // Arrange
-            var resourceRepo = _provider.GetRequiredService<IPartsRepository>();
+            var resourceRepo = _provider.GetRequiredService<IPartlyxRepository>();
             var resourceService = _provider.GetRequiredService<IResourceService>();
 
             var uid = await resourceService.CreateResourceAsync();

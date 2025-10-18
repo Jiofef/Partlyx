@@ -10,9 +10,9 @@ namespace Partlyx.Services.ServiceImplementations
 {
     public class RecipeService : IRecipeService
     {
-        private readonly IPartsRepository _repo;
+        private readonly IPartlyxRepository _repo;
         private readonly IEventBus _eventBus;
-        public RecipeService(IPartsRepository repo, IEventBus bus)
+        public RecipeService(IPartlyxRepository repo, IEventBus bus)
         {
             _repo = repo;
             _eventBus = bus;
@@ -143,7 +143,7 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task<RecipeDto?> GetRecipeAsync(Guid parentResourceUid, Guid recipeUid)
         {
-            var resource = await _repo.GetByUidAsync(parentResourceUid);
+            var resource = await _repo.GetResourceByUidAsync(parentResourceUid);
             if (resource == null) return null;
 
             var recipe = resource.GetRecipeByUid(recipeUid);
@@ -153,7 +153,7 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task<List<RecipeDto>> GetAllTheRecipesAsync(Guid parentResourceUid)
         {
-            var resource = await _repo.GetByUidAsync(parentResourceUid);
+            var resource = await _repo.GetResourceByUidAsync(parentResourceUid);
             if (resource == null) 
                 throw new InvalidOperationException("Resource not found with Uid: " + parentResourceUid);
 

@@ -29,7 +29,7 @@ public class ZoomPanControl : ContentControl
     public double ZoomLevel
     {
         get => (double)GetValue(ZoomLevelProperty);
-        set => SetValue(ZoomLevelProperty, value);
+        set => SetValue(ZoomLevelProperty, Math.Clamp(value, MinZoom, MaxZoom));
     }
 
     public double PanPositionX

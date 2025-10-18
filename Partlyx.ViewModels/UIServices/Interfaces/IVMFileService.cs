@@ -14,5 +14,6 @@ namespace Partlyx.ViewModels.UIServices.Interfaces
         Task<bool> SaveProjectAsync();
         Task<bool> SaveProjectAsAsync();
         Task OpenProjectAsync();
+        Task DeleteWorkingDBAsync();
     }
 }

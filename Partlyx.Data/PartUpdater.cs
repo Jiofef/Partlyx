@@ -8,13 +8,13 @@ namespace Partlyx.Infrastructure
     /// </summary>
     public class PartUpdater : IPartUpdater
     {
-        private IPartsRepository _repo;
-        public PartUpdater(IPartsRepository rr) => _repo = rr;
+        private IPartlyxRepository _repo;
+        public PartUpdater(IPartlyxRepository rr) => _repo = rr;
 
         public async Task<Resource?> Update(Resource resource)
         {
             var uid = resource.Uid;
-            var result = await _repo.GetByUidAsync(uid);
+            var result = await _repo.GetResourceByUidAsync(uid);
 
             return result;
         }
@@ -26,7 +26,7 @@ namespace Partlyx.Infrastructure
 
             if (parentUid == null) return null;
 
-            var actualParent = await _repo.GetByUidAsync((Guid)parentUid);
+            var actualParent = await _repo.GetResourceByUidAsync((Guid)parentUid);
             var result = actualParent?.GetRecipeByUid(uid);
 
             return result;
@@ -39,7 +39,7 @@ namespace Partlyx.Infrastructure
 
             if (grandParentUid == null) return null;
 
-            var actualGrandParent = await _repo.GetByUidAsync((Guid)grandParentUid);
+            var actualGrandParent = await _repo.GetResourceByUidAsync((Guid)grandParentUid);
             var result = actualGrandParent?.GetRecipeComponentByUid(uid);
 
             return result;

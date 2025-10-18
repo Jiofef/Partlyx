@@ -33,6 +33,7 @@
                     <MenuItem Header="Delete" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
                     <MenuItem Header="Expand branch" Command="{Binding UiItem.ExpandBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
                     <MenuItem Header="Collapse branch" Command="{Binding UiItem.CollapseBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="Find in tree" Command="{Binding UiItem.FindInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
             <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
@@ -89,6 +90,7 @@
                     <MenuItem Header="Delete" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
                     <MenuItem Header="Expand branch" Command="{Binding UiItem.ExpandBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
                     <MenuItem Header="Collapse branch" Command="{Binding UiItem.CollapseBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="Find in tree" Command="{Binding UiItem.FindInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
             <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
@@ -123,7 +125,7 @@
                                                                SelectAllOnFocus="True"/>
                     </i:Interaction.Behaviors>
                 </TextBox>
-                <ToggleButton Grid.Column="2" Style="{StaticResource StarToggleButtonStyle}" Margin="4"
+                <ToggleButton Grid.Column="2" Style="{StaticResource StarToggleButtonStyle}" Margin="4" ToolTip="Set as default"
                                                   Command="{Binding LinkedParentResource.Value.SetDefaultRecipeUidCommand}"
                                                   CommandParameter="{Binding Uid}">
                     <ToggleButton.IsChecked>
@@ -157,6 +159,7 @@
             <Grid.ContextMenu>
                 <ContextMenu Style="{StaticResource MaterialDesignMenu}">
                     <MenuItem Header="Delete" Command="{Binding Services.ComponentService.RemoveCommand}" CommandParameter="{Binding}"/>
+                    <MenuItem Header="Find setted resource in tree" Command="{Binding UiItem.FindResourceInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
             <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>

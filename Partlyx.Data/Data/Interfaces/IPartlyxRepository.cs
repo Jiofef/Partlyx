@@ -3,14 +3,14 @@ using Partlyx.Infrastructure.Data.Implementations;
 
 namespace Partlyx.Infrastructure.Data.Interfaces
 {
-    public interface IPartsRepository
+    public interface IPartlyxRepository
     {
-        Task<Guid> AddAsync(Resource resource);
+        Task<Guid> AddResourceAsync(Resource resource);
         Task DeleteResourceAsync(Guid uid);
-        Task<Guid> DuplicateAsync(Guid uid);
+        Task<Guid> DuplicateResourceAsync(Guid uid);
         Task ExecuteOnResourceAsync(Guid resourceUid, Func<Resource, Task> action);
-        Task<Resource?> GetByUidAsync(Guid uid);
-        Task<List<Resource>> SearchAsync(string query);
+        Task<Resource?> GetResourceByUidAsync(Guid uid);
+        Task<List<Resource>> SearchResourcesAsync(string query);
 
         // ExecuteOnPart methods
         Task<TResult> ExecuteOnComponentAsync<TResult>(Guid resourceUid, Guid componentUid, Func<RecipeComponent, Task<TResult>> action);
@@ -22,10 +22,11 @@ namespace Partlyx.Infrastructure.Data.Interfaces
         Task<List<Recipe>> GetAllTheRecipesAsync();
         Task<List<RecipeComponent>> GetAllTheRecipeComponentsAsync();
         Task ClearEverything();
-        Task<PartsRepository.BatchLoadResult> LoadBatchAsync(IEnumerable<Guid> resourceUids, IEnumerable<Guid> recipeUids, IEnumerable<Guid> componentUids, CancellationToken ct = default);
-        Task<TResult> ExecuteWithBatchAsync<TResult>(IEnumerable<Guid>? resourceUids, IEnumerable<Guid>? recipeUids, IEnumerable<Guid>? componentUids, PartsRepository.BatchIncludeOptions? options, Func<PartsRepository.BatchLoadResult, Task<TResult>> action, CancellationToken ct = default);
+        Task<PartlyxRepository.BatchLoadResult> LoadBatchAsync(IEnumerable<Guid> resourceUids, IEnumerable<Guid> recipeUids, IEnumerable<Guid> componentUids, CancellationToken ct = default);
+        Task<TResult> ExecuteWithBatchAsync<TResult>(IEnumerable<Guid>? resourceUids, IEnumerable<Guid>? recipeUids, IEnumerable<Guid>? componentUids, PartlyxRepository.BatchIncludeOptions? options, Func<PartlyxRepository.BatchLoadResult, Task<TResult>> action, CancellationToken ct = default);
         Task DeleteRecipeAsync(Guid uid);
         Task DeleteComponentAsync(Guid uid);
-        Task ExecuteWithBatchAsync(IEnumerable<Guid>? resourceUids, IEnumerable<Guid>? recipeUids, IEnumerable<Guid>? componentUids, PartsRepository.BatchIncludeOptions? options, Func<PartsRepository.BatchLoadResult, Task> action, CancellationToken ct = default);
+        Task ExecuteWithBatchAsync(IEnumerable<Guid>? resourceUids, IEnumerable<Guid>? recipeUids, IEnumerable<Guid>? componentUids, PartlyxRepository.BatchIncludeOptions? options, Func<PartlyxRepository.BatchLoadResult, Task> action, CancellationToken ct = default);
+        Task DeleteWorkingDBFile();
     }
 }
