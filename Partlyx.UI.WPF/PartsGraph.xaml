@@ -60,7 +60,7 @@
                                 </Grid>
                                 <Button.ContextMenu>
                                     <ContextMenu Style="{StaticResource MaterialDesignMenu}">
-                                        <MenuItem Header="Select in tree" Style="{StaticResource CommonMenuItem}"/>
+                                        <MenuItem Header="Find in tree" Style="{StaticResource CommonMenuItem}"/>
                                     </ContextMenu>
                                 </Button.ContextMenu>
                             </Button>
@@ -84,7 +84,7 @@
         </localo:ZoomPanControl>
 
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
-            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding CenterizePanPositionCommand}">
+            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding CenterizePanPositionCommand}" ToolTip="Return to tree root">
                 <fa:ImageAwesome Icon="Home" Foreground="{StaticResource PxBlackBrush}" Width="32" Height="32" Margin="4"/>
             </Button>
         </StackPanel>

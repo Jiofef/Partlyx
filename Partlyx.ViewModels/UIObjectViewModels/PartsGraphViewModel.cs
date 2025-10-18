@@ -161,6 +161,12 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             PanAndZoomController.CenterizePanPosition(RootNodeDefaultPosition);
         }
 
+        [RelayCommand]
+        public void CallSearchFromPart(IVMPart part)
+        {
+
+        }
+
         private void AddNode(GraphTreeNodeViewModel node)
         {
             Nodes.Add(node);

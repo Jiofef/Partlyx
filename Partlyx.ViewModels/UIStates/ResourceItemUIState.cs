@@ -1,31 +1,36 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.UIServices.Implementations;
+using Partlyx.ViewModels.UIStates;
 
 namespace Partlyx.ViewModels
 {
-    public partial class ResourceItemUIState : ObservableObject
+    public partial class ResourceItemUIState : PartItemUIState
     {
         private readonly PartsServiceViewModel _services;
         private readonly ResourceViewModel _resourceVM;
 
-        public ResourceItemUIState(ResourceViewModel vm, PartsServiceViewModel svm)
+        public ResourceItemUIState(ResourceViewModel vm, PartsServiceViewModel svm, IEventBus bus)
         {
             _services = svm;
 
             _resourceVM = vm;
             _unConfirmedName = vm.Name;
+
+            var expandAllPartItemsSubscription = bus.Subscribe<SetAllThePartItemsExpandedEvent>(ev => SetExpanded(ev.expand));
+            Subscriptions.Add(expandAllPartItemsSubscription);
+            var expandAllResourceItemsSubscription = bus.Subscribe<SetAllTheResourceItemsExpandedEvent>(ev => SetExpanded(ev.expand));
+            Subscriptions.Add(expandAllResourceItemsSubscription);
         }
 
-        private bool _isSelected;
         private bool _isRenaming;
         private string _unConfirmedName;
 
-        public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
         public bool IsRenaming { get => _isRenaming; set => SetProperty(ref _isRenaming, value); }
         public string UnConfirmedName { get => _unConfirmedName; set => SetProperty(ref _unConfirmedName, value); }
 
@@ -50,5 +55,23 @@ namespace Partlyx.ViewModels
         [RelayCommand]
         public void StartRenaming()
             => IsRenaming = true;
+
+        [RelayCommand]
+        public void ExpandBranch()
+        {
+            IsExpanded = true;
+
+            foreach (var child in _resourceVM.Recipes)
+                child.UiItem.ExpandBranch();
+        }
+
+        [RelayCommand]
+        public void CollapseBranch()
+        {
+            IsExpanded = false;
+
+            foreach (var child in _resourceVM.Recipes)
+                child.UiItem.CollapseBranch();
+        }
     }
 }

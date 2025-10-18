@@ -31,6 +31,8 @@
             <Grid.ContextMenu>
                 <ContextMenu Style="{StaticResource MaterialDesignMenu}">
                     <MenuItem Header="Delete" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="Expand branch" Command="{Binding UiItem.ExpandBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="Collapse branch" Command="{Binding UiItem.CollapseBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
             <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
@@ -70,7 +72,8 @@
                         Command="{Binding Services.RecipeService.CreateRecipeCommand}" Grid.Column="2"
                         CommandParameter="{Binding}"
                         Width="32"
-                        Height="32">
+                        Height="32"
+                        ToolTip="Create a recipe for this resource">
                     <Button.Content>
                         <fa:ImageAwesome Icon="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
                     </Button.Content>
@@ -84,6 +87,8 @@
             <Grid.ContextMenu>
                 <ContextMenu Style="{StaticResource MaterialDesignMenu}">
                     <MenuItem Header="Delete" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="Expand branch" Command="{Binding UiItem.ExpandBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="Collapse branch" Command="{Binding UiItem.CollapseBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
             <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
@@ -137,7 +142,8 @@
                         Command="{Binding Services.ComponentService.CreateComponentCommand}" Grid.Column="3"
                         CommandParameter="{Binding}"
                         Width="32"
-                        Height="32">
+                        Height="32"
+                        ToolTip="Create a component for this recipe">
                     <Button.Content>
                         <fa:ImageAwesome Icon="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
                     </Button.Content>

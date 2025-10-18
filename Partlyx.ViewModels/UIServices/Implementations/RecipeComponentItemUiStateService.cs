@@ -19,15 +19,15 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             _provider = provider;
         }
-        private readonly Dictionary<Guid, RecipeComponentUIState> _itemStates = new();
+        private readonly Dictionary<Guid, RecipeComponentItemUIState> _itemStates = new();
         private readonly Dictionary<Guid, RecipeComponentNodeUIState> _nodeStates = new();
 
-        public RecipeComponentUIState GetOrCreateItemUi(RecipeComponentViewModel vm)
+        public RecipeComponentItemUIState GetOrCreateItemUi(RecipeComponentViewModel vm)
         {
             var state = _itemStates.GetValueOrDefault(vm.Uid);
             if (state == null)
             {
-                state = (RecipeComponentUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeComponentUIState), vm);
+                state = (RecipeComponentItemUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeComponentItemUIState), vm);
                 _itemStates.Add(vm.Uid, state);
             }
             return state;

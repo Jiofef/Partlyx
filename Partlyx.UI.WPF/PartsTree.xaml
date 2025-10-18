@@ -19,6 +19,14 @@
                 <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
                 <TextBlock Text="Parts tree" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
             </Grid>
+            <StackPanel Orientation="Horizontal" Margin="4, 2, 4, 2">
+                <Button Style="{StaticResource BaseButtonStyle}" Width="32" ToolTip="Expand all" Command="{Binding ExpandAllCommand}">
+                    <fa:ImageAwesome Icon="AngleDoubleDown" Foreground="{StaticResource PxBlackBrush}" Width="16"/>
+                </Button>
+                <Button Style="{StaticResource BaseButtonStyle}" Width="32" ToolTip="Collapse all" Command="{Binding CollapseAllCommand}">
+                    <fa:ImageAwesome Icon="AngleDoubleUp" Foreground="{StaticResource PxBlackBrush}" Width="16"/>
+                </Button>
+            </StackPanel>
             <TextBox Style="{StaticResource CommonSearchTextBox}"
                      md:HintAssist.Hint="Search..." Grid.Row="0"
                      Text="{Binding Search.SearchText, UpdateSourceTrigger=PropertyChanged}"
@@ -39,6 +47,11 @@
                             </Border>
                         </ControlTemplate>
                     </TreeView.Template>
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
+                            <Setter Property="IsExpanded" Value="{Binding UiItem.IsExpanded, Mode=TwoWay}"/>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
                     <i:Interaction.Behaviors>
                         <beh:CollectionViewFilterBehavior Predicate="{Binding Search.SearchByName}"/>
                         <beh:TreeViewPartSelectionBehavior SelectedPartsContainer="{Binding SelectedParts}" AutoSetAncestorParts="True"
@@ -62,7 +75,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding Service.CreateResourceCommand}" Grid.Column="0">
+            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding Service.CreateResourceCommand}" Grid.Column="0" ToolTip="Create resource">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
                         <TextBlock Text="Create "/>
@@ -70,15 +83,6 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
-            <Button Style="{StaticResource BaseButtonStyle}" Width="Auto" Grid.Column="1">
-                <Button.Content>
-                    <StackPanel Orientation="Horizontal" Margin="8">
-                        <TextBlock Text="Options "/>
-                        <fa:ImageAwesome Icon="Gear" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
-                    </StackPanel>
-                </Button.Content>
-            </Button>
-
         </Grid>
     </Grid>
 </UserControl>
