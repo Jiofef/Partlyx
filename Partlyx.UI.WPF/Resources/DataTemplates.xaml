@@ -178,7 +178,7 @@
                     <TextBlock Text="{Binding LinkedResource.Value.Name}" Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}"/>
                 </Grid>
                 <Grid Grid.Row="1" Height="32">
-                    <md:NumericUpDown Value="{Binding Quantity}">
+                    <md:DecimalUpDown Value="{Binding Quantity}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="ValueChanged">
                                 <i:InvokeCommandAction
@@ -186,7 +186,7 @@
                                                         CommandParameter="{Binding Quantity}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </md:NumericUpDown>
+                    </md:DecimalUpDown>
                 </Grid>
             </Grid>
         </Grid>

@@ -1,4 +1,5 @@
 ﻿using Partlyx.Core;
+using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.OtherEvents;
 using System;
@@ -10,14 +11,19 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Partlyx.Services.Commands
 {
-    public class CommandDispatcher : ICommandDispatcher
+    public class CommandDispatcher : ICommandDispatcher, IDisposable
     {
         private readonly IEventBus _bus;
         private readonly CommandDispatcherUndoableComplexHelper _complexHelper;
+
+        private readonly IDisposable _fileClosedSubscription;
+
         public CommandDispatcher(IEventBus bus)
         {
             _bus = bus;
             _complexHelper = new CommandDispatcherUndoableComplexHelper();
+
+            _fileClosedSubscription = _bus.Subscribe<FileClosedEvent>(ev => ClearHistory());
         }
 
         private int maxHistoryLength = 100;
@@ -106,6 +112,17 @@ namespace Partlyx.Services.Commands
                     _commandsHistory.RemoveFirst();
             }
             _canceledCommandsHistory.Clear();
+        }
+
+        private void ClearHistory()
+        {
+            _commandsHistory.Clear();
+            _canceledCommandsHistory.Clear();
+        }
+
+        public void Dispose()
+        {
+            _fileClosedSubscription.Dispose();
         }
     }
 }

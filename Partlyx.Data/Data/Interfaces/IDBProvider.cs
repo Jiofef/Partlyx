@@ -11,6 +11,7 @@ namespace Partlyx.Infrastructure.Data.Interfaces
         SemaphoreSlim DBExportLoadSemaphore { get; }
 
         Task InitializeAsync(string dbPath, CancellationToken ct = default);
+        void NotifyDatabaseClosed();
         void NotifyDatabaseReplaced();
     }
 }

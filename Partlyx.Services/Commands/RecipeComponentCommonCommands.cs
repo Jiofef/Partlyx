@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core;
 using Partlyx.Infrastructure.Data.Interfaces;
+using Partlyx.Infrastructure.Events;
+using Partlyx.Services.Dtos;
+using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
 
 namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
@@ -9,6 +12,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
     {
         private IRecipeComponentService _recipeComponentService;
         private IPartlyxRepository _resourceRepository;
+        private readonly IEventBus _bus;
 
         private Guid _resourceUid;
         private Guid _recipeUid;
@@ -19,10 +23,12 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         private RecipeComponent? _createdRecipeComponent;
 
         public CreateRecipeComponentCommand(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid, 
-            IRecipeComponentService rcs, IPartlyxRepository rr)
+            IRecipeComponentService rcs, IPartlyxRepository rr, IEventBus bus)
         {
             _recipeComponentService = rcs;
             _resourceRepository = rr;
+            _bus = bus;
+
             _resourceUid = grandParentResourceUid;
             _recipeUid = parentRecipeUid;
             _componentResourceUid = componentResourceUid;
@@ -55,6 +61,9 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
                     return Task.CompletedTask;
                 });
 
+            var @event = new RecipeComponentCreatedEvent(_createdRecipeComponent.ToDto());
+            _bus.Publish(@event);
+
             _createdRecipeComponent = null;
         }
     }
@@ -63,6 +72,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
     {
         private IRecipeComponentService _recipeComponentService;
         private IPartlyxRepository _resourceRepository;
+        private readonly IEventBus _bus;
 
         private Guid _resourceUid;
         private Guid _recipeUid;
@@ -71,7 +81,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         private RecipeComponent? _deletedRecipeComponent;
 
         public DeleteRecipeComponentCommand(Guid grandParentResourceUid, Guid parentRecipeUid, Guid recipeComponentUid,
-            IRecipeComponentService rcs, IPartlyxRepository rr)
+            IRecipeComponentService rcs, IPartlyxRepository rr, IEventBus bus)
         {
             _recipeComponentService = rcs;
             _resourceRepository = rr;
@@ -79,6 +89,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
             _resourceUid = grandParentResourceUid;
             _recipeUid = parentRecipeUid;
             _recipeComponentUid = recipeComponentUid;
+            _bus = bus;
         }
 
         public async Task ExecuteAsync()
@@ -108,6 +119,9 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
                     _deletedRecipeComponent.AttachTo(recipe);
                     return Task.CompletedTask;
                 });
+
+            var @event = new RecipeComponentCreatedEvent(_deletedRecipeComponent.ToDto());
+            _bus.Publish(@event);
 
             _deletedRecipeComponent = null;
         }

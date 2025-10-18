@@ -1,23 +1,28 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core;
 using Partlyx.Infrastructure.Data.Interfaces;
+using Partlyx.Infrastructure.Events;
+using Partlyx.Services.Dtos;
+using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
 
 namespace Partlyx.Services.Commands.ResourceCommonCommands
 {
     public class CreateResourceCommand : IUndoableCommand
     {
-        private IResourceService _resourceService;
-        private IPartlyxRepository _resourceRepository;
+        private readonly IResourceService _resourceService;
+        private readonly IPartlyxRepository _resourceRepository;
+        private readonly IEventBus _bus;
 
         public Guid ResourceUid { get; private set; }
 
         private Resource? _createdResource;
 
-        public CreateResourceCommand(IResourceService rs, IPartlyxRepository rr)
+        public CreateResourceCommand(IResourceService rs, IPartlyxRepository rr, IEventBus bus)
         {
             _resourceService = rs;
             _resourceRepository = rr;
+            _bus = bus;
         }
 
         public async Task ExecuteAsync()
@@ -33,28 +38,33 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
             ResourceUid = Guid.Empty;
         }
 
-        public async Task Redo()
+        public async Task RedoAsync()
         {
             if (_createdResource == null) return;
 
             await _resourceRepository.AddResourceAsync(_createdResource);
+
+            var @event = new ResourceCreatedEvent(_createdResource.ToDto());
+            _bus.Publish(@event);
         }
     }
 
     public class DeleteResourceCommand : IUndoableCommand
     {
-        private IResourceService _resourceService;
-        private IPartlyxRepository _resourceRepository;
+        private readonly IResourceService _resourceService;
+        private readonly IPartlyxRepository _resourceRepository;
+        private readonly IEventBus _bus;
 
         public Guid DeletedResourceUid { get; private set; }
 
         private Resource? _deletedResource;
 
-        public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IPartlyxRepository rr)
+        public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IPartlyxRepository rr, IEventBus bus)
         {
             DeletedResourceUid = resourceUid;
             _resourceService = rs;
             _resourceRepository = rr;
+            _bus = bus;
         }
 
         public async Task ExecuteAsync()
@@ -68,13 +78,17 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
             if (_deletedResource == null) return;
 
             await _resourceRepository.AddResourceAsync(_deletedResource);
+
+            var @event = new ResourceCreatedEvent(_deletedResource.ToDto());
+            _bus.Publish(@event);
+
             _deletedResource = null;
         }
     }
 
     public class DuplicateResourceCommand : IUndoableCommand
     {
-        private IResourceService _resourceService;
+        private readonly IResourceService _resourceService;
 
         private Guid _resourceUid;
 

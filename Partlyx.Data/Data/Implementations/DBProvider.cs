@@ -58,15 +58,20 @@ namespace Partlyx.Infrastructure.Data.Implementations
 
             IsInitialized = true;
 
-            _bus?.Publish(new PartlyxDBInitializedEvent(CurrentDbPath!));
+            NotifyDatabaseReplaced();
         }
 
         /// <summary>
-        /// Вызывайте, когда вы заменяете базу по ссылке CurrentDbPath и удостоверились в её корректности.
+        /// Call when you replace the database with a CurrentDbPath link and make sure it is correct.
         /// </summary>
         public void NotifyDatabaseReplaced()
         {
-            _bus?.Publish(new PartlyxDBInitializedEvent(CurrentDbPath!));
+            _bus.Publish(new PartlyxDBInitializedEvent(CurrentDbPath!));
+        }
+
+        public void NotifyDatabaseClosed()
+        {
+            _bus.Publish(new FileClosedEvent());
         }
     }
 }

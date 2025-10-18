@@ -84,6 +84,15 @@ namespace Partlyx.Infrastructure.Data.Implementations
                     return new ImportResult(false, $"Succesfull import, but NotifyDatabaseReplaced() thrown an exception: {exNotify.Message}");
                 }
 
+                try
+                {
+                    _dbProvider.NotifyDatabaseClosed();
+                }
+                catch (Exception exNotify)
+                {
+                    return new ImportResult(false, $"Succesfull import, but NotifyDatabaseClosed() thrown an exception: {exNotify.Message}");
+                }
+
                 return new ImportResult(true);
             }
             catch (OperationCanceledException)

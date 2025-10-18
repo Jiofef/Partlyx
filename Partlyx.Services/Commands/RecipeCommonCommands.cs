@@ -13,18 +13,20 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
         private readonly IRecipeService _recipeService;
         private readonly IResourceService _resourceService;
         private readonly IPartlyxRepository _resourceRepository;
+        private readonly IEventBus _bus;
 
         private Guid _resourceUid;
         public Guid RecipeUid { get; private set; }
 
         private Recipe? _createdRecipe;
 
-        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceService rs2, IPartlyxRepository rr)
+        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceService rs2, IPartlyxRepository rr, IEventBus bus)
         {
             _recipeService = rs;
             _resourceService = rs2;
             _resourceRepository = rr;
             _resourceUid = parentResourceUid;
+            _bus = bus;
         }
 
         public async Task ExecuteAsync()
@@ -53,6 +55,11 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
                     return Task.CompletedTask;
                 });
 
+            RecipeUid = _createdRecipe.Uid;
+
+            var @event = new RecipeCreatedEvent(_createdRecipe.ToDto());
+            await _bus.PublishAsync(@event);
+
             var resource = await _resourceService.GetResourceAsync(_resourceUid);
             if (resource?.Recipes.Count == 1)
                 await _resourceService.SetDefaultRecipeAsync(_resourceUid, RecipeUid);
@@ -64,13 +71,14 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
         private readonly IRecipeService _recipeService;
         private readonly IResourceService _resourceService;
         private readonly IPartlyxRepository _resourceRepository;
+        private readonly IEventBus _bus;
 
         private Guid _resourceUid;
         public Guid RecipeUid { get; private set; }
 
         private Recipe? _deletedRecipe;
 
-        public DeleteRecipeCommand(Guid parentResourceUid, Guid recipeUid, IRecipeService rs, IResourceService rs2, IPartlyxRepository rr)
+        public DeleteRecipeCommand(Guid parentResourceUid, Guid recipeUid, IRecipeService rs, IResourceService rs2, IPartlyxRepository rr , IEventBus bus)
         {
             _recipeService = rs;
             _resourceService = rs2;
@@ -78,6 +86,7 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
 
             _resourceUid = parentResourceUid;
             RecipeUid = recipeUid;
+            _bus = bus;
         }
 
         public async Task ExecuteAsync()
@@ -102,7 +111,10 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
                     _deletedRecipe.AttachTo(resource);
 
                     return Task.CompletedTask;
-                }); 
+                });
+
+            var @event = new RecipeCreatedEvent(_deletedRecipe.ToDto());
+            _bus.Publish(@event);
 
             _deletedRecipe = null;
 

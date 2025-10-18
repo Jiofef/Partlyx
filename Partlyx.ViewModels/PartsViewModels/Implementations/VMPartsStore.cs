@@ -9,9 +9,11 @@ using System.Diagnostics;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public class VMPartsStore : IVMPartsStore
+    public class VMPartsStore : IVMPartsStore, IDisposable
     {
         private readonly IEventBus _bus;
+
+        private readonly IDisposable _fileClosedSubscription;
 
         private Dictionary<Guid, ResourceViewModel> _resources { get; }
         private Dictionary<Guid, RecipeViewModel> _recipes { get; }
@@ -29,8 +31,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _recipes = new();
             _recipeComponents = new();
 
-            bus.Subscribe<PartsInitializationStartedEvent>((ev) => ClearStore(), true);
-            bus.Subscribe<FileClearedEvent>((ev) => ClearStore(), true);
+            _fileClosedSubscription = bus.Subscribe<FileClosedUIEvent>((ev) => ClearStore(), true);
         }
 
         public void Register(ResourceViewModel resource)
@@ -107,6 +108,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _resources.Clear();
             _recipes.Clear();
             _recipeComponents.Clear();
+        }
+
+        public void Dispose()
+        {
+            _fileClosedSubscription.Dispose();
         }
     }
 }

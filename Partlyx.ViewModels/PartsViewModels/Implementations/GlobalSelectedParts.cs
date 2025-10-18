@@ -1,15 +1,20 @@
-﻿using Partlyx.Infrastructure.Events;
+﻿using Partlyx.Infrastructure.Data.CommonFileEvents;
+using Partlyx.Infrastructure.Events;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System.Collections.Specialized;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public class GlobalSelectedParts : SelectedPartsAbstract, IGlobalSelectedParts
+    public class GlobalSelectedParts : SelectedPartsAbstract, IGlobalSelectedParts, IDisposable
     {
         private readonly IEventBus _bus;
+        private readonly List<IDisposable> _subscriptions = new();
         public GlobalSelectedParts(IEventBus bus)
         {
             _bus = bus;
+
+            var fileClosedSubscription = bus.Subscribe<FileClosedUIEvent>((ev) => ClearSelection());
+            _subscriptions.Add(fileClosedSubscription);
         }
 
         protected override void SelectedResourcesChangedHandler(object? sender, NotifyCollectionChangedEventArgs args)
@@ -100,6 +105,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             var @commonChangedEvent = new GlobalPartsSelectedChangedEvent(PartTypeEnumVM.Component, selectedComponentsUids);
             _bus.Publish(@commonChangedEvent);
+        }
+
+        public void Dispose()
+        {
+            foreach (var subscription in _subscriptions)
+                subscription.Dispose();
         }
     }
 }

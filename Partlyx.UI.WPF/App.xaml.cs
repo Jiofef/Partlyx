@@ -91,6 +91,7 @@ namespace Partlyx.UI.WPF
 
             services.AddTransient<MenuPanelViewModel>();
             services.AddTransient<MenuPanelFileViewModel>();
+            services.AddTransient<MenuPanelEditViewModel>();
 
             services.AddTransient<ComponentCreateViewModel>();
 

@@ -167,6 +167,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await db.Database.EnsureCreatedAsync();
 
             _bus.Publish(new FileClearedEvent());
+            _bus.Publish(new FileClosedEvent());
         }
 
         /// <summary>!!!!!</summary>

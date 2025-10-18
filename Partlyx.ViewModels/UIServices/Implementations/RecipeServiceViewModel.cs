@@ -13,11 +13,13 @@ namespace Partlyx.ViewModels.UIServices.Implementations
     {
         private readonly ICommandServices _commands;
         private readonly IGlobalSelectedParts _selectedParts;
+        private readonly IGlobalFocusedPart _focusedPart;
 
-        public RecipeServiceViewModel(ICommandServices cs, IGlobalSelectedParts gsp)
+        public RecipeServiceViewModel(ICommandServices cs, IGlobalSelectedParts gsp, IGlobalFocusedPart gfp)
         {
             _commands = cs;
             _selectedParts = gsp;
+            _focusedPart = gfp;
         }
 
         [RelayCommand]
@@ -27,12 +29,12 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        public void StartRenamingSelected()
+        public void StartRenamingFocused()
         {
-            var recipeVM = _selectedParts.GetSingleRecipeOrNull();
-            if (recipeVM == null) return;
+            var focused = _focusedPart.FocusedPart;
+            if (focused is not RecipeViewModel recipe) return;
 
-            recipeVM.UiItem.IsRenaming = true;
+            recipe.UiItem.IsRenaming = true;
         }
 
         [RelayCommand]
@@ -58,6 +60,15 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
                 await _commands.CreateSyncAndExcecuteAsync<MoveRecipeCommand>(previousParentUid, newParentUid, recipe.Uid);
             }
+        }
+
+        [RelayCommand]
+        public async Task SetCraftableAmount(PartSetValueInfo<RecipeViewModel, double> info)
+        {
+            var recipe = info.Part;
+            var amount = info.Value;
+
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeCraftAmountCommand>(recipe.LinkedParentResource!.Uid, recipe.Uid, amount);
         }
 
         [RelayCommand]

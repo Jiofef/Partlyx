@@ -8,6 +8,8 @@ namespace Partlyx.Infrastructure.Data.CommonFileEvents
 {
     public record PartlyxDBInitializedEvent(string path);
 
+    public record FileClosedEvent();
+
     public record SaveStartedEvent(string destination, Guid correlationUid);
 
     public record SaveCompletedEvent(string destination, Guid correlationUid);

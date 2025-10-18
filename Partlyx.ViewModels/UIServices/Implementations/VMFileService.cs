@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,12 +17,14 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         private IFileService _fileService;
         private IFileDialogService _dialogService;
         private INotificationService _notificationService;
+        private IEventBus _bus;
 
-        public VMFileService(IFileService dbfm, IFileDialogService fds, INotificationService ns)
+        public VMFileService(IFileService dbfm, IFileDialogService fds, INotificationService ns, IEventBus bus)
         {
             _fileService = dbfm;
             _dialogService = fds;
             _notificationService = ns;
+            _bus = bus;
         }
 
         public bool IsChangesSaved => _fileService.IsChangesSaved;
@@ -43,11 +47,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 // If answer is No, we just continue
             }
 
+            var @event = new FileClosedUIEvent();
+            await _bus.PublishAsync(@event);
+
             await _fileService.ClearCurrentFile();
         }
 
         public async Task DeleteWorkingDBAsync()
         {
+            var @event = new FileClosedUIEvent();
+            await _bus.PublishAsync(@event);
+
             await _fileService.DeleteWorkingDB();
         }
 
@@ -103,6 +113,9 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             });
 
             if (path == null) return;
+
+            var @event = new FileClosedUIEvent();
+            await _bus.PublishAsync(@event);
 
             var result = await _fileService.ImportPartreeAsync(path);
 

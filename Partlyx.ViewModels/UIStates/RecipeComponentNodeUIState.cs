@@ -31,6 +31,12 @@ namespace Partlyx.ViewModels.UIStates
             var selectedRecipeUpdateSubscription = _componentVM
                 .WhenAnyValue(c => c.LinkedSelectedRecipe!.Value!.Name)
                 .Subscribe(n => UpdateBottomColumnText());
+            _subscriptions.Add(selectedRecipeUpdateSubscription);
+
+            var quantityUpdateSubscription = _componentVM
+                .WhenValueChanged(c => c.Quantity)
+                .Subscribe(n => UpdateColumnText());
+            _subscriptions.Add(quantityUpdateSubscription);
 
             UpdateColumnText();
             UpdateBottomColumnText();

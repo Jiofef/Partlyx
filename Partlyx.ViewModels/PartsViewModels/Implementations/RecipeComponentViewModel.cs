@@ -125,15 +125,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _store.RemoveRecipeComponent(Uid);
         }
 
-        // Commands
-        [RelayCommand]
-        public async Task SetQuantityAsync(double value)
-        {
-            var grandParentUid = LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
-            var uid = Uid;
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentQuantityCommand>(grandParentUid, uid, value);
-        }
-
         // For UI
         public RecipeComponentItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
         public RecipeComponentNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);

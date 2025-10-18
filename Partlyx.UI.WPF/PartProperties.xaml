@@ -67,6 +67,29 @@
                 </Grid>
             </Grid>
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vmprop:SpinBoxItemPropertyViewModel}">
+            <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
+                <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding DisplayableName}" Grid.Column="0" VerticalAlignment="Center" Style="{StaticResource CommonTextBlock}" Margin="4"/>
+                    <md:DecimalUpDown Value="{Binding Value, Mode=TwoWay}" Grid.Column="1" VerticalAlignment="Center" Margin="4">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="ValueChanged">
+                                <i:InvokeCommandAction
+                                                        Command="{Binding SaveChangesCommand}"
+                                                        CommandParameter="{Binding Value}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </md:DecimalUpDown>
+                </Grid>
+            </Grid>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>

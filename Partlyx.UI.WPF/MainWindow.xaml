@@ -18,6 +18,10 @@
     <Window.InputBindings>
         <KeyBinding Gesture="CTRL+S" Command="{Binding MenuPanel.FileMenu.SaveProjectCommand}"/>
         <KeyBinding Gesture="CTRL+SHIFT+S" Command="{Binding MenuPanel.FileMenu.SaveProjectAsCommand}"/>
+
+        <KeyBinding Gesture="CTRL+Z" Command="{Binding MenuPanel.EditMenu.UndoCommand}"/>
+        <KeyBinding Gesture="CTRL+SHIFT+Z" Command="{Binding MenuPanel.EditMenu.RedoCommand}"/>
+        <KeyBinding Gesture="CTRL+Y" Command="{Binding MenuPanel.EditMenu.RedoCommand}"/>
     </Window.InputBindings>
 
     <Grid>
@@ -36,9 +40,13 @@
                     </Menu.ItemsPanel>
                     <MenuItem Header="File" DataContext="{Binding FileMenu}" Height="32">
                         <MenuItem Header="Create" Command="{Binding NewFileCommand}" Style="{StaticResource CommonMenuItem}"/>
-                        <MenuItem Header="Save" Command="{Binding SaveProjectCommand}" Style="{StaticResource CommonMenuItem}"/>
-                        <MenuItem Header="Save as..." Command="{Binding SaveProjectAsCommand}" Style="{StaticResource CommonMenuItem}"/>
+                        <MenuItem Header="Save" Command="{Binding SaveProjectCommand}" Style="{StaticResource CommonMenuItem}" InputGestureText="Ctrl+S"/>
+                        <MenuItem Header="Save as..." Command="{Binding SaveProjectAsCommand}" Style="{StaticResource CommonMenuItem}" InputGestureText="Ctrl+Shift+S"/>
                         <MenuItem Header="Open" Command="{Binding OpenProjectCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    </MenuItem>
+                    <MenuItem Header="Edit" DataContext="{Binding EditMenu}" Height="32">
+                        <MenuItem Header="Undo" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z" Style="{StaticResource CommonMenuItem}"/>
+                        <MenuItem Header="Redo" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Shift+Z / Ctrl+Y" Style="{StaticResource CommonMenuItem}"/>
                     </MenuItem>
                 </Menu>
 

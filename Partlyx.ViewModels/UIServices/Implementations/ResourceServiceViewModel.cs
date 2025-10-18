@@ -35,11 +35,6 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                     // Default recipe creating
                     var defaultRecipeCreateCommand = _commands.Factory.Create<CreateRecipeCommand>(resourseUid);
                     await complexDispatcher.ExcecuteAsync(defaultRecipeCreateCommand);
-
-                    var recipeUid = defaultRecipeCreateCommand.RecipeUid;
-                    var recipeName = "Default recipe";
-                    var defaultRecipeSetNameCommand = await _commands.Factory.CreateAsync<SetRecipeNameCommand>(resourseUid, recipeUid, recipeName);
-                    await complexDispatcher.ExcecuteAsync(defaultRecipeSetNameCommand);
                 });
             });
         }

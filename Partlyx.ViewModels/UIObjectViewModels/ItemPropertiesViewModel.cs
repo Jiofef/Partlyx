@@ -142,6 +142,20 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             var nameUpdateSubscription = recipe.WhenValueChanged(r => r.Name).Subscribe((args) => nameProperty.Text = recipe.Name);
             nameProperty.Subscriptions.Add(nameUpdateSubscription);
             Properties.Add(nameProperty);
+
+            // Creating "Craft amount" property
+            var amountProperty = new SpinBoxItemPropertyViewModel() { Name = "Product amount", Item = recipe};
+            amountProperty.Value = (decimal)recipe.CraftAmount;
+            amountProperty.SaveChangesTask = new(
+                async arg =>
+                {
+                    if (arg is not decimal amount) return;
+                    var args = new PartSetValueInfo<RecipeViewModel, double>(recipe, (double)amount);
+                    await _services.RecipeService.SetCraftableAmount(args);
+                });
+            var amountUpdateSubscription = recipe.WhenValueChanged(r => r.CraftAmount).Subscribe(args => amountProperty.Value = (decimal)recipe.CraftAmount);
+            amountProperty.Subscriptions.Add(amountUpdateSubscription);
+            Properties.Add(amountProperty);
         }
 
         public void LoadComponentProperties(RecipeComponentViewModel component)
@@ -169,6 +183,20 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             var selectedRecipeUpdateSubscription = component.WhenValueChanged(r => r.LinkedSelectedRecipe).Subscribe((args) => selectedRecipeProperty.Part = component.LinkedSelectedRecipe?.Value);
             selectedRecipeProperty.Subscriptions.Add(selectedRecipeUpdateSubscription);
             Properties.Add(selectedRecipeProperty);
+
+            // Creating "Quantity" property
+            var quantityProperty = new SpinBoxItemPropertyViewModel() { Name = "Needed amount", Item = component };
+            quantityProperty.Value = (decimal)component.Quantity;
+            quantityProperty.SaveChangesTask = new(
+                async arg =>
+                {
+                    if (arg is not decimal quantity) return;
+                    var args = new PartSetValueInfo<RecipeComponentViewModel, double>(component, (double)quantity);
+                    await _services.ComponentService.SetQuantityAsync(args);
+                });
+            var quantityUpdateSubscription = component.WhenValueChanged(r => r.Quantity).Subscribe(args => quantityProperty.Value = (decimal)component.Quantity);
+            quantityProperty.Subscriptions.Add(quantityUpdateSubscription);
+            Properties.Add(quantityProperty);
         }
 
         public void Dispose()

@@ -93,5 +93,18 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentSelectedRecipe>(grandParentUid, component.Uid, targetRecipe?.Uid!);
         }
+
+        [RelayCommand]
+        public async Task SetQuantityAsync(PartSetValueInfo<RecipeComponentViewModel, double> info)
+        {
+            if (info == null || info.Part == null) return;
+
+            var component = info.Part;
+            var value = info.Value;
+
+            var grandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
+            var uid = component.Uid;
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentQuantityCommand>(grandParentUid, uid, value);
+        }
     }
 }

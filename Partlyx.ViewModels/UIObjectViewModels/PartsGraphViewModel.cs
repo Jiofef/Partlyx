@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.ViewModels.Graph;
@@ -19,18 +20,15 @@ namespace Partlyx.ViewModels.UIObjectViewModels
     {
         public IGlobalSelectedParts SelectedParts { get; }
 
-        // Subscriptions
-        private readonly IDisposable _recipeChangedSubscription;
-        private readonly IDisposable _recipeRemovedSubscription;
-
-        private readonly IDisposable _componentAddedSubscription;
-        private readonly IDisposable _componentRemovedSubscription;
-        private readonly IDisposable _componentMovedSubscription;
+        private List<IDisposable> _subscriptions = new();
 
         // Collections
         private ObservableMultiCollection<FromToLineViewModel> _edges = new();
 
-        public ObservableMultiCollection<FromToLineViewModel> Edges { get => _edges; private set => SetProperty(ref _edges, value); } 
+        public ObservableMultiCollection<FromToLineViewModel> Edges { get => _edges; private set => SetProperty(ref _edges, value); }
+
+        private GraphTreeNodeViewModel? _rootNode;
+        public GraphTreeNodeViewModel? RootNode { get => _rootNode; private set => SetProperty(ref _rootNode, value); }
 
         public ObservableCollection<GraphTreeNodeViewModel> Nodes { get; } = new();
 
@@ -46,12 +44,17 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             SelectedParts = selectedParts;
             PanAndZoomController = pazc;
 
-            _recipeChangedSubscription = bus.Subscribe<GlobalSingleRecipeSelectedEvent>((ev) => OnSelectedTreeChanged());
-            _recipeRemovedSubscription = bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => UpdateGraph());
+            var recipeChangedSubscription = bus.Subscribe<GlobalSingleRecipeSelectedEvent>((ev) => OnSelectedTreeChanged());
+            _subscriptions.Add(recipeChangedSubscription);
+            var recipeRemovedSubscription = bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => UpdateGraph());
+            _subscriptions.Add(recipeRemovedSubscription);
 
-            _componentAddedSubscription = bus.Subscribe<RecipeComponentVMAddedToStoreEvent>((ev) => UpdateGraph());
-            _componentRemovedSubscription = bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>((ev) => UpdateGraph());
-            _componentMovedSubscription = bus.Subscribe<RecipeComponentMovedEvent>((ev) => UpdateGraph());
+            var componentAddedSubscription = bus.Subscribe<RecipeComponentVMAddedToStoreEvent>((ev) => UpdateGraph());
+            _subscriptions.Add(componentAddedSubscription);
+            var componentRemovedSubscription = bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>((ev) => UpdateGraph());
+            _subscriptions.Add(componentRemovedSubscription);
+            var componentMovedSubscription = bus.Subscribe<RecipeComponentMovedEvent>((ev) => UpdateGraph());
+            _subscriptions.Add(componentMovedSubscription);
         }
 
         private void OnSelectedTreeChanged()
@@ -73,6 +76,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             mainNode.XCentered = RootNodeDefaultPosition.X;
             mainNode.YCentered = RootNodeDefaultPosition.Y;
             AddNode(mainNode);
+            RootNode = mainNode;
 
             LoadChildComponentsFrom(selectedRecipe.Components, mainNode);
 
@@ -99,6 +103,11 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             Edges = mainNode.GetBranchLinesMultiCollection();
 
             BuildEdgesFor(mainNode);
+        }
+
+        private void UpdateBranch(GraphTreeNodeViewModel rootNode)
+        {
+
         }
 
         private Vector2 GetChildPositionFromParentPosition(GraphTreeNodeViewModel child, Vector2 parentPosition) 
@@ -171,12 +180,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public void Dispose()
         {
-            _recipeChangedSubscription.Dispose();
-            _recipeRemovedSubscription.Dispose();
-
-            _componentAddedSubscription.Dispose();
-            _componentRemovedSubscription.Dispose();
-            _componentMovedSubscription.Dispose();
+            foreach(var subscription in _subscriptions)
+                subscription.Dispose();
         }
 
         // Commands

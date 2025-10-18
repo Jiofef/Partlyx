@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
+using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.UIServices.Implementations;
 namespace Partlyx.ViewModels.UIStates
@@ -34,6 +35,13 @@ namespace Partlyx.ViewModels.UIStates
             if (resource == null) return;
 
             resource.UiItem.FindInTree();
+        }
+
+        [RelayCommand]
+        public async Task SetQuantityAsync(double value)
+        {
+            var args = new PartSetValueInfo<RecipeComponentViewModel, double>(_componentVM, value);
+            await _services.ComponentService.SetQuantityAsync(args);
         }
     }
 }

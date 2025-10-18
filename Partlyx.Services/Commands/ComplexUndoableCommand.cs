@@ -25,17 +25,19 @@ namespace Partlyx.Services.Commands
 
         public async Task UndoAsync()
         {
-            foreach (var commands in _commands)
+            // We undo the command backwards to ensure that the large operation is correctly canceled
+            for (int i = _commands.Count - 1; i >= 0; i--)
             {
-                await commands.UndoAsync();
+                var command = _commands[i];
+                await command.UndoAsync();
             }
         }
 
         public async Task RedoAsync()
         {
-            foreach (var commands in _commands)
+            foreach (var command in _commands)
             {
-                await commands.RedoAsync();
+                await command.RedoAsync();
             }
         }
     }
