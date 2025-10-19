@@ -22,8 +22,6 @@ namespace Partlyx.ViewModels.UIStates
 
             _componentVM = vm;
 
-            var expandAllPartItemsSubscription = bus.Subscribe<SetAllThePartItemsExpandedEvent>(ev => SetExpanded(ev.expand));
-            Subscriptions.Add(expandAllPartItemsSubscription);
             var expandAllRecipeComponentItemsSubscription = bus.Subscribe<SetAllTheRecipeComponentItemsExpandedEvent>(ev => SetExpanded(ev.expand));
             Subscriptions.Add(expandAllRecipeComponentItemsSubscription);
         }

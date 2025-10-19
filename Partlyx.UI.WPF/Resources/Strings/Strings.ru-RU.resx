@@ -1,0 +1,291 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Clear_search_text" xml:space="preserve">
+    <value>Очистить текст в поиске</value>
+  </data>
+  <data name="Collapse_All" xml:space="preserve">
+    <value>Свернуть всё</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Создать</value>
+  </data>
+  <data name="Create_resource1" xml:space="preserve">
+    <value>Создать ресурс</value>
+  </data>
+  <data name="Create_resource2" xml:space="preserve">
+    <value>Создать ресурс</value>
+  </data>
+  <data name="Expand_All" xml:space="preserve">
+    <value>Развернуть всё</value>
+  </data>
+  <data name="Parts_Tree" xml:space="preserve">
+    <value>Дерево элементов</value>
+  </data>
+  <data name="Search___" xml:space="preserve">
+    <value>Поиск...</value>
+  </data>
+  <data name="Create_resource" xml:space="preserve">
+    <value>Создать ресурс</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="Expand_branch" xml:space="preserve">
+    <value>Развернуть ветку</value>
+  </data>
+  <data name="Collapse_branch" xml:space="preserve">
+    <value>Свернуть ветку</value>
+  </data>
+  <data name="Find_in_tree" xml:space="preserve">
+    <value>Найти в дереве</value>
+  </data>
+  <data name="Find_setted_resource_in_tree" xml:space="preserve">
+    <value>Найти ресурс компонента в дереве</value>
+  </data>
+  <data name="Return_to_the_tree_root" xml:space="preserve">
+    <value>Вернуться к корню дерева</value>
+  </data>
+  <data name="Zoom_in" xml:space="preserve">
+    <value>Приблизить</value>
+  </data>
+  <data name="Zoom_out" xml:space="preserve">
+    <value>Отдалить</value>
+  </data>
+  <data name="Properties" xml:space="preserve">
+    <value>Свойства</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>Выбрать</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="File" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="Save_as___" xml:space="preserve">
+    <value>Сохранить как...</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>Открыть</value>
+  </data>
+  <data name="menu_Edit" xml:space="preserve">
+    <value>Правка</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>Отменить</value>
+  </data>
+  <data name="Redo" xml:space="preserve">
+    <value>Вернуть</value>
+  </data>
+  <data name="resource_properties_annotation" xml:space="preserve">
+    <value>Ресурс "{0}"</value>
+  </data>
+  <data name="recipe_properties_annotation" xml:space="preserve">
+    <value>Рецепт "{0}"</value>
+  </data>
+  <data name="recipe_component_properties_annotation" xml:space="preserve">
+    <value>Компонент "{0}" {1}</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="Product_amount" xml:space="preserve">
+    <value>Получаемое количество</value>
+  </data>
+  <data name="Selected_recipe" xml:space="preserve">
+    <value>Выбранный рецепт</value>
+  </data>
+  <data name="Needed_amount" xml:space="preserve">
+    <value>Необходимое количество</value>
+  </data>
+  <data name="Default_recipe" xml:space="preserve">
+    <value>Рецепт по умолчанию</value>
+  </data>
+  <data name="Resource" xml:space="preserve">
+    <value>Ресурс</value>
+  </data>
+  <data name="Recipe" xml:space="preserve">
+    <value>Рецепт</value>
+  </data>
+  <data name="Component" xml:space="preserve">
+    <value>Компонент</value>
+  </data>
+  <data name="Recipe_N" xml:space="preserve">
+    <value>Рецепт {0}</value>
+  </data>
+  <data name="Resource_N" xml:space="preserve">
+    <value>Ресурс {0}</value>
+  </data>
+  <data name="Component_N" xml:space="preserve">
+    <value>Компонент {0}</value>
+  </data>
+  <data name="The_button_that_does_the_weird_thing" xml:space="preserve">
+    <value>Кнопка, которая делает странные вещи</value>
+  </data>
+  <data name="postfix_funny_programm_for_interesting_things" xml:space="preserve">
+    <value>весёлая прога для интересных вещей</value>
+  </data>
+  <data name="postfix_Send_my_regards_to_David___" xml:space="preserve">
+    <value>Давиду привет :D</value>
+  </data>
+  <data name="postfix_you_forgot_to_save" xml:space="preserve">
+    <value>вы забыли сохранить &lt;:(</value>
+  </data>
+  <data name="Do_you_want_to_save_your_file_before_creating_a_new_one_" xml:space="preserve">
+    <value>Вы хотите сохранить файл перед созданием нового?</value>
+  </data>
+  <data name="Do_you_want_to_save_your_file_before_opening_another_one" xml:space="preserve">
+    <value>Вы хотите сохранить файл перед открытием другого?</value>
+  </data>
+  <data name="The_file_is_not_saved" xml:space="preserve">
+    <value>Файл не сохранён</value>
+  </data>
+  <data name="Details_" xml:space="preserve">
+    <value>Подробнее:</value>
+  </data>
+  <data name="Do_you_want_to_save_your_file_before_leaving_" xml:space="preserve">
+    <value>Вы хотите сохранить файл перед созданием нового?</value>
+  </data>
+  <data name="Saving_error" xml:space="preserve">
+    <value>Ошибка сохранения</value>
+  </data>
+  <data name="Invalid_file_error" xml:space="preserve">
+    <value>Ошибка: невалидный файл</value>
+  </data>
+  <data name="An_error_occured_during_opening_a_file_File_wasnt_opened" xml:space="preserve">
+    <value>При открытии файла возникла ошибка. Файл не был открыт</value>
+  </data>
+  <data name="An_error_occured_during_saving_a_file_File_wasnt_saved" xml:space="preserve">
+    <value>Во время сохранения файла возникла ошибка. Файл не получилось сохранить</value>
+  </data>
+  <data name="filter_Partree_files" xml:space="preserve">
+    <value>Файлы Partree (*.partree)|*.partree|Все файлы (*.*)|*.*</value>
+  </data>
+  <data name="partree_Open_Project" xml:space="preserve">
+    <value>Открыть проект (.partree)</value>
+  </data>
+  <data name="partree_Save_Project" xml:space="preserve">
+    <value>Сохранить проект (.partree)</value>
+  </data>
+</root>

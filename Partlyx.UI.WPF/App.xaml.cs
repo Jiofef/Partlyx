@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Partlyx.Core.Contracts;
 using Partlyx.Infrastructure;
 using Partlyx.Infrastructure.Data;
+using Partlyx.Infrastructure.Data.ApplicationResources;
 using Partlyx.Infrastructure.Data.Implementations;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Services.Commands;
@@ -18,7 +20,10 @@ using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using System.Diagnostics;
+using System.Globalization;
 using System.Windows;
+using System.Windows.Navigation;
 using System.Windows.Threading;
 
 namespace Partlyx.UI.WPF
@@ -30,6 +35,14 @@ namespace Partlyx.UI.WPF
     {
         public static IServiceProvider Services { get; private set; } = null!;
 
+        public static ILocalizationService LocService { get; private set; }
+
+        static App()
+        {
+            var resourceProvider = new ApplicationResourcesProvider(typeof(App).Assembly);
+            LocService = new LocalizationService(resourceProvider);
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -38,8 +51,12 @@ namespace Partlyx.UI.WPF
             InitializeDI(services);
             Services = services.BuildServiceProvider();
 
+            var culture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
+
             var mainVM = Services.GetRequiredService<MainViewModel>();
-            var window = new MainWindow() { DataContext = mainVM };
+            var window = new MainWindow() { DataContext = mainVM};
             window.Show();
 
             DirectoryManager.CreatePartlyxFolder();
@@ -58,6 +75,7 @@ namespace Partlyx.UI.WPF
             services.AddTransient<IPartUpdater, PartUpdater>();
             services.AddSingleton<Infrastructure.Events.IEventBus, Infrastructure.Events.EventBus>();
 
+            services.AddSingleton<IApplicationResourceProvider>(new Infrastructure.Data.ApplicationResources.ApplicationResourcesProvider(typeof(App).Assembly));
 
             services.AddTransient<IPartlyxRepository, PartlyxRepository>();
 
@@ -79,6 +97,8 @@ namespace Partlyx.UI.WPF
             services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
             services.AddTransient<ICommandFactory, DICommandFactory>();
             services.AddTransient<ICommandServices, CommandServices>();
+
+            services.AddSingleton<ILocalizationService, LocalizationService>();
 
             InitializeCommands(services);
 
@@ -107,6 +127,9 @@ namespace Partlyx.UI.WPF
             services.AddSingleton<IVMPartsStoreCleaner, VMPartsStoreCleaner>();
             services.AddSingleton<IGuidLinkedPartFactory, GuidLinkedPartFactory>();
             services.AddSingleton<ILinkedPartsManager, LinkedPartsManager>();
+
+            services.AddSingleton<IMainWindowController, MainWindowController>();
+            services.AddTransient<MainWindowNameController>();
 
             services.AddTransient<ResourceViewModel>();
             services.AddTransient<RecipeViewModel>();

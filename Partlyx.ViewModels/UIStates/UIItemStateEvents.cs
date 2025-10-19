@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.UIStates
 {
-    public record SetAllThePartItemsExpandedEvent(bool expand);
-
     public record SetAllTheResourceItemsExpandedEvent(bool expand);
     public record SetAllTheRecipeItemsExpandedEvent(bool expand);
     public record SetAllTheRecipeComponentItemsExpandedEvent(bool expand);

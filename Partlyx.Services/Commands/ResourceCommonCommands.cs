@@ -17,17 +17,19 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
         public Guid ResourceUid { get; private set; }
 
         private Resource? _createdResource;
+        private string? _resourceName;
 
-        public CreateResourceCommand(IResourceService rs, IPartlyxRepository rr, IEventBus bus)
+        public CreateResourceCommand(IResourceService rs, IPartlyxRepository rr, IEventBus bus, string? name = null)
         {
             _resourceService = rs;
             _resourceRepository = rr;
             _bus = bus;
+            _resourceName = name;
         }
 
         public async Task ExecuteAsync()
         {
-            Guid uid = await _resourceService.CreateResourceAsync();
+            Guid uid = await _resourceService.CreateResourceAsync(_resourceName);
             ResourceUid = uid;
             _createdResource = await _resourceRepository.GetResourceByUidAsync(uid);
         }

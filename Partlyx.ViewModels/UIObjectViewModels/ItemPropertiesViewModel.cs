@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using DynamicData.Binding;
 using Partlyx.Core;
+using Partlyx.Core.Contracts;
 using Partlyx.Infrastructure.Events;
 using Partlyx.ViewModels.ItemProperties;
 using Partlyx.ViewModels.PartsViewModels;
@@ -22,6 +23,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
     {
         private readonly PartsServiceViewModel _services;
         private readonly IDialogService _dialogService;
+        private readonly ILocalizationService _loc;
 
         private readonly IDisposable _focusedPartChangedSubscription;
 
@@ -33,10 +35,11 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
 
 
-        public ItemPropertiesViewModel(PartsServiceViewModel services, IDialogService ds, IGlobalFocusedPart focusedPart, IEventBus bus)
+        public ItemPropertiesViewModel(PartsServiceViewModel services, IDialogService ds, IGlobalFocusedPart focusedPart, IEventBus bus, ILocalizationService loc)
         {
             _services = services;
             _dialogService = ds;
+            _loc = loc;
 
             _focusedPartChangedSubscription = bus.Subscribe<FocusedPartChangedEvent>(ev => OnFocusedPartChanged());
 
@@ -56,17 +59,17 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             {
                 case PartTypeEnumVM.Resource:
                     var resource = (ResourceViewModel)focusedPart;
-                    FocusedPartTextAnnotation = $"\"{resource.Name}\" resource";
+                    FocusedPartTextAnnotation = _loc.Get("resource_properties_annotation", resource.Name);
                     LoadResourceProperties(resource);
                     break;
                 case PartTypeEnumVM.Recipe:
                     var recipe = (RecipeViewModel)focusedPart;
-                    FocusedPartTextAnnotation = $"\"{recipe.Name}\" recipe";
+                    FocusedPartTextAnnotation = _loc.Get("recipe_properties_annotation", recipe.Name);
                     LoadRecipeProperties(recipe);
                     break;
                 case PartTypeEnumVM.Component:
                     var component = (RecipeComponentViewModel)focusedPart;
-                    FocusedPartTextAnnotation = $"\"{component.LinkedResource?.Value?.Name}\" x{component.Quantity} component";
+                    FocusedPartTextAnnotation = _loc.Get("recipe_component_properties_annotation", component.LinkedResource?.Value?.Name ?? "", component.Quantity);
                     LoadComponentProperties(component);
                     break;
             }
@@ -85,7 +88,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public void LoadResourceProperties(ResourceViewModel resource)
         {
             // Creating "Name" property
-            var nameProperty = new TextBoxItemPropertyViewModel() { Name = "Name", Item = resource };
+            var nameProperty = new TextBoxItemPropertyViewModel() { Name = _loc["Name"], Item = resource };
             nameProperty.Text = resource.Name;
             nameProperty.SaveChangesTask = new(
                 async (arg) => 
@@ -101,7 +104,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             Properties.Add(nameProperty);
 
             // Creating "Default recipe" property
-            var defaultRecipeProperty = new RecipeItemPropertyViewModel() { Name = "Default recipe", Item = resource, Part = resource.LinkedDefaultRecipe?.Value };
+            var defaultRecipeProperty = new RecipeItemPropertyViewModel() { Name = _loc["Default_recipe"], Item = resource, Part = resource.LinkedDefaultRecipe?.Value };
             defaultRecipeProperty.SelectButtonPressedTask = new(
                 async (arg) =>
                 {
@@ -128,7 +131,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public void LoadRecipeProperties(RecipeViewModel recipe)
         {
             // Creating "Name" property
-            var nameProperty = new TextBoxItemPropertyViewModel() { Name = "Name", Item = recipe };
+            var nameProperty = new TextBoxItemPropertyViewModel() { Name = _loc["Name"], Item = recipe };
             nameProperty.Text = recipe.Name;
             nameProperty.SaveChangesTask = new(
                 async (arg) =>
@@ -144,7 +147,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             Properties.Add(nameProperty);
 
             // Creating "Craft amount" property
-            var amountProperty = new SpinBoxItemPropertyViewModel() { Name = "Product amount", Item = recipe};
+            var amountProperty = new SpinBoxItemPropertyViewModel() { Name = _loc["Product_amount"], Item = recipe};
             amountProperty.Value = (decimal)recipe.CraftAmount;
             amountProperty.SaveChangesTask = new(
                 async arg =>
@@ -161,7 +164,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public void LoadComponentProperties(RecipeComponentViewModel component)
         {
             // Creating "Selected recipe" property
-            var selectedRecipeProperty = new RecipeItemPropertyViewModel() { Name = "Selected recipe", Item = component, Part = component.LinkedSelectedRecipe?.Value };
+            var selectedRecipeProperty = new RecipeItemPropertyViewModel() { Name = _loc["Selected_recipe"], Item = component, Part = component.LinkedSelectedRecipe?.Value };
             selectedRecipeProperty.SelectButtonPressedTask = new(
                 async (arg) =>
                 {
@@ -185,7 +188,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             Properties.Add(selectedRecipeProperty);
 
             // Creating "Quantity" property
-            var quantityProperty = new SpinBoxItemPropertyViewModel() { Name = "Needed amount", Item = component };
+            var quantityProperty = new SpinBoxItemPropertyViewModel() { Name = _loc["Needed_amount"], Item = component };
             quantityProperty.Value = (decimal)component.Quantity;
             quantityProperty.SaveChangesTask = new(
                 async arg =>

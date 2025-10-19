@@ -9,6 +9,7 @@ using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices;
+using Partlyx.ViewModels.UIServices.Interfaces;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Numerics;
@@ -19,6 +20,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
     public partial class PartsGraphViewModel : ObservableObject, IDisposable
     {
         public IGlobalSelectedParts SelectedParts { get; }
+
+        public IMainWindowController MainWindowController { get; }
 
         private List<IDisposable> _subscriptions = new();
 
@@ -39,9 +42,10 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public Point RootNodeDefaultPosition { get; } = new Point(0, 0);
 
-        public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IEventBus bus, PanAndZoomControllerViewModel pazc)
+        public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IMainWindowController mwc, IEventBus bus, PanAndZoomControllerViewModel pazc)
         {
             SelectedParts = selectedParts;
+            MainWindowController = mwc;
             PanAndZoomController = pazc;
 
             var recipeChangedSubscription = bus.Subscribe<GlobalSingleRecipeSelectedEvent>((ev) => OnSelectedTreeChanged());

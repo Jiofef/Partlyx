@@ -4,6 +4,7 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
              xmlns:local="clr-namespace:Partlyx.UI.WPF"
+             xmlns:h="clr-namespace:Partlyx.UI.WPF.Helpers"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
              xmlns:vmprop="clr-namespace:Partlyx.ViewModels.ItemProperties;assembly=Partlyx.ViewModels"
@@ -100,7 +101,7 @@
         <StackPanel Orientation="Vertical" Grid.Row="0">
             <Grid Height="48">
                 <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
-                <TextBlock Text="Properties" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
+                <TextBlock Text="{h:Loc Properties}" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
             </Grid>
             <TextBlock Grid.Row="0" Text="{Binding FocusedPartTextAnnotation}" Margin="8, 4, 8, 4" HorizontalAlignment="Center" Foreground="{StaticResource PxBlackBrush}" Style="{StaticResource CommonTextBlock}"/>
             <ListView x:Name="PropertiesListView" ItemsSource="{Binding Properties}" HorizontalContentAlignment="Stretch">

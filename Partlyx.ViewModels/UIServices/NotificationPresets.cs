@@ -3,13 +3,14 @@
     public static class NotificationPresets
     {
         // Errors
-        public static readonly NotificationErrorOptions InvalidFileErrorPreset = new("Invalid file error", "An error occured during opening a file. File wasn't opened");
-        public static readonly NotificationErrorOptions SavingFileErrorPreset = new("Saving error", "An error occured during saving a file. File wasn't saved");
+        public static readonly NotificationErrorOptions InvalidFileErrorPreset = new("Invalid_file_error", "An_error_occured_during_opening_a_file_File_wasnt_opened");
+        public static readonly NotificationErrorOptions SavingFileErrorPreset = new("Saving_error", "An_error_occured_during_saving_a_file_File_wasnt_saved");
 
         // Info
 
         // Confirm
-        public static readonly NotificationConfirmOptions ExitingFileSaveConfirm = new("The file is not saved", "Do you want to save your file before leaving?");
-        public static readonly NotificationConfirmOptions NewFileCreationFileSaveConfirm = new("The file is not saved", "Do you want to save your file before creating a new one?");
+        public static readonly NotificationConfirmOptions ExitingFileSaveConfirm = new("The_file_is_not_saved", "Do_you_want_to_save_your_file_before_leaving_");
+        public static readonly NotificationConfirmOptions NewFileCreationFileSaveConfirm = new("The_file_is_not_saved", "Do_you_want_to_save_your_file_before_creating_a_new_one_");
+        public static readonly NotificationConfirmOptions OtherFileOpenFileSaveConfirm = new("The_file_is_not_saved", "Do_you_want_to_save_your_file_before_opening_another_one");
     }
 }

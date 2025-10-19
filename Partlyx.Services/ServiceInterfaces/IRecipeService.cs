@@ -4,7 +4,7 @@ namespace Partlyx.Services.ServiceInterfaces
 {
     public interface IRecipeService
     {
-        Task<Guid> CreateRecipeAsync(Guid parentResourceUid);
+        Task<Guid> CreateRecipeAsync(Guid parentResourceUid, string? recipeName = null);
         Task DeleteRecipeAsync(Guid parentResourceUid, Guid recipeUid);
         Task<Guid> DuplicateRecipeAsync(Guid parentResourceUid, Guid recipeUid);
         Task<List<RecipeDto>> GetAllTheRecipesAsync(Guid parentResourceUid);

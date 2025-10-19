@@ -38,26 +38,42 @@ namespace Partlyx.Infrastructure.Data.Implementations
         private void OnCommandExcecuted(ICommand command)
         {
             _lastExcecutedCommand = command;
+
             IsChangesSaved = false;
+            _bus.Publish(new FileChangesSavedUpdatedEvent(IsChangesSaved));
         }
         private void OnCommandUndoed(ICommand command, ICommand? previousCommand) 
         {
             _lastExcecutedCommand = command;
-            IsChangesSaved = false;
+           
         }
 
-        private void OnSelectedFileChanged(string? newFilePath)
+        private void OnCurrentFileChanged()
+        {
+            IsChangesSaved = false;
+            _bus.Publish(new FileChangesSavedUpdatedEvent(IsChangesSaved));
+        }
+
+        private void OnFilePathChanged(string? newFilePath)
         {
             _lastExcecutedCommand = null;
+
             IsChangesSaved = true;
+            _bus.Publish(new FileChangesSavedUpdatedEvent(IsChangesSaved));
+
+            CurrentPartreePath = newFilePath;
+            var newFileName = Path.GetFileName(newFilePath);
+            _bus.Publish(new CurrentFileNameChangedEvent(newFileName));
         }
 
         public async Task ClearCurrentFile()
         {
             await _repo.ClearEverything();
-            IsChangesSaved = false;
 
-            OnSelectedFileChanged(null);
+            IsChangesSaved = false;
+            _bus.Publish(new FileChangesSavedUpdatedEvent(IsChangesSaved));
+
+            OnFilePathChanged(null);
         }
 
         public async Task DeleteWorkingDB()
@@ -73,6 +89,12 @@ namespace Partlyx.Infrastructure.Data.Implementations
             {
                 CurrentPartreePath = targetPath;
                 _bus.Publish(new FileSavedEvent());
+
+
+                _bus.Publish(new FileChangesSavedUpdatedEvent(IsChangesSaved));
+
+                var newFileName = Path.GetFileName(targetPath);
+                _bus.Publish(new CurrentFileNameChangedEvent(newFileName));
             }
 
             return result;
@@ -83,9 +105,14 @@ namespace Partlyx.Infrastructure.Data.Implementations
             var result = await _loader.ImportPartreeAsync(partreePath, cancellationToken);
 
             if (result.Success)
-                OnSelectedFileChanged(partreePath);
+                OnFilePathChanged(partreePath);
 
             return result;
         }
     }
+
+
+    public record CurrentFileNameChangedEvent(string? newName);
+
+    public record FileChangesSavedUpdatedEvent(bool IsChangesSaved);
 }

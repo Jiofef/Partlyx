@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Partlyx.Core.Contracts;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
+using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -11,12 +13,16 @@ namespace Partlyx.ViewModels.UIServices.Implementations
     public partial class ResourceServiceViewModel
     {
         private readonly ICommandServices _commands;
+        private readonly IResourceService _resourceService;
         private readonly IGlobalSelectedParts _selectedParts;
+        private readonly ILocalizationService _loc;
 
-        public ResourceServiceViewModel(ICommandServices cs, IGlobalSelectedParts gsp) 
+        public ResourceServiceViewModel(ICommandServices cs, IResourceService rs, IGlobalSelectedParts gsp, ILocalizationService loc) 
         {
             _commands = cs;
+            _resourceService = rs;
             _selectedParts = gsp;
+            _loc = loc;
         }
 
         [RelayCommand]
@@ -28,7 +34,13 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 await _commands.Dispatcher.ExcecuteComplexAsync(async complexDispatcher =>
                 {
                     // Resource creating
-                    var createResourceCommand = _commands.Factory.Create<CreateResourceCommand>();
+                    int resourcesCount = await _resourceService.GetResourcesCountAsync();
+
+                    var resourceName = resourcesCount == 0
+                            ? _loc["Resource"]
+                            : _loc.Get("Resource_N", resourcesCount + 1);
+
+                    var createResourceCommand = _commands.Factory.Create<CreateResourceCommand>(resourceName);
                     await complexDispatcher.ExcecuteAsync(createResourceCommand);
                     var resourseUid = createResourceCommand.ResourceUid;
 

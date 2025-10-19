@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Partlyx.Core.Contracts;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
@@ -12,12 +13,15 @@ namespace Partlyx.ViewModels.UIServices.Implementations
     public partial class RecipeServiceViewModel
     {
         private readonly ICommandServices _commands;
+        private readonly ILocalizationService _loc;
+
         private readonly IGlobalSelectedParts _selectedParts;
         private readonly IGlobalFocusedPart _focusedPart;
 
-        public RecipeServiceViewModel(ICommandServices cs, IGlobalSelectedParts gsp, IGlobalFocusedPart gfp)
+        public RecipeServiceViewModel(ICommandServices cs, ILocalizationService loc, IGlobalSelectedParts gsp, IGlobalFocusedPart gfp)
         {
             _commands = cs;
+            _loc = loc;
             _selectedParts = gsp;
             _focusedPart = gfp;
         }
@@ -25,7 +29,12 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task CreateRecipeAsync(ResourceViewModel parent)
         {
-            await _commands.CreateSyncAndExcecuteAsync<CreateRecipeCommand>(parent.Uid);
+            int siblingsAmount = parent.Recipes.Count;
+            var recipeName = siblingsAmount == 0
+                            ? _loc["Recipe"]
+                            : _loc.Get("Recipe_N", siblingsAmount + 1);
+
+            await _commands.CreateSyncAndExcecuteAsync<CreateRecipeCommand>(parent.Uid, recipeName);
         }
 
         [RelayCommand]

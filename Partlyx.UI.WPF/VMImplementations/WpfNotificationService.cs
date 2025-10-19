@@ -1,4 +1,5 @@
-﻿using Partlyx.ViewModels.UIServices;
+﻿using Partlyx.Core.Contracts;
+using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,12 +13,18 @@ namespace Partlyx.UI.WPF.VMImplementations
 {
     public class WpfNotificationService : INotificationService
     {
+        private readonly ILocalizationService _loc;
+        public WpfNotificationService(ILocalizationService loc) 
+        {
+            _loc = loc;
+        }
+
         public Task<bool> ShowYesNoConfirmAsync(NotificationConfirmOptions options, CancellationToken ct = default)
         {
             return RunOnUIThreadAsync(() =>
             {
                 var owner = GetActiveWindow();
-                var result = MessageBox.Show(owner, options.message, options.title, MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var result = MessageBox.Show(owner, _loc[options.message], _loc[options.title], MessageBoxButton.YesNo, MessageBoxImage.Question);
                 return result == MessageBoxResult.Yes;
             });
         }
@@ -27,7 +34,7 @@ namespace Partlyx.UI.WPF.VMImplementations
             return RunOnUIThreadAsync(() =>
             {
                 var owner = GetActiveWindow();
-                var result = MessageBox.Show(owner, options.message, options.title, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                var result = MessageBox.Show(owner, _loc[options.message], _loc[options.title], MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
                 bool? boolResult;
 
@@ -51,10 +58,10 @@ namespace Partlyx.UI.WPF.VMImplementations
             {
                 var text = options.message;
                 if (!string.IsNullOrEmpty(options.details))
-                    text += Environment.NewLine + Environment.NewLine + "Details:" + options.details;
+                    text += Environment.NewLine + Environment.NewLine + _loc["Details_"] + options.details;
 
                 var owner = GetActiveWindow();
-                MessageBox.Show(owner, text, options.title, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(owner, _loc[text], _loc[options.title], MessageBoxButton.OK, MessageBoxImage.Error);
             });
         }
 
@@ -63,7 +70,7 @@ namespace Partlyx.UI.WPF.VMImplementations
             return RunOnUIThreadAsync(() =>
             {
                 var owner = GetActiveWindow();
-                MessageBox.Show(owner, options.message, options.title, MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(owner, _loc[options.message], _loc[options.title], MessageBoxButton.OK, MessageBoxImage.Information);
             });
         }
 

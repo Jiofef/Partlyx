@@ -18,7 +18,7 @@ namespace Partlyx.Services.ServiceImplementations
             _eventBus = bus;
         }
 
-        public async Task<Guid> CreateRecipeAsync(Guid parentResourceUid)
+        public async Task<Guid> CreateRecipeAsync(Guid parentResourceUid, string? recipeName = null)
         {
             // If we change DefaultRecipe in ParentResource while performing the task from below, at the end of the method we will publish the event
             ResourceUpdatedEvent? defaultRecipeChangedEvent = null;
@@ -26,8 +26,8 @@ namespace Partlyx.Services.ServiceImplementations
             var result = await _repo.ExecuteOnResourceAsync(parentResourceUid, resource =>
             {
                 var recipe = resource.CreateRecipe();
-                string recipeName = $"Recipe {resource.Recipes.Count}";
-                recipe.Name = recipeName;
+                if (recipeName != null)
+                    recipe.Name = recipeName;
 
                 if (recipe.ParentResource?.DefaultRecipe == null)
                 {

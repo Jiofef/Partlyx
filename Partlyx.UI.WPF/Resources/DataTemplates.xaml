@@ -4,7 +4,7 @@
                     xmlns:viewmodelparts="clr-namespace:Partlyx.ViewModels.PartsViewModels.Implementations;assembly=Partlyx.ViewModels"
                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                     xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
-                    xmlns:help="clr-namespace:Partlyx.UI.WPF.Helpers"
+                    xmlns:h="clr-namespace:Partlyx.UI.WPF.Helpers"
                     xmlns:conv="clr-namespace:Partlyx.UI.WPF.Converters"
                     xmlns:dts="clr-namespace:Partlyx.UI.WPF.DataTemplateSelectors"
                     xmlns:vmo="clr-namespace:Partlyx.ViewModels.UIObjectViewModels;assembly=Partlyx.ViewModels"
@@ -30,10 +30,10 @@
         <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
             <Grid.ContextMenu>
                 <ContextMenu Style="{StaticResource MaterialDesignMenu}">
-                    <MenuItem Header="Delete" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
-                    <MenuItem Header="Expand branch" Command="{Binding UiItem.ExpandBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
-                    <MenuItem Header="Collapse branch" Command="{Binding UiItem.CollapseBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
-                    <MenuItem Header="Find in tree" Command="{Binding UiItem.FindInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding UiItem.ExpandBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc Collapse_branch}" Command="{Binding UiItem.CollapseBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding UiItem.FindInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
             <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
@@ -87,10 +87,10 @@
         <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
             <Grid.ContextMenu>
                 <ContextMenu Style="{StaticResource MaterialDesignMenu}">
-                    <MenuItem Header="Delete" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
-                    <MenuItem Header="Expand branch" Command="{Binding UiItem.ExpandBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
-                    <MenuItem Header="Collapse branch" Command="{Binding UiItem.CollapseBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
-                    <MenuItem Header="Find in tree" Command="{Binding UiItem.FindInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding UiItem.ExpandBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc Collapse_branch}" Command="{Binding UiItem.CollapseBranchCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding UiItem.FindInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
             <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
@@ -158,8 +158,8 @@
         <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="Auto">
             <Grid.ContextMenu>
                 <ContextMenu Style="{StaticResource MaterialDesignMenu}">
-                    <MenuItem Header="Delete" Command="{Binding Services.ComponentService.RemoveCommand}" CommandParameter="{Binding}"/>
-                    <MenuItem Header="Find setted resource in tree" Command="{Binding UiItem.FindResourceInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.ComponentService.RemoveCommand}" CommandParameter="{Binding}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc Find_setted_resource_in_tree}" Command="{Binding UiItem.FindResourceInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
                 </ContextMenu>
             </Grid.ContextMenu>
             <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
@@ -182,7 +182,7 @@
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="ValueChanged">
                                 <i:InvokeCommandAction
-                                                        Command="{Binding SetQuantityCommand}"
+                                                        Command="{Binding UiItem.SetQuantityCommand}"
                                                         CommandParameter="{Binding Quantity}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Partlyx.Core.Contracts;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
@@ -14,38 +15,60 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 {
     public class VMFileService : IVMFileService
     {
-        private IFileService _fileService;
-        private IFileDialogService _dialogService;
-        private INotificationService _notificationService;
-        private IEventBus _bus;
+        private readonly IFileService _fileService;
+        private readonly IFileDialogService _dialogService;
+        private readonly INotificationService _notificationService;
+        private readonly IEventBus _bus;
+        private readonly MainWindowNameController _mainWindowNameController;
+        private readonly ILocalizationService _loc;
 
-        public VMFileService(IFileService dbfm, IFileDialogService fds, INotificationService ns, IEventBus bus)
+        public VMFileService(IFileService dbfm, IFileDialogService fds, INotificationService ns, IEventBus bus, MainWindowNameController mwnc, ILocalizationService loc)
         {
             _fileService = dbfm;
             _dialogService = fds;
             _notificationService = ns;
             _bus = bus;
+            _mainWindowNameController = mwnc;
+            _loc = loc;
         }
 
         public bool IsChangesSaved => _fileService.IsChangesSaved;
 
-        public async Task NewFileAsync()
+        public async Task<bool> DropFileConfirmNotificationIfNeeded(NotificationConfirmOptions options)
         {
             if (!IsChangesSaved)
             {
-                bool? questionResult = await _notificationService.ShowYesNoCancelConfirmAsync(NotificationPresets.NewFileCreationFileSaveConfirm);
+                _mainWindowNameController.SetAsPostfix(_loc["postfix_you_forgot_to_save"]);
+                bool? questionResult = await _notificationService.ShowYesNoCancelConfirmAsync(options);
 
                 if (questionResult == true) // If answer is Yes
                 {
                     var savingResult = await SaveProjectAsync();
                     if (!savingResult)
-                        return;
+                    {
+                        _mainWindowNameController.ClearPostfix();
+                        return false;
+                    }
                 }
                 else if (questionResult == null)// If answer is Cancel
-                    return;
+                {
+                    _mainWindowNameController.ClearPostfix();
+                    return false;
+                }
 
-                // If answer is No, we just continue
+                _mainWindowNameController.ClearPostfix();
+                return true; // If answer is No
             }
+
+            _mainWindowNameController.ClearPostfix();
+            return true;
+        }
+
+        public async Task NewFileAsync()
+        {
+            bool isOperationConfirmed = await DropFileConfirmNotificationIfNeeded(NotificationPresets.NewFileCreationFileSaveConfirm);
+            if (!isOperationConfirmed)
+                return;
 
             var @event = new FileClosedUIEvent();
             await _bus.PublishAsync(@event);
@@ -84,8 +107,8 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             var path = await _dialogService.ShowSaveFileDialogAsync(new FileDialogOptions()
             {
-                Title = "Open Project (.partree)",
-                Filter = "Partree files (*.partree)|*.partree|All files (*.*)|*.*",
+                Title = _loc["partree_Save_Project"],
+                Filter = _loc["filter_Partree_files"],
                 DefaultFileName = "project.partree",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
             });
@@ -107,12 +130,16 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             var path = await _dialogService.ShowOpenFileDialogAsync(new FileDialogOptions()
             {
-                Title = "Open Project (.partree)",
-                Filter = "Partree files (*.partree)|*.partree|All files (*.*)|*.*",
+                Title = _loc["partree_Open_Project"],
+                Filter = _loc["filter_Partree_files"],
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
             });
 
             if (path == null) return;
+
+            bool isOperationConfirmed = await DropFileConfirmNotificationIfNeeded(NotificationPresets.OtherFileOpenFileSaveConfirm);
+            if (!isOperationConfirmed)
+                return;
 
             var @event = new FileClosedUIEvent();
             await _bus.PublishAsync(@event);

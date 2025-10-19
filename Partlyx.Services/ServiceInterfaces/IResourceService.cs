@@ -5,7 +5,7 @@ namespace Partlyx.Services.ServiceInterfaces
 {
     public interface IResourceService
     {
-        Task<Guid> CreateResourceAsync();
+        Task<Guid> CreateResourceAsync(string? name = null);
         Task<Guid> DuplicateResourceAsync(Guid uid);
         Task DeleteResourceAsync(Guid uid);
         Task<ResourceDto?> GetResourceAsync(Guid uid);
@@ -14,5 +14,6 @@ namespace Partlyx.Services.ServiceInterfaces
         Task SetNameAsync(Guid resourceUid, string name);
         Task<List<ResourceDto>> GetAllTheResourcesAsync();
         Task<List<Guid>> SearchResourcesUidsAsync(string query);
+        Task<int> GetResourcesCountAsync();
     }
 }

@@ -26,8 +26,6 @@ namespace Partlyx.ViewModels
             _recipeVM = vm;
             _unConfirmedName = vm.Name;
 
-            var expandAllPartItemsSubscription = bus.Subscribe<SetAllThePartItemsExpandedEvent>(ev => SetExpanded(ev.expand));
-            Subscriptions.Add(expandAllPartItemsSubscription);
             var expandAllRecipeItemsSubscription = bus.Subscribe<SetAllTheRecipeItemsExpandedEvent>(ev => SetExpanded(ev.expand));
             Subscriptions.Add(expandAllRecipeItemsSubscription);
         }

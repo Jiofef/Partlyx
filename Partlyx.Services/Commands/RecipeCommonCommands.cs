@@ -19,19 +19,22 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
         public Guid RecipeUid { get; private set; }
 
         private Recipe? _createdRecipe;
+        private string? _recipeName;
 
-        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceService rs2, IPartlyxRepository rr, IEventBus bus)
+        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceService rs2, IPartlyxRepository rr, IEventBus bus, string? recipeName = null)
         {
             _recipeService = rs;
             _resourceService = rs2;
             _resourceRepository = rr;
             _resourceUid = parentResourceUid;
             _bus = bus;
+
+            _recipeName = recipeName;
         }
 
         public async Task ExecuteAsync()
         {
-            Guid uid = await _recipeService.CreateRecipeAsync(_resourceUid);
+            Guid uid = await _recipeService.CreateRecipeAsync(_resourceUid, _recipeName);
             RecipeUid = uid;
             var resource = await _resourceRepository.GetResourceByUidAsync(_resourceUid);
             _createdRecipe = resource?.GetRecipeByUid(uid);

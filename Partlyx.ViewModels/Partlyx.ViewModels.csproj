@@ -18,8 +18,4 @@
     <ProjectReference Include="..\Partlyx.Services\Partlyx.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="LocalizationViewModels\" />
-  </ItemGroup>
-
 </Project>

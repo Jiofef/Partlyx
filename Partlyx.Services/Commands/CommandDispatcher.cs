@@ -61,7 +61,6 @@ namespace Partlyx.Services.Commands
         {
             await command.ExecuteAsync();
             OnCommandExcecuted(command);
-            _bus.Publish(new CommandExcecutedEvent(command));
         }
 
         public async Task ExcecuteComplexAsync(Func<ICommandDispatcherComplexHelper, Task> complexAction)
@@ -104,6 +103,7 @@ namespace Partlyx.Services.Commands
 
         private void OnCommandExcecuted(ICommand command)
         {
+            _bus.Publish(new CommandExcecutedEvent(command));
             if (command is IUndoableCommand uCommand)
             {
                 _commandsHistory.AddLast(uCommand);

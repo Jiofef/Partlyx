@@ -5,6 +5,7 @@ using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
+using System.Runtime.CompilerServices;
 
 namespace Partlyx.Services.ServiceImplementations
 {
@@ -20,9 +21,12 @@ namespace Partlyx.Services.ServiceImplementations
             _infoProvider = iip;
         }
 
-        public async Task<Guid> CreateResourceAsync()
+        public async Task<Guid> CreateResourceAsync(string? name = null)
         {
             var resource = new Resource();
+            if (name != null)
+                resource.Name = name;
+
             var icon = new FigureIcon();
             var iconInfo = _infoProvider.GetInfo(icon);
             resource.SetIcon(icon, iconInfo);
@@ -109,6 +113,11 @@ namespace Partlyx.Services.ServiceImplementations
             var resource = await GetResourceAsync(resourceUid);
             if (resource != null)
                 _eventBus.Publish(new ResourceUpdatedEvent(resource, new[]{"Name"}));
+        }
+
+        public async Task<int> GetResourcesCountAsync()
+        {
+            return await _repo.GetResourcesCountAsync();
         }
     }
 }

@@ -155,15 +155,21 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         [RelayCommand]
         public void ExpandAll()
         {
-            var ev = new SetAllThePartItemsExpandedEvent(true);
-            _bus.Publish(ev);
+            var ev1 = new SetAllTheResourceItemsExpandedEvent(true);
+            _bus.Publish(ev1);
+
+            var ev2 = new SetAllTheRecipeItemsExpandedEvent(true);
+            _bus.Publish(ev2);
         }
 
         [RelayCommand]
         public void CollapseAll()
         {
-            var ev = new SetAllThePartItemsExpandedEvent(false);
-            _bus.Publish(ev);
+            var ev1 = new SetAllTheRecipeItemsExpandedEvent(true);
+            _bus.Publish(ev1);
+
+            var ev2 = new SetAllTheResourceItemsExpandedEvent(true);
+            _bus.Publish(ev2);
         }
     }
 }

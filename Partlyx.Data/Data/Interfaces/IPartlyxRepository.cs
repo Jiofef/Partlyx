@@ -28,5 +28,6 @@ namespace Partlyx.Infrastructure.Data.Interfaces
         Task DeleteComponentAsync(Guid uid);
         Task ExecuteWithBatchAsync(IEnumerable<Guid>? resourceUids, IEnumerable<Guid>? recipeUids, IEnumerable<Guid>? componentUids, PartlyxRepository.BatchIncludeOptions? options, Func<PartlyxRepository.BatchLoadResult, Task> action, CancellationToken ct = default);
         Task DeleteWorkingDBFile();
+        Task<int> GetResourcesCountAsync();
     }
 }

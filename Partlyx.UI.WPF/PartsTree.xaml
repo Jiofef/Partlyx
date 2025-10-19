@@ -4,6 +4,7 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
              xmlns:local="clr-namespace:Partlyx.UI.WPF"
+             xmlns:h="clr-namespace:Partlyx.UI.WPF.Helpers"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
              xmlns:ddlocal="clr-namespace:Partlyx.UI.WPF.DragAndDrop"
@@ -17,7 +18,7 @@
         <StackPanel Orientation="Vertical" Grid.Row="0">
             <Grid Height="48">
                 <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
-                <TextBlock Text="Parts tree" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
+                <TextBlock Text="{h:Loc Parts_Tree}" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
             </Grid>
             <Grid Margin="8, 2, 4, 2">
                 <Grid.ColumnDefinitions>
@@ -25,18 +26,18 @@
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBox Style="{StaticResource CommonSearchTextBox}"
-                     md:HintAssist.Hint="Search..." Grid.Row="0"
+                     md:HintAssist.Hint="{h:Loc Search___}" Grid.Row="0"
                      Text="{Binding Search.SearchText, UpdateSourceTrigger=PropertyChanged}"/>
                 <Button Grid.Column="1" Style="{StaticResource BaseButtonStyle}" Width="32" Height="32" Command="{Binding ClearSearchCommand}" 
-                        ToolTip="Clear search text">
+                        ToolTip="{h:Loc Clear_search_text}">
                     <fa:ImageAwesome Icon="Remove" Style="{StaticResource BaseImageAwesomeStyle}" Height="16"/>
                 </Button>
             </Grid>
             <StackPanel Orientation="Horizontal" Margin="8, 2, 4, 2">
-                <Button Style="{StaticResource BaseButtonStyle}" Width="32" ToolTip="Expand all" Command="{Binding ExpandAllCommand}">
+                <Button Style="{StaticResource BaseButtonStyle}" Width="32" ToolTip="{h:Loc Expand_All}" Command="{Binding ExpandAllCommand}">
                     <fa:ImageAwesome Icon="AngleDoubleDown" Foreground="{StaticResource PxBlackBrush}" Width="16"/>
                 </Button>
-                <Button Style="{StaticResource BaseButtonStyle}" Width="32" ToolTip="Collapse all" Command="{Binding CollapseAllCommand}">
+                <Button Style="{StaticResource BaseButtonStyle}" Width="32" ToolTip="{h:Loc Collapse_All}" Command="{Binding CollapseAllCommand}">
                     <fa:ImageAwesome Icon="AngleDoubleUp" Foreground="{StaticResource PxBlackBrush}" Width="16"/>
                 </Button>
             </StackPanel>
@@ -84,11 +85,11 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding Service.CreateResourceCommand}" Grid.Column="0" ToolTip="Create resource">
+            <Button HorizontalAlignment="Stretch" Style="{StaticResource BaseButtonStyle}" Command="{Binding Service.CreateResourceCommand}" Grid.Column="0" ToolTip="{h:Loc Create_resource}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
-                        <TextBlock Text="Create "/>
-                        <fa:ImageAwesome Icon="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
+                        <TextBlock Text="{h:Loc Create}"/>
+                        <fa:ImageAwesome Icon="Plus" Width="15" Margin="4, 0, 0, 0" Foreground="{StaticResource PxBlackBrush}"/>
                     </StackPanel>
                 </Button.Content>
             </Button>

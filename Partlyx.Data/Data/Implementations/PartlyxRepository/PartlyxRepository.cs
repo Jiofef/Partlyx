@@ -87,6 +87,14 @@ namespace Partlyx.Infrastructure.Data.Implementations
             }
         }
 
+        public async Task<int> GetResourcesCountAsync()
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            var count = db.Resources.Count();
+            return count;
+        }
+
         /// <summary>
         /// Important note. If you want to change the state of the received Resource or its descendants, use one of "ExecuteOn___Async" instead so that your changes are saved correctly.
         /// </summary>

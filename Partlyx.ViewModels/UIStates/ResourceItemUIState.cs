@@ -26,8 +26,6 @@ namespace Partlyx.ViewModels
             _resourceVM = vm;
             _unConfirmedName = vm.Name;
 
-            var expandAllPartItemsSubscription = bus.Subscribe<SetAllThePartItemsExpandedEvent>(ev => SetExpanded(ev.expand));
-            Subscriptions.Add(expandAllPartItemsSubscription);
             var expandAllResourceItemsSubscription = bus.Subscribe<SetAllTheResourceItemsExpandedEvent>(ev => SetExpanded(ev.expand));
             Subscriptions.Add(expandAllResourceItemsSubscription);
         }

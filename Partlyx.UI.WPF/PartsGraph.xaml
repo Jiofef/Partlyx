@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:beh="clr-namespace:Partlyx.UI.WPF.Behaviors"
-             xmlns:help="clr-namespace:Partlyx.UI.WPF.Helpers"
+             xmlns:h="clr-namespace:Partlyx.UI.WPF.Helpers"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:graphvm="clr-namespace:Partlyx.ViewModels.Graph;assembly=Partlyx.ViewModels"
              xmlns:local="clr-namespace:Partlyx.UI.WPF"
@@ -15,9 +15,9 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{StaticResource PxWhiteBrush}"
              x:Name="Root">
-    <Grid help:SizeObserver.Observe="True" help:SizeObserver.BindableWidth="{Binding PanAndZoomController.ElementWidth}" help:SizeObserver.BindableHeight="{Binding PanAndZoomController.ElementHeight}"
-          help:SizeObserver.SizeChangedCommand="{Binding CenterizePanPositionCommand}"
-          help:SizeObserver.OneShotCommand="True">
+    <Grid h:SizeObserver.Observe="True" h:SizeObserver.BindableWidth="{Binding PanAndZoomController.ElementWidth}" h:SizeObserver.BindableHeight="{Binding PanAndZoomController.ElementHeight}"
+          h:SizeObserver.SizeChangedCommand="{Binding CenterizePanPositionCommand}"
+          h:SizeObserver.OneShotCommand="True">
         <localo:ZoomPanControl PanPositionX="{Binding PanAndZoomController.PanPositionX, Mode=TwoWay}" PanPositionY="{Binding PanAndZoomController.PanPositionY, Mode=TwoWay}" 
                                ZoomLevel="{Binding PanAndZoomController.ZoomLevel, Mode=TwoWay}"
                                MinZoom="{Binding PanAndZoomController.MinZoom}"
@@ -94,15 +94,21 @@
         </localo:ZoomPanControl>
 
         <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right">
-            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding CenterizePanPositionCommand}" ToolTip="Return to tree root">
+            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding CenterizePanPositionCommand}" ToolTip="{h:Loc Return_to_the_tree_root}">
                 <fa:ImageAwesome Icon="Home" Foreground="{StaticResource PxBlackBrush}" Width="24" Height="24" Margin="4"/>
             </Button>
             <Separator Style="{StaticResource MaterialDesignDarkSeparator}" Height="8"/>
-            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding ZoomInCommand}" ToolTip="Return to tree root">
+            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding ZoomInCommand}" ToolTip="{h:Loc Zoom_in}">
                 <fa:ImageAwesome Icon="Plus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
             </Button>
-            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding ZoomOutCommand}" ToolTip="Return to tree root">
+            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding ZoomOutCommand}" ToolTip="{h:Loc Zoom_out}">
                 <fa:ImageAwesome Icon="Minus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding MainWindowController.NameController.RandomizePostfixCommand}" ToolTip="{h:Loc The_button_that_does_the_weird_thing}" Width="32">
+                <fa:ImageAwesome Icon="Question" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="16" Margin="4"/>
             </Button>
         </StackPanel>
     </Grid>

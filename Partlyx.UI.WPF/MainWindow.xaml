@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Partlyx.UI.WPF"
         xmlns:localother="clr-namespace:Partlyx.UI.WPF.OtherControls"
+        xmlns:h="clr-namespace:Partlyx.UI.WPF.Helpers"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:viewmodel="clr-namespace:Partlyx.ViewModels;assembly=Partlyx.ViewModels"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="Partlyx" Height="720" Width="1280"
+        Title="{Binding WindowController.WindowTitle, FallbackValue=Loading...}" Height="720" Width="1280"
         MinHeight="640" MinWidth="968"
         Icon="/Images/Partlyx.ico"
         WindowState="Maximized"
@@ -38,15 +39,15 @@
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center"/>
                         </ItemsPanelTemplate>
                     </Menu.ItemsPanel>
-                    <MenuItem Header="File" DataContext="{Binding FileMenu}" Height="32">
-                        <MenuItem Header="Create" Command="{Binding NewFileCommand}" Style="{StaticResource CommonMenuItem}"/>
-                        <MenuItem Header="Save" Command="{Binding SaveProjectCommand}" Style="{StaticResource CommonMenuItem}" InputGestureText="Ctrl+S"/>
-                        <MenuItem Header="Save as..." Command="{Binding SaveProjectAsCommand}" Style="{StaticResource CommonMenuItem}" InputGestureText="Ctrl+Shift+S"/>
-                        <MenuItem Header="Open" Command="{Binding OpenProjectCommand}" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc File}" DataContext="{Binding FileMenu}" Height="32">
+                        <MenuItem Header="{h:Loc Create}" Command="{Binding NewFileCommand}" Style="{StaticResource CommonMenuItem}"/>
+                        <MenuItem Header="{h:Loc Save}" Command="{Binding SaveProjectCommand}" Style="{StaticResource CommonMenuItem}" InputGestureText="Ctrl+S"/>
+                        <MenuItem Header="{h:Loc Save_as___}" Command="{Binding SaveProjectAsCommand}" Style="{StaticResource CommonMenuItem}" InputGestureText="Ctrl+Shift+S"/>
+                        <MenuItem Header="{h:Loc Open}" Command="{Binding OpenProjectCommand}" Style="{StaticResource CommonMenuItem}"/>
                     </MenuItem>
-                    <MenuItem Header="Edit" DataContext="{Binding EditMenu}" Height="32">
-                        <MenuItem Header="Undo" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z" Style="{StaticResource CommonMenuItem}"/>
-                        <MenuItem Header="Redo" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Shift+Z / Ctrl+Y" Style="{StaticResource CommonMenuItem}"/>
+                    <MenuItem Header="{h:Loc menu_Edit}" DataContext="{Binding EditMenu}" Height="32">
+                        <MenuItem Header="{h:Loc Undo}" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z" Style="{StaticResource CommonMenuItem}"/>
+                        <MenuItem Header="{h:Loc Redo}" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Shift+Z / Ctrl+Y" Style="{StaticResource CommonMenuItem}"/>
                     </MenuItem>
                 </Menu>
 

@@ -1,4 +1,5 @@
-﻿using Partlyx.Services.ServiceInterfaces;
+﻿using Partlyx.Core.Contracts;
+using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Implementations;
@@ -23,23 +24,28 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public MenuPanelViewModel MenuPanel { get; }
 
+        public IMainWindowController WindowController { get; }
+
         private readonly IPartsLoader _partsLoader;
         private readonly IPartsInitializeService _partsInitializeService;
         private readonly IVMFileService _fileService;
         private readonly INotificationService _notificationService;
         private readonly IVMPartsStoreCleaner _cleaner;
+        private readonly ILocalizationService _loc;
 
         public MainViewModel(
             PartsTreeViewModel partsTree,
             PartsGraphViewModel partsGraph,
             ItemPropertiesViewModel itemProperties,
             MenuPanelViewModel menuPanel,
+            IMainWindowController windowController,
             IGlobalSelectedParts selectedParts,
             IPartsLoader pl,
             IPartsInitializeService pis,
             IVMFileService vmfs,
             INotificationService ns,
-            IVMPartsStoreCleaner vmpsc
+            IVMPartsStoreCleaner vmpsc,
+            ILocalizationService loc
             )
         {
             PartsTree = partsTree;
@@ -47,40 +53,29 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             ItemProperties = itemProperties;
             MenuPanel = menuPanel;
             SelectedParts = selectedParts;
+            WindowController = windowController;
 
             _partsLoader = pl;
             _partsInitializeService = pis;
             _fileService = vmfs;
             _notificationService = ns;
             _cleaner = vmpsc;
+            _loc = loc;
         }
 
         private const bool DISABLE_DB_DELETE_ON_EXIT = true; // During development, it is inconvenient to reopen the file every time you restart. However, don't forget to disable this when releasing the application.
         public async Task<bool> ConfirmClosingAsync()
         {
             // Saving changes notification
-            if (!_fileService.IsChangesSaved)
+            bool isExitConfirmed = await _fileService.DropFileConfirmNotificationIfNeeded(NotificationPresets.ExitingFileSaveConfirm);
+
+            if (isExitConfirmed)
             {
-                bool? questionResult = await _notificationService.ShowYesNoCancelConfirmAsync(NotificationPresets.ExitingFileSaveConfirm);
-
-                if (questionResult == true) // If answer is Yes
-                {
-                    var savingResult = await _fileService.SaveProjectAsync();
-                    if (!savingResult)
-                        return false;
-                }
-                else if (questionResult == null)// If answer is Cancel
-                    return false;
-
-                // If answer is No, we delete DB and close the app
                 if (!DISABLE_DB_DELETE_ON_EXIT)
                     await _fileService.DeleteWorkingDBAsync();
-                return true;
             }
 
-            if (!DISABLE_DB_DELETE_ON_EXIT)
-                await _fileService.DeleteWorkingDBAsync();
-            return true;
+            return isExitConfirmed;
         }
         public Task OnAppClosingAsync()
         {
