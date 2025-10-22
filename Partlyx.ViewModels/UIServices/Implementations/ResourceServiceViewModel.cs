@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Partlyx.Core.Contracts;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
@@ -16,18 +17,21 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         private readonly IResourceService _resourceService;
         private readonly IGlobalSelectedParts _selectedParts;
         private readonly ILocalizationService _loc;
+        private readonly IEventBus _bus;
 
-        public ResourceServiceViewModel(ICommandServices cs, IResourceService rs, IGlobalSelectedParts gsp, ILocalizationService loc) 
+        public ResourceServiceViewModel(ICommandServices cs, IResourceService rs, IGlobalSelectedParts gsp, ILocalizationService loc, IEventBus bus) 
         {
             _commands = cs;
             _resourceService = rs;
             _selectedParts = gsp;
             _loc = loc;
+            _bus = bus;
         }
 
         [RelayCommand]
         public async Task CreateResourceAsync()
         {
+            Guid resourceUid = Guid.Empty;
             // It must be executed on a single thread so that recipients respond to events immediately after they are sent
             await Task.Run(async () =>
             {
@@ -42,13 +46,15 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
                     var createResourceCommand = _commands.Factory.Create<CreateResourceCommand>(resourceName);
                     await complexDispatcher.ExcecuteAsync(createResourceCommand);
-                    var resourseUid = createResourceCommand.ResourceUid;
+                    resourceUid = createResourceCommand.ResourceUid;
 
                     // Default recipe creating
-                    var defaultRecipeCreateCommand = _commands.Factory.Create<CreateRecipeCommand>(resourseUid);
+                    var defaultRecipeCreateCommand = _commands.Factory.Create<CreateRecipeCommand>(resourceUid);
                     await complexDispatcher.ExcecuteAsync(defaultRecipeCreateCommand);
                 });
             });
+
+            _bus.Publish(new ResourceCreatingCompletedVMEvent(resourceUid));
         }
 
         [RelayCommand]

@@ -23,6 +23,9 @@ namespace UJL.CSharp.Collections
             _multiCollection = (ObservableCollection<T>)Items;
             foreach (var collection in collections)
                 AddCollection(collection);
+
+            _multiCollection.CollectionChanged += (sender, args) =>
+                CollectionChanged?.Invoke(this, args);
         }
 
         private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -61,6 +64,11 @@ namespace UJL.CSharp.Collections
             SubscribeCollection(collection);
             CollectionAdded?.Invoke(collection);
         }
+        public void AddCollections<TObservableCollection>(ICollection<TObservableCollection> collections) where TObservableCollection : ICollection<T>, INotifyCollectionChanged
+        {
+            foreach (var collection in collections)
+                AddCollection(collection);
+        }
         public void RemoveCollectionAt(int index)
         {
             var collection = _collections[index];
@@ -81,6 +89,11 @@ namespace UJL.CSharp.Collections
                 _multiCollection.Remove(item);
 
             CollectionRemoved?.Invoke(collection);
+        }
+        public void RemoveCollections<TObservableCollection>(ICollection<TObservableCollection> collections) where TObservableCollection : ICollection<T>, INotifyCollectionChanged
+        {
+            foreach (var collection in collections)
+                RemoveCollection(collection);
         }
 
         private void SubscribeCollection(INotifyCollectionChanged collection)
@@ -110,5 +123,7 @@ namespace UJL.CSharp.Collections
                 }
             }
         }
+
+        new public event NotifyCollectionChangedEventHandler CollectionChanged = delegate { };
     }
 }

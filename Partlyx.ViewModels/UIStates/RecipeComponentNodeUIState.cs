@@ -23,47 +23,16 @@ namespace Partlyx.ViewModels.UIStates
 
             _componentVM = vm;
 
-            var columnTextUpdateSubscription = _componentVM
-                .WhenAnyValue(c => c.LinkedResource!.Value!.Name)
-                .Subscribe(n => UpdateColumnText());
-            _subscriptions.Add(columnTextUpdateSubscription);
-
             var selectedRecipeUpdateSubscription = _componentVM
                 .WhenAnyValue(c => c.LinkedSelectedRecipe!.Value!.Name)
                 .Subscribe(n => UpdateBottomColumnText());
             _subscriptions.Add(selectedRecipeUpdateSubscription);
 
-            var quantityUpdateSubscription = _componentVM
-                .WhenValueChanged(c => c.Quantity)
-                .Subscribe(n => UpdateColumnText());
-            _subscriptions.Add(quantityUpdateSubscription);
-
-            UpdateColumnText();
             UpdateBottomColumnText();
         }
 
-        private string _columnText = "";
-
-        public string ColumnText { get => _columnText; private set => SetProperty(ref _columnText, value); }
-
         private string _bottomColumnText = "";
         public string BottomColumnText { get => _bottomColumnText; set => SetProperty(ref _bottomColumnText, value); }
-
-        private void UpdateColumnText()
-        {
-            string? name = _componentVM.LinkedResource?.Value?.Name;
-
-            if (name == null)
-                ColumnText = "Null";
-            else
-            {
-                string newText = name;
-
-                // When different component display modes appear, the code here should be updated
-                newText += $" x{_componentVM.Quantity}";
-                ColumnText = newText;
-            }
-        }
 
         private void UpdateBottomColumnText()
         {

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Partlyx.ViewModels.Graph;
 using System.Collections.ObjectModel;
 
 namespace Partlyx.ViewModels.GraphicsViewModels
@@ -24,6 +25,17 @@ namespace Partlyx.ViewModels.GraphicsViewModels
             }
             newParent.AddChild(this);
         }
+        public ObservableHierarchyObject GetRoot()
+        {
+            var root = this;
+
+            while (root.Parent is ObservableHierarchyObject parent)
+            {
+                root = parent;
+            }
+
+            return root;
+        }
         public void AddChild(ObservableHierarchyObject child)
         {
             if (_children.Contains(child)) return;
@@ -39,6 +51,32 @@ namespace Partlyx.ViewModels.GraphicsViewModels
         {
             RemoveChild(_children[index]);
         }
-    }
 
+        /// <summary> Performs the action for all hierarchy elements from top to bottom, starting with this </summary>
+        protected void ExcecuteWithAllTheChildren(Action<ObservableHierarchyObject> action)
+        {
+            ExcecuteRecursion(this);
+            void ExcecuteRecursion(ObservableHierarchyObject hObject)
+            {
+                foreach (ObservableHierarchyObject child in hObject.Children)
+                {
+                    action(child);
+                    ExcecuteRecursion(child);
+                }
+            }
+        }
+
+        public TParent? TryFindParent<TParent>() where TParent : ObservableHierarchyObject
+        {
+            var current = this;
+
+            do
+            {
+                current = current.Parent;
+            }
+            while (current is not TParent && current is not null);
+
+            return (TParent?)current;
+        }
+    }
 }

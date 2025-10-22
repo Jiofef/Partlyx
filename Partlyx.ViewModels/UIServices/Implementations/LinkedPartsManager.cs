@@ -26,13 +26,13 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             _bus = bus;
             _store = store;
 
-            _bus.Subscribe<ResourceVMAddedToStoreEvent>((ev) => NotifyAdded(ev.resourceUid, _store.Resources[ev.resourceUid], _linkedResourcesDic));
-            _bus.Subscribe<RecipeVMAddedToStoreEvent>((ev) => NotifyAdded(ev.recipeUid, _store.Recipes[ev.recipeUid], _linkedRecipesDic));
-            _bus.Subscribe<RecipeComponentVMAddedToStoreEvent>((ev) => NotifyAdded(ev.componentUid, _store.RecipeComponents[ev.componentUid], _linkedComponentsDic));
+            _bus.Subscribe<ResourceVMAddedToStoreEvent>((ev) => NotifyAdded(ev.ResourceUid, _store.Resources[ev.ResourceUid], _linkedResourcesDic));
+            _bus.Subscribe<RecipeVMAddedToStoreEvent>((ev) => NotifyAdded(ev.RecipeUid, _store.Recipes[ev.RecipeUid], _linkedRecipesDic));
+            _bus.Subscribe<RecipeComponentVMAddedToStoreEvent>((ev) => NotifyAdded(ev.ComponentUid, _store.RecipeComponents[ev.ComponentUid], _linkedComponentsDic));
 
-            _bus.Subscribe<ResourceVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.resourceUid, _linkedResourcesDic));
-            _bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.recipeUid, _linkedResourcesDic));
-            _bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.componentUid, _linkedResourcesDic));
+            _bus.Subscribe<ResourceVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.ResourceUid, _linkedResourcesDic));
+            _bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.RecipeUid, _linkedResourcesDic));
+            _bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.ComponentUid, _linkedResourcesDic));
         }
 
         private List<WeakReference<GuidLinkedPart<ResourceViewModel>>> _linkedResourcesDisorderedList = new();

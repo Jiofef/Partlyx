@@ -121,7 +121,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             if (Uid == ev.OldRecipeUid)
             {
-                var componentVM = Components.FirstOrDefault(c => c.Uid == ev.RecipeComponentUid);
+                var componentVM = Components.FirstOrDefault(c => c.Uid == ev.ComponentUid);
                 if (componentVM != null)
                 {
                     Components.Remove(componentVM);
@@ -129,7 +129,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             }
             else if (Uid == ev.NewRecipeUid)
             {
-                var componentVM = _store.RecipeComponents.GetValueOrDefault(ev.RecipeComponentUid);
+                var componentVM = _store.RecipeComponents.GetValueOrDefault(ev.ComponentUid);
                 if (componentVM != null)
                 {
                     Components.Add(componentVM);

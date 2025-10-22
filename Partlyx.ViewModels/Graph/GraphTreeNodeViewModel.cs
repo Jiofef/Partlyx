@@ -9,7 +9,7 @@ namespace Partlyx.ViewModels.Graph
     {
         private const float StandardNodeDistanceX = 24;
         private const float StandardNodeDistanceY = 48;
-        private const float StandardBranchDistanceX = StandardNodeDistanceX * 2;
+        private const float StandardBranchDistanceX = StandardNodeDistanceX * 2.5f;
 
         public const float StandardNodeWidth = 96;
         public const float StandardNodeHeight = 96;
@@ -69,11 +69,24 @@ namespace Partlyx.ViewModels.Graph
                 child.AddBranchLinesCollectionsToList(collections);
         }
 
-        public void UpdateChildrenPositions()
+        /// <summary> Call it when your tree is ready </summary>
+        public virtual void BuildChildren()
         {
             BuildBranchAndGetItsWidth();
             UpdateGlobalPositionOfTree();
+
+            BuildingRecursion(this);
+            void BuildingRecursion(GraphTreeNodeViewModel node)
+            {
+                foreach (GraphTreeNodeViewModel child in node.Children)
+                {
+                    child.Build();
+                    BuildingRecursion(child);
+                }
+            }
         }
+
+        protected virtual void Build() { }
 
         // This method works almost without errors, but requires rework and removal of workarounds (for example adding Width to branchOffset)
         private float BuildBranchAndGetItsWidth()
@@ -93,7 +106,7 @@ namespace Partlyx.ViewModels.Graph
                 branchWidth += childBranchWidth;
 
                 if (i < Children.Count - 1)
-                    branchWidth += child.Children.Count == 0 ? BranchesDistanceX : SingleChildrenDistanceX;
+                    branchWidth += child.Children.Count == 0 ? SingleChildrenDistanceX : BranchesDistanceX;
             }
 
             // Setting children positions
@@ -107,7 +120,7 @@ namespace Partlyx.ViewModels.Graph
                 child.SetYLocalSilent(Height + SingleChildrenDistanceY);
                 child.SetXLocalSilent(nextChildOffsetX + currentBranchWidth / 2);
 
-                float dist = child.Children.Count == 0 ? BranchesDistanceX : SingleChildrenDistanceX;
+                float dist = child.Children.Count == 0 ? SingleChildrenDistanceX : BranchesDistanceX;
                 nextChildOffsetX += currentBranchWidth + dist;
             }
 

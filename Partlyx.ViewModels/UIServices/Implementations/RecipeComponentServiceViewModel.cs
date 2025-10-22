@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Partlyx.Core;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
@@ -16,12 +18,14 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         private readonly ICommandServices _commands;
         private readonly IGlobalSelectedParts _selectedParts;
         private readonly IDialogService _dialogService;
+        private readonly IEventBus _bus;
 
-        public RecipeComponentServiceViewModel(ICommandServices cs, IGlobalSelectedParts gsp, IDialogService ds)
+        public RecipeComponentServiceViewModel(ICommandServices cs, IGlobalSelectedParts gsp, IDialogService ds, IEventBus bus)
         {
             _commands = cs;
             _selectedParts = gsp;
             _dialogService = ds;
+            _bus = bus;
         }
 
         [RelayCommand]
@@ -52,7 +56,15 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             {
                 var componentResUid = resource.Uid;
                 var command = _commands.Factory.Create<CreateRecipeComponentCommand>(grandParentResUid, parentRecipeUid, componentResUid);
-                await _commands.Dispatcher.ExcecuteAsync(command);
+
+                // It must be executed on a single thread so that recipients respond to events immediately after they are sent
+                await Task.Run(async () =>
+                {
+                    await _commands.Dispatcher.ExcecuteAsync(command);
+                });
+
+                var componentUid = command.RecipeComponentUid;
+                _bus.Publish(new RecipeComponentCreatingCompletedVMEvent(componentUid));
             }
         }
 
@@ -71,6 +83,9 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
                 await _commands.CreateSyncAndExcecuteAsync<MoveRecipeComponentCommand>(previousGrandParentUid, newGrandParentUid, previousParentUid, newParentUid, component.Uid);
             }
+
+            var componentUids = components.Select(c => c.Uid).ToArray();
+            _bus.Publish(new RecipeComponentsMovingCompletedVMEvent(componentUids));
         }
 
         [RelayCommand]

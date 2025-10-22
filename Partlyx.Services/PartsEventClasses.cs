@@ -25,7 +25,7 @@ namespace Partlyx.Services.PartsEventClasses
 
     public record RecipeComponentCreatedEvent(RecipeComponentDto RecipeComponent);
 
-    public record RecipeComponentMovedEvent(Guid OldResourceUid, Guid NewResourceUid, Guid OldRecipeUid, Guid NewRecipeUid, Guid RecipeComponentUid);
+    public record RecipeComponentMovedEvent(Guid OldResourceUid, Guid NewResourceUid, Guid OldRecipeUid, Guid NewRecipeUid, Guid ComponentUid);
 
     // Parts initialization events
     public record PartsInitializationStartedEvent();

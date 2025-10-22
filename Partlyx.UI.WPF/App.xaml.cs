@@ -14,6 +14,7 @@ using Partlyx.Services.ServiceInterfaces;
 using Partlyx.UI.WPF.DragAndDrop;
 using Partlyx.UI.WPF.VMImplementations;
 using Partlyx.ViewModels;
+using Partlyx.ViewModels.Graph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIObjectViewModels;
@@ -130,6 +131,9 @@ namespace Partlyx.UI.WPF
 
             services.AddSingleton<IMainWindowController, MainWindowController>();
             services.AddTransient<MainWindowNameController>();
+
+            services.AddTransient<IGraphTreeBuilderViewModel, GraphTreeBuilderViewModel>();
+            services.AddTransient<PartsGraphTreeBuilderViewModel>();
 
             services.AddTransient<ResourceViewModel>();
             services.AddTransient<RecipeViewModel>();

@@ -45,7 +45,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public void Register(RecipeViewModel recipe)
         {
-            if (!_resources.ContainsKey(recipe.Uid))
+            if (!_recipes.ContainsKey(recipe.Uid))
             {
                 _recipes.Add(recipe.Uid, recipe);
                 _bus.Publish(new RecipeVMAddedToStoreEvent(recipe.Uid));
@@ -54,7 +54,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public void Register(RecipeComponentViewModel component)
         {
-            if (!_resources.ContainsKey(component.Uid))
+            if (!_recipeComponents.ContainsKey(component.Uid))
             {
                 _recipeComponents.Add(component.Uid, component);
                 _bus.Publish(new RecipeComponentVMAddedToStoreEvent(component.Uid));

@@ -24,7 +24,7 @@
                                MaxZoom="{Binding PanAndZoomController.MaxZoom}">
             <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <!-- edges behind -->
-                <ItemsControl ItemsSource="{Binding Edges}">
+                <ItemsControl ItemsSource="{Binding Graph.Edges}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas />
@@ -37,7 +37,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <!-- nodes on top -->
-                <ItemsControl ItemsSource="{Binding Nodes}">
+                <ItemsControl ItemsSource="{Binding Graph.Nodes}">
                     <ItemsControl.Resources>
                         <DataTemplate DataType="{x:Type graphvm:RecipeGraphNodeViewModel}">
                             <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
@@ -64,7 +64,7 @@
                                 <Grid VerticalAlignment="Stretch">
                                     <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
                                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.BottomColumnText}"/>
-                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.ColumnText}"/>
+                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ColumnText}"/>
                                     </StackPanel>
                                 </Grid>
                                 

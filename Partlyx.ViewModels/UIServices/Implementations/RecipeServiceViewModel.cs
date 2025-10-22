@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Partlyx.Core.Contracts;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
@@ -14,14 +15,16 @@ namespace Partlyx.ViewModels.UIServices.Implementations
     {
         private readonly ICommandServices _commands;
         private readonly ILocalizationService _loc;
+        private readonly IEventBus _bus;
 
         private readonly IGlobalSelectedParts _selectedParts;
         private readonly IGlobalFocusedPart _focusedPart;
 
-        public RecipeServiceViewModel(ICommandServices cs, ILocalizationService loc, IGlobalSelectedParts gsp, IGlobalFocusedPart gfp)
+        public RecipeServiceViewModel(ICommandServices cs, ILocalizationService loc, IGlobalSelectedParts gsp, IGlobalFocusedPart gfp, IEventBus bus)
         {
             _commands = cs;
             _loc = loc;
+            _bus = bus;
             _selectedParts = gsp;
             _focusedPart = gfp;
         }
@@ -34,7 +37,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                             ? _loc["Recipe"]
                             : _loc.Get("Recipe_N", siblingsAmount + 1);
 
-            await _commands.CreateSyncAndExcecuteAsync<CreateRecipeCommand>(parent.Uid, recipeName);
+            var command = _commands.Factory.Create<CreateRecipeCommand>(parent.Uid, recipeName);
+
+            // It must be executed on a single thread so that recipients respond to events immediately after they are sent
+            await Task.Run(async () =>
+            {
+                await _commands.Dispatcher.ExcecuteAsync(command);
+            });
+                 
+
+            var recipeUid = command.RecipeUid;
+            _bus.Publish(new RecipeCreatingCompletedVMEvent(recipeUid));
         }
 
         [RelayCommand]
@@ -69,6 +82,9 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
                 await _commands.CreateSyncAndExcecuteAsync<MoveRecipeCommand>(previousParentUid, newParentUid, recipe.Uid);
             }
+
+            var recipeUids = recipes.Select(r => r.Uid).ToArray();
+            _bus.Publish(new RecipesMovingCompletedVMEvent(recipeUids));
         }
 
         [RelayCommand]

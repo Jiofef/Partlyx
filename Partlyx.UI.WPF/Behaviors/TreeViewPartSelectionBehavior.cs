@@ -120,29 +120,36 @@ namespace Partlyx.UI.WPF.Behaviors
             var selectedParts = SelectedPartsContainer;
             if (selectedParts != null)
             {
-                if (part is ResourceViewModel resource)
+                if (part is ResourceViewModel resource && !selectedParts.Resources.Contains(resource))
                 {
-                    selectedParts.ClearSelection();
                     selectedParts.SelectSingleResource(resource);
 
                     if (AutoSelectDefaultResourceRecipe && resource.LinkedDefaultRecipe?.Value != null)
                         selectedParts.SelectSingleRecipe(resource.LinkedDefaultRecipe.Value);
+                    else
+                        selectedParts.ClearSelectedRecipes();
                 }
-                else if (part is RecipeViewModel recipe)
+                else if (part is RecipeViewModel recipe && !selectedParts.Recipes.Contains(recipe))
                 {
-                    selectedParts.ClearSelection();
                     selectedParts.SelectSingleRecipe(recipe);
 
                     if (AutoSetAncestorParts)
                         selectedParts.SelectSingleRecipeAncestor(recipe);
+                    else 
+                        selectedParts.ClearSelectedResources();
+                    selectedParts.ClearSelectedComponents();
                 }
-                else if (part is RecipeComponentViewModel component)
+                else if (part is RecipeComponentViewModel component && !selectedParts.Components.Contains(component))
                 {
-                    selectedParts.ClearSelection();
                     selectedParts.SelectSingleComponent(component);
 
                     if (AutoSetAncestorParts)
                         selectedParts.SelectSingleComponentAncestors(component);
+                    else
+                    {
+                        selectedParts.ClearSelectedRecipes();
+                        selectedParts.ClearSelectedResources();
+                    }
                 }
             }
 

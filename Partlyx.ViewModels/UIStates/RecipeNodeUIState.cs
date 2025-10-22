@@ -33,6 +33,10 @@ namespace Partlyx.ViewModels
                 .WhenAnyValue(rc => rc.LinkedParentResource!.Value!.Name)
                 .Subscribe(n => UpdateSecondaryColumnText());
             _subscriptions.Add(secondaryColumnTextUpdateSubscription);
+            var secondaryColumnAmountUpdateSubscription = _recipeVM
+                .WhenAnyValue(rc => rc.CraftAmount)
+                .Subscribe(n => UpdateSecondaryColumnText());
+            _subscriptions.Add(secondaryColumnAmountUpdateSubscription);
 
             UpdateColumnText();
             UpdateSecondaryColumnText();

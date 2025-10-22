@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public record ResourceVMAddedToStoreEvent(Guid resourceUid);
-    public record ResourceVMRemovedFromStoreEvent(Guid resourceUid);
+    public record ResourceVMAddedToStoreEvent(Guid ResourceUid);
+    public record ResourceVMRemovedFromStoreEvent(Guid ResourceUid);
 
-    public record RecipeVMAddedToStoreEvent(Guid recipeUid);
-    public record RecipeVMRemovedFromStoreEvent(Guid recipeUid);
+    public record RecipeVMAddedToStoreEvent(Guid RecipeUid);
+    public record RecipeVMRemovedFromStoreEvent(Guid RecipeUid);
 
-    public record RecipeComponentVMAddedToStoreEvent(Guid componentUid);
-    public record RecipeComponentVMRemovedFromStoreEvent(Guid componentUid);
+    public record RecipeComponentVMAddedToStoreEvent(Guid ComponentUid);
+    public record RecipeComponentVMRemovedFromStoreEvent(Guid ComponentUid);
 }
