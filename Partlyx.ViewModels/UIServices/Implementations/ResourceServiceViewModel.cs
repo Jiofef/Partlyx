@@ -49,7 +49,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                     resourceUid = createResourceCommand.ResourceUid;
 
                     // Default recipe creating
-                    var defaultRecipeCreateCommand = _commands.Factory.Create<CreateRecipeCommand>(resourceUid);
+                    var defaultRecipeCreateCommand = _commands.Factory.Create<CreateRecipeCommand>(resourceUid, _loc["Recipe"]);
                     await complexDispatcher.ExcecuteAsync(defaultRecipeCreateCommand);
                 });
             });

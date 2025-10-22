@@ -26,11 +26,11 @@ namespace Partlyx.ViewModels.PartsViewModels
     public record GlobalPartAddedToSelectedEvent(PartTypeEnumVM partType, Guid newSelected);
 
     // Single selection
-    public record GlobalSingleResourceSelectedEvent(Guid selected);
+    public record GlobalSingleResourceSelectedEvent(Guid? selected);
 
-    public record GlobalSingleRecipeSelectedEvent(Guid selected);
+    public record GlobalSingleRecipeSelectedEvent(Guid? selected);
 
-    public record GlobalSingleComponentSelectedEvent(Guid selected);
+    public record GlobalSingleComponentSelectedEvent(Guid? selected);
 
-    public record GlobalSinglePartSelectedEvent(PartTypeEnumVM partType, Guid selected);
+    public record GlobalSinglePartSelectedEvent(PartTypeEnumVM partType, Guid? selected);
 }

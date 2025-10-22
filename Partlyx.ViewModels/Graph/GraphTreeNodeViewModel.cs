@@ -1,4 +1,5 @@
 ﻿using Partlyx.ViewModels.GraphicsViewModels;
+using Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels;
 using System.Collections.ObjectModel;
 using System.Numerics;
 using UJL.CSharp.Collections;

@@ -288,4 +288,7 @@
   <data name="partree_Save_Project" xml:space="preserve">
     <value>Save Project (.partree)</value>
   </data>
+  <data name="Total_resources_amount" xml:space="preserve">
+    <value>Total recipe's resources amount</value>
+  </data>
 </root>

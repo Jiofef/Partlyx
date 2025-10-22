@@ -65,8 +65,10 @@ namespace Partlyx.ViewModels.Graph
 
                     var edge = new TwoObjectsLineViewModel(parentNode, node);
 
-                    if (component.SelectedRecipeComponents != null)
+                    if (component.SelectedRecipeComponents != null && component.SelectedRecipeComponents.Count > 0)
                         LoadChildComponentsFrom(component.SelectedRecipeComponents, node);
+                    else
+                        ComponentLeafs.Add(node);
                 }
             }
 
@@ -111,8 +113,6 @@ namespace Partlyx.ViewModels.Graph
 
             Edges = mainNode.GetBranchLinesMultiCollection();
             BuildEdgesFor(mainNode);
-
-            //
         }
 
         protected override void OnTreeDestroyed()

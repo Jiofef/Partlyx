@@ -38,6 +38,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                     _bus.Publish(@commonEvent);
                 }
             }
+            else
+            {
+                var @event = new GlobalSingleResourceSelectedEvent(null);
+                _bus.Publish(@event);
+            }
 
             var selectedResourcesUids = Resources.Select(r => r.Uid).ToArray();
             var @changedEvent = new GlobalSelectedResourcesChangedEvent(selectedResourcesUids);
@@ -68,8 +73,13 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                     _bus.Publish(@commonEvent);
                 }
             }
+            else
+            {
+                var @event = new GlobalSingleRecipeSelectedEvent(null);
+                _bus.Publish(@event);
+            }
 
-            var selectedRecipeUids = Recipes.Select(r => r.Uid).ToArray();
+                var selectedRecipeUids = Recipes.Select(r => r.Uid).ToArray();
             var @changedEvent = new GlobalSelectedRecipesChangedEvent(selectedRecipeUids);
             _bus.Publish(@changedEvent);
 
@@ -97,6 +107,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                     var @commonEvent = new GlobalSinglePartSelectedEvent(PartTypeEnumVM.Component, added.Uid);
                     _bus.Publish(@commonEvent);
                 }
+            }
+            else
+            {
+                var @event = new GlobalSingleComponentSelectedEvent(null);
+                _bus.Publish(@event);
             }
 
             var selectedComponentsUids = Components.Select(c => c.Uid).ToArray();

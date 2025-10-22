@@ -547,6 +547,15 @@ namespace Partlyx.UI.WPF.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Total recipe&apos;s resources amount.
+        /// </summary>
+        internal static string Total_resources_amount {
+            get {
+                return ResourceManager.GetString("Total_resources_amount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Undo.
         /// </summary>
         internal static string Undo {

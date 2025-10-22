@@ -2,7 +2,7 @@
 using Partlyx.ViewModels.Graph;
 using System.Collections.ObjectModel;
 
-namespace Partlyx.ViewModels.GraphicsViewModels
+namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
 {
     public class ObservableHierarchyObject : ObservableObject
     {

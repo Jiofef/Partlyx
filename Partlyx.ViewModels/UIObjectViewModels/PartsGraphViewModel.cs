@@ -23,6 +23,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         // Core
         public PartsGraphTreeBuilderViewModel Graph { get; }
+        public ComponentSumController SumController { get; }
+        private readonly ComponentSumControllerBinder _componentSumBinder;
 
         public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IMainWindowController mwc, PanAndZoomControllerViewModel pazc, PartsGraphTreeBuilderViewModel graph, IEventBus bus)
         {
@@ -33,6 +35,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             var recipeChangedSubscription = bus.Subscribe<GlobalSingleRecipeSelectedEvent>(ev => CenterizePanPosition());
             _subscriptions.Add(recipeChangedSubscription);
+
+            SumController = new();
+            _componentSumBinder = new ComponentSumControllerBinder(graph.ComponentLeafs, SumController);
         }
 
         public void Dispose()

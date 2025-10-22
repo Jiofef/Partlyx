@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Partlyx.ViewModels.Graph;
-using Partlyx.ViewModels.GraphicsViewModels;
 using System.Numerics;
 
-namespace Partlyx.ViewModels.GraphicsViewModels
+namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
 {
     public class HierarchyTransformObject : ObservableHierarchyObject, ISizePositionObject
     {
