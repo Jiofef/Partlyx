@@ -8,7 +8,7 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
              xmlns:ddlocal="clr-namespace:Partlyx.UI.WPF.DragAndDrop"
-             xmlns:fa="http://schemas.fontawesome.io/icons/">
+             xmlns:fa="clr-namespace:Meziantou.WpfFontAwesome;assembly=Meziantou.WpfFontAwesome">
     <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -30,15 +30,15 @@
                      Text="{Binding Search.SearchText, UpdateSourceTrigger=PropertyChanged}"/>
                 <Button Grid.Column="1" Style="{StaticResource BaseButtonStyle}" Width="32" Height="32" Command="{Binding ClearSearchCommand}" 
                         ToolTip="{h:Loc Clear_search_text}">
-                    <fa:ImageAwesome Icon="Remove" Style="{StaticResource BaseImageAwesomeStyle}" Height="16"/>
+                    <fa:FontAwesomeIcon SolidIcon="Times" Style="{StaticResource BaseImageAwesomeStyle}" Height="16"/>
                 </Button>
             </Grid>
             <StackPanel Orientation="Horizontal" Margin="8, 2, 4, 2">
                 <Button Style="{StaticResource BaseButtonStyle}" Width="32" ToolTip="{h:Loc Expand_All}" Command="{Binding ExpandAllCommand}">
-                    <fa:ImageAwesome Icon="AngleDoubleDown" Foreground="{StaticResource PxBlackBrush}" Width="16"/>
+                    <fa:FontAwesomeIcon SolidIcon="AngleDoubleDown" Style="{StaticResource BaseImageAwesomeStyle}" Width="16"/>
                 </Button>
                 <Button Style="{StaticResource BaseButtonStyle}" Width="32" ToolTip="{h:Loc Collapse_All}" Command="{Binding CollapseAllCommand}">
-                    <fa:ImageAwesome Icon="AngleDoubleUp" Foreground="{StaticResource PxBlackBrush}" Width="16"/>
+                    <fa:FontAwesomeIcon SolidIcon="AngleDoubleUp" Style="{StaticResource BaseImageAwesomeStyle}" Width="16"/>
                 </Button>
             </StackPanel>
         </StackPanel>
@@ -89,7 +89,7 @@
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
                         <TextBlock Text="{h:Loc Create}"/>
-                        <fa:ImageAwesome Icon="Plus" Width="15" Margin="4, 0, 0, 0" Foreground="{StaticResource PxBlackBrush}"/>
+                        <fa:FontAwesomeIcon SolidIcon="Plus" Width="15" Margin="4, 0, 0, 0" Style="{StaticResource BaseImageAwesomeStyle}"/>
                     </StackPanel>
                 </Button.Content>
             </Button>

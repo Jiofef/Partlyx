@@ -9,6 +9,11 @@ namespace Partlyx.Core.VisualsInfo
         string Path { get; set; }
     }
 
+    public interface IUidIcon : IIcon 
+    {
+        Guid Uid { get; }
+    }
+
     public interface IFigureIcon : IIcon
     {
         Color Color { get; set; }
@@ -19,5 +24,5 @@ namespace Partlyx.Core.VisualsInfo
         string FigureType { get; set; }
     }
 
-    public enum IconTypeEnum { Figure, Image }
+    public enum IconTypeEnum { Null, Figure, Image }
 }

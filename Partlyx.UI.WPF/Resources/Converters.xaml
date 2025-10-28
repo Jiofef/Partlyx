@@ -6,4 +6,7 @@
     <conv:InverseBooleanToVisibilityConverter x:Key="BoolToSelectionModeConv"/>
     <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisConv"/>
     <conv:SelectedEqualsConverter x:Key="SelectedEqualsConv"/>
+    <conv:ImageTypeToVisibilityConverter x:Key="IconKindToVisConv"/>
+    <conv:BytesToBitmapImageConverter x:Key="BytesToBitmapImageConv"/>
+    <conv:ColorToSolidColorBrushValueConverter x:Key="ColorToBrushConv"/>
 </ResourceDictionary>

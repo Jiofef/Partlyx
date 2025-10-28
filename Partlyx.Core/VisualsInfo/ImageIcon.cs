@@ -1,27 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 
 namespace Partlyx.Core.VisualsInfo
 {
-    public class ImageIcon : IPathIcon
+    public class ImageIcon : IUidIcon
     {
-        public string Path { get; set; }
+        public Guid Uid { get; set; }
 
-        public ImageIcon(string path)
+        public string Name { get; set; } = "Image";
+
+        public ImageIcon(Guid imageUid)
         {
-            Path = path;
-        }
-
-        public ImageIcon CreateFromIconInfo(IconInfo info)
-        {
-            if (info.Type != IconTypeEnum.Image)
-                throw new ArgumentException("Sent IconInfo does not match ImageIcon type");
-
-            return JsonSerializer.Deserialize<ImageIcon>(info.Data)!;
+            Uid = imageUid;
         }
     }
 }

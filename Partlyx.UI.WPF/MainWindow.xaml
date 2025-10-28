@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Partlyx.UI.WPF"
         xmlns:localother="clr-namespace:Partlyx.UI.WPF.OtherControls"
         xmlns:h="clr-namespace:Partlyx.UI.WPF.Helpers"
-        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:fa="clr-namespace:Meziantou.WpfFontAwesome;assembly=Meziantou.WpfFontAwesome"
         xmlns:viewmodel="clr-namespace:Partlyx.ViewModels;assembly=Partlyx.ViewModels"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"

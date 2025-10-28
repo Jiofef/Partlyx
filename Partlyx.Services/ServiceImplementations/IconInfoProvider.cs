@@ -22,5 +22,15 @@ namespace Partlyx.Services.ServiceImplementations
 
             return new IconInfo(type, data);
         }
+
+        public ImageIcon? GetImageIconFromInfo(IconInfo info)
+        {
+            return JsonSerializer.Deserialize<ImageIcon>(info.Data);
+        }
+
+        public FigureIcon? GetFigureIconFromInfo(IconInfo info)
+        {
+            return JsonSerializer.Deserialize<FigureIcon>(info.Data);
+        }
     }
 }

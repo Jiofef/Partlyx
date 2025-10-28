@@ -10,7 +10,7 @@
              xmlns:local="clr-namespace:Partlyx.UI.WPF"
              xmlns:localo="clr-namespace:Partlyx.UI.WPF.OtherControls"
              xmlns:zoom="https://github.com/Moravuscz/WPFZoomPanel"
-             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:fa="clr-namespace:Meziantou.WpfFontAwesome;assembly=Meziantou.WpfFontAwesome"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{StaticResource PxWhiteBrush}"
@@ -105,20 +105,20 @@
 
             <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right">
                 <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding CenterizePanPositionCommand}" ToolTip="{h:Loc Return_to_the_tree_root}">
-                    <fa:ImageAwesome Icon="Home" Foreground="{StaticResource PxBlackBrush}" Width="24" Height="24" Margin="4"/>
+                    <fa:FontAwesomeIcon SolidIcon="Home" Foreground="{StaticResource PxBlackBrush}" Width="24" Height="24" Margin="4"/>
                 </Button>
                 <Separator Style="{StaticResource MaterialDesignDarkSeparator}" Height="8"/>
                 <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding ZoomInCommand}" ToolTip="{h:Loc Zoom_in}">
-                    <fa:ImageAwesome Icon="Plus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
+                    <fa:FontAwesomeIcon SolidIcon="Plus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
                 </Button>
                 <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding ZoomOutCommand}" ToolTip="{h:Loc Zoom_out}">
-                    <fa:ImageAwesome Icon="Minus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
+                    <fa:FontAwesomeIcon SolidIcon="Minus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
                 </Button>
             </StackPanel>
 
             <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding MainWindowController.NameController.RandomizePostfixCommand}" ToolTip="{h:Loc The_button_that_does_the_weird_thing}" Width="32">
-                    <fa:ImageAwesome Icon="Question" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="16" Margin="4"/>
+                    <fa:FontAwesomeIcon SolidIcon="Question" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="16" Margin="4"/>
                 </Button>
             </StackPanel>
 

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Partlyx.Core
 {
-    public class Resource : ICloneable, IPart
+    public class Resource : ICloneable, IIconHolder, IPart
     {
         public Resource(string name = "Resource")
         {
@@ -20,21 +20,6 @@ namespace Partlyx.Core
 
         public string Name { get; set; }
 
-        public IconTypeEnum IconType { get; private set; }
-        public string IconData { get; private set; }
-        [NotMapped]
-        public IIcon? Icon { get; private set; }
-        public void SetIcon(IIcon icon, IconInfo info)
-        {
-            Icon = icon;
-            UpdateIconInfo(info);
-        }
-        public void UpdateIconInfo(IconInfo info)
-        {
-            IconType = info.Type;
-            IconData = info.Data;
-        }
-
         private readonly List<Recipe> _recipes = new();
         public IReadOnlyList<Recipe> Recipes => _recipes;
 
@@ -42,6 +27,7 @@ namespace Partlyx.Core
         public Guid? DefaultRecipeUid { get => _defaultRecipeUid; set => _defaultRecipeUid = value; }
 
         private Recipe? _defaultRecipeCached;
+
         [NotMapped]
         public Recipe? DefaultRecipe 
         {
@@ -55,6 +41,20 @@ namespace Partlyx.Core
 
             return _defaultRecipeCached;
         }
+
+        // Icon features
+        public IconTypeEnum IconType { get; private set; }
+        public string IconData { get; private set; }
+        public void SetIcon(IIcon icon, IconInfo info)
+        {
+            UpdateIconInfo(info);
+        }
+        public void UpdateIconInfo(IconInfo info)
+        {
+            IconType = info.Type;
+            IconData = info.Data;
+        }
+        public IconInfo GetIconInfo() => new IconInfo(IconType, IconData);
 
         // Secondary features
         public Recipe CreateRecipe()
@@ -116,12 +116,9 @@ namespace Partlyx.Core
         {
             var clone = new Resource();
             clone.Name = Name;
-            if (Icon is ICloneable cloneableIcon)
-            {
-                var iconClone = (IIcon)cloneableIcon.Clone();
-                var info = new IconInfo(IconType, IconData);
-                clone.SetIcon(iconClone, info);
-            }
+
+            clone.IconType = IconType;
+            clone.IconData = IconData;
 
             foreach (var recipe in _recipes)
             {

@@ -1,10 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Partlyx.Core;
+using Partlyx.Core.VisualsInfo;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
@@ -57,6 +59,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 _components.Add(vm);
             }
 
+            _icon = new IconViewModel(dto.Icon);
+
             // Info updating binding
             _updatedSubscription = bus.Subscribe<RecipeUpdatedEvent>(OnRecipeUpdated, true);
             _childAddSubscription = bus.Subscribe<RecipeComponentCreatedEvent>(OnComponentCreated, true);
@@ -82,12 +86,15 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public ObservableCollection<RecipeComponentViewModel> Components { get => _components; } // Updates locally when component is created/removed
 
+        private IconViewModel _icon;
+        public IconViewModel Icon { get => _icon; private set => SetProperty(ref _icon, value); }
 
         // Info updating
         protected override Dictionary<string, Action<RecipeDto>> ConfigureUpdaters() => new()
         {
             { nameof(RecipeDto.Name), dto => Name = dto.Name },
             { nameof(RecipeDto.CraftAmount), dto => CraftAmount = dto.CraftAmount },
+            { nameof(RecipeDto.Icon), dto => Icon.UpdateFromDto(dto.Icon) },
         };
 
         private void OnRecipeUpdated(RecipeUpdatedEvent ev)

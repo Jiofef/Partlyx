@@ -13,6 +13,7 @@
     <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
     <PackageReference Include="MaterialDesignColors" Version="5.2.1" />
     <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
+    <PackageReference Include="Meziantou.WpfFontAwesome" Version="5.15.4" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="WPFMultiSelectTreeView" Version="1.0.14" />
   </ItemGroup>
@@ -27,6 +28,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="DialogsXAML\IconSelectionWindow.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
 	  <Compile Update="DialogsXAML\PartsSelectionWindow.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>

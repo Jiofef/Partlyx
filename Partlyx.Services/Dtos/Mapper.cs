@@ -1,4 +1,6 @@
 ﻿using Partlyx.Core;
+using Partlyx.Core.VisualsInfo;
+using Partlyx.Services.CoreExtensions;
 using System.Linq;
 
 namespace Partlyx.Services.Dtos
@@ -11,18 +13,20 @@ namespace Partlyx.Services.Dtos
                 r.Uid,
                 r.Name,
                 r.Recipes.Select(rc => rc.ToDto()).ToList(),
-                r.DefaultRecipeUid
+                r.DefaultRecipeUid,
+                r.GetIconInfo().ToDto()
                 );
         }
 
-        public static RecipeDto ToDto(this Recipe recipe)
+        public static RecipeDto ToDto(this Recipe rc)
         {
             return new RecipeDto(
-                recipe.Uid,
-                recipe.ParentResource?.Uid,
-                recipe.Name,
-                recipe.CraftAmount,
-                recipe.Components.Select(c => c.ToDto()).ToList()
+                rc.Uid,
+                rc.ParentResource?.Uid,
+                rc.Name,
+                rc.CraftAmount,
+                rc.Components.Select(c => c.ToDto()).ToList(),
+                rc.GetIconInfo().ToDto()
                 );
         }
 
@@ -35,6 +39,21 @@ namespace Partlyx.Services.Dtos
                 c.Quantity,
                 c.ComponentSelectedRecipeUid
                 );
+        }
+
+        public static IconDto ToDto(this IconInfo ii)
+        {
+            switch (ii.Type)
+            {
+                case IconTypeEnum.Figure:
+                    var figureIcon = (FigureIcon)ii.GetIcon();
+                    return new FigureIconDto(figureIcon.Color, figureIcon.FigureType);
+                case IconTypeEnum.Image:
+                    var imageIcon = (ImageIcon)ii.GetIcon();
+                    return new ImageIconDto(imageIcon.Uid, imageIcon.Name);
+                default:
+                    return new NullIconDto();
+            }
         }
     }
 }

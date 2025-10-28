@@ -1,11 +1,13 @@
 ﻿using Partlyx.Core.VisualsInfo;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
+using Partlyx.Services.Dtos;
+using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
 
 namespace Partlyx.Services.ServiceImplementations
 {
-    public class ResourceImageIconService : IResourceImageIconService
+    public class ResourceImageIconService : ImageIconServiceAbstract, IResourceImageIconService
     {
         private readonly IPartlyxRepository _repo;
         private readonly IEventBus _eventBus;
@@ -17,24 +19,20 @@ namespace Partlyx.Services.ServiceImplementations
             _infoProvider = iip;
         }
 
-        public async Task SetImagePathAsync(Guid parentResourceUid, string path)
+        protected override async Task TryExcecuteOnImageIconAsync(Func<ImageIcon, Task> action, params Guid[] parentUids)
         {
-            await TryExcecuteOnImageIconAsync(parentResourceUid, icon =>
+            await _repo.ExecuteOnResourceAsync(parentUids[0], async res =>
             {
-                icon.Path = path;
-                return Task.CompletedTask;
-            });
-        }
+                var iconInfo = res.GetIconInfo();
+                var icon = _infoProvider.GetImageIconFromInfo(iconInfo);
 
-        private async Task TryExcecuteOnImageIconAsync(Guid parentResourceUid, Func<ImageIcon, Task> action)
-        {
-            await _repo.ExecuteOnResourceAsync(parentResourceUid, async res =>
-            {
-                var icon = res.Icon as ImageIcon;
                 if (icon == null) return;
                 await action(icon);
                 var info = _infoProvider.GetInfo(icon);
                 res.UpdateIconInfo(info);
+
+                var ev = new ResourceUpdatedEvent(res.ToDto(), ["Icon"]);
+                _eventBus.Publish(ev);
             });
         }
     }

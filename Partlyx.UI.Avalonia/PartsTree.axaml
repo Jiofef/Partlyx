@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             x:Class="Partlyx.UI.Avalonia.PartsTree"
+             xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
+             xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
+             xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:CompileBindings="false"
+             x:DataType="vmo:PartsTreeViewModel">
+        <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" Grid.Row="0">
+            <Grid Height="48">
+                <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
+                <TextBlock Text="{h:Loc Parts_Tree}" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
+            </Grid>
+            <Grid Margin="8, 2, 4, 2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Classes="common"
+                     Watermark="{h:Loc Search___}" Grid.Row="0"
+                     Text="{Binding Search.SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Grid.Column="1" Classes="base" Width="32" Height="32" Command="{Binding ClearSearchCommand}" 
+                        ToolTip.Tip="{h:Loc Clear_search_text}">
+                    <mdi:MaterialIcon Kind="Cancel" Width="16" Classes="common"/>
+                </Button>
+            </Grid>
+            <StackPanel Orientation="Horizontal" Margin="8, 2, 4, 2">
+                <Button Classes="base" Width="32" ToolTip.Tip="{h:Loc Expand_All}" Command="{Binding ExpandAllCommand}">
+                    <mdi:MaterialIcon Kind="ChevronDoubleDown" Width="16" Classes="common"/>
+                </Button>
+                <Button Classes="base" Width="32" ToolTip.Tip="{h:Loc Collapse_All}" Command="{Binding CollapseAllCommand}">
+                    <mdi:MaterialIcon Kind="ChevronDoubleUp" Width="16" Classes="common"/>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TreeView x:Name="TreeViewControl"
+                          ItemsSource="{Binding Resources}" 
+                          Margin="0,0,10,0" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
+                    <TreeView.Template>
+                        <ControlTemplate TargetType="TreeView">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderBrush}">
+                                <ItemsPresenter/>
+                            </Border>
+                        </ControlTemplate>
+                    </TreeView.Template>
+                    <ItemsPresenter HorizontalAlignment="Stretch"/>
+                    <TreeView.ItemContainerTheme>
+                        <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
+                            <Setter Property="IsExpanded" Value="{Binding DataContext.UiItem.IsExpanded, RelativeSource={RelativeSource AncestorType=TreeViewItem}, Mode=TwoWay}"/>
+                        </ControlTheme>
+                    </TreeView.ItemContainerTheme>
+                    <i:Interaction.Behaviors>
+                        <beh:CollectionViewFilterBehavior Predicate="{Binding Search.SearchByName}"/>
+                        <beh:TreeViewPartSelectionBehavior SelectedPartsContainer="{Binding SelectedParts}" AutoSetAncestorParts="True"
+                                                           FocusSelectedPart="True" FocusedPartContainer="{Binding FocusedPart}"/>
+                    </i:Interaction.Behaviors>
+                    <TreeView.KeyBindings>
+                        <KeyBinding Gesture="F2" Command="{Binding Service.StartRenamingSelectedCommand}"/>
+                        <KeyBinding Gesture="Enter" Command="{Binding Service.StartRenamingSelectedCommand}"/>
+                    </TreeView.KeyBindings>
+                    <TreeView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
+                        </ItemsPanelTemplate>
+                    </TreeView.ItemsPanel>
+                </TreeView>
+            </ScrollViewer>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button HorizontalAlignment="Stretch" Classes="base" Command="{Binding Service.CreateResourceCommand}" Grid.Column="0" ToolTip.Tip="{h:Loc Create_resource}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal" Margin="8">
+                        <TextBlock Text="{h:Loc Create}"/>
+                       <mdi:MaterialIcon Kind="Plus" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,40 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Partlyx.UI.Avalonia.App"
+             RequestedThemeVariant="Default"
+             xmlns:local="using:Partlyx.UI.Avalonia"
+             xmlns:localo="using:Partlyx.UI.Avalonia.OtherControls"
+             xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:vmprop="using:Partlyx.ViewModels.ItemProperties"
+             xmlns:dialogs="using:Partlyx.UI.Avalonia.DialogsXAML"
+             xmlns:conv="using:Partlyx.UI.Avalonia.Converters"
+             xmlns:beh="using:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+             xmlns:graphvm="using:Partlyx.ViewModels.Graph"
+             xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- External resources -->
+
+                <!-- Partlyx resources -->
+                <ResourceInclude Source="/Resources/Converters.axaml"/>
+                <ResourceInclude Source="/Resources/Colors.axaml"/>
+                <ResourceInclude Source="/Resources/DefaultResources.axaml"/>
+
+                <!--
+                <ResourceInclude Source="/Resources/Styles/DefaultStylesDictionary.axaml"/>
+                <ResourceInclude Source="/Resources/Styles/CommonStylesDictionary.axaml"/>
+                <ResourceInclude Source="/Resources/Styles/FavsScrollViewer.axaml"/>
+                <ResourceInclude Source="/Resources/DataTemplates.axaml"/> 
+                -->
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme/>
+         <themes:MaterialTheme BaseTheme="Light" PrimaryColor="LightBlue" SecondaryColor="Blue" />
+         <mdi:MaterialIconStyles/>
+    </Application.Styles>
+</Application>

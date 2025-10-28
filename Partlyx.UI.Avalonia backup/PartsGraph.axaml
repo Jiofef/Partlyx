@@ -1,0 +1,170 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Partlyx.UI.Avalonia.PartProperties"
+             xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:graphvm="clr-namespace:Partlyx.ViewModels.Graph;assembly=Partlyx.ViewModels"
+             xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
+             xmlns:localo="clr-namespace:Partlyx.UI.Avalonia.OtherControls"
+             xmlns:zoom="https://github.com/Moravuscz/WPFZoomPanel"
+             xmlns:fa="clr-namespace:Meziantou.WpfFontAwesome;assembly=Meziantou.WpfFontAwesome"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{StaticResource PxWhiteBrush}"
+             x:Name="Root">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" MinHeight="32"/>
+            <RowDefinition Height="3"/>
+            <RowDefinition Height="152" MinHeight="64"/>
+        </Grid.RowDefinitions>
+
+
+        <Grid h:SizeObserver.Observe="True" h:SizeObserver.BindableWidth="{Binding PanAndZoomController.ElementWidth}"
+          h:SizeObserver.BindableHeight="{Binding PanAndZoomController.ElementHeight}"
+          h:SizeObserver.SizeChangedCommand="{Binding CenterizePanPositionCommand}"
+          h:SizeObserver.OneShotCommand="True">
+
+            <localo:ZoomPanControl PanPositionX="{Binding PanAndZoomController.PanPositionX, Mode=TwoWay}" PanPositionY="{Binding PanAndZoomController.PanPositionY, Mode=TwoWay}" 
+                               ZoomLevel="{Binding PanAndZoomController.ZoomLevel, Mode=TwoWay}"
+                               MinZoom="{Binding PanAndZoomController.MinZoom}"
+                               MaxZoom="{Binding PanAndZoomController.MaxZoom}">
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <!-- edges behind -->
+                    <ItemsControl ItemsSource="{Binding Graph.Edges}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <localo:FromToLineControl From="{Binding From}" To="{Binding To}" Brush="{StaticResource PxBlackBrush}" LineThickness="2"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <!-- nodes on top -->
+                    <ItemsControl ItemsSource="{Binding Graph.Nodes}">
+                        <ItemsControl.Resources>
+                            <DataTemplate DataType="{x:Type graphvm:RecipeGraphNodeViewModel}">
+                                <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
+                            BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2" VerticalContentAlignment="Stretch">
+                                    <Grid VerticalAlignment="Stretch">
+                                        <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.ColumnText}"/>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.SecondaryColumnText}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Button.ContextMenu>
+                                        <ContextMenu Style="{StaticResource MaterialDesignMenu}">
+                                            <MenuItem Header="Find recipe in tree" Command="{Binding Value.UiNode.FindInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
+                                            <MenuItem Header="Find resource in tree" Command="{Binding Value.UiNode.FindResourceInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                </Button>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type graphvm:ComponentGraphNodeViewModel}">
+                                <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
+                                BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2"
+                                    Command="{Binding Value.UiNode.SetNextSelectedRecipeCommand }" VerticalContentAlignment="Stretch">
+                                    <Grid VerticalAlignment="Stretch">
+                                        <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.BottomColumnText}"/>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ColumnText}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Button.ContextMenu>
+                                        <ContextMenu Style="{StaticResource MaterialDesignMenu}">
+                                            <MenuItem Header="Find in tree" Command="{Binding Value.UiNode.FindResourceInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.Resources>
+
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Left" Value="{Binding X}" />
+                                <Setter Property="Canvas.Top"  Value="{Binding Y}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                    </ItemsControl>
+                </Grid>
+            </localo:ZoomPanControl>
+
+            <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right">
+                <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding CenterizePanPositionCommand}" ToolTip="{h:Loc Return_to_the_tree_root}">
+                    <fa:FontAwesomeIcon SolidIcon="Home" Foreground="{StaticResource PxBlackBrush}" Width="24" Height="24" Margin="4"/>
+                </Button>
+                <Separator Style="{StaticResource MaterialDesignDarkSeparator}" Height="8"/>
+                <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding ZoomInCommand}" ToolTip="{h:Loc Zoom_in}">
+                    <fa:FontAwesomeIcon SolidIcon="Plus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
+                </Button>
+                <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding ZoomOutCommand}" ToolTip="{h:Loc Zoom_out}">
+                    <fa:FontAwesomeIcon SolidIcon="Minus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
+                </Button>
+            </StackPanel>
+
+            <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                <Button Style="{StaticResource BaseButtonStyle}" Command="{Binding MainWindowController.NameController.RandomizePostfixCommand}" ToolTip="{h:Loc The_button_that_does_the_weird_thing}" Width="32">
+                    <fa:FontAwesomeIcon SolidIcon="Question" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="16" Margin="4"/>
+                </Button>
+            </StackPanel>
+
+        </Grid>
+
+        <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{StaticResource PxBlue1Brush}"/>
+
+        <Grid Grid.Row="2" VerticalAlignment="Stretch"  Background="{StaticResource PxBlue0Brush}">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
+                <TextBlock Text="{h:Loc Total_resources_amount}" Style="{StaticResource CommonTextBlock}" HorizontalAlignment="Center"/>
+                
+                <ScrollViewer VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch">
+                    <ItemsControl ItemsSource="{Binding SumController.Compilations}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type graphvm:ComponentNodeSumCompilation}">
+                                <Button Background="{StaticResource PxWhiteBrush}" Height="128" Width="128" Padding="2"
+                                Margin="8, 0, 8, 0"
+                                BorderBrush="{StaticResource PxBlue1Brush}" BorderThickness="4"
+                                VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                        <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
+                                            <TextBlock HorizontalAlignment="Center" Text="{Binding ColumnText}"/>
+                                            <TextBlock HorizontalAlignment="Center" Text="{Binding BottomColumnText}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Button.ContextMenu>
+                                        <ContextMenu Style="{StaticResource MaterialDesignMenu}">
+                                            <MenuItem Header="Find in tree" Command="{Binding ComponentsResource.UiItem.FindInTreeCommand}" Style="{StaticResource CommonMenuItem}"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+
+                                </StackPanel>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

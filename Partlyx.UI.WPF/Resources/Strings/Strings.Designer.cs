@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Partlyx.UI.WPF.Resources.Strings {
+namespace Partlyx.UI.Avalonia.Resources.Strings {
     using System;
     
     

@@ -1,0 +1,164 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:local="using:Partlyx.UI.Avalonia"
+        xmlns:conv="using:Partlyx.UI.Avalonia.Converters"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
+
+    <!-- BaseButtonStyle -->
+    <Style Selector="Button.base">
+        <Setter Property="Margin" Value="2"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Background" Value="{DynamicResource PxBlue1Brush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PxBlackBrush}"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontFamily" Value="Cascadia Code"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <Border Name="border" 
+                            Background="{TemplateBinding Background}" 
+                            CornerRadius="4" 
+                            RenderTransformOrigin="0.5,0.5"/>
+                    <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="Button.base-button:pointerover /template/ Border#border">
+        <Setter Property="Background" Value="{DynamicResource PxWhiteBrush}"/>
+    </Style>
+
+    <!-- BaseButtonStyleDarkerFocus -->
+    <Style Selector="Button.darker-focus">
+        <Setter Property="Margin" Value="2"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Background" Value="{DynamicResource PxBlue1Brush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PxBlackBrush}"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontFamily" Value="Cascadia Code"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <Border Name="border" 
+                            Background="{TemplateBinding Background}" 
+                            CornerRadius="4" 
+                            RenderTransformOrigin="0.5,0.5"/>
+                    <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="Button.darker-focus:pointerover /template/ Border#border">
+        <Setter Property="Background" Value="{StaticResource PxBlue0Brush}"/>
+    </Style>
+
+    <!-- SelectableItemStyle -->
+    <Style Selector="Button.selectable">
+        <Setter Property="Background" Value="{StaticResource PxWhiteBrush}"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <Border Name="border" 
+                            Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            CornerRadius="4" 
+                            RenderTransformOrigin="0.5,0.5"/>
+                    <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="Button.selectable-item:pointerover /template/ Border#border">
+        <Setter Property="BorderBrush" Value="{StaticResource PxBlue0Brush}"/>
+        <Setter Property="BorderThickness" Value="3"/>
+    </Style>
+
+    <Style Selector="Button.selectable-item:focus /template/ Border#border">
+        <Setter Property="Background" Value="{StaticResource PxBlue1Brush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <!-- CommonTextBlock -->
+    <Style Selector="TextBlock.common">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
+        <Setter Property="Foreground" Value="{StaticResource PxBlackBrush}"/>
+    </Style>
+
+    <!-- CommonTextBox -->
+    <Style Selector="TextBox.common">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
+        <Setter Property="Foreground" Value="{StaticResource PxBlackBrush}"/>
+    </Style>
+    
+    <!-- CommonListBox -->
+    <Style Selector="ListBox.common">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
+    </Style>
+
+    <!-- CommonMenuItem -->
+    <Style Selector="MenuItem.common">
+        <Setter Property="Background" Value="{StaticResource PxWhiteBrush}"/>
+    </Style>
+
+    <!-- CommonSearchTextBox -->
+    <Style Selector="TextBox.search">
+        <Setter Property="Background" Value="{StaticResource PxWhiteBrush}"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="Foreground" Value="{StaticResource PxBlackBrush}"/>
+    </Style>
+
+    <!-- CommonMaterialIcon -->
+    <Style Selector="mdi|MaterialIcon.common">
+		<Setter Property="Foreground" Value="{StaticResource PxBlackBrush}"/>
+    </Style>
+
+    <!-- StarToggleButtonStyle -->
+    <Style Selector="ToggleButton.star">
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+                    <Border Background="Transparent" />
+                    <Path Name="PART_StarPath"
+                          Data="M12,2 L15,9 L22,9 L17,13 L19,20 L12,16 L5,20 L7,13 L2,9 L9,9 Z"
+                          Stretch="Uniform"
+                          Fill="{DynamicResource PxGrayBrush}"
+                          RenderTransformOrigin="0.5,0.5">
+                        <Path.RenderTransform>
+                            <ScaleTransform ScaleX="1" ScaleY="1" />
+                        </Path.RenderTransform>
+                    </Path>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="ToggleButton.star-toggle:checked /template/ Path#PART_StarPath">
+        <Setter Property="Fill" Value="{StaticResource PxBlue1Brush}" />
+    </Style>
+
+    <Style Selector="ToggleButton.star-toggle:pointerover /template/ Path#PART_StarPath">
+        <Setter Property="RenderTransform">
+            <ScaleTransform ScaleX="1.15" ScaleY="1.15" />
+        </Setter>
+    </Style>
+
+    <Style Selector="ToggleButton.star-toggle:pressed /template/ Path#PART_StarPath">
+        <Setter Property="RenderTransform">
+            <ScaleTransform ScaleX="0.95" ScaleY="0.95" />
+        </Setter>
+    </Style>
+
+</Styles>

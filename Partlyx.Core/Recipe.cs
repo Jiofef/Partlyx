@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Partlyx.Core.VisualsInfo;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Partlyx.Core
 {
-    public class Recipe : ICopiable<Resource>, IPart
+    public class Recipe : ICopiable<Resource>, IIconHolder, IPart
     {
         // Hierarchy
         private Resource? _parentResource;
@@ -75,6 +76,20 @@ namespace Partlyx.Core
         /// Clears the list of components
         /// </summary>
         public void Clear() => _components.Clear();
+
+        // Icon features
+        public IconTypeEnum IconType { get; private set; }
+        public string IconData { get; private set; }
+        public void SetIcon(IIcon icon, IconInfo info)
+        {
+            UpdateIconInfo(info);
+        }
+        public void UpdateIconInfo(IconInfo info)
+        {
+            IconType = info.Type;
+            IconData = info.Data;
+        }
+        public IconInfo GetIconInfo() => new IconInfo(IconType, IconData);
 
         // Secondary features
         /// <summary>

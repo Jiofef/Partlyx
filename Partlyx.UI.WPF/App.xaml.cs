@@ -94,6 +94,8 @@ namespace Partlyx.UI.WPF
             services.AddTransient<IIconInfoProvider, IconInfoProvider>();
             services.AddTransient<IResourceFigureIconService, ResourceFigureIconService>();
             services.AddTransient<IResourceImageIconService, ResourceImageIconService>();
+            services.AddTransient<IRecipeFigureIconService, RecipeFigureIconService>();
+            services.AddTransient<IRecipeImageIconService, RecipeImageIconService>();
 
             services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
             services.AddTransient<ICommandFactory, DICommandFactory>();

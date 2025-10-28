@@ -1,0 +1,111 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Partlyx.UI.Avalonia.PartProperties"
+             xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
+             xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:dd="clr-namespace:GongSolutions.Avalonia.DragDrop;assembly=GongSolutions.Avalonia.DragDrop"
+             xmlns:vmprop="clr-namespace:Partlyx.ViewModels.ItemProperties;assembly=Partlyx.ViewModels"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             x:DataType="vmo:ItemPropertiesViewModel">
+    <UserControl.Resources>
+        <DataTemplate x:Key="TextBoxItemPropertyTemplate" DataType="{x:Type vmprop:TextBoxItemPropertyViewModel}">
+            <Grid Margin="4,2,4,2" Height="36" HorizontalAlignment="Stretch">
+                <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
+                <Grid ColumnDefinitions="Auto, *">
+                    <i:Interaction.Behaviors>
+						<ia:EventTrigger EventName="LeftClick">
+							<ia:InvokeCommandAction Command="{Binding StartTypingCommand}"/>
+                        </ia:EventTrigger>
+                    </i:Interaction.Behaviors>
+
+                    <TextBlock Text="{Binding DisplayableName}" Grid.Column="0" VerticalAlignment="Center" Classes="common" Margin="4"/>
+
+                    <TextBlock Text="{Binding Text, Mode=OneWay}" Grid.Column="1" VerticalAlignment="Center" Classes="common" Background="{StaticResource PxWhiteBrush}"
+                               Margin="4" IsVisible="{Binding !IsChangingText}">
+                    </TextBlock>
+
+                    <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" VerticalAlignment="Center" Classes="common"
+                             Background="{StaticResource PxWhiteBrush}" BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2"
+                             Margin="4" IsVisible="{Binding IsChangingText}" FontFamily="Cascadia Code">
+                        <TextBox.KeyBindings>
+                            <KeyBinding Gesture="Enter" Command="{Binding ConfirmChangesCommand}" CommandParameter="{Binding Text}"/>
+                            <KeyBinding Gesture="Esc" Command="{Binding CancelChangesCommand}"/>
+                        </TextBox.KeyBindings>
+                        <i:Interaction.Behaviors>
+                            <ia:EventTrigger EventName="LostKeyboardFocus">
+                                <ia:InvokeCommandAction Command="{Binding ConfirmChangesCommand}" CommandParameter="{Binding Text}"/>
+                                <beh:TextBoxFocusBehavior IsFocused="{Binding IsChangingText, Mode=TwoWay}"/>
+                            </ia:EventTrigger>
+                        </i:Interaction.Behaviors>
+                    </TextBox>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="RecipeItemPropertyTemplate" DataType="{x:Type vmprop:RecipeItemPropertyViewModel}">
+            <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
+                <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBlock Text="{Binding DisplayableName}" Grid.Column="0" VerticalAlignment="Center" Classes="common" Margin="4"/>
+                    <TextBlock Text="{Binding Part.Name, Mode=OneWay}" Grid.Column="1" VerticalAlignment="Center" Classes="common" Background="{StaticResource PxWhiteBrush}" Margin="4"/>
+
+                    <Button Content="Select" Classes="darker-focus" Command="{Binding SelectButtonPressedCommand}" Grid.Column="2"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SpinBoxItemPropertyTemplate" DataType="{x:Type vmprop:SpinBoxItemPropertyViewModel}">
+            <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
+                <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding DisplayableName}" Grid.Column="0" VerticalAlignment="Center" Classes="common" Margin="4"/>
+                    <NumericUpDown Value="{Binding Value, Mode=TwoWay}" Grid.Column="1" VerticalAlignment="Center" Margin="4">
+                        <i:Interaction.Behaviors>
+                            <ia:EventTrigger EventName="ValueChanged">
+                                <ia:InvokeCommandAction
+                                                        Command="{Binding SaveChangesCommand}"
+                                                        CommandParameter="{Binding Value}"/>
+                            </ia:EventTrigger>
+                        </i:Interaction.Behaviors>
+                    </NumericUpDown>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" Grid.Row="0">
+            <Grid Height="48">
+                <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
+                <TextBlock Text="{h:Loc Properties}" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
+            </Grid>
+            <TextBlock Grid.Row="0" Text="{Binding FocusedPartTextAnnotation}" Margin="8, 4, 8, 4" HorizontalAlignment="Center" Foreground="{StaticResource PxBlackBrush}" Classes="common"/>
+            <ListBox x:Name="PropertiesListView" ItemsSource="{Binding Properties}">
+                <ContentPresenter HorizontalAlignment="Stretch"/>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <ContentControl>
+                            <ContentPresenter Content="{Binding}"/>
+                        </ContentControl>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+    </Grid>
+</UserControl>

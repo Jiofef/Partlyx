@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MaterialDesignThemes.Wpf;
+using Microsoft.Extensions.DependencyInjection;
 using Partlyx.ViewModels.UIServices.Interfaces;
 
 namespace Partlyx.UI.WPF.VMImplementations
@@ -23,5 +24,11 @@ namespace Partlyx.UI.WPF.VMImplementations
 
         public Task<object?> ShowDialogAsync(object viewModel, string hostIdentifier = "RootDialog")
             => MaterialDesignThemes.Wpf.DialogHost.Show(viewModel, hostIdentifier);
+
+
+        public void Close(string hostIdentifier, object? result = null)
+        {
+            DialogHost.Close(hostIdentifier, result);
+        }
     }
 }

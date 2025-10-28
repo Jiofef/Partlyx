@@ -108,7 +108,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             defaultRecipeProperty.SelectButtonPressedTask = new(
                 async (arg) =>
                 {
-                    var dialogVM = new PartsSelectionWindowViewModel<RecipeViewModel>(new IsolatedSelectedParts())
+                    var dialogVM = new PartsSelectionWindowViewModel<RecipeViewModel>(_dialogService, new IsolatedSelectedParts())
                     { 
                         EnableMultiSelect = false, 
                         Items = resource.Recipes, 
@@ -168,7 +168,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             selectedRecipeProperty.SelectButtonPressedTask = new(
                 async (arg) =>
                 {
-                    var dialogVM = new PartsSelectionWindowViewModel<RecipeViewModel>(new IsolatedSelectedParts())
+                    var dialogVM = new PartsSelectionWindowViewModel<RecipeViewModel>(_dialogService, new IsolatedSelectedParts())
                     {
                         EnableMultiSelect = false,
                         Items = component.LinkedResource?.Value?.Recipes,

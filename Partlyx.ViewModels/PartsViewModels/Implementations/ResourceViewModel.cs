@@ -5,6 +5,7 @@ using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
@@ -48,6 +49,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             if (dto.DefaultRecipeUid is Guid dRecipeUid)
                 _defaultRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(dRecipeUid);
 
+            _icon = new IconViewModel(dto.Icon);
+
             foreach (var recipe in dto.Recipes)
             {
                 var vm = _partsFactory.GetOrCreateRecipeVM(recipe);
@@ -70,12 +73,14 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public string Name { get => _name; set => SetProperty(ref _name, value); }
 
         private ObservableCollection<RecipeViewModel> _recipes = new();
-
         public ObservableCollection<RecipeViewModel> Recipes { get => _recipes; } // Updates locally when recipe is created/removed
 
-
         private GuidLinkedPart<RecipeViewModel>? _defaultRecipe;
+
         public GuidLinkedPart<RecipeViewModel>? LinkedDefaultRecipe { get => _defaultRecipe; set => SetProperty(ref _defaultRecipe, value); }
+
+        private IconViewModel _icon;
+        public IconViewModel Icon { get => _icon; private set => SetProperty(ref _icon, value); }
 
         // Info updating
         protected override Dictionary<string, Action<ResourceDto>> ConfigureUpdaters() => new()
@@ -86,6 +91,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 dto.DefaultRecipeUid is Guid dRecipeUid
                 ? _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(dRecipeUid)
                 : null},
+            { nameof(ResourceDto.Icon), dto => Icon.UpdateFromDto(dto.Icon) },
         };
 
         private void OnResourceUpdated(ResourceUpdatedEvent ev)

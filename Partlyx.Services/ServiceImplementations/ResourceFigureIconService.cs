@@ -2,12 +2,13 @@
 using Partlyx.Core.VisualsInfo;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
+using Partlyx.Services.Dtos;
+using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
-using System.Drawing;
 
 namespace Partlyx.Services.ServiceImplementations
 {
-    public class ResourceFigureIconService : IResourceFigureIconService
+    public class ResourceFigureIconService : FigureIconServiceAbstract, IResourceFigureIconService
     {
         private readonly IPartlyxRepository _repo;
         private readonly IEventBus _eventBus;
@@ -19,41 +20,50 @@ namespace Partlyx.Services.ServiceImplementations
             _infoProvider = iip;
         }
 
-        public async Task SetColorAsync(Guid parentResourceUid, Color color)
+        protected override async Task TryExcecuteOnFigureIconAsync(Func<FigureIcon, Task> action, params Guid[] parentUids)
         {
-            await TryExcecuteOnFigureIconAsync(parentResourceUid, icon =>
+            await _repo.ExecuteOnResourceAsync(parentUids[0], async res =>
             {
-                icon.Color = color;
-                return Task.CompletedTask;
-            });
-        }
+                var iconInfo = res.GetIconInfo();
+                var icon = _infoProvider.GetFigureIconFromInfo(iconInfo);
 
-        /// <summary>
-        /// You can see the valid types through FigureTypes in Partlyx.Services.Dtos namespace
-        /// </summary>
-        public async Task SetFigureTypeAsync(Guid parentResourceUid, string figureType)
-        {
-            await TryExcecuteOnFigureIconAsync(parentResourceUid, icon =>
-            {
-                icon.FigureType = figureType;
-                return Task.CompletedTask;
-            });
-        }
-
-        private record FigureIconResourcePair(FigureIcon Figure, Resource Resource);
-
-        /// <summary>
-        /// Automates getting icon object and saving changes to Resource and DB. If the icon is null, does not accomplish the task.
-        /// </summary>
-        private async Task TryExcecuteOnFigureIconAsync(Guid parentResourceUid, Func<FigureIcon, Task> action)
-        {
-            await _repo.ExecuteOnResourceAsync(parentResourceUid, async res =>
-            {
-                var icon = res.Icon as FigureIcon;
                 if (icon == null) return;
                 await action(icon);
                 var info = _infoProvider.GetInfo(icon);
                 res.UpdateIconInfo(info);
+
+                var ev = new ResourceUpdatedEvent(res.ToDto(), ["Icon"]);
+                _eventBus.Publish(ev);
+            });
+        }
+    }
+
+    public class RecipeFigureIconService : FigureIconServiceAbstract, IRecipeFigureIconService
+    {
+        private readonly IPartlyxRepository _repo;
+        private readonly IEventBus _eventBus;
+        private readonly IIconInfoProvider _infoProvider;
+        public RecipeFigureIconService(IPartlyxRepository repo, IEventBus bus, IIconInfoProvider iip)
+        {
+            _repo = repo;
+            _eventBus = bus;
+            _infoProvider = iip;
+        }
+
+        protected override async Task TryExcecuteOnFigureIconAsync(Func<FigureIcon, Task> action, params Guid[] parentUids)
+        {
+            await _repo.ExecuteOnRecipeAsync(parentUids[0], parentUids[1], async recipe =>
+            {
+                var iconInfo = recipe.GetIconInfo();
+                var icon = _infoProvider.GetFigureIconFromInfo(iconInfo);
+
+                if (icon == null) return;
+                await action(icon);
+                var info = _infoProvider.GetInfo(icon);
+                recipe.UpdateIconInfo(info);
+
+                var ev = new RecipeUpdatedEvent(recipe.ToDto(), ["Icon"]);
+                _eventBus.Publish(ev);
             });
         }
     }

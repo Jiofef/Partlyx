@@ -1,0 +1,83 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Partlyx.UI.Avalonia.MainWindow"
+        xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
+        xmlns:localother="clr-namespace:Partlyx.UI.Avalonia.OtherControls"
+        xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
+        xmlns:viewmodel="clr-namespace:Partlyx.ViewModels;assembly=Partlyx.ViewModels"
+        xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+        xmlns:dh="using:DialogHostAvalonia"
+        mc:Ignorable="d"
+        Title="{Binding WindowController.WindowTitle, FallbackValue=Loading...}" Height="720" Width="1280"
+        MinHeight="640" MinWidth="968"
+        Icon="/Images/Partlyx.ico"
+        WindowState="Maximized"
+        Background="{StaticResource PxWhiteBrush}"
+        x:DataType="vmo:MainViewModel">
+
+    <Window.KeyBindings>
+        <KeyBinding Gesture="CTRL+S" Command="{Binding MenuPanel.FileMenu.SaveProjectCommand}"/>
+        <KeyBinding Gesture="CTRL+SHIFT+S" Command="{Binding MenuPanel.FileMenu.SaveProjectAsCommand}"/>
+
+        <KeyBinding Gesture="CTRL+Z" Command="{Binding MenuPanel.EditMenu.UndoCommand}"/>
+        <KeyBinding Gesture="CTRL+SHIFT+Z" Command="{Binding MenuPanel.EditMenu.RedoCommand}"/>
+        <KeyBinding Gesture="CTRL+Y" Command="{Binding MenuPanel.EditMenu.RedoCommand}"/>
+    </Window.KeyBindings>
+
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <DockPanel>
+                <Menu DataContext="{Binding MenuPanel}" Background="{StaticResource PxBlue0Brush}">
+                    <Menu.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"/>
+                        </ItemsPanelTemplate>
+                    </Menu.ItemsPanel>
+                    <MenuItem Header="{h:Loc File}" DataContext="{Binding FileMenu}" Height="32">
+                        <MenuItem Header="{h:Loc Create}" Command="{Binding NewFileCommand}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Save}" Command="{Binding SaveProjectCommand}" Classes="common" InputGesture="Ctrl+S"/>
+                        <MenuItem Header="{h:Loc Save_as___}" Command="{Binding SaveProjectAsCommand}" Classes="common" InputGesture="Ctrl+Shift+S"/>
+                        <MenuItem Header="{h:Loc Open}" Command="{Binding OpenProjectCommand}" Classes="common"/>
+                    </MenuItem>
+                    <MenuItem Header="{h:Loc menu_Edit}" DataContext="{Binding EditMenu}" Height="32">
+                        <MenuItem Header="{h:Loc Undo}" Command="{Binding UndoCommand}" InputGesture="Ctrl+Z" Classes="common"/>
+                        <MenuItem Header="{h:Loc Redo}" Command="{Binding RedoCommand}" InputGesture="Ctrl+Shift+Z / Ctrl+Y" Classes="common"/>
+                    </MenuItem>
+                </Menu>
+
+            </DockPanel>
+
+            <Grid Grid.Row="1" Grid.RowSpan="2" Background="{StaticResource PxBlue0Brush}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="360" MinWidth="32" MaxWidth="1024"/>
+                    <ColumnDefinition Width="4"/>
+                    <ColumnDefinition Width="*" MinWidth="32"/>
+                    <ColumnDefinition Width="4"/>
+                    <ColumnDefinition Width="360" MinWidth="32" MaxWidth="1024"/>
+                </Grid.ColumnDefinitions>
+                <local:PartsTree DataContext="{Binding PartsTree}" 
+                                Grid.Row="0" Grid.Column="0" />
+
+                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="{StaticResource PxBlue1Brush}"/>
+
+                <local:PartsGraph Grid.Column="2" DataContext="{Binding PartsGraph}"/>
+
+                <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="{StaticResource PxBlue1Brush}"/>
+
+                <local:PartProperties Grid.Column="4" DataContext="{Binding ItemProperties}"/>
+            </Grid>
+        </Grid>
+
+        <dh:DialogHost Identifier="RootDialog" CloseOnClickAway="False">
+        </dh:DialogHost>
+    </Grid>
+
+</Window>

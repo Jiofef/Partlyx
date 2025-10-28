@@ -191,4 +191,18 @@
             </Grid>
         </Grid>
     </HierarchicalDataTemplate>
+    
+    <!--Icon drawing templates -->
+    <DataTemplate x:Key="ImageSourceTemplate">
+        <Image Source="{Binding}" Stretch="Uniform" Width="24" Height="24"/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="DrawingTemplate">
+        <Image Width="24" Height="24" Stretch="Uniform">
+            <Image.Source>
+                <DrawingImage Drawing="{Binding}" />
+            </Image.Source>
+        </Image>
+    </DataTemplate>
 </ResourceDictionary>
+   
