@@ -79,7 +79,7 @@ namespace Partlyx.Core
 
         // Icon features
         public IconTypeEnum IconType { get; private set; }
-        public string IconData { get; private set; }
+        public string IconData { get; private set; } = "{}";
         public void SetIcon(IIcon icon, IconInfo info)
         {
             UpdateIconInfo(info);

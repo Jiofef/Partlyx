@@ -10,6 +10,7 @@ using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using Partlyx.ViewModels.UIStates;
 using System.Collections.ObjectModel;
 using System.Xml.Linq;
 
@@ -166,6 +167,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         // For UI
         public RecipeItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
+        PartItemUIState IVMPart.UiItem => UiItem;
         public RecipeNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
     }
 }

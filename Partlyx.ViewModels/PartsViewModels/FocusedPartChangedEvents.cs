@@ -2,9 +2,9 @@
 
 namespace Partlyx.ViewModels.PartsViewModels
 {
-    public record FocusedPartChangedEvent(PartTypeEnumVM? partType, Guid? selected);
+    public record GlobalFocusedPartChangedEvent(PartTypeEnumVM? FocusedPartType, Guid? FocusedPartUid, PartTypeEnumVM? PreviousSelectedPartType, Guid? PreviousSelectedPartUid);
 
-    public record PartFocusedEvent(PartTypeEnumVM partType, Guid selected);
+    public record GlobalPartFocusedEvent(PartTypeEnumVM FocusedPartType, Guid FocusedPartUid, PartTypeEnumVM? PreviousSelectedPartType, Guid? PreviousSelectedPartUid);
 
-    public record PartUnfocusedEvent();
+    public record GlobalPartUnfocusedEvent();
 }

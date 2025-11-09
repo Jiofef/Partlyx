@@ -127,6 +127,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         // For UI
         public RecipeComponentItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
+        PartItemUIState IVMPart.UiItem => UiItem;
         public RecipeComponentNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
 
         private void UpdateSelectedComponents()

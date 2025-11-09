@@ -16,7 +16,7 @@
              x:DataType="vmo:PartsGraphViewModel"
              x:CompileBindings="false">
 
-        <Grid>
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" MinHeight="32"/>
             <RowDefinition Height="3"/>
@@ -33,12 +33,12 @@
                                ZoomLevel="{Binding PanAndZoomController.ZoomLevel, Mode=TwoWay}"
                                MinZoom="{Binding PanAndZoomController.MinZoom}"
                                MaxZoom="{Binding PanAndZoomController.MaxZoom}">
-                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <!-- edges behind -->
-                    <ItemsControl ItemsSource="{Binding Graph.Edges}">
+                <Grid>
+					<!-- edges behind -->
+                    <ItemsControl ItemsSource="{Binding Graph.Edges}" ClipToBounds="False">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <Canvas />
+                                <Canvas x:Name="PART_Canvas"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
@@ -48,10 +48,24 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     <!-- nodes on top -->
-                    <ItemsControl ItemsSource="{Binding Graph.Nodes}">
-                        <ItemsControl.Resources>
-                            <DataTemplate x:Key="RecipeNodeTemplate" DataType="{x:Type graphvm:RecipeGraphNodeViewModel}">
+                    <ItemsControl ItemsSource="{Binding Graph.Nodes}" ClipToBounds="False">
+                        <ItemsControl.ItemsPanel>
+						    <ItemsPanelTemplate>
+							    <Canvas x:Name="PART_Canvas"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                          <ItemsControl.ItemContainerTheme>
+                            <ControlTheme TargetType="ContentPresenter">
+                              <Setter Property="Canvas.Left" Value="{Binding Content.X, RelativeSource={RelativeSource Self}}"/>
+                              <Setter Property="Canvas.Top"  Value="{Binding Content.Y, RelativeSource={RelativeSource Self}}"/>
+                            </ControlTheme>
+                          </ItemsControl.ItemContainerTheme>
+
+                        <ItemsControl.DataTemplates>
+                            <DataTemplate DataType="graphvm:RecipeGraphNodeViewModel">
                                 <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
+                                        Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}"
                             BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2" VerticalContentAlignment="Stretch">
                                     <Grid VerticalAlignment="Stretch">
                                         <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
@@ -68,10 +82,11 @@
                                     </Button.ContextMenu>
                                 </Button>
                             </DataTemplate>
-                            <DataTemplate x:Key="ComponentNodeTemplate" DataType="{x:Type graphvm:ComponentGraphNodeViewModel}">
+                            <DataTemplate DataType="graphvm:ComponentGraphNodeViewModel">
                                 <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
                                 BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2"
-                                    Command="{Binding Value.UiNode.SetNextSelectedRecipeCommand }" VerticalContentAlignment="Stretch">
+                                    Command="{Binding Value.UiNode.SetNextSelectedRecipeCommand }" VerticalContentAlignment="Stretch"
+                                    Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}">
                                     <Grid VerticalAlignment="Stretch">
                                         <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
                                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.BottomColumnText}"/>
@@ -86,20 +101,7 @@
                                     </Button.ContextMenu>
                                 </Button>
                             </DataTemplate>
-                        </ItemsControl.Resources>
-
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <Canvas />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-
-                        <ItemsControl.ItemContainerTheme>
-                            <ControlTheme TargetType="ContentPresenter">
-                                <Setter Property="Canvas.Left" Value="{Binding DataContext.X, RelativeSource={RelativeSource AncestorType=Button}}" />
-                                <Setter Property="Canvas.Top"  Value="{Binding DataContext.Y, RelativeSource={RelativeSource AncestorType=Button}}" />
-                            </ControlTheme>
-                        </ItemsControl.ItemContainerTheme>
+                        </ItemsControl.DataTemplates>
                     </ItemsControl>
                 </Grid>
             </localo:ZoomPanControl>
@@ -118,7 +120,7 @@
             </StackPanel>
 
             <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
-                <Button Classes="base" Command="{Binding MainWindowController.NameController.RandomizePostfixCommand}" ToolTip.Tip="{h:Loc The_button_that_does_the_weird_thing}" Width="32">
+                <Button Classes="base" Command="{Binding MainWindowController.NameController.RandomizePostfixCommand}" ToolTip.Tip="{h:Loc The_button_that_does_the_weird_thing}" Width="40">
                     <mdi:MaterialIcon Kind="QuestionMark" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="16" Margin="4"/>
                 </Button>
             </StackPanel>
@@ -148,7 +150,7 @@
 
                                     <Button.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Find in tree" Command="{Binding ComponentsResource.UiItem.FindInTreeCommand}" Classes="common"/>
+                                            <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding ComponentsResource.UiItem.FindInTreeCommand}" Classes="common"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                 </Button>

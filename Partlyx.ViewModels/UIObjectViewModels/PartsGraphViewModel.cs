@@ -7,6 +7,7 @@ using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using ReactiveUI;
 
 namespace Partlyx.ViewModels.UIObjectViewModels
 {
@@ -26,15 +27,28 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public ComponentSumController SumController { get; }
         private readonly ComponentSumControllerBinder _componentSumBinder;
 
-        public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IMainWindowController mwc, PanAndZoomControllerViewModel pazc, PartsGraphTreeBuilderViewModel graph, IEventBus bus)
+        private readonly IVMPartsStore _store;
+
+        public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IMainWindowController mwc, PanAndZoomControllerViewModel pazc, PartsGraphTreeBuilderViewModel graph, IVMPartsStore store, IEventBus bus)
         {
             SelectedParts = selectedParts;
             MainWindowController = mwc;
             PanAndZoomController = pazc;
             Graph = graph;
 
-            var recipeChangedSubscription = bus.Subscribe<GlobalSingleRecipeSelectedEvent>(ev => CenterizePanPosition());
-            _subscriptions.Add(recipeChangedSubscription);
+            _store = store;
+
+            var focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedPartChangedEvent>(ev =>
+                {
+                    _store.TryGet(ev.FocusedPartUid, out var focused);
+                    _store.TryGet(ev.PreviousSelectedPartUid, out var previous);
+                    var focusedRecipe = focused?.GetRelatedRecipe();
+                    var previousRecipe = previous?.GetRelatedRecipe();
+
+                    if (focusedRecipe != previousRecipe)
+                        CenterizePanPosition();
+                });
+            _subscriptions.Add(focusedPartChangedSubscription);
 
             SumController = new();
             _componentSumBinder = new ComponentSumControllerBinder(graph.ComponentLeafs, SumController);

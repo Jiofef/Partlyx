@@ -16,14 +16,18 @@ namespace Partlyx.ViewModels
     {
         private readonly IEventBus _bus;
         private readonly PartsServiceViewModel _services;
-        private readonly RecipeViewModel _recipeVM;
+        public RecipeViewModel AttachedRecipe { get; }
+        public override IVMPart AttachedPart { get => AttachedRecipe; }
+        public IGlobalFocusedPart GlobalFocusedPart { get; }
 
-        public RecipeItemUIState(RecipeViewModel vm, PartsServiceViewModel cvm, IEventBus bus) 
+        public RecipeItemUIState(RecipeViewModel vm, IEventBus bus, PartsServiceViewModel cvm, IGlobalFocusedPart gfc) 
         {
             _bus = bus;
             _services = cvm;
 
-            _recipeVM = vm;
+            GlobalFocusedPart = gfc;
+
+            AttachedRecipe = vm;
             _unConfirmedName = vm.Name;
 
             var expandAllRecipeItemsSubscription = bus.Subscribe<SetAllTheRecipeItemsExpandedEvent>(ev => SetExpanded(ev.expand));
@@ -41,7 +45,7 @@ namespace Partlyx.ViewModels
         {
             if (!IsRenaming) return;
 
-            var args = new PartSetValueInfo<RecipeViewModel, string>(_recipeVM, UnConfirmedName);
+            var args = new PartSetValueInfo<RecipeViewModel, string>(AttachedRecipe, UnConfirmedName);
             await _services.RecipeService.RenameRecipe(args);
 
             IsRenaming = false;
@@ -50,7 +54,7 @@ namespace Partlyx.ViewModels
         [RelayCommand]
         public void CancelNameChange()
         {
-            UnConfirmedName = _recipeVM.Name;
+            UnConfirmedName = AttachedRecipe.Name;
             IsRenaming = false;
         }
 
@@ -73,9 +77,21 @@ namespace Partlyx.ViewModels
         [RelayCommand]
         public void FindInTree()
         {
-            var query = _recipeVM.Name;
+            var query = AttachedRecipe.Name;
             var ev = new TreeSearchQueryEvent(query, PartTypeEnumVM.Recipe);
             _bus.Publish(ev);
+        }
+
+        [RelayCommand]
+        public void ToggleGlobalFocus()
+        {
+            ToggleFocused(GlobalFocusedPart);
+        }
+
+        [RelayCommand]
+        public void ToggleLocalFocus(IIsolatedFocusedPart target)
+        {
+            ToggleFocused(target);
         }
     }
 }

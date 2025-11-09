@@ -3,7 +3,8 @@ using System.Collections.ObjectModel;
 
 public interface IResourceSearchService
 {
-    ObservableCollection<ResourceViewModel> Resources { get; }
     string SearchText { get; set; }
-    Predicate<object> SearchByName { get; }
+    Predicate<ResourceViewModel> SearchByName { get; }
+    ReadOnlyObservableCollection<ResourceViewModel> FilteredResources { get; }
+    ReadOnlyObservableCollection<ResourceViewModel> UnfilteredResources { get; }
 }

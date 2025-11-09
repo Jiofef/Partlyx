@@ -1,40 +1,269 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             
              x:Class="Partlyx.UI.Avalonia.App"
              RequestedThemeVariant="Default"
              xmlns:local="using:Partlyx.UI.Avalonia"
              xmlns:localo="using:Partlyx.UI.Avalonia.OtherControls"
              xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:vmoi="using:Partlyx.ViewModels.GraphicsViewModels.IconViewModels"
+             xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels.Implementations"
+             xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
              xmlns:vmprop="using:Partlyx.ViewModels.ItemProperties"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
              xmlns:dialogs="using:Partlyx.UI.Avalonia.DialogsXAML"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:conv="using:Partlyx.UI.Avalonia.Converters"
-             xmlns:beh="using:Partlyx.UI.Avalonia.Behaviors"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:graphvm="using:Partlyx.ViewModels.Graph"
              xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- External resources -->
-
                 <!-- Partlyx resources -->
                 <ResourceInclude Source="/Resources/Converters.axaml"/>
                 <ResourceInclude Source="/Resources/Colors.axaml"/>
                 <ResourceInclude Source="/Resources/DefaultResources.axaml"/>
-
-                <!--
-                <ResourceInclude Source="/Resources/Styles/DefaultStylesDictionary.axaml"/>
-                <ResourceInclude Source="/Resources/Styles/CommonStylesDictionary.axaml"/>
-                <ResourceInclude Source="/Resources/Styles/FavsScrollViewer.axaml"/>
-                <ResourceInclude Source="/Resources/DataTemplates.axaml"/> 
-                -->
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 
     <Application.Styles>
         <FluentTheme/>
+        <!--External themes-->
          <themes:MaterialTheme BaseTheme="Light" PrimaryColor="LightBlue" SecondaryColor="Blue" />
          <mdi:MaterialIconStyles/>
+         <dialogHostAvalonia:DialogHostStyles />
+
+        <!--Partlyx themes-->
+         <StyleInclude Source="/Resources/Styles/DefaultStylesDictionary.axaml"/>
+         <StyleInclude Source="/Resources/Styles/CommonStylesDictionary.axaml"/>
     </Application.Styles>
+
+    <Application.DataTemplates>
+        <!--Partlyx DataTemplates-->
+        <DataTemplate DataType="{x:Type vmo:ComponentCreateViewModel}">
+        <dialogs:ComponentCreate/>
+        </DataTemplate>
+    
+            <DataTemplate DataType="vmo:ResourcesSelectionViewModel">
+            <ContentControl Content="{Binding}"
+                           ContentTemplate="{StaticResource DialogTemplateSelector}"/>
+        </DataTemplate>
+
+        <DataTemplate DataType="vmo:RecipesSelectionViewModel">
+            <ContentControl Content="{Binding}"
+                           ContentTemplate="{StaticResource DialogTemplateSelector}"/>
+        </DataTemplate>
+    
+        <DataTemplate DataType="vmo:RecipeComponentsSelectionViewModel">
+            <ContentControl Content="{Binding}"
+                           ContentTemplate="{StaticResource DialogTemplateSelector}"/>
+        </DataTemplate>
+    
+        <DataTemplate DataType="vmo:AnyPartsSelectionViewModel">
+            <ContentControl Content="{Binding}"
+                           ContentTemplate="{StaticResource DialogTemplateSelector}"/>
+        </DataTemplate>
+
+        <!--
+
+        <dts:WindowDialogsTemplateSelector x:Key="WindowDialogsTemplateSelector"
+                                           PartsSelectionWindowTemplate="{StaticResource PartsSelectionWindowTemplate}"/>
+        -->
+
+        <!-- Parts tree hierarchy: Resource -> Recipe -> Components -->
+        <TreeDataTemplate DataType="vmp:ResourceViewModel" ItemsSource="{Binding Recipes}">
+            <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
+                <Grid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}"/>
+                        <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding UiItem.ExpandBranchCommand}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Collapse_branch}" Command="{Binding UiItem.CollapseBranchCommand}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding UiItem.FindInTreeCommand}" Classes="common" />
+                    </ContextMenu>
+                </Grid.ContextMenu>
+                <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Margin="4"/>
+                    <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent">
+                        <i:Interaction.Behaviors>
+                            <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                <ia:InvokeCommandAction Command="{Binding UiItem.StartRenamingCommand}"/>
+                            </ia:EventTriggerBehavior>
+                       </i:Interaction.Behaviors>
+
+					    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" Classes="common" IsVisible="{Binding !UiItem.IsRenaming}"/>
+
+                        <TextBox VerticalAlignment="Center" Text="{Binding UiItem.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" IsVisible="{Binding UiItem.IsRenaming}" Classes="common">
+                            <TextBox.KeyBindings>
+						        <KeyBinding Gesture="Enter" Command="{Binding UiItem.CommitNameChangeCommand}"/>
+                                <KeyBinding Gesture="Escape" Command="{Binding UiItem.CancelNameChangeCommand}"/>
+                            </TextBox.KeyBindings>
+                            <i:Interaction.Behaviors>
+                                    <ia:EventTriggerBehavior EventName="LostFocus">
+                                        <ia:InvokeCommandAction Command="{Binding UiItem.CommitNameChangeCommand}"/>
+                                    </ia:EventTriggerBehavior>
+                                <beh:TextBoxFocusAndSelectBehavior IsActive="{Binding UiItem.IsRenaming}"/>
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+                    </Panel>
+
+                    <ToggleButton Grid.Column="2" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
+                                    Command="{Binding UiItem.ToggleGlobalFocus}"
+                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}"/>
+
+                    <Button HorizontalAlignment="Stretch" Classes="darker-focus" 
+                            Command="{Binding Services.RecipeService.CreateRecipeCommand}" Grid.Column="3"
+                            CommandParameter="{Binding}"
+                            Width="32"
+                            Height="32"
+                            ToolTip.Tip="{h:Loc Create_a_recipe_for_this_resource }">
+                        <Button.Content>
+                            <mdi:MaterialIcon Kind="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+            </Grid>
+        </TreeDataTemplate>
+
+        <TreeDataTemplate DataType="vmp:RecipeViewModel" ItemsSource="{Binding Components}">
+            <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
+                <Grid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding UiItem.ExpandBranchCommand}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Collapse_branch}" Command="{Binding UiItem.CollapseBranchCommand}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding UiItem.FindInTreeCommand}" Classes="common"/>
+                    </ContextMenu>
+                </Grid.ContextMenu>
+                <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                    <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent">
+                        <i:Interaction.Behaviors>
+                            <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                <ia:InvokeCommandAction Command="{Binding UiItem.StartRenamingCommand}"/>
+                            </ia:EventTriggerBehavior>
+                       </i:Interaction.Behaviors>
+
+					    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" Classes="common" IsVisible="{Binding !UiItem.IsRenaming}"/>
+
+                        <TextBox VerticalAlignment="Center" Text="{Binding UiItem.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" IsVisible="{Binding UiItem.IsRenaming}" Classes="common">
+                            <TextBox.KeyBindings>
+						        <KeyBinding Gesture="Enter" Command="{Binding UiItem.CommitNameChangeCommand}"/>
+                                <KeyBinding Gesture="Escape" Command="{Binding UiItem.CancelNameChangeCommand}"/>
+                            </TextBox.KeyBindings>
+                            <i:Interaction.Behaviors>
+                                    <ia:EventTriggerBehavior EventName="LostFocus">
+                                        <ia:InvokeCommandAction Command="{Binding UiItem.CommitNameChangeCommand}"/>
+                                    </ia:EventTriggerBehavior>
+                                <beh:TextBoxFocusAndSelectBehavior IsActive="{Binding UiItem.IsRenaming}"/>
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+                    </Panel>
+
+                    <ToggleButton Grid.Column="2" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Set_as_default}"
+                                                      Command="{Binding LinkedParentResource.Value.SetDefaultRecipeUidCommand}"
+                                                      CommandParameter="{Binding Uid}"
+                                                      Tag="Star">
+                        <ToggleButton.IsChecked>
+                            <MultiBinding Converter="{StaticResource SelectedEqualsConv}" Mode="OneWay">
+                                <Binding Path="LinkedParentResource.Value.LinkedDefaultRecipe.Uid"/>
+                                <Binding Path="Uid" Mode="OneWay"/>
+                            </MultiBinding>
+                        </ToggleButton.IsChecked>
+                        <i:Interaction.Behaviors>
+                            <beh:PreventUncheckBehavior/>
+                        </i:Interaction.Behaviors>
+                    </ToggleButton>
+
+                    <ToggleButton Grid.Column="3" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
+                                    Command="{Binding UiItem.ToggleGlobalFocus}"
+                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}"/>
+                
+                    <Button HorizontalAlignment="Stretch" Classes="darker-focus" 
+                            Command="{Binding Services.ComponentService.CreateComponentCommand}" Grid.Column="4"
+                            CommandParameter="{Binding}"
+                            Width="32"
+                            Height="32"
+                            ToolTip.Tip="{ h:Loc Create_a_component_for_this_recipe }">
+                        <Button.Content>
+                            <mdi:MaterialIcon Kind="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+            </Grid>
+        </TreeDataTemplate>
+
+        <TreeDataTemplate DataType="vmp:RecipeComponentViewModel" ItemsSource="{x:Null}" >
+            <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2">
+                <Grid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.ComponentService.RemoveCommand}" CommandParameter="{Binding}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Find_setted_resource_in_tree}" Command="{Binding UiItem.FindResourceInTreeCommand}" Classes="common"/>
+                    </ContextMenu>
+                </Grid.ContextMenu>
+                <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid HorizontalAlignment="Stretch" Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                        <TextBlock Text="{Binding LinkedResource.Value.Name}" Grid.Column="1" VerticalAlignment="Center" Classes="common"/>
+
+                    <ToggleButton Grid.Column="2" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
+                                    Command="{Binding UiItem.ToggleGlobalFocus}"
+                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}"/>
+                    </Grid>
+                    <NumericUpDown Value="{Binding Quantity, Mode=TwoWay}" Grid.Row="1" Height="32" HorizontalAlignment="Stretch">
+						<i:Interaction.Behaviors>
+							<ia:EventTrigger EventName="ValueChanged">
+								<ia:InvokeCommandAction
+                                    Command="{Binding UiItem.SetQuantityCommand}"
+                                    CommandParameter="{Binding Quantity}"/>
+                            </ia:EventTrigger>
+                        </i:Interaction.Behaviors>
+                    </NumericUpDown>
+                </Grid>
+            </Grid>
+        </TreeDataTemplate>
+    
+        <!--Icon drawing templates (Not finished yet)
+        <DataTemplate DataType="vmoi:IconViewModel">
+            <Image Source="{Binding}" Stretch="Uniform" Width="24" Height="24"/>
+        </DataTemplate>
+
+        <DataTemplate DataType="vmoi:IconFigureItem">
+            <Image Width="24" Height="24" Stretch="Uniform">
+                <Image.Source>
+                    <DrawingImage Drawing="{Binding}" />
+                </Image.Source>
+            </Image>
+        </DataTemplate>
+        -->
+    </Application.DataTemplates>
 </Application>

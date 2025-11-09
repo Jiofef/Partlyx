@@ -16,24 +16,30 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _subscriptions.Add(fileClosedSubscription);
         }
 
-        protected override void OnPartFocused(IVMPart? part, bool isValueChanged)
+        protected override void OnPartFocused(IVMPart? part, IVMPart? previousPart, bool isValueChanged)
         {
-            base.OnPartFocused(part, isValueChanged);
+            base.OnPartFocused(part, previousPart, isValueChanged);
 
             if (!isValueChanged) return;
 
             if (part != null)
             {
-                var @event = new PartFocusedEvent((PartTypeEnumVM)SelectedPartType!, FocusedPart!.Uid);
+                var @event = new GlobalPartFocusedEvent(
+                    (PartTypeEnumVM)SelectedPartType!, FocusedPart!.Uid,
+                    previousPart?.PartType, previousPart?.Uid
+                    );
                 _bus.Publish(@event);
             }
             else
             {
-                var @event = new PartUnfocusedEvent();
+                var @event = new GlobalPartUnfocusedEvent();
                 _bus.Publish(@event);
             }
 
-            var @changedEvent = new FocusedPartChangedEvent(SelectedPartType, FocusedPart?.Uid);
+            var @changedEvent = new GlobalFocusedPartChangedEvent(
+                SelectedPartType, FocusedPart?.Uid,
+                previousPart?.PartType, previousPart?.Uid
+                );
             _bus.Publish(changedEvent);
         }
 

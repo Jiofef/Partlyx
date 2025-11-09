@@ -79,21 +79,28 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 _bus.Publish(new RecipeComponentVMRemovedFromStoreEvent(uid));
         }
 
-        public bool TryGet(Guid itemUid, out IVMPart? part)
+        public bool TryGet(Guid? itemUid, out IVMPart? part)
         {
-            if (Resources.ContainsKey(itemUid))
+            if (itemUid == null)
             {
-                part = Resources[itemUid];
+                part = null;
                 return true;
             }
-            else if (Recipes.ContainsKey(itemUid))
+
+            Guid itemUidNotNull = (Guid)itemUid;
+            if (Resources.ContainsKey(itemUidNotNull))
             {
-                part = Recipes[itemUid];
+                part = Resources[itemUidNotNull];
                 return true;
             }
-            else if (RecipeComponents.ContainsKey(itemUid))
+            else if (Recipes.ContainsKey(itemUidNotNull))
             {
-                part = RecipeComponents[itemUid];
+                part = Recipes[itemUidNotNull];
+                return true;
+            }
+            else if (RecipeComponents.ContainsKey(itemUidNotNull))
+            {
+                part = RecipeComponents[itemUidNotNull];
                 return true;
             }
             else

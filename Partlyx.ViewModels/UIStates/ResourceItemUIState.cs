@@ -16,17 +16,25 @@ namespace Partlyx.ViewModels
     {
         private readonly IEventBus _bus;
         private readonly PartsServiceViewModel _services;
-        private readonly ResourceViewModel _resourceVM;
 
-        public ResourceItemUIState(ResourceViewModel vm, PartsServiceViewModel svm, IEventBus bus)
+        public ResourceViewModel AttachedResource { get; }
+        public override IVMPart AttachedPart { get => AttachedResource; }
+
+        public IGlobalFocusedPart GlobalFocusedPart { get; }
+
+        public ResourceItemUIState(ResourceViewModel vm, PartsServiceViewModel svm, IEventBus bus, IGlobalFocusedPart gfc)
         {
             _bus = bus;
             _services = svm;
 
-            _resourceVM = vm;
+            GlobalFocusedPart = gfc;
+
+            AttachedResource = vm;
             _unConfirmedName = vm.Name;
 
-            var expandAllResourceItemsSubscription = bus.Subscribe<SetAllTheResourceItemsExpandedEvent>(ev => SetExpanded(ev.expand));
+            var expandAllResourceItemsSubscription = bus.Subscribe<SetAllTheResourceItemsExpandedEvent>(
+                ev => 
+                SetExpanded(ev.expand));
             Subscriptions.Add(expandAllResourceItemsSubscription);
         }
 
@@ -41,7 +49,7 @@ namespace Partlyx.ViewModels
         {
             if (!IsRenaming) return;
 
-            var args = new PartSetValueInfo<ResourceViewModel, string>(_resourceVM, UnConfirmedName);
+            var args = new PartSetValueInfo<ResourceViewModel, string>(AttachedResource, UnConfirmedName);
             await _services.ResourceService.RenameResource(args);
 
             IsRenaming = false;
@@ -50,7 +58,7 @@ namespace Partlyx.ViewModels
         [RelayCommand]
         public void CancelNameChange()
         {
-            UnConfirmedName = _resourceVM.Name;
+            UnConfirmedName = AttachedResource.Name;
             IsRenaming = false;
         }
 
@@ -63,7 +71,7 @@ namespace Partlyx.ViewModels
         {
             IsExpanded = true;
 
-            foreach (var child in _resourceVM.Recipes)
+            foreach (var child in AttachedResource.Recipes)
                 child.UiItem.ExpandBranch();
         }
 
@@ -72,16 +80,28 @@ namespace Partlyx.ViewModels
         {
             IsExpanded = false;
 
-            foreach (var child in _resourceVM.Recipes)
+            foreach (var child in AttachedResource.Recipes)
                 child.UiItem.CollapseBranch();
         }
 
         [RelayCommand]
         public void FindInTree()
         {
-            var query = _resourceVM.Name;
+            var query = AttachedResource.Name;
             var ev = new TreeSearchQueryEvent(query, PartTypeEnumVM.Resource);
             _bus.Publish(ev);
+        }
+
+        [RelayCommand]
+        public void ToggleGlobalFocus()
+        {
+            ToggleFocused(GlobalFocusedPart);
+        }
+
+        [RelayCommand]
+        public void ToggleLocalFocus(IIsolatedFocusedPart target)
+        {
+            ToggleFocused(target);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Partlyx.ViewModels.UIStates;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
     {
         PartTypeEnumVM PartType { get; }
         Guid Uid { get; }
+        PartItemUIState UiItem { get; }
     }
 
     public enum PartTypeEnumVM { Resource, Recipe, Component }

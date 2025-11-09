@@ -52,10 +52,65 @@ namespace Partlyx.UI.Avalonia.VMImplementations
             var result = await topLevel.StorageProvider.OpenFolderPickerAsync(pickerOptions);
             return result?.FirstOrDefault()?.Path.LocalPath;
         }
+
         private static IReadOnlyList<FilePickerFileType>? ConvertFilters(string? filter)
         {
-            if (string.IsNullOrEmpty(filter)) return null;
-            return filter.Split('|').Chunk(2).Select(x => new FilePickerFileType(x[0]) { Patterns = x[1].Split(';').Select(p => $"*.{p}").ToList() }).ToList();
+            if (string.IsNullOrWhiteSpace(filter))
+                return null;
+
+            var parts = filter.Split('|');
+            var list = new List<FilePickerFileType>();
+
+            for (int i = 0; i < parts.Length - 1; i += 2)
+            {
+                var name = parts[i].Trim();
+                var patternPart = parts[i + 1];
+
+                var patterns = ParsePatternPart(patternPart);
+                if (patterns.Count == 0)
+                    continue;
+
+                list.Add(new FilePickerFileType(string.IsNullOrEmpty(name) ? "Files" : name)
+                {
+                    Patterns = patterns
+                });
+            }
+
+            return list.Count == 0 ? null : list;
+        }
+
+        private static List<string> ParsePatternPart(string part)
+        {
+            var separators = new[] { ';', ',' };
+            var raw = part.Split(separators, StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim()).Where(s => !string.IsNullOrEmpty(s));
+            var patterns = new List<string>();
+
+            foreach (var p in raw)
+            {
+                var pat = p;
+                if (pat == "*.*")
+                {
+                    patterns.Add("*.*");
+                    continue;
+                }
+                if (pat.StartsWith("*"))
+                {
+                    patterns.Add(pat);
+                    continue;
+                }
+                if (pat.StartsWith("."))
+                {
+                    patterns.Add("*" + pat);
+                    continue;
+                }
+                if (pat.Contains('.'))
+                {
+                    patterns.Add("*" + (pat.StartsWith(".") ? pat : "." + pat));
+                    continue;
+                }
+                patterns.Add("*." + pat.TrimStart('.'));
+            }
+            return patterns.Distinct().ToList();
         }
         private TopLevel? GetTopLevel() => Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop ? desktop.MainWindow : null;
     }

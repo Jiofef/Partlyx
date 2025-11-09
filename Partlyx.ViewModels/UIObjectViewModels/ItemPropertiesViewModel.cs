@@ -41,7 +41,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _dialogService = ds;
             _loc = loc;
 
-            _focusedPartChangedSubscription = bus.Subscribe<FocusedPartChangedEvent>(ev => OnFocusedPartChanged());
+            _focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedPartChangedEvent>(ev => OnFocusedPartChanged());
 
             FocusedPart = focusedPart;
         }

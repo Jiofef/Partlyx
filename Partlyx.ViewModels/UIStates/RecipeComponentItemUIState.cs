@@ -1,11 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DynamicData.Binding;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
+using SQLitePCL;
 namespace Partlyx.ViewModels.UIStates
 {
     public partial class RecipeComponentItemUIState : PartItemUIState
@@ -13,14 +16,18 @@ namespace Partlyx.ViewModels.UIStates
         private readonly IEventBus _bus;
         private readonly PartsServiceViewModel _services;
 
-        private readonly RecipeComponentViewModel _componentVM;
+        public RecipeComponentViewModel AttachedComponent { get; }
+        public override IVMPart AttachedPart { get => AttachedComponent; }
 
-        public RecipeComponentItemUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm, IEventBus bus)
+        public IGlobalFocusedPart GlobalFocusedPart { get; }
+
+        public RecipeComponentItemUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm, IEventBus bus, IGlobalFocusedPart gfc)
         {
             _bus = bus;
             _services = svm;
 
-            _componentVM = vm;
+            GlobalFocusedPart = gfc;
+            AttachedComponent = vm;
 
             var expandAllRecipeComponentItemsSubscription = bus.Subscribe<SetAllTheRecipeComponentItemsExpandedEvent>(ev => SetExpanded(ev.expand));
             Subscriptions.Add(expandAllRecipeComponentItemsSubscription);
@@ -29,7 +36,7 @@ namespace Partlyx.ViewModels.UIStates
         [RelayCommand]
         public void FindResourceInTree()
         {
-            var resource = _componentVM.LinkedResource?.Value;
+            var resource = AttachedComponent.LinkedResource?.Value;
             if (resource == null) return;
 
             resource.UiItem.FindInTree();
@@ -38,8 +45,22 @@ namespace Partlyx.ViewModels.UIStates
         [RelayCommand]
         public async Task SetQuantityAsync(double value)
         {
-            var args = new PartSetValueInfo<RecipeComponentViewModel, double>(_componentVM, value);
+            if (value == AttachedComponent.Quantity) return;
+
+            var args = new PartSetValueInfo<RecipeComponentViewModel, double>(AttachedComponent, value);
             await _services.ComponentService.SetQuantityAsync(args);
+        }
+
+        [RelayCommand]
+        public void ToggleGlobalFocus()
+        {
+            ToggleFocused(GlobalFocusedPart);
+        }
+
+        [RelayCommand]
+        public void ToggleLocalFocus(IIsolatedFocusedPart target)
+        {
+            ToggleFocused(target);
         }
     }
 }

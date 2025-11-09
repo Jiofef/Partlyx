@@ -11,7 +11,9 @@
              xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
              xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:CompileBindings="false"
-             x:DataType="vmo:PartsTreeViewModel">
+             x:DataType="vmo:PartsTreeViewModel"
+             d:DesignWidth="320"
+             d:DesignHeight="320">
         <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -49,25 +51,29 @@
         <Grid Grid.Row="1" HorizontalAlignment="Stretch">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <TreeView x:Name="TreeViewControl"
-                          ItemsSource="{Binding Resources}" 
+                          ItemsSource="{Binding Search.UnfilteredResources}" 
                           Margin="0,0,10,0" BorderThickness="0" Background="{StaticResource PxBlue0Brush}">
                     <TreeView.Template>
                         <ControlTemplate TargetType="TreeView">
-                            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderBrush}">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
                                 <ItemsPresenter/>
                             </Border>
                         </ControlTemplate>
                     </TreeView.Template>
-                    <ItemsPresenter HorizontalAlignment="Stretch"/>
                     <TreeView.ItemContainerTheme>
-                        <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
-                            <Setter Property="IsExpanded" Value="{Binding DataContext.UiItem.IsExpanded, RelativeSource={RelativeSource AncestorType=TreeViewItem}, Mode=TwoWay}"/>
+                        <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource MaterialTreeViewItem}">
+                        <Setter Property="IsExpanded">
+                            <Setter.Value>
+                            <Binding Path="DataContext.UiItem.IsExpanded"
+                                        RelativeSource="{RelativeSource Self}"
+                                        Mode="TwoWay"/>
+                            </Setter.Value>
+                        </Setter>
                         </ControlTheme>
                     </TreeView.ItemContainerTheme>
                     <i:Interaction.Behaviors>
-                        <beh:CollectionViewFilterBehavior Predicate="{Binding Search.SearchByName}"/>
-                        <beh:TreeViewPartSelectionBehavior SelectedPartsContainer="{Binding SelectedParts}" AutoSetAncestorParts="True"
-                                                           FocusSelectedPart="True" FocusedPartContainer="{Binding FocusedPart}"/>
+                        <beh:TreeViewPartSelectionBehavior SelectedPartsContainer="{Binding SelectedParts}" AutoSetAncestorParts="True"/>
                     </i:Interaction.Behaviors>
                     <TreeView.KeyBindings>
                         <KeyBinding Gesture="F2" Command="{Binding Service.StartRenamingSelectedCommand}"/>

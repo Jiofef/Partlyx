@@ -23,7 +23,6 @@
                             Margin="0,0,10,0" Classes="common"
                             BorderThickness="0" Background="{StaticResource PxBlue0Brush}"
                             Grid.Row="1" SelectionMode="{Binding EnableMultiSelect, Converter={StaticResource BoolToSelectionModeConv}}">
-                <ItemsPresenter HorizontalAlignment="Stretch"/>
                 <i:Interaction.Behaviors>
                     <beh:ListViewSelectedPartsSyncBehavior SelectedParts="{Binding SelectedParts}"/>
                 </i:Interaction.Behaviors>

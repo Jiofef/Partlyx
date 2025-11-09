@@ -20,7 +20,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             if (resource != null)
                 return resource;
 
-            resource = CreateViewModelFrom<ResourceViewModel>(dto);
+          resource = CreateViewModelFrom<ResourceViewModel>(dto);
             _store.Register(resource);
             return resource;
         }

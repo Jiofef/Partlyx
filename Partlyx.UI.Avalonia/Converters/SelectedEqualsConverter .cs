@@ -13,7 +13,8 @@ namespace Partlyx.UI.Avalonia.Converters
         public object Convert(IList<object?> values, Type targetType, object parameter, CultureInfo culture)
         {
             // values[0] = SelectedItem, values[1] = currentItem
-            return Equals(values[0], values[1]);
+            var result = Equals(values[0], values[1]);
+            return result;
         }
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
             => throw new NotSupportedException();

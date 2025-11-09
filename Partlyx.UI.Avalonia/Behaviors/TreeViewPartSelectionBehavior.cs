@@ -82,7 +82,7 @@ namespace Partlyx.UI.Avalonia.Behaviors
         {
             base.OnSelectedItemChanged(sender, args);
 
-            if (args.AddedItems[0] is not IVMPart part) return;
+            if (args.AddedItems.Count == 0 || args.AddedItems[0] is not IVMPart part) return;
 
             SetSelectedPart(part);
         }

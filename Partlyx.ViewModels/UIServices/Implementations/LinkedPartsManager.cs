@@ -6,6 +6,7 @@ using Partlyx.ViewModels.UIServices.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -110,11 +111,11 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             if (_store.TryGet(uid, out IVMPart? found))
             {
-                DispatchToUi(() => linkedPart.Value = (TPart)found!);
+                DispatchToUiWithoutBlock(() => linkedPart.Value = (TPart)found!);
             }
             else
             {
-                DispatchToUi(() => linkedPart.Value = default);
+                DispatchToUiWithoutBlock(() => linkedPart.Value = default);
             }
         }
 
@@ -154,7 +155,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             foreach (var t in targets)
             {
-                DispatchToUi(() => t.Value = instance);
+                DispatchToUiWithoutBlock(() => t.Value = instance);
             }
         }
 
@@ -172,7 +173,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             foreach (var t in targets)
             {
-                DispatchToUi(() => t.Value = default);
+                DispatchToUiWithoutBlock(() => t.Value = default);
             }
         }
 
@@ -186,6 +187,20 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             else
             {
                 action(); // for tests or no ui
+            }
+        }
+
+        private void DispatchToUiWithoutBlock(Action action)
+        {
+            {
+                if (_invoker != null)
+                {
+                    _invoker.BeginInvoke(action);
+                }
+                else
+                {
+                    action(); // for tests or no ui
+                }
             }
         }
 

@@ -14,6 +14,7 @@ using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.UI.Avalonia.Resources;
 using Partlyx.UI.Avalonia.VMImplementations;
 using Partlyx.ViewModels.Graph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
@@ -46,11 +47,6 @@ namespace Partlyx.UI.Avalonia
 
         public override void OnFrameworkInitializationCompleted()
         {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            {
-                desktop.MainWindow = new MainWindow();
-            }
-
 
             var services = new ServiceCollection();
             InitializeDI(services);
@@ -62,7 +58,10 @@ namespace Partlyx.UI.Avalonia
 
             var mainVM = Services.GetRequiredService<MainViewModel>();
             var window = new MainWindow() { DataContext = mainVM };
-            window.Show();
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.MainWindow = window;
+            }
 
             DirectoryManager.CreatePartlyxFolder();
             InitializeDatabaseAsync();

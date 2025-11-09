@@ -103,25 +103,25 @@ namespace Partlyx.UI.Avalonia.Behaviors
         private void ApplyFilter()
         {
             if (AssociatedObject == null) return;
-            if (!Dispatcher.UIThread.CheckAccess())
+
+            Dispatcher.UIThread.Post(() =>
             {
-                Dispatcher.UIThread.Post(ApplyFilter);
-                return;
-            }
+                IEnumerable sourceEnumerable = _originalSource ?? Enumerable.Empty<object>();
+                var items = sourceEnumerable.Cast<object>();
+                IEnumerable<object> accepted;
+                if (Predicate != null)
+                    accepted = items.Where(o => Predicate(o));
+                else
+                    accepted = items;
 
-            IEnumerable sourceEnumerable = _originalSource ?? Enumerable.Empty<object>();
-            var items = sourceEnumerable.Cast<object>();
-            IEnumerable<object> accepted;
-            if (Predicate != null)
-                accepted = items.Where(o => Predicate(o));
-            else
-                accepted = items;
+                _filtered.Clear();
 
-            _filtered.Clear();
-            foreach (var it in accepted)
-                _filtered.Add(it);
+                if (AssociatedObject.Items.Count > 0)
+                    AssociatedObject.Items.Clear();
 
-            AssociatedObject.ItemsSource = _filtered;
+                foreach (var it in accepted)
+                    _filtered.Add(it);
+            });
         }
     }
 }

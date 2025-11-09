@@ -16,7 +16,7 @@ namespace Partlyx.Infrastructure.Data.ApplicationResources
         public ApplicationResourcesProvider(Assembly resourcesAssembly)
         {
              _stringsResourceManager = new Lazy<ResourceManager>(() => 
-                new ResourceManager("Partlyx.UI.WPF.Resources.Strings.Strings", resourcesAssembly),
+                new ResourceManager("Partlyx.UI.Avalonia.Resources.Strings.Strings", resourcesAssembly),
                 isThreadSafe: true);
         }
         public string GetString(string key, CultureInfo? culture = null)

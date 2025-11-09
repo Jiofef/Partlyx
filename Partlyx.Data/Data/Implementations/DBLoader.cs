@@ -64,7 +64,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
                 var srcConnStr = $"Data Source={sourceDbPath};Pooling=False";
                 var dstConnStr = $"Data Source={_dbProvider.CurrentDbPath}";
 
-                await Task.Run(() =>
+                await Task.Run(async () =>
                 {
                     using var src = new SqliteConnection(srcConnStr);
                     using var dst = new SqliteConnection(dstConnStr);
@@ -73,6 +73,8 @@ namespace Partlyx.Infrastructure.Data.Implementations
                     dst.Open();
 
                     src.BackupDatabase(dst);
+
+                    await _dbProvider.DataBaseMigrateAsync();
                 }, cancellationToken).ConfigureAwait(false);
 
                 try

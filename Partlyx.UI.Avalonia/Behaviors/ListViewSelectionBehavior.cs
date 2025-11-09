@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Partlyx.UI.Avalonia.Behaviors;
@@ -11,8 +12,7 @@ public static class ListViewSelectionBehavior
 {
     public static readonly AttachedProperty<IList> BindableSelectedItemsProperty =
         AvaloniaProperty.RegisterAttached<Control, IList>(
-            "BindableSelectedItems",
-            null);
+            "BindableSelectedItems", typeof(IList));
 
     public static void SetBindableSelectedItems(ListBox element, IList value)
         => element.SetValue(BindableSelectedItemsProperty, value);

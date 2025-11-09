@@ -49,7 +49,7 @@
                     </MenuItem>
                     <MenuItem Header="{h:Loc menu_Edit}" DataContext="{Binding EditMenu}" Height="32">
                         <MenuItem Header="{h:Loc Undo}" Command="{Binding UndoCommand}" InputGesture="Ctrl+Z" Classes="common"/>
-                        <MenuItem Header="{h:Loc Redo}" Command="{Binding RedoCommand}" InputGesture="Ctrl+Shift+Z / Ctrl+Y" Classes="common"/>
+                        <MenuItem Header="{h:Loc Redo}" Command="{Binding RedoCommand}" InputGesture="Ctrl+Y" Classes="common"/>
                     </MenuItem>
                 </Menu>
 
@@ -57,7 +57,7 @@
 
             <Grid Grid.Row="1" Grid.RowSpan="2" Background="{StaticResource PxBlue0Brush}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="360" MinWidth="32" MaxWidth="1024"/>
+                    <ColumnDefinition Width="400" MinWidth="32" MaxWidth="1024"/>
                     <ColumnDefinition Width="4"/>
                     <ColumnDefinition Width="*" MinWidth="32"/>
                     <ColumnDefinition Width="4"/>

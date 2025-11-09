@@ -11,6 +11,7 @@
              xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:fa="clr-namespace:Meziantou.WpfFontAwesome;assembly=Meziantou.WpfFontAwesome"
              xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels.Implementations"
              mc:Ignorable="d" 
              d:DesignHeight="280" d:DesignWidth="450"
              x:DataType="vmo:ComponentCreateViewModel"
@@ -19,33 +20,27 @@
     <Grid Background="{StaticResource PxBlue0Brush}">
         <Grid Margin="4" RowDefinitions="Auto,*,Auto">
             <TextBox Classes="common" Watermark="{h:Loc Search___}" Background="{StaticResource PxWhiteBrush}" Grid.Row="0"/>
-            <ListBox ItemsSource="{Binding Search.Resources}"
+            <ListBox ItemsSource="{Binding Search.UnfilteredResources}"
                             Margin="0,0,10,0" Classes="common"
                             BorderThickness="0" Background="{StaticResource PxBlue0Brush}"
                             Grid.Row="1"
                             beh:ListViewSelectionBehavior.BindableSelectedItems="{Binding SelectedParts.Resources}">
-                <ItemsPresenter HorizontalAlignment="Stretch"/>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
 
-                <ListBox.ItemContainerTheme>
-                    <ControlTheme TargetType="ListBoxItem">
-						 <i:Interaction.Behaviors>
-                            <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                <ia:InvokeCommandAction 
-                                    Command="{Binding #Root.DataContext.CloseDialogCommand}"
-                                    CommandParameter="{Binding #Root.DataContext.SelectedParts}"/>
-                            </ia:EventTriggerBehavior>
-                        </i:Interaction.Behaviors>
-                    </ControlTheme>
-                </ListBox.ItemContainerTheme>
-
                 <ListBox.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate DataType="vmp:ResourceViewModel">
                         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4,2,4,2" Height="32">
+                            <i:Interaction.Behaviors>
+                                <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                    <ia:InvokeCommandAction 
+                                        Command="{Binding $parent[UserControl].DataContext.CloseDialogCommand}"
+                                        CommandParameter="{Binding $parent[UserControl].DataContext.SelectedParts}"/>
+                                </ia:EventTriggerBehavior>
+                            </i:Interaction.Behaviors>
                             <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                             <Grid HorizontalAlignment="Stretch" ColumnDefinitions="Auto,*,Auto">
                                 <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>

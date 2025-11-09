@@ -10,6 +10,7 @@ namespace Partlyx.Infrastructure.Data.Interfaces
         string? CurrentDbPath { get; }
         SemaphoreSlim DBExportLoadSemaphore { get; }
 
+        Task DataBaseMigrateAsync();
         Task InitializeAsync(string dbPath, CancellationToken ct = default);
         void NotifyDatabaseClosed();
         void NotifyDatabaseReplaced();

@@ -112,8 +112,7 @@ namespace Partlyx.UI.Avalonia.OtherControls
         {
             if (e.KeyModifiers != KeyModifiers.None) return;
 
-            var point = e.GetCurrentPoint(this);
-            double zoomFactor = point.Properties.YTilt > 0 ? ZoomSpeed : 1 / ZoomSpeed;
+            double zoomFactor = e.Delta.Y > 0 ? ZoomSpeed : 1 / ZoomSpeed;
             double oldZoom = ZoomLevel;
             double newZoom = Math.Clamp(oldZoom * zoomFactor, MinZoom, MaxZoom);
 

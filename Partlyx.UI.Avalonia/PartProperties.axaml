@@ -14,8 +14,8 @@
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
              x:DataType="vmo:ItemPropertiesViewModel">
-    <UserControl.Resources>
-        <DataTemplate x:Key="TextBoxItemPropertyTemplate" DataType="{x:Type vmprop:TextBoxItemPropertyViewModel}">
+    <UserControl.DataTemplates>
+        <DataTemplate DataType="vmprop:TextBoxItemPropertyViewModel">
             <Grid Margin="4,2,4,2" Height="36" HorizontalAlignment="Stretch">
                 <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
                 <Grid ColumnDefinitions="Auto, *">
@@ -36,12 +36,11 @@
                              Margin="4" IsVisible="{Binding IsChangingText}" FontFamily="Cascadia Code">
                         <TextBox.KeyBindings>
                             <KeyBinding Gesture="Enter" Command="{Binding ConfirmChangesCommand}" CommandParameter="{Binding Text}"/>
-                            <KeyBinding Gesture="Esc" Command="{Binding CancelChangesCommand}"/>
+                            <KeyBinding Gesture="Escape" Command="{Binding CancelChangesCommand}"/>
                         </TextBox.KeyBindings>
                         <i:Interaction.Behaviors>
                             <ia:EventTrigger EventName="LostKeyboardFocus">
                                 <ia:InvokeCommandAction Command="{Binding ConfirmChangesCommand}" CommandParameter="{Binding Text}"/>
-                                <beh:TextBoxFocusBehavior IsFocused="{Binding IsChangingText, Mode=TwoWay}"/>
                             </ia:EventTrigger>
                         </i:Interaction.Behaviors>
                     </TextBox>
@@ -49,7 +48,7 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:Key="RecipeItemPropertyTemplate" DataType="{x:Type vmprop:RecipeItemPropertyViewModel}">
+        <DataTemplate DataType="vmprop:RecipeItemPropertyViewModel">
             <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
                 <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
                 <Grid ColumnDefinitions="Auto,*,Auto">
@@ -61,7 +60,7 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate x:Key="SpinBoxItemPropertyTemplate" DataType="{x:Type vmprop:SpinBoxItemPropertyViewModel}">
+        <DataTemplate DataType="vmprop:SpinBoxItemPropertyViewModel">
             <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
                 <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
                 <Grid>
@@ -83,7 +82,7 @@
                 </Grid>
             </Grid>
         </DataTemplate>
-    </UserControl.Resources>
+    </UserControl.DataTemplates>
     <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -97,7 +96,6 @@
             </Grid>
             <TextBlock Grid.Row="0" Text="{Binding FocusedPartTextAnnotation}" Margin="8, 4, 8, 4" HorizontalAlignment="Center" Foreground="{StaticResource PxBlackBrush}" Classes="common"/>
             <ListBox x:Name="PropertiesListView" ItemsSource="{Binding Properties}">
-                <ContentPresenter HorizontalAlignment="Stretch"/>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <ContentControl>

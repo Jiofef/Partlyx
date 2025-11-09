@@ -10,6 +10,7 @@ using ReactiveUI;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using static Partlyx.ViewModels.PartsViewModels.VMPartExtensions;
 using System.Runtime.CompilerServices;
 using UJL.CSharp.Collections;
 
@@ -21,14 +22,24 @@ namespace Partlyx.ViewModels.Graph
 
         private IVMPartsStore _store;
 
-        public PartsGraphTreeBuilderViewModel(IGlobalSelectedParts selectedParts, IEventBus bus, IVMPartsStore store)
+        public PartsGraphTreeBuilderViewModel(IGlobalFocusedPart focusedPart, IEventBus bus, IVMPartsStore store)
         {
             _store = store;
 
-            SelectedParts = selectedParts;
+            FocusedPart = focusedPart;
 
-            var recipeChangedSubscription = bus.Subscribe<GlobalSingleRecipeSelectedEvent>((ev) => UpdateGraph());
-            _subscriptions.Add(recipeChangedSubscription);
+            var focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedPartChangedEvent>(
+                (ev) =>
+                    {
+                        _store.TryGet(ev.FocusedPartUid, out var focused);
+                        _store.TryGet(ev.PreviousSelectedPartUid, out var previous);
+                        var focusedRecipe = focused?.GetRelatedRecipe();
+                        var previousRecipe = previous?.GetRelatedRecipe();
+
+                        if (focusedRecipe != previousRecipe)
+                            UpdateGraph();
+                    });
+            _subscriptions.Add(focusedPartChangedSubscription);
             var recipeRemovedSubscription = bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => UpdateGraph());
             _subscriptions.Add(recipeRemovedSubscription);
 
@@ -37,7 +48,7 @@ namespace Partlyx.ViewModels.Graph
             _subscriptions.Add(bus.Subscribe<RecipeComponentsMovingCompletedVMEvent>((ev) => UpdateGraph()));
         }
 
-        public IGlobalSelectedParts SelectedParts { get; }
+        public IGlobalFocusedPart FocusedPart { get; }
 
         public ObservableCollection<ComponentGraphNodeViewModel> ComponentLeafs { get; } = new();
 
@@ -98,7 +109,7 @@ namespace Partlyx.ViewModels.Graph
             DestroyTree();
 
             // Getting the part to build the tree from it
-            var selectedRecipe = SelectedParts.GetSingleRecipeOrNull();
+            var selectedRecipe = FocusedPart.FocusedPart?.GetRelatedRecipe();
             if (selectedRecipe == null) return;
 
             // Creating the root node

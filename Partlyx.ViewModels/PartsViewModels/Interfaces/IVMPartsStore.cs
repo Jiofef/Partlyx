@@ -14,6 +14,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
         void RemoveRecipe(Guid uid);
         void RemoveRecipeComponent(Guid uid);
         void RemoveResource(Guid uid);
-        bool TryGet(Guid itemUid, out IVMPart? part);
+        bool TryGet(Guid? itemUid, out IVMPart? part);
     }
 }

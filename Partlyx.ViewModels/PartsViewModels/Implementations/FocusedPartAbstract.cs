@@ -18,14 +18,16 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             bool isValueChanged = part != _focusedPart;
 
+            var previous = FocusedPart;
+
             FocusedPart = part;
             SelectedPartType = part?.PartType;
 
             HasFocusedPart = part != null;
 
-            OnPartFocused(part, isValueChanged);
+            OnPartFocused(part, previous, isValueChanged);
         }
 
-        protected virtual void OnPartFocused(IVMPart? part, bool isValueChanged) { }
+        protected virtual void OnPartFocused(IVMPart? part, IVMPart? previousPart, bool isValueChanged) { }
     }
 }

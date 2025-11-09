@@ -9,6 +9,7 @@ using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using Partlyx.ViewModels.UIStates;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -31,6 +32,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childRemoveSubscription;
         private readonly IDisposable _childMoveSubscription;
 
+        private ResourceViewModel() { }
         public ResourceViewModel(ResourceDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
@@ -168,5 +170,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         // For UI
         public ResourceItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
+        PartItemUIState IVMPart.UiItem => UiItem;
     }
 }

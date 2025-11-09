@@ -14,17 +14,6 @@
         <Setter Property="FontSize" Value="16"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="FontFamily" Value="Cascadia Code"/>
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Grid>
-                    <Border Name="border" 
-                            Background="{TemplateBinding Background}" 
-                            CornerRadius="4" 
-                            RenderTransformOrigin="0.5,0.5"/>
-                    <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                </Grid>
-            </ControlTemplate>
-        </Setter>
     </Style>
 
     <Style Selector="Button.base-button:pointerover /template/ Border#border">
@@ -40,17 +29,6 @@
         <Setter Property="FontSize" Value="16"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="FontFamily" Value="Cascadia Code"/>
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Grid>
-                    <Border Name="border" 
-                            Background="{TemplateBinding Background}" 
-                            CornerRadius="4" 
-                            RenderTransformOrigin="0.5,0.5"/>
-                    <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                </Grid>
-            </ControlTemplate>
-        </Setter>
     </Style>
 
     <Style Selector="Button.darker-focus:pointerover /template/ Border#border">
@@ -107,58 +85,51 @@
         <Setter Property="Background" Value="{StaticResource PxWhiteBrush}"/>
     </Style>
 
-    <!-- CommonSearchTextBox -->
-    <Style Selector="TextBox.search">
-        <Setter Property="Background" Value="{StaticResource PxWhiteBrush}"/>
-        <Setter Property="Height" Value="32"/>
-        <Setter Property="Foreground" Value="{StaticResource PxBlackBrush}"/>
-    </Style>
-
     <!-- CommonMaterialIcon -->
     <Style Selector="mdi|MaterialIcon.common">
 		<Setter Property="Foreground" Value="{StaticResource PxBlackBrush}"/>
     </Style>
 
-    <!-- StarToggleButtonStyle -->
-    <Style Selector="ToggleButton.star">
+
+    <!-- CommonToggleButton -->
+    <Style Selector="ToggleButton.with_icon">
         <Setter Property="Width" Value="24"/>
         <Setter Property="Height" Value="24"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="2"/>
         <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Tag" Value="Circle"/>
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
-                    <Border Background="Transparent" />
-                    <Path Name="PART_StarPath"
-                          Data="M12,2 L15,9 L22,9 L17,13 L19,20 L12,16 L5,20 L7,13 L2,9 L9,9 Z"
-                          Stretch="Uniform"
-                          Fill="{DynamicResource PxGrayBrush}"
-                          RenderTransformOrigin="0.5,0.5">
-                        <Path.RenderTransform>
-                            <ScaleTransform ScaleX="1" ScaleY="1" />
-                        </Path.RenderTransform>
-                    </Path>
+                    <Border Background="Transparent"/>
+                <mdi:MaterialIcon Kind="{TemplateBinding Tag}"
+                                  x:Name="ButtonIcon"
+                                  Classes="Common"
+                                  Foreground="{DynamicResource PxGrayBrush}"
+                                  RenderTransformOrigin="0.5,0.5"
+                                  Width="{TemplateBinding Width}"
+                                  Height="{TemplateBinding Height}"/>
+                    <Border x:Name="HoverRing"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            CornerRadius="2"
+                            IsHitTestVisible="False"/>
                 </Grid>
             </ControlTemplate>
         </Setter>
     </Style>
-
-    <Style Selector="ToggleButton.star-toggle:checked /template/ Path#PART_StarPath">
-        <Setter Property="Fill" Value="{StaticResource PxBlue1Brush}" />
+    <Style Selector="ToggleButton.with_icon:checked /template/ mdi|MaterialIcon#ButtonIcon">
+      <Setter Property="Foreground" Value="{DynamicResource PxBlue1Brush}"/>
     </Style>
-
-    <Style Selector="ToggleButton.star-toggle:pointerover /template/ Path#PART_StarPath">
-        <Setter Property="RenderTransform">
-            <ScaleTransform ScaleX="1.15" ScaleY="1.15" />
-        </Setter>
+    <Style Selector="ToggleButton.with_icon:pointerover /template/ mdi|MaterialIcon#ButtonIcon">
+      <Setter Property="RenderTransform" Value="scale(1.15)"/>
     </Style>
-
-    <Style Selector="ToggleButton.star-toggle:pressed /template/ Path#PART_StarPath">
-        <Setter Property="RenderTransform">
-            <ScaleTransform ScaleX="0.95" ScaleY="0.95" />
-        </Setter>
+    <Style Selector="ToggleButton.with_icon:pressed /template/ mdi|MaterialIcon#ButtonIcon">
+      <Setter Property="RenderTransform" Value="scale(0.95)"/>
     </Style>
-
+    <Style Selector="ToggleButton.with_icon:disabled /template/ mdi|MaterialIcon#ButtonIcon">
+      <Setter Property="Opacity" Value="0.45"/>
+    </Style>
 </Styles>

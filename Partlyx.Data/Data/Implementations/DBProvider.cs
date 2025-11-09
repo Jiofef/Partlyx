@@ -54,11 +54,20 @@ namespace Partlyx.Infrastructure.Data.Implementations
             using var scope = _services.CreateScope();
             var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<PartlyxDBContext>>();
             using var ctx = factory.CreateDbContext();
-            ctx.Database.EnsureCreated();
+            ctx.Database.Migrate();
 
             IsInitialized = true;
 
             NotifyDatabaseReplaced();
+        }
+
+        public async Task DataBaseMigrateAsync()
+        {
+            using var scope = _services.CreateScope();
+            var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<PartlyxDBContext>>();
+            using var ctx = factory.CreateDbContext();
+
+            await ctx.Database.MigrateAsync();
         }
 
         /// <summary>
