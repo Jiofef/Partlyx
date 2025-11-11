@@ -1,0 +1,8 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:localdnd="using:Partlyx.UI.Avalonia.DragAndDrop">
+
+    <localdnd:ResourceItemDropHandler x:Key="ResourceItemDropHandler"/>
+    <localdnd:RecipeItemDropHandler x:Key="RecipeItemDropHandler"/>
+    <localdnd:RecipeComponentItemDropHandler x:Key="RecipeComponentItemDropHandler"/>
+</ResourceDictionary>

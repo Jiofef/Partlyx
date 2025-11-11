@@ -53,5 +53,8 @@ namespace Partlyx.ViewModels.UIStates
         {
             HasGlobalFocus = false;
         }
+
+        public virtual Task HandleDrop(ISelectedParts droppedParts) { return Task.CompletedTask; }
+        
     }
 }

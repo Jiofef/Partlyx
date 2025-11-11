@@ -5,6 +5,7 @@ using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.GlobalNavigations;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
@@ -33,12 +34,14 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childMoveSubscription;
 
         private ResourceViewModel() { }
-        public ResourceViewModel(ResourceDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IResourceItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
+        public ResourceViewModel(ResourceDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store, IVMPartsFactory partsFactory,
+            IEventBus bus, IResourceItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
             // Services
             Services = service;
+            GlobalNavigations = nav;
             _store = store;
             _partsFactory = partsFactory;
             _bus = bus;
@@ -171,5 +174,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         // For UI
         public ResourceItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
         PartItemUIState IVMPart.UiItem => UiItem;
+        public PartsGlobalNavigations GlobalNavigations { get; }
     }
 }

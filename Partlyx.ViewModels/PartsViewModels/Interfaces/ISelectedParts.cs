@@ -22,6 +22,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
         bool IsComponentsSelected { get; }
 
         void AddComponentToSelected(RecipeComponentViewModel component);
+        void AddPartToSelected(IVMPart part);
         void AddRecipeToSelected(RecipeViewModel recipe);
         void AddResourceToSelected(ResourceViewModel resource);
 

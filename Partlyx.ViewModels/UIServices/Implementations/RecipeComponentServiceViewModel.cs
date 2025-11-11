@@ -71,9 +71,14 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task MoveComponentsAsync(PartsTargetInteractionInfo<RecipeComponentViewModel, RecipeViewModel> info)
         {
-            var components = info.Parts;
             var targetRecipe = info.Target;
+            var components = info.Parts;
 
+            await MoveComponentsAsync(targetRecipe, components);
+        }
+
+        public async Task MoveComponentsAsync(RecipeViewModel targetRecipe, List<RecipeComponentViewModel> components)
+        {
             foreach (var component in components)
             {
                 var previousGrandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Value!.Uid;
@@ -101,12 +106,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             if (info == null || info.Part == null || info.Value == null) return;
 
-            var component = info.Part;
-            var targetRecipe = info.Value;
+            var targetComponent = info.Part;
+            var valueRecipe = info.Value;
 
-            var grandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
+            await SetSelectedRecipe(targetComponent, valueRecipe);
+        }
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentSelectedRecipe>(grandParentUid, component.Uid, targetRecipe?.Uid!);
+        public async Task SetSelectedRecipe(RecipeComponentViewModel targetComponent, RecipeViewModel valueRecipe)
+        {
+            var grandParentUid = targetComponent.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
+
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentSelectedRecipe>(grandParentUid, targetComponent.Uid, valueRecipe?.Uid!);
         }
 
         [RelayCommand]
@@ -114,11 +124,15 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             if (info == null || info.Part == null) return;
 
-            var component = info.Part;
+            var targetComponent = info.Part;
             var value = info.Value;
 
-            var grandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
-            var uid = component.Uid;
+            await SetQuantityAsync(targetComponent, value);
+        }
+        public async Task SetQuantityAsync(RecipeComponentViewModel targetComponent, double value)
+        {
+            var grandParentUid = targetComponent.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
+            var uid = targetComponent.Uid;
             await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentQuantityCommand>(grandParentUid, uid, value);
         }
     }

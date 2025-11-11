@@ -8,6 +8,7 @@ using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.GlobalNavigations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
@@ -34,12 +35,14 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _childComponentsDefaultRecipeUpdateSubscribe;
         private readonly IDisposable _childComponentsSelectedRecipeUpdateSubscribe;
 
-        public RecipeComponentViewModel(RecipeComponentDto dto, PartsServiceViewModel service, IVMPartsStore store, IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
+        public RecipeComponentViewModel(RecipeComponentDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store,
+            IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
             // Services
             Services = service;
+            GlobalNavigations = nav;
             _store = store;
             _partsFactory = partsFactory;
             _bus = bus;
@@ -129,7 +132,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public RecipeComponentItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
         PartItemUIState IVMPart.UiItem => UiItem;
         public RecipeComponentNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
-
+        public PartsGlobalNavigations GlobalNavigations { get; }
         private void UpdateSelectedComponents()
         {
             SelectedRecipeComponents =

@@ -58,38 +58,31 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        public void StartRenamingSelected()
-        {
-            var resourceVM = _selectedParts.GetSingleResourceOrNull();
-            if (resourceVM == null) return;
-
-            resourceVM.UiItem.IsRenaming = true;
-        }
-
-        [RelayCommand]
-        public async Task RemoveAsync(ResourceViewModel resource)
-        {
+        public async Task RemoveAsync(ResourceViewModel resource) =>
             await _commands.CreateSyncAndExcecuteAsync<DeleteResourceCommand>(resource.Uid);
-        }
 
         [RelayCommand]
         public async Task RenameResource(PartSetValueInfo<ResourceViewModel, string> info)
         {
-            string newName = info.Value;
             var resource = info.Part;
+            string newName = info.Value;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetNameToResourceCommand>(resource.Uid, newName);
+            await RenameResource(resource, newName);
         }
+        public async Task RenameResource(ResourceViewModel resource, string newName) =>
+            await _commands.CreateAsyncEndExcecuteAsync<SetNameToResourceCommand>(resource.Uid, newName);
 
         [RelayCommand]
         public async Task SetDefaultRecipe(PartSetValueInfo<ResourceViewModel, RecipeViewModel> info)
         {
             if (info == null || info.Part == null || info.Value == null) return;
 
-            var resource = info.Part;
-            var recipe = info.Value;
+            var targetResource = info.Part;
+            var valueRecipe = info.Value;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetDefaultRecipeToResourceCommand>(resource.Uid, recipe.Uid);
+            await SetDefaultRecipe(targetResource, valueRecipe);
         }
+        public async Task SetDefaultRecipe(ResourceViewModel resource, RecipeViewModel recipe) =>
+            await _commands.CreateAsyncEndExcecuteAsync<SetDefaultRecipeToResourceCommand>(resource.Uid, recipe.Uid);
     }
 }

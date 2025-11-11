@@ -1,4 +1,5 @@
-﻿using Partlyx.ViewModels.UIStates;
+﻿using Partlyx.ViewModels.GlobalNavigations;
+using Partlyx.ViewModels.UIStates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
         PartTypeEnumVM PartType { get; }
         Guid Uid { get; }
         PartItemUIState UiItem { get; }
+        PartsGlobalNavigations GlobalNavigations { get; }
     }
 
     public enum PartTypeEnumVM { Resource, Recipe, Component }

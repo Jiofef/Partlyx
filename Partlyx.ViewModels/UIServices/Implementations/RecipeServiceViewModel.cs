@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Partlyx.Core;
 using Partlyx.Core.Contracts;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
@@ -62,19 +63,28 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task RenameRecipe(PartSetValueInfo<RecipeViewModel, string> info)
         {
+            var targetRecipe = info.Part;
             string newName = info.Value;
-            var recipe = info.Part;
-            if (recipe.LinkedParentResource == null) return;
+            if (targetRecipe.LinkedParentResource == null) return;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeNameCommand>(recipe.LinkedParentResource!.Uid, recipe.Uid, newName);
+            await RenameRecipe(targetRecipe, newName);
+        }
+        public async Task RenameRecipe(RecipeViewModel targetRecipe, string newName)
+        {
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeNameCommand>(targetRecipe.LinkedParentResource!.Uid, targetRecipe.Uid, newName);
         }
 
         [RelayCommand]
         public async Task MoveRecipesAsync(PartsTargetInteractionInfo<RecipeViewModel, ResourceViewModel> info)
         {
-            var recipes = info.Parts;
             var targetResource = info.Target;
+            var recipes = info.Parts;
 
+            await (MoveRecipesAsync(targetResource, recipes));
+        }
+
+        public async Task MoveRecipesAsync(ResourceViewModel targetResource, List<RecipeViewModel> recipes)
+        {
             foreach (var recipe in recipes)
             {
                 var previousParentUid = recipe.LinkedParentResource!.Uid;
@@ -90,10 +100,14 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task SetCraftableAmount(PartSetValueInfo<RecipeViewModel, double> info)
         {
-            var recipe = info.Part;
+            var targetRecipe = info.Part;
             var amount = info.Value;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeCraftAmountCommand>(recipe.LinkedParentResource!.Uid, recipe.Uid, amount);
+            await SetCraftableAmount(targetRecipe, amount);
+        }
+        public async Task SetCraftableAmount(RecipeViewModel targetRecipe, double amount)
+        {
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeCraftAmountCommand>(targetRecipe.LinkedParentResource!.Uid, targetRecipe.Uid, amount);
         }
 
         [RelayCommand]

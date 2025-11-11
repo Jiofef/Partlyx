@@ -7,12 +7,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
-  <ItemGroup>
-    <AvaloniaXaml Remove="DragAndDrop\**" />
-    <Compile Remove="DragAndDrop\**" />
-    <EmbeddedResource Remove="DragAndDrop\**" />
-    <None Remove="DragAndDrop\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.8" />

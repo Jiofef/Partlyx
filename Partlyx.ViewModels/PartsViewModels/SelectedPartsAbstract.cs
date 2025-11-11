@@ -199,6 +199,22 @@ namespace Partlyx.ViewModels.PartsViewModels
                 SelectSingleComponent(component);
             }
         }
+
+        public void AddPartToSelected(IVMPart part)
+        {
+            if (part is ResourceViewModel resource)
+            {
+                AddResourceToSelected(resource);
+            }
+            else if (part is RecipeViewModel recipe)
+            {
+                AddRecipeToSelected(recipe);
+            }
+            else if (part is RecipeComponentViewModel component)
+            {
+                AddComponentToSelected(component);
+            }
+        }
         public void ClearSelection()
         {
             ClearSelectedResources();

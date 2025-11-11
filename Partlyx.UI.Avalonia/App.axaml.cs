@@ -16,6 +16,7 @@ using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.UI.Avalonia.Resources;
 using Partlyx.UI.Avalonia.VMImplementations;
+using Partlyx.ViewModels.GlobalNavigations;
 using Partlyx.ViewModels.Graph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -160,6 +161,8 @@ namespace Partlyx.UI.Avalonia
             services.AddSingleton<IGlobalFocusedPart, GlobalFocusedPart>();
             services.AddTransient<IIsolatedResourcesVMContainer, ResourcesVMContainer>();
             services.AddSingleton<IGlobalResourcesVMContainer, ResourcesVMContainer>();
+
+            services.AddSingleton<PartsGlobalNavigations>();
 
             services.AddTransient<IResourceItemUiStateService, ResourceItemUiStateService>();
             services.AddTransient<IRecipeItemUiStateService, RecipeItemUiStateService>();

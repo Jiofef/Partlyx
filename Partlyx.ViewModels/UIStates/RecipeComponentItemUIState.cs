@@ -19,14 +19,11 @@ namespace Partlyx.ViewModels.UIStates
         public RecipeComponentViewModel AttachedComponent { get; }
         public override IVMPart AttachedPart { get => AttachedComponent; }
 
-        public IGlobalFocusedPart GlobalFocusedPart { get; }
-
         public RecipeComponentItemUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm, IEventBus bus, IGlobalFocusedPart gfc)
         {
             _bus = bus;
             _services = svm;
 
-            GlobalFocusedPart = gfc;
             AttachedComponent = vm;
 
             var expandAllRecipeComponentItemsSubscription = bus.Subscribe<SetAllTheRecipeComponentItemsExpandedEvent>(ev => SetExpanded(ev.expand));
@@ -52,7 +49,8 @@ namespace Partlyx.ViewModels.UIStates
         [RelayCommand]
         public void ToggleGlobalFocus()
         {
-            ToggleFocused(GlobalFocusedPart);
+            var globalFocusedPart = AttachedComponent.GlobalNavigations.FocusedPart;
+            ToggleFocused(globalFocusedPart);
         }
 
         [RelayCommand]

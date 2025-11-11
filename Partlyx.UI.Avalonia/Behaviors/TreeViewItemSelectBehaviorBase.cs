@@ -11,7 +11,7 @@ namespace Partlyx.UI.Avalonia.Behaviors
             base.OnAttached();
 
             if (AssociatedObject != null)
-                AssociatedObject.SelectionChanged += OnSelectedItemChanged;
+                AssociatedObject.SelectionChanged += OnSelectedItemsChanged;
         }
 
         protected override void OnDetaching()
@@ -19,9 +19,9 @@ namespace Partlyx.UI.Avalonia.Behaviors
             base.OnDetaching();
 
             if (AssociatedObject != null)
-                AssociatedObject.SelectionChanged -= OnSelectedItemChanged;
+                AssociatedObject.SelectionChanged -= OnSelectedItemsChanged;
         }
 
-        protected virtual void OnSelectedItemChanged(object? sender, SelectionChangedEventArgs e) { }
+        protected virtual void OnSelectedItemsChanged(object? sender, SelectionChangedEventArgs e) { }
     }
 }

@@ -18,14 +18,10 @@ namespace Partlyx.ViewModels
         private readonly PartsServiceViewModel _services;
         public RecipeViewModel AttachedRecipe { get; }
         public override IVMPart AttachedPart { get => AttachedRecipe; }
-        public IGlobalFocusedPart GlobalFocusedPart { get; }
-
         public RecipeItemUIState(RecipeViewModel vm, IEventBus bus, PartsServiceViewModel cvm, IGlobalFocusedPart gfc) 
         {
             _bus = bus;
             _services = cvm;
-
-            GlobalFocusedPart = gfc;
 
             AttachedRecipe = vm;
             _unConfirmedName = vm.Name;
@@ -39,6 +35,23 @@ namespace Partlyx.ViewModels
 
         public bool IsRenaming { get => _isRenaming; set => SetProperty(ref _isRenaming, value); }
         public string UnConfirmedName { get => _unConfirmedName; set => SetProperty(ref _unConfirmedName, value); }
+
+        public override async Task HandleDrop(ISelectedParts droppedParts)
+        {
+            var dropType = droppedParts.GetOnlyNotEmptyCollectionPartsTypeOrNull();
+            if (dropType == null) return;
+
+            if (dropType == PartTypeEnumVM.Resource)
+            {
+                var resources = droppedParts.Resources.ToList();
+                await _services.ComponentService.CreateComponentsFromAsync(AttachedRecipe, resources);
+            }
+            else if (dropType == PartTypeEnumVM.Component)
+            {
+                var components = droppedParts.Components.ToList();
+                await _services.ComponentService.MoveComponentsAsync(AttachedRecipe, components);
+            }
+        }
 
         [RelayCommand]
         public async Task CommitNameChangeAsync()
@@ -85,7 +98,8 @@ namespace Partlyx.ViewModels
         [RelayCommand]
         public void ToggleGlobalFocus()
         {
-            ToggleFocused(GlobalFocusedPart);
+            var globalFocusedPart = AttachedPart.GlobalNavigations.FocusedPart;
+            ToggleFocused(globalFocusedPart);
         }
 
         [RelayCommand]
