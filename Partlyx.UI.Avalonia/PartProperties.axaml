@@ -20,7 +20,7 @@
                 <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
                 <Grid ColumnDefinitions="Auto, *">
                     <i:Interaction.Behaviors>
-						<ia:EventTrigger EventName="LeftClick">
+						<ia:EventTrigger EventName="PointerPressed">
 							<ia:InvokeCommandAction Command="{Binding StartTypingCommand}"/>
                         </ia:EventTrigger>
                     </i:Interaction.Behaviors>
@@ -39,9 +39,10 @@
                             <KeyBinding Gesture="Escape" Command="{Binding CancelChangesCommand}"/>
                         </TextBox.KeyBindings>
                         <i:Interaction.Behaviors>
-                            <ia:EventTrigger EventName="LostKeyboardFocus">
+                            <ia:EventTrigger EventName="LostFocus">
                                 <ia:InvokeCommandAction Command="{Binding ConfirmChangesCommand}" CommandParameter="{Binding Text}"/>
                             </ia:EventTrigger>
+                            <beh:TextBoxFocusAndSelectBehavior IsActive="{Binding IsChangingText}"/>
                         </i:Interaction.Behaviors>
                     </TextBox>
                 </Grid>
@@ -70,13 +71,14 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="{Binding DisplayableName}" Grid.Column="0" VerticalAlignment="Center" Classes="common" Margin="4"/>
-                    <NumericUpDown Value="{Binding Value, Mode=TwoWay}" Grid.Column="1" VerticalAlignment="Center" Margin="4">
+                    <NumericUpDown x:Name="SpinBox" Value="{Binding Value, Mode=TwoWay}" Grid.Column="1" VerticalAlignment="Center" Margin="4">
                         <i:Interaction.Behaviors>
-                            <ia:EventTrigger EventName="ValueChanged">
+                            <ia:EventTrigger EventName="LostFocus">
                                 <ia:InvokeCommandAction
-                                                        Command="{Binding SaveChangesCommand}"
-                                                        CommandParameter="{Binding Value}"/>
+                                        Command="{Binding SaveChangesCommand}"
+                                        CommandParameter="{Binding Value}"/>
                             </ia:EventTrigger>
+                            <beh:NumericUpDownUnfocusOnEnterOrEscapeBehavior/>
                         </i:Interaction.Behaviors>
                     </NumericUpDown>
                 </Grid>

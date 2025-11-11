@@ -45,8 +45,6 @@ namespace Partlyx.ViewModels.UIStates
         [RelayCommand]
         public async Task SetQuantityAsync(double value)
         {
-            if (value == AttachedComponent.Quantity) return;
-
             var args = new PartSetValueInfo<RecipeComponentViewModel, double>(AttachedComponent, value);
             await _services.ComponentService.SetQuantityAsync(args);
         }

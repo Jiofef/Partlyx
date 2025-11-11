@@ -126,12 +126,6 @@
   <data name="Create" xml:space="preserve">
     <value>Create</value>
   </data>
-  <data name="Create_resource1" xml:space="preserve">
-    <value>Create resource</value>
-  </data>
-  <data name="Create_resource2" xml:space="preserve">
-    <value>Create resource</value>
-  </data>
   <data name="Expand_All" xml:space="preserve">
     <value>Expand all</value>
   </data>
@@ -140,9 +134,6 @@
   </data>
   <data name="Search___" xml:space="preserve">
     <value>Search...</value>
-  </data>
-  <data name="Create_resource" xml:space="preserve">
-    <value>Create resource</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
@@ -290,5 +281,20 @@
   </data>
   <data name="Total_resources_amount" xml:space="preserve">
     <value>Total recipe's resources amount</value>
+  </data>
+  <data name="Open_in_editor" xml:space="preserve">
+    <value>Open in editor</value>
+  </data>
+  <data name="Create_a_recipe_for_this_resource" xml:space="preserve">
+    <value>Create a recipe for this resource</value>
+  </data>
+  <data name="Create_a_component_for_this_recipe" xml:space="preserve">
+    <value>Create a component for this recipe</value>
+  </data>
+  <data name="Set_as_default" xml:space="preserve">
+    <value>Set as default</value>
+  </data>
+  <data name="Create_resource" xml:space="preserve">
+    <value>Create a resource</value>
   </data>
 </root>

@@ -33,13 +33,13 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public IGlobalSelectedParts SelectedParts { get; }
         public IGlobalFocusedPart FocusedPart { get; }
         public IResourceSearchService Search { get; }
-        public ResourceServiceViewModel Service { get; }
+        public PartsServiceViewModel Service { get; }
 
         private IGlobalResourcesVMContainer _resourcesContainer { get; }
         public ObservableCollection<ResourceViewModel> Resources => _resourcesContainer.Resources;
 
         public PartsTreeViewModel(IGlobalResourcesVMContainer grvmc, IGlobalSelectedParts sp, IGlobalFocusedPart fp, IEventBus bus, IVMPartsFactory vmpf,
-                IVMPartsStore vmps, IResourceSearchService rss, ResourceServiceViewModel service)
+                IVMPartsStore vmps, IResourceSearchService rss, PartsServiceViewModel service)
         {
             _resourcesContainer = grvmc;
             _partsFactory = vmpf;

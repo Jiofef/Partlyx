@@ -39,7 +39,7 @@ namespace Partlyx.ViewModels.Graph
                 .Subscribe((o) => UpdateColumnText());
 
             _valueUpdateSubscription = 
-                this.WhenValueChanged(@this => @this.Value)
+                this.WhenAnyValue(@this => @this.Value)
                 .Subscribe((o) => OnValueChanged());
 
             _quantityUpdateSubscription =

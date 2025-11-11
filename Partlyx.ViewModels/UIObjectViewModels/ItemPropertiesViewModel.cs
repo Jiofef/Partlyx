@@ -10,6 +10,7 @@ using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -99,7 +100,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 });
             nameProperty.CancelChangesTask = new(
                 (args) => { nameProperty.Text = resource.Name; return Task.CompletedTask; });
-            var nameUpdateSubscription = resource.WhenValueChanged(r => r.Name).Subscribe((args) => nameProperty.Text = resource.Name);
+            var nameUpdateSubscription = resource.WhenAnyValue(r => r.Name).Subscribe((args) => nameProperty.Text = resource.Name);
             nameProperty.Subscriptions.Add(nameUpdateSubscription);
             Properties.Add(nameProperty);
 
@@ -108,7 +109,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             defaultRecipeProperty.SelectButtonPressedTask = new(
                 async (arg) =>
                 {
-                    var dialogVM = new PartsSelectionWindowViewModel<RecipeViewModel>(_dialogService, new IsolatedSelectedParts())
+                    var dialogVM = new RecipesSelectionViewModel(_dialogService, new IsolatedSelectedParts())
                     { 
                         EnableMultiSelect = false, 
                         Items = resource.Recipes, 
@@ -123,7 +124,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     var args = new PartSetValueInfo<ResourceViewModel, RecipeViewModel>(resource, recipe);
                     await _services.ResourceService.SetDefaultRecipe(args);
                 });
-            var defaultRecipeUpdateSubscription = resource.WhenValueChanged(r => r.LinkedDefaultRecipe).Subscribe((args) => defaultRecipeProperty.Part = resource.LinkedDefaultRecipe?.Value);
+            var defaultRecipeUpdateSubscription = resource.WhenAnyValue(r => r.LinkedDefaultRecipe!.Value).Subscribe((args) => defaultRecipeProperty.Part = resource.LinkedDefaultRecipe?.Value);
             defaultRecipeProperty.Subscriptions.Add(defaultRecipeUpdateSubscription);
             Properties.Add(defaultRecipeProperty);
         }
@@ -142,7 +143,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 });
             nameProperty.CancelChangesTask = new(
                 (args) => { nameProperty.Text = recipe.Name; return Task.CompletedTask; });
-            var nameUpdateSubscription = recipe.WhenValueChanged(r => r.Name).Subscribe((args) => nameProperty.Text = recipe.Name);
+            var nameUpdateSubscription = recipe.WhenAnyValue(r => r.Name).Subscribe((args) => nameProperty.Text = recipe.Name);
             nameProperty.Subscriptions.Add(nameUpdateSubscription);
             Properties.Add(nameProperty);
 
@@ -156,7 +157,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     var args = new PartSetValueInfo<RecipeViewModel, double>(recipe, (double)amount);
                     await _services.RecipeService.SetCraftableAmount(args);
                 });
-            var amountUpdateSubscription = recipe.WhenValueChanged(r => r.CraftAmount).Subscribe(args => amountProperty.Value = (decimal)recipe.CraftAmount);
+            var amountUpdateSubscription = recipe.WhenAnyValue(r => r.CraftAmount).Subscribe(args => amountProperty.Value = (decimal)recipe.CraftAmount);
             amountProperty.Subscriptions.Add(amountUpdateSubscription);
             Properties.Add(amountProperty);
         }
@@ -168,7 +169,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             selectedRecipeProperty.SelectButtonPressedTask = new(
                 async (arg) =>
                 {
-                    var dialogVM = new PartsSelectionWindowViewModel<RecipeViewModel>(_dialogService, new IsolatedSelectedParts())
+                    var dialogVM = new RecipesSelectionViewModel(_dialogService, new IsolatedSelectedParts())
                     {
                         EnableMultiSelect = false,
                         Items = component.LinkedResource?.Value?.Recipes,
@@ -183,7 +184,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     var args = new PartSetValueInfo<RecipeComponentViewModel, RecipeViewModel>(component, recipe);
                     await _services.ComponentService.SetSelectedRecipe(args);
                 });
-            var selectedRecipeUpdateSubscription = component.WhenValueChanged(r => r.LinkedSelectedRecipe).Subscribe((args) => selectedRecipeProperty.Part = component.LinkedSelectedRecipe?.Value);
+            var selectedRecipeUpdateSubscription = component.WhenAnyValue(r => r.LinkedSelectedRecipe!.Value).Subscribe((args) => selectedRecipeProperty.Part = component.LinkedSelectedRecipe?.Value);
             selectedRecipeProperty.Subscriptions.Add(selectedRecipeUpdateSubscription);
             Properties.Add(selectedRecipeProperty);
 
@@ -197,7 +198,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     var args = new PartSetValueInfo<RecipeComponentViewModel, double>(component, (double)quantity);
                     await _services.ComponentService.SetQuantityAsync(args);
                 });
-            var quantityUpdateSubscription = component.WhenValueChanged(r => r.Quantity).Subscribe(args => quantityProperty.Value = (decimal)component.Quantity);
+            var quantityUpdateSubscription = component.WhenAnyValue(r => r.Quantity).Subscribe(args => quantityProperty.Value = (decimal)component.Quantity);
             quantityProperty.Subscriptions.Add(quantityUpdateSubscription);
             Properties.Add(quantityProperty);
         }

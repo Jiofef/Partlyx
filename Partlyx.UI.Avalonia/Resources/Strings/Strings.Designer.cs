@@ -142,29 +142,29 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Create resource.
+        ///   Ищет локализованную строку, похожую на Create a component for this recipe.
+        /// </summary>
+        internal static string Create_a_component_for_this_recipe {
+            get {
+                return ResourceManager.GetString("Create_a_component_for_this_recipe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Create a recipe for this resource.
+        /// </summary>
+        internal static string Create_a_recipe_for_this_resource {
+            get {
+                return ResourceManager.GetString("Create_a_recipe_for_this_resource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Create a resource.
         /// </summary>
         internal static string Create_resource {
             get {
                 return ResourceManager.GetString("Create_resource", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Create resource.
-        /// </summary>
-        internal static string Create_resource1 {
-            get {
-                return ResourceManager.GetString("Create_resource1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Create resource.
-        /// </summary>
-        internal static string Create_resource2 {
-            get {
-                return ResourceManager.GetString("Create_resource2", resourceCulture);
             }
         }
         
@@ -318,6 +318,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         internal static string Open {
             get {
                 return ResourceManager.GetString("Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Open in editor.
+        /// </summary>
+        internal static string Open_in_editor {
+            get {
+                return ResourceManager.GetString("Open_in_editor", resourceCulture);
             }
         }
         
@@ -525,6 +534,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         internal static string Selected_recipe {
             get {
                 return ResourceManager.GetString("Selected_recipe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Set as default.
+        /// </summary>
+        internal static string Set_as_default {
+            get {
+                return ResourceManager.GetString("Set_as_default", resourceCulture);
             }
         }
         

@@ -25,7 +25,7 @@ namespace Partlyx.ViewModels
             _recipeVM = vm;
 
             var columnTextUpdateSubscription = _recipeVM
-                .WhenValueChanged(rc => rc.Name)
+                .WhenAnyValue(rc => rc.Name)
                 .Subscribe(n => UpdateColumnText());
             _subscriptions.Add(columnTextUpdateSubscription);
 

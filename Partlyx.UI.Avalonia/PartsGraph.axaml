@@ -14,7 +14,9 @@
              Background="{StaticResource PxWhiteBrush}"
              x:Name="Root"
              x:DataType="vmo:PartsGraphViewModel"
-             x:CompileBindings="false">
+             x:CompileBindings="false"
+             d:DesignHeight="500"
+             d:DesignWidth="500">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -106,16 +108,16 @@
                 </Grid>
             </localo:ZoomPanControl>
 
-            <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right">
-                <Button Classes="base" Command="{Binding CenterizePanPositionCommand}" ToolTip.Tip="{h:Loc Return_to_the_tree_root}">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Right" Width="48">
+                <Button Classes="base" Command="{Binding CenterizePanPositionCommand}" ToolTip.Tip="{h:Loc Return_to_the_tree_root}" Height="40">
                     <mdi:MaterialIcon Kind="Home" Foreground="{StaticResource PxBlackBrush}" Width="24" Height="24" Margin="4"/>
                 </Button>
-                <Separator Height="8"/>
+                <Separator Height="8" Width="32"/>
                 <Button Classes="base" Command="{Binding ZoomInCommand}" ToolTip.Tip="{h:Loc Zoom_in}">
-                    <mdi:MaterialIcon Kind="Plus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
+                    <mdi:MaterialIcon Kind="Plus" Foreground="{StaticResource PxBlackBrush}" Width="24" Height="24"/>
                 </Button>
                 <Button Classes="base" Command="{Binding ZoomOutCommand}" ToolTip.Tip="{h:Loc Zoom_out}">
-                    <mdi:MaterialIcon Kind="Minus" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="24"/>
+                    <mdi:MaterialIcon Kind="Minus" Foreground="{StaticResource PxBlackBrush}" Width="24" Height="24"/>
                 </Button>
             </StackPanel>
 

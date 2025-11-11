@@ -73,11 +73,11 @@
                         </ControlTheme>
                     </TreeView.ItemContainerTheme>
                     <i:Interaction.Behaviors>
-                        <beh:TreeViewPartSelectionBehavior SelectedPartsContainer="{Binding SelectedParts}" AutoSetAncestorParts="True"/>
+                        <beh:TreeViewPartSelectionBehavior SelectedPartsContainer="{Binding SelectedParts}"/>
                     </i:Interaction.Behaviors>
                     <TreeView.KeyBindings>
-                        <KeyBinding Gesture="F2" Command="{Binding Service.StartRenamingSelectedCommand}"/>
-                        <KeyBinding Gesture="Enter" Command="{Binding Service.StartRenamingSelectedCommand}"/>
+                        <KeyBinding Gesture="F2" Command="{Binding Service.TryRenamingSingleSelectedCommand}"/>
+                        <KeyBinding Gesture="Enter" Command="{Binding Service.TryRenamingSingleSelectedCommand}"/>
                     </TreeView.KeyBindings>
                     <TreeView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -93,7 +93,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button HorizontalAlignment="Stretch" Classes="base" Command="{Binding Service.CreateResourceCommand}" Grid.Column="0" ToolTip.Tip="{h:Loc Create_resource}">
+            <Button HorizontalAlignment="Stretch" Classes="base" Command="{Binding Service.ResourceService.CreateResourceCommand}" Grid.Column="0" ToolTip.Tip="{h:Loc Create_resource}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
                         <TextBlock Text="{h:Loc Create}"/>

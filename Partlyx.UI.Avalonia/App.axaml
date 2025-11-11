@@ -45,27 +45,23 @@
     <Application.DataTemplates>
         <!--Partlyx DataTemplates-->
         <DataTemplate DataType="{x:Type vmo:ComponentCreateViewModel}">
-        <dialogs:ComponentCreate/>
+            <dialogs:ComponentCreate/>
         </DataTemplate>
-    
-            <DataTemplate DataType="vmo:ResourcesSelectionViewModel">
-            <ContentControl Content="{Binding}"
-                           ContentTemplate="{StaticResource DialogTemplateSelector}"/>
+
+        <DataTemplate DataType="vmo:ResourcesSelectionViewModel">
+            <dialogs:PartsSelectionWindow/>
         </DataTemplate>
 
         <DataTemplate DataType="vmo:RecipesSelectionViewModel">
-            <ContentControl Content="{Binding}"
-                           ContentTemplate="{StaticResource DialogTemplateSelector}"/>
+            <dialogs:PartsSelectionWindow/>
         </DataTemplate>
     
         <DataTemplate DataType="vmo:RecipeComponentsSelectionViewModel">
-            <ContentControl Content="{Binding}"
-                           ContentTemplate="{StaticResource DialogTemplateSelector}"/>
+            <dialogs:PartsSelectionWindow/>
         </DataTemplate>
     
         <DataTemplate DataType="vmo:AnyPartsSelectionViewModel">
-            <ContentControl Content="{Binding}"
-                           ContentTemplate="{StaticResource DialogTemplateSelector}"/>
+            <dialogs:PartsSelectionWindow/>
         </DataTemplate>
 
         <!--
@@ -241,11 +237,12 @@
                     </Grid>
                     <NumericUpDown Value="{Binding Quantity, Mode=TwoWay}" Grid.Row="1" Height="32" HorizontalAlignment="Stretch">
 						<i:Interaction.Behaviors>
-							<ia:EventTrigger EventName="ValueChanged">
+							<ia:EventTrigger EventName="LostFocus">
 								<ia:InvokeCommandAction
                                     Command="{Binding UiItem.SetQuantityCommand}"
                                     CommandParameter="{Binding Quantity}"/>
                             </ia:EventTrigger>
+                            <beh:NumericUpDownUnfocusOnEnterOrEscapeBehavior/>
                         </i:Interaction.Behaviors>
                     </NumericUpDown>
                 </Grid>

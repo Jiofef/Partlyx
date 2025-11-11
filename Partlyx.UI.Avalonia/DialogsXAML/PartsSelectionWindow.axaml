@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             x:Class="Partlyx.UI.Avalonia.PartsSelectionWindow"
+             x:Class="Partlyx.UI.Avalonia.DialogsXAML.PartsSelectionWindow"
              xmlns:local="clr-namespace:Partlyx.UI.Avalonia.DialogsXAML"
              xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
              xmlns:i="using:Avalonia.Xaml.Interactivity"
@@ -12,11 +12,50 @@
              xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:fa="clr-namespace:Meziantou.WpfFontAwesome;assembly=Meziantou.WpfFontAwesome"
              xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels.Implementations"
              xmlns:dh="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:CompileBindings="False"
              mc:Ignorable="d" 
              d:DesignHeight="280" d:DesignWidth="450"
              x:Name="Root">
+
+    <UserControl.DataTemplates>
+		<DataTemplate DataType="vmp:ResourceViewModel">
+            <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
+                <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+                <Grid HorizontalAlignment="Stretch" ColumnDefinitions="Auto,*">
+                    <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Margin="4"/>
+                    <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent">
+					    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" Classes="common"/>
+                    </Panel>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="vmp:RecipeViewModel">
+            <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
+                <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+                <Grid HorizontalAlignment="Stretch" Grid.ColumnDefinitions="Auto,*">
+                    <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                    <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent">
+					    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" Classes="common"/>
+                    </Panel>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="vmp:RecipeComponentViewModel">
+            <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2">
+                <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+                <Grid Grid.RowDefinitions="Auto,Auto">
+                    <Grid HorizontalAlignment="Stretch" Grid.Row="0" Grid.ColumnDefinitions="Auto,*,Auto">
+                        <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                        <TextBlock Text="{Binding LinkedResource.Value.Name}" Grid.Column="1" VerticalAlignment="Center" Classes="common"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+    </UserControl.DataTemplates>
     <Grid Background="{StaticResource PxBlue0Brush}">
         <Grid Margin="4" RowDefinitions="Auto,*,Auto">
             <ListBox ItemsSource="{Binding Items}"
@@ -33,7 +72,7 @@
                 </ListBox.ItemsPanel>
 
                 <ListBox.ItemContainerTheme>
-                    <ControlTheme TargetType="ListBoxItem">
+                    <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource MaterialListBoxItem}">
                         <i:Interaction.Behaviors>
                             <ia:EventTriggerBehavior EventName="DoubleTapped">
                                 <ia:InvokeCommandAction 
@@ -66,7 +105,6 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-
             </Grid>
         </Grid>
     </Grid>

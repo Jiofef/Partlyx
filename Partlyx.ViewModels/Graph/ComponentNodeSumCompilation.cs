@@ -22,7 +22,7 @@ namespace Partlyx.ViewModels.Graph
             _subscriptions.Add(componentResourceNameUpdateSubscription);
 
             var componentsSumChangedSubscription = this.
-                WhenValueChanged(c => c.Sum)
+                WhenAnyValue(c => c.Sum)
                 .Subscribe(n => UpdateBottomColumnText());
             _subscriptions.Add(componentsSumChangedSubscription);
 

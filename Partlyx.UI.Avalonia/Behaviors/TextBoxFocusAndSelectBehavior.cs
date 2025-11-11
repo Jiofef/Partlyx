@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 using Avalonia.Xaml.Interactivity;
 using System;
+using Avalonia.Input;
 
 namespace Partlyx.UI.Avalonia.Behaviors
 {
@@ -20,7 +21,6 @@ namespace Partlyx.UI.Avalonia.Behaviors
             set => SetValue(IsActiveProperty, value);
         }
 
-        // You can set the priority of a delayed call (default is Render).
         public static readonly StyledProperty<DispatcherPriority> PriorityProperty =
             AvaloniaProperty.Register<TextBoxFocusAndSelectBehavior, DispatcherPriority>(nameof(Priority), DispatcherPriority.Render);
 
@@ -33,10 +33,9 @@ namespace Partlyx.UI.Avalonia.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
-            // we monitor the change of the IsActive property inside the behavior
+            // We monitor the change of the IsActive property inside the behavior
             this.GetObservable(IsActiveProperty).Subscribe(OnIsActiveChanged);
 
-            // Если при прикреплении уже true — активируем
             if (IsActive)
                 PostFocusSelect();
         }
@@ -44,14 +43,14 @@ namespace Partlyx.UI.Avalonia.Behaviors
         protected override void OnDetaching()
         {
             base.OnDetaching();
-            // subscriptions via GetObservable do not require manual unsubscribing in a simple case,
-            // but if you want, you can save the IDisposable and Dispose() is here.
         }
 
         private void OnIsActiveChanged(bool value)
         {
             if (value)
                 PostFocusSelect();
+            else
+                TransferFocusToParent();
         }
 
         private void PostFocusSelect()
@@ -73,6 +72,38 @@ namespace Partlyx.UI.Avalonia.Behaviors
                     // silent
                 }
             }, Priority);
+        }
+
+        private void TransferFocusToParent()
+        {
+            var tb = AssociatedObject;
+            if (tb == null) return;
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                var parent = tb.Parent as Control;
+                bool focusSet = false;
+
+                // Traverse up the logical tree to find the nearest Focusable parent.
+                while (parent != null)
+                {
+                    // Check if the parent is focusable and effectively visible.
+                    if (parent.Focusable && parent.IsEffectivelyVisible)
+                    {
+                        // Set focus on the parent.
+                        parent.Focus();
+                        focusSet = true;
+                        break;
+                    }
+                    parent = parent.Parent as Control;
+                }
+
+                // If no Focusable parent was found, clear the focus completely.
+                if (!focusSet)
+                {
+                    TopLevel.GetTopLevel(tb)?.FocusManager?.ClearFocus();
+                }
+            }, DispatcherPriority.Background); // Use low priority for reliable execution after visibility changes
         }
     }
 }

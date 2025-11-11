@@ -41,7 +41,7 @@ namespace Partlyx.UI.Avalonia.Behaviors
         public static readonly StyledProperty<bool> AutoSelectDefaultResourceRecipeProperty =
             AvaloniaProperty.Register< TreeViewPartSelectionBehavior, bool>(
                 nameof(AutoSelectDefaultResourceRecipeProperty),
-                defaultValue: true);
+                defaultValue: false);
 
         public bool AutoSelectDefaultResourceRecipe
         {

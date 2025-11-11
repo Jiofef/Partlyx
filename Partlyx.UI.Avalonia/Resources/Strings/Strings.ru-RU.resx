@@ -126,12 +126,6 @@
   <data name="Create" xml:space="preserve">
     <value>Создать</value>
   </data>
-  <data name="Create_resource1" xml:space="preserve">
-    <value>Создать ресурс</value>
-  </data>
-  <data name="Create_resource2" xml:space="preserve">
-    <value>Создать ресурс</value>
-  </data>
   <data name="Expand_All" xml:space="preserve">
     <value>Развернуть всё</value>
   </data>
@@ -140,9 +134,6 @@
   </data>
   <data name="Search___" xml:space="preserve">
     <value>Поиск...</value>
-  </data>
-  <data name="Create_resource" xml:space="preserve">
-    <value>Создать ресурс</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
@@ -220,7 +211,7 @@
     <value>Необходимое количество</value>
   </data>
   <data name="Default_recipe" xml:space="preserve">
-    <value>Рецепт по умолчанию</value>
+    <value>Стандартный рецепт</value>
   </data>
   <data name="Resource" xml:space="preserve">
     <value>Ресурс</value>
@@ -290,5 +281,20 @@
   </data>
   <data name="Total_resources_amount" xml:space="preserve">
     <value>Общее количество ресурсов в рецепте</value>
+  </data>
+  <data name="Open_in_editor" xml:space="preserve">
+    <value>Открыть в редакторе</value>
+  </data>
+  <data name="Create_a_recipe_for_this_resource" xml:space="preserve">
+    <value>Создать рецепт для этого ресурса</value>
+  </data>
+  <data name="Create_a_component_for_this_recipe" xml:space="preserve">
+    <value>Создать компонент для этого ресурса</value>
+  </data>
+  <data name="Set_as_default" xml:space="preserve">
+    <value>Установить как стандартный</value>
+  </data>
+  <data name="Create_resource" xml:space="preserve">
+    <value>Создать ресурс</value>
   </data>
 </root>

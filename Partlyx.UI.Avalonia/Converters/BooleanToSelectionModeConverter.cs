@@ -11,7 +11,7 @@ public class BooleanToSelectionModeConverter : IValueConverter
     {
         if (value is bool boolValue)
         {
-            return boolValue ? SelectionMode.Single : SelectionMode.Multiple;
+            return !boolValue ? SelectionMode.Single : SelectionMode.Multiple;
         }
         return SelectionMode.Single; 
     }
@@ -20,7 +20,7 @@ public class BooleanToSelectionModeConverter : IValueConverter
     {
         if (value is SelectionMode selectionMode)
         {
-            return selectionMode == SelectionMode.Single;
+            return selectionMode == SelectionMode.Multiple;
         }
         return true;
     }
