@@ -565,6 +565,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Toggle focus.
+        /// </summary>
+        internal static string Toggle_focus {
+            get {
+                return ResourceManager.GetString("Toggle_focus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Total recipe&apos;s resources amount.
         /// </summary>
         internal static string Total_resources_amount {

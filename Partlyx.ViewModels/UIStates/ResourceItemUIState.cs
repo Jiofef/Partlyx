@@ -101,14 +101,14 @@ namespace Partlyx.ViewModels
         }
 
         [RelayCommand]
-        public void ToggleGlobalFocus()
+        public override void ToggleGlobalFocus()
         {
             var globalFocusedPart = AttachedResource.GlobalNavigations.FocusedPart;
             ToggleFocused(globalFocusedPart);
         }
 
         [RelayCommand]
-        public void ToggleLocalFocus(IIsolatedFocusedPart target)
+        public override void ToggleLocalFocus(IIsolatedFocusedPart target)
         {
             ToggleFocused(target);
         }

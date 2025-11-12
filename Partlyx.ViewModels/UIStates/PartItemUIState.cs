@@ -35,8 +35,6 @@ namespace Partlyx.ViewModels.UIStates
 
         protected void ToggleFocused(IFocusedPart focusedContainer)
         {
-            var previousFocused = focusedContainer.FocusedPart;
-
             if (focusedContainer.FocusedPart == AttachedPart)
                 focusedContainer.FocusPart(null);
             else
@@ -44,17 +42,20 @@ namespace Partlyx.ViewModels.UIStates
                 focusedContainer.FocusPart(AttachedPart);
                 HasGlobalFocus = true;
             }
-
-            if (previousFocused != null)
-                previousFocused.UiItem.NotifyUnfocused();
         }
 
-        private void NotifyUnfocused()
+        public abstract void ToggleGlobalFocus();
+        public abstract void ToggleLocalFocus(IIsolatedFocusedPart target);
+
+        public void NotifyUnfocused()
         {
             HasGlobalFocus = false;
         }
+        public void NotifyFocused()
+        {
+            HasGlobalFocus = true;
+        }
 
         public virtual Task HandleDrop(ISelectedParts droppedParts) { return Task.CompletedTask; }
-        
     }
 }

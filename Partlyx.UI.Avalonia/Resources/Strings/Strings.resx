@@ -297,4 +297,7 @@
   <data name="Create_resource" xml:space="preserve">
     <value>Create a resource</value>
   </data>
+  <data name="Toggle_focus" xml:space="preserve">
+    <value>Toggle focus</value>
+  </data>
 </root>

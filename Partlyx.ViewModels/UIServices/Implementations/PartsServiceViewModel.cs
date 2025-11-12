@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 
@@ -42,10 +43,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public void TryRenamingSingleSelected()
         {
-            var selectedPartsList = new List<IVMPart>();
-            selectedPartsList.AddRange(_selectedparts.Resources);
-            selectedPartsList.AddRange(_selectedparts.Recipes);
-            selectedPartsList.AddRange(_selectedparts.Components);
+            var selectedPartsList = _selectedparts.GetAllTheParts();
 
             if (selectedPartsList.Count != 1) return;
 
@@ -59,6 +57,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             {
                 recipe.UiItem.StartRenaming();
             }
+        }
+
+        [RelayCommand]
+        public void TryToggleSingleSelectedFocus()
+        {
+            var selectedPartsList = _selectedparts.GetAllTheParts();
+
+            if (selectedPartsList.Count != 1) return;
+
+            var singleSelected = selectedPartsList.Single();
+            singleSelected.UiItem.ToggleGlobalFocus();
         }
     }
 }

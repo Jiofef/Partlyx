@@ -24,10 +24,11 @@
             <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
                 <Grid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}"/>
+                        <MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding UiItem.ToggleGlobalFocusCommand}" InputGesture="F"/>
                         <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding UiItem.ExpandBranchCommand}" Classes="common"/>
                         <MenuItem Header="{h:Loc Collapse_branch}" Command="{Binding UiItem.CollapseBranchCommand}" Classes="common"/>
                         <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding UiItem.FindInTreeCommand}" Classes="common" />
+                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}"/>
                     </ContextMenu>
                 </Grid.ContextMenu>
 
@@ -64,12 +65,13 @@
                                         <ia:InvokeCommandAction Command="{Binding UiItem.CommitNameChangeCommand}"/>
                                     </ia:EventTriggerBehavior>
                                 <beh:TextBoxFocusAndSelectBehavior IsActive="{Binding UiItem.IsRenaming}"/>
-                            </i:Interaction.Behaviors>
+                            </i:Interaction.Behaviors>  
                         </TextBox>
                     </Panel>
 
                     <ToggleButton Grid.Column="2" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
-                                    Command="{Binding UiItem.ToggleGlobalFocus}"
+                                  IsHitTestVisible="True"
+                                  Command="{Binding UiItem.ToggleGlobalFocus}"
                                     Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}"/>
 
                     <Button HorizontalAlignment="Stretch" Classes="darker-focus" 
@@ -91,10 +93,11 @@
             <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
                 <Grid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding UiItem.ToggleGlobalFocusCommand}" InputGesture="F"/>
                         <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding UiItem.ExpandBranchCommand}" Classes="common"/>
                         <MenuItem Header="{h:Loc Collapse_branch}" Command="{Binding UiItem.CollapseBranchCommand}" Classes="common"/>
                         <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding UiItem.FindInTreeCommand}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}" Classes="common"/>
                     </ContextMenu>
                 </Grid.ContextMenu>
 
@@ -175,8 +178,9 @@
             <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2">
                 <Grid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.ComponentService.RemoveCommand}" CommandParameter="{Binding}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding UiItem.ToggleGlobalFocusCommand}" InputGesture="F"/>
                         <MenuItem Header="{h:Loc Find_setted_resource_in_tree}" Command="{Binding UiItem.FindResourceInTreeCommand}" Classes="common"/>
+                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.ComponentService.RemoveCommand}" CommandParameter="{Binding}" Classes="common"/>
                     </ContextMenu>
                 </Grid.ContextMenu>
 
@@ -283,6 +287,7 @@
                     <TreeView.KeyBindings>
                         <KeyBinding Gesture="F2" Command="{Binding Service.TryRenamingSingleSelectedCommand}"/>
                         <KeyBinding Gesture="Enter" Command="{Binding Service.TryRenamingSingleSelectedCommand}"/>
+                        <KeyBinding Gesture="F" Command="{Binding Service.TryToggleSingleSelectedFocusCommand}"/>
                     </TreeView.KeyBindings>
                     <TreeView.ItemsPanel>
                         <ItemsPanelTemplate>

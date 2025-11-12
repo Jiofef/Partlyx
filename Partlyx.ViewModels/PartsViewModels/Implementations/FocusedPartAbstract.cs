@@ -25,6 +25,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             HasFocusedPart = part != null;
 
+            previous?.UiItem.NotifyUnfocused();
+            part?.UiItem.NotifyFocused();
+
             OnPartFocused(part, previous, isValueChanged);
         }
 

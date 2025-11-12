@@ -6,6 +6,7 @@
              x:Class="Partlyx.UI.Avalonia.PartProperties"
              xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
              xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
+             xmlns:localdnd="using:Partlyx.UI.Avalonia.DragAndDrop"
              xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
@@ -51,6 +52,9 @@
 
         <DataTemplate DataType="vmprop:RecipeItemPropertyViewModel">
             <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
+                <i:Interaction.Behaviors>
+					<localdnd:PartlyxContextDropBehavior DropHandler="{Binding DropHandler}"/>
+                </i:Interaction.Behaviors>
                 <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
                 <Grid ColumnDefinitions="Auto,*,Auto">
                     <TextBlock Text="{Binding DisplayableName}" Grid.Column="0" VerticalAlignment="Center" Classes="common" Margin="4"/>

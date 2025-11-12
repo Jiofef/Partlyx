@@ -95,8 +95,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 async (arg) => 
                 {
                     if (arg is not string name) return;
-                    var args = new PartSetValueInfo<ResourceViewModel, string>(resource, name);
-                    await _services.ResourceService.RenameResource(args); 
+                    await _services.ResourceService.RenameResource(resource, name); 
                 });
             nameProperty.CancelChangesTask = new(
                 (args) => { nameProperty.Text = resource.Name; return Task.CompletedTask; });
@@ -123,6 +122,12 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
                     var args = new PartSetValueInfo<ResourceViewModel, RecipeViewModel>(resource, recipe);
                     await _services.ResourceService.SetDefaultRecipe(args);
+                });
+            defaultRecipeProperty.SaveChangesTask = new(
+                async (arg) =>
+                {
+                    if (arg is not RecipeViewModel recipe) return;
+                    await _services.ResourceService.SetDefaultRecipe(resource, recipe);
                 });
             var defaultRecipeUpdateSubscription = resource.WhenAnyValue(r => r.LinkedDefaultRecipe!.Value).Subscribe((args) => defaultRecipeProperty.Part = resource.LinkedDefaultRecipe?.Value);
             defaultRecipeProperty.Subscriptions.Add(defaultRecipeUpdateSubscription);
@@ -154,8 +159,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 async arg =>
                 {
                     if (arg is not decimal amount) return;
-                    var args = new PartSetValueInfo<RecipeViewModel, double>(recipe, (double)amount);
-                    await _services.RecipeService.SetCraftableAmount(args);
+                    await _services.RecipeService.SetCraftableAmount(recipe, (double)amount);
                 });
             var amountUpdateSubscription = recipe.WhenAnyValue(r => r.CraftAmount).Subscribe(args => amountProperty.Value = (decimal)recipe.CraftAmount);
             amountProperty.Subscriptions.Add(amountUpdateSubscription);
@@ -181,8 +185,13 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     if (result is not ISelectedParts selected) return;
                     var recipe = selected.GetSingleRecipeOrNull()!;
 
-                    var args = new PartSetValueInfo<RecipeComponentViewModel, RecipeViewModel>(component, recipe);
-                    await _services.ComponentService.SetSelectedRecipe(args);
+                    await _services.ComponentService.SetSelectedRecipe(component, recipe);
+                });
+            selectedRecipeProperty.SaveChangesTask = new(
+                async (arg) =>
+                {
+                    if (arg is not RecipeViewModel recipe) return;
+                    await _services.ComponentService.SetSelectedRecipe(component, recipe);
                 });
             var selectedRecipeUpdateSubscription = component.WhenAnyValue(r => r.LinkedSelectedRecipe!.Value).Subscribe((args) => selectedRecipeProperty.Part = component.LinkedSelectedRecipe?.Value);
             selectedRecipeProperty.Subscriptions.Add(selectedRecipeUpdateSubscription);
@@ -195,8 +204,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 async arg =>
                 {
                     if (arg is not decimal quantity) return;
-                    var args = new PartSetValueInfo<RecipeComponentViewModel, double>(component, (double)quantity);
-                    await _services.ComponentService.SetQuantityAsync(args);
+                    await _services.ComponentService.SetQuantityAsync(component, (double)quantity);
                 });
             var quantityUpdateSubscription = component.WhenAnyValue(r => r.Quantity).Subscribe(args => quantityProperty.Value = (decimal)component.Quantity);
             quantityProperty.Subscriptions.Add(quantityUpdateSubscription);
