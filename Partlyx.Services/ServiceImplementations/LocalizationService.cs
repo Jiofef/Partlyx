@@ -30,7 +30,10 @@ namespace Partlyx.Services.ServiceImplementations
         {
             if (_culture.Equals(culture)) return;
             _culture = culture;
+            CultureInfo.CurrentCulture = culture;
             CultureInfo.CurrentUICulture = culture;
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
             CultureChanged?.Invoke();
         }
     }

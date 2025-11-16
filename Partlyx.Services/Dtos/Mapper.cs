@@ -1,7 +1,11 @@
 ﻿using Partlyx.Core;
+using Partlyx.Core.Settings;
+using Partlyx.Core.Technical;
 using Partlyx.Core.VisualsInfo;
 using Partlyx.Services.CoreExtensions;
+using Partlyx.Services.Helpers;
 using System.Linq;
+using System.Text.Json;
 
 namespace Partlyx.Services.Dtos
 {
@@ -54,6 +58,16 @@ namespace Partlyx.Services.Dtos
                 default:
                     return new NullIconDto();
             }
+        }
+
+        public static OptionDto ToDto(this OptionEntity o, object? value = null)
+        {
+            return new OptionDto(
+                o.Id,
+                o.Key,
+                value ?? CoreTypesHelper.DeserializeUsingCoreType(o.ValueJson, o.TypeName),
+                o.TypeName
+                );
         }
     }
 }

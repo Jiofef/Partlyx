@@ -16,9 +16,9 @@ namespace Partlyx.Infrastructure.Data.Implementations
 
     public class DBLoader : IDBLoader
     {
-        private readonly IDBProvider _dbProvider;
+        private readonly IPartlyxDBProvider _dbProvider;
 
-        public DBLoader(IDBProvider dbProvider)
+        public DBLoader(IPartlyxDBProvider dbProvider)
         {
             _dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
         }

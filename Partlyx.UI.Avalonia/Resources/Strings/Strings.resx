@@ -300,4 +300,22 @@
   <data name="Toggle_focus" xml:space="preserve">
     <value>Toggle focus</value>
   </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="App_Settings" xml:space="preserve">
+    <value>Application settings</value>
+  </data>
+  <data name="settings_General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
 </root>

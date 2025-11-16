@@ -1,6 +1,7 @@
 ﻿using Partlyx.Core.Contracts;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.Settings;
 using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
@@ -32,6 +33,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly INotificationService _notificationService;
         private readonly IVMPartsStoreCleaner _cleaner;
         private readonly ILocalizationService _loc;
+        private readonly IServicesResponsibilitySettingsHandler _servicesSettingsHandler;
+        private readonly IGlobalApplicationSettingsServiceViewModelContainer _appSettingsContainer;
 
         public MainViewModel(
             PartsTreeViewModel partsTree,
@@ -45,7 +48,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             IVMFileService vmfs,
             INotificationService ns,
             IVMPartsStoreCleaner vmpsc,
-            ILocalizationService loc
+            ILocalizationService loc,
+            IServicesResponsibilitySettingsHandler srsh,
+            IGlobalApplicationSettingsServiceViewModelContainer gassvmc
             )
         {
             PartsTree = partsTree;
@@ -61,6 +66,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _notificationService = ns;
             _cleaner = vmpsc;
             _loc = loc;
+            _servicesSettingsHandler = srsh;
+            _appSettingsContainer = gassvmc;
         }
 
         private const bool DISABLE_DB_DELETE_ON_EXIT = true; // During development, it is inconvenient to reopen the file every time you restart. However, don't forget to disable this when releasing the application.

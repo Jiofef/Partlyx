@@ -20,6 +20,7 @@ using Partlyx.ViewModels.GlobalNavigations;
 using Partlyx.ViewModels.Graph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.Settings;
 using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Implementations;
@@ -48,14 +49,9 @@ namespace Partlyx.UI.Avalonia
 
         public override void OnFrameworkInitializationCompleted()
         {
-
             var services = new ServiceCollection();
             InitializeDI(services);
             Services = services.BuildServiceProvider();
-
-            var culture = new CultureInfo("en-US");
-            CultureInfo.DefaultThreadCurrentCulture = culture;
-            CultureInfo.DefaultThreadCurrentUICulture = culture;
 
             var mainVM = Services.GetRequiredService<MainViewModel>();
             var window = new MainWindow() { DataContext = mainVM };
@@ -86,12 +82,15 @@ namespace Partlyx.UI.Avalonia
             services.AddSingleton<IApplicationResourceProvider>(new Infrastructure.Data.ApplicationResources.ApplicationResourcesProvider(typeof(App).Assembly));
 
             services.AddTransient<IPartlyxRepository, PartlyxRepository>();
+            services.AddTransient<ISettingsRepository, SettingsRepository>();
 
             // Services
             services.AddTransient<IServiceProvider, ServiceProvider>();
 
             services.AddSingleton<IPartsLoader, PartsLoader>();
             services.AddSingleton<IFileService, FileService>();
+            services.AddSingleton<ISettingsService, SettingsService>();
+            services.AddSingleton<IServicesResponsibilitySettingsHandler, ServicesResponsibilitySettingsHandler>();
 
             services.AddTransient<IResourceService, ResourceService>();
             services.AddTransient<IRecipeService, RecipeService>();
@@ -108,7 +107,7 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<ICommandFactory, DICommandFactory>();
             services.AddTransient<ICommandServices, CommandServices>();
 
-            services.AddSingleton<ILocalizationService, LocalizationService>();
+            services.AddSingleton(LocService);
 
             InitializeCommands(services);
 
@@ -122,15 +121,18 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<MenuPanelViewModel>();
             services.AddTransient<MenuPanelFileViewModel>();
             services.AddTransient<MenuPanelEditViewModel>();
+            services.AddTransient<MenuPanelSettingsViewModel>();
 
             services.AddTransient<ComponentCreateViewModel>();
 
             services.AddTransient<MainWindow>();
 
-            // Other view classes
-            //services.AddTransient<PartsTreeDropHandler>();
-
             // Helper viewmodels
+            services.AddTransient<SettingsServiceViewModel>();
+            services.AddTransient<ApplicationSettingsMenuViewModel>();
+            services.AddSingleton<ApplicationSettingsProviderViewModel>();
+            services.AddSingleton<IGlobalApplicationSettingsServiceViewModelContainer, ApplicationSettingsServiceViewModelContainer>();
+
             services.AddTransient<IVMPartsFactory, VMPartsFactory>();
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
             services.AddSingleton<IPartsInitializeService, PartsInitializeService>();
@@ -204,9 +206,11 @@ namespace Partlyx.UI.Avalonia
 
         private async void InitializeDatabaseAsync()
         {
-            var dbp = Services.GetRequiredService<IDBProvider>();
-
+            var dbp = Services.GetRequiredService<IPartlyxDBProvider>();
             await dbp.InitializeAsync(DirectoryManager.DefaultDBPath);
+
+            var sdbp = Services.GetRequiredService<ISettingsDBProvider>();
+            await sdbp.InitializeAsync();
         }
     }
 }

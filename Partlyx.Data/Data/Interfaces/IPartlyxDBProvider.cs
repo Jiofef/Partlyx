@@ -3,7 +3,7 @@ using Partlyx.Infrastructure.Data.CommonFileEvents;
 
 namespace Partlyx.Infrastructure.Data.Interfaces
 {
-    public interface IDBProvider
+    public interface IPartlyxDBProvider
     {
         string? ConnectionString { get; }
         bool IsInitialized { get; }

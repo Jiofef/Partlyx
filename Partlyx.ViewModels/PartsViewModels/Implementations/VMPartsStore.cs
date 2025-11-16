@@ -2,6 +2,7 @@
 using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.PartsEventClasses;
+using Partlyx.UI.Avalonia.Helpers;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -63,20 +64,32 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public void RemoveResource(Guid uid)
         {
-            if (_resources.Remove(uid))
+            if (_resources.ContainsKey(uid))
+            {
+                _resources[uid].Dispose();
+                _resources.Remove(uid);
                 _bus.Publish(new ResourceVMRemovedFromStoreEvent(uid));
+            }
         }
 
         public void RemoveRecipe(Guid uid)
         {
-            if (_recipes.Remove(uid))
+            if (_recipes.ContainsKey(uid))
+            {
+                _recipes[uid].Dispose();
+                _recipes.Remove(uid);
                 _bus.Publish(new RecipeVMRemovedFromStoreEvent(uid));
+            }
         }
 
         public void RemoveRecipeComponent(Guid uid)
         {
-            if (_recipeComponents.Remove(uid))
+            if (_recipeComponents.ContainsKey(uid))
+            {
+                _recipeComponents[uid].Dispose();
+                _recipeComponents.Remove(uid);
                 _bus.Publish(new RecipeComponentVMRemovedFromStoreEvent(uid));
+            }
         }
 
         public bool TryGet(Guid? itemUid, out IVMPart? part)
@@ -112,14 +125,15 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         private void ClearStore()
         {
-            _resources.Clear();
-            _recipes.Clear();
-            _recipeComponents.Clear();
+            _resources.ClearAndDispose();
+            _recipes.ClearAndDispose();
+            _recipeComponents.ClearAndDispose();
         }
 
         public void Dispose()
         {
             _fileClosedSubscription.Dispose();
+            ClearStore();
         }
     }
 }

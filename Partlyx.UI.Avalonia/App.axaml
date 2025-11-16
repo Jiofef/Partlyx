@@ -8,6 +8,7 @@
              xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
              xmlns:vmoi="using:Partlyx.ViewModels.GraphicsViewModels.IconViewModels"
              xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels.Implementations"
+             xmlns:vms="using:Partlyx.ViewModels.Settings"
              xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
              xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
              xmlns:vmprop="using:Partlyx.ViewModels.ItemProperties"
@@ -47,8 +48,12 @@
 
     <Application.DataTemplates>
         <!--Partlyx DataTemplates-->
-        <DataTemplate DataType="{x:Type vmo:ComponentCreateViewModel}">
+        <DataTemplate DataType="vmo:ComponentCreateViewModel">
             <dialogs:ComponentCreate/>
+        </DataTemplate>
+
+         <DataTemplate DataType="vms:ApplicationSettingsMenuViewModel">
+            <dialogs:ApplicationSettingsMenu/>
         </DataTemplate>
 
         <DataTemplate DataType="vmo:ResourcesSelectionViewModel">

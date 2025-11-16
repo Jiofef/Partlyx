@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Partlyx.UI.Avalonia.Helpers;
 using Partlyx.ViewModels.GraphicsViewModels;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -113,12 +114,15 @@ namespace Partlyx.ViewModels.Graph
             Nodes.Remove(node);
             NodesDictionary.Remove(node.Uid);
 
+            if (node is IDisposable d)
+                d.Dispose();
+
             OnNodeRemoved(node);
         }
 
         public void DestroyTree()
         {
-            Nodes.Clear();
+            Nodes.ClearAndTryDispose();
             NodesDictionary.Clear();
             Edges.ClearCollections();
 

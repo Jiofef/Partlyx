@@ -4,6 +4,7 @@
     {
         public static string PartlyxDataDirectory => FolderPathInAppData("Partlyx");
         public static string DefaultDBPath => Path.Combine(PartlyxDataDirectory, "partlyx.db");
+        public static string DefaultSettingsDBPath => Path.Combine(PartlyxDataDirectory, "settings.db");
 
         public static bool CreatePartlyxFolder()
         {

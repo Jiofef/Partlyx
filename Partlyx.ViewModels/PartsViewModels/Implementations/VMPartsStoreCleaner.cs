@@ -12,7 +12,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
     public class VMPartsStoreCleaner : IVMPartsStoreCleaner
     {
         private readonly IVMPartsStore _store;
-        private readonly IEventBus _bus;
 
         private readonly IDisposable _resourceRemoveSubscription;
         private readonly IDisposable _recipeRemoveSubscription;
@@ -21,11 +20,10 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public VMPartsStoreCleaner(IVMPartsStore store, IEventBus bus)
         {
             _store = store;
-            _bus = bus;
 
             _resourceRemoveSubscription = bus.Subscribe<ResourceDeletedEvent>(ev => RemoveResource(ev.ResourceUid));
-            _recipeRemoveSubscription = bus.Subscribe<RecipeDeletedEvent>(ev => RemoveResource(ev.RecipeUid));
-            _componentRemoveSubscription = bus.Subscribe<RecipeComponentDeletedEvent>(ev => RemoveResource(ev.RecipeComponentUid));
+            _recipeRemoveSubscription = bus.Subscribe<RecipeDeletedEvent>(ev => RemoveRecipe(ev.RecipeUid));
+            _componentRemoveSubscription = bus.Subscribe<RecipeComponentDeletedEvent>(ev => RemoveComponent(ev.RecipeComponentUid));
         }
 
         private void RemoveResource(Guid uid)
@@ -33,18 +31,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             var resource = _store.Resources.GetValueOrDefault(uid);
             if (resource == null) return;
 
-            foreach (var recipe in resource.Recipes)
-                RemoveRecipe(recipe.Uid);
-
             _store.RemoveResource(uid);
         }
         private void RemoveRecipe(Guid uid)
         {
             var recipe = _store.Recipes.GetValueOrDefault(uid);
             if (recipe == null) return;
-
-            foreach (var component in recipe.Components)
-                RemoveComponent(component.Uid);
 
             _store.RemoveRecipe(uid);
         }

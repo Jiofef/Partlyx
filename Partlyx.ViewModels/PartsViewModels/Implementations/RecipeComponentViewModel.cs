@@ -121,6 +121,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public void Dispose()
         {
+            UiItem.Dispose();
+
             _updatedSubscription.Dispose(); 
             _childComponentsDefaultRecipeUpdateSubscribe.Dispose();
             _childComponentsSelectedRecipeUpdateSubscribe.Dispose();

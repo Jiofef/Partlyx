@@ -51,6 +51,9 @@
                         <MenuItem Header="{h:Loc Undo}" Command="{Binding UndoCommand}" InputGesture="Ctrl+Z" Classes="common"/>
                         <MenuItem Header="{h:Loc Redo}" Command="{Binding RedoCommand}" InputGesture="Ctrl+Y" Classes="common"/>
                     </MenuItem>
+                    <MenuItem Header="{h:Loc Settings}" Height="32" DataContext="{Binding SettingsMenu}">
+                        <MenuItem Header="{h:Loc App_Settings}" Command="{Binding OpenSettingsCommand}"/>
+                    </MenuItem>
                 </Menu>
 
             </DockPanel>
@@ -76,7 +79,7 @@
             </Grid>
         </Grid>
 
-        <dh:DialogHost Identifier="RootDialog" CloseOnClickAway="False">
+        <dh:DialogHost Identifier="RootDialog" CloseOnClickAway="False" Background="{StaticResource PxWhiteBrush}">
         </dh:DialogHost>
     </Grid>
 

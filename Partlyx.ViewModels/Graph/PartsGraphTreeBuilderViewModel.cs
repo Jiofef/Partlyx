@@ -13,6 +13,7 @@ using System.Diagnostics;
 using static Partlyx.ViewModels.PartsViewModels.VMPartExtensions;
 using System.Runtime.CompilerServices;
 using UJL.CSharp.Collections;
+using Partlyx.UI.Avalonia.Helpers;
 
 namespace Partlyx.ViewModels.Graph
 {
@@ -128,7 +129,7 @@ namespace Partlyx.ViewModels.Graph
 
         protected override void OnTreeDestroyed()
         {
-            ComponentLeafs.Clear();
+            ComponentLeafs.ClearAndDispose();
         }
 
         #region Unfinished optimization code

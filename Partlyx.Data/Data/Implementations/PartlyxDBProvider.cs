@@ -15,14 +15,14 @@ using static System.Formats.Asn1.AsnWriter;
 
 namespace Partlyx.Infrastructure.Data.Implementations
 {
-    public class DBProvider : IDBProvider
+    public class PartlyxDBProvider : IPartlyxDBProvider
     {
         private readonly IEventBus _bus;
         private readonly IServiceProvider _services;
 
         public SemaphoreSlim DBExportLoadSemaphore { get; private set; }
         
-        public DBProvider(IEventBus bus, IServiceProvider services)
+        public PartlyxDBProvider(IEventBus bus, IServiceProvider services)
         {
             _bus = bus;
             _services = services;

@@ -153,6 +153,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public void Dispose()
         {
+            UiItem.Dispose();
+
             _updatedSubscription.Dispose();
             _childAddSubscription.Dispose();
             _childRemoveSubscription.Dispose();

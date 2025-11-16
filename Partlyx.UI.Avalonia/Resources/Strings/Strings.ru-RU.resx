@@ -300,4 +300,22 @@
   <data name="Toggle_focus" xml:space="preserve">
     <value>Переключить фокус</value>
   </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="App_Settings" xml:space="preserve">
+    <value>Настройки приложения</value>
+  </data>
+  <data name="settings_General" xml:space="preserve">
+    <value>Общие</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Применить</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ок</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Язык</value>
+  </data>
 </root>

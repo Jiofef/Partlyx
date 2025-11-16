@@ -74,8 +74,11 @@ namespace Partlyx.UI.Avalonia.Behaviors
         {
             base.OnDetaching();
 
-            foreach (var subscription in _subscriptions) subscription.Dispose();
+            foreach (var subscription in _subscriptions)
+            {
+                subscription.Dispose();
                 _subscriptions.Clear();
+            }
         }
     }
 }

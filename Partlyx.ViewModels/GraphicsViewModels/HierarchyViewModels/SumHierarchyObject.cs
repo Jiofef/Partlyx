@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicData;
 using DynamicData.Binding;
+using Partlyx.UI.Avalonia.Helpers;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -64,6 +65,7 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
         public void Dispose()
         {
             _childrenSumChanged.Dispose();
+            SumObjectChildren.ClearAndDispose();
         }
     }
 }

@@ -46,8 +46,6 @@ namespace Partlyx.UI.Avalonia.Behaviors
             set => SetValue(ValueProperty, value);
         }
 
-        private IDisposable? _keyDownSubscription;
-
         protected override void OnAttached()
         {
             base.OnAttached();

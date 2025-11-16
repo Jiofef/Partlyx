@@ -7,12 +7,9 @@ namespace Partlyx.Infrastructure.Data;
 
 public class PartlyxDBContext : DbContext, IDisposable
 {
-    public DbSet<Resource> Resources { get; set; }
-
     public PartlyxDBContext(DbContextOptions<PartlyxDBContext> options)
-    : base(options)
-    { }
-
+        : base(options) { }
+    public DbSet<Resource> Resources { get; set; }
     public DbSet<Recipe> Recipes { get; set; }
     public DbSet<RecipeComponent> RecipeComponents { get; set; }
 

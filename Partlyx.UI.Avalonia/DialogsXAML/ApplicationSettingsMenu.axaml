@@ -1,0 +1,120 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:md="https://github.com/AvaloniaUtils/Material.Avalonia"
+             xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:fa="clr-namespace:Meziantou.WpfFontAwesome;assembly=Meziantou.WpfFontAwesome"
+             xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels.Implementations"
+             xmlns:vms="using:Partlyx.ViewModels.Settings"
+             xmlns:dh="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="640"
+             Width="640" Height="640"
+             x:Class="Partlyx.UI.Avalonia.DialogsXAML.ApplicationSettingsMenu"
+             x:DataType="vms:ApplicationSettingsMenuViewModel"
+             x:Name="Root">
+    <UserControl.DataTemplates>
+		<DataTemplate x:DataType="vms:OptionViewModel">
+			<Grid>
+                <Grid.DataTemplates>
+					<DataTemplate x:DataType="vms:IntOptionViewModel">
+						<NumericUpDown Increment="1" Value="{Binding Value}"/>
+                    </DataTemplate>
+                    <DataTemplate x:DataType="vms:FloatOptionViewModel">
+						<NumericUpDown Value="{Binding Value}"/>
+                    </DataTemplate>
+                    <DataTemplate x:DataType="vms:DoubleOptionViewModel">
+						<NumericUpDown Value="{Binding Value}"/>
+                    </DataTemplate>
+                    <DataTemplate x:DataType="vms:BoolOptionViewModel">
+						<CheckBox Classes="common" IsChecked="{Binding Value}"/>
+                    </DataTemplate>
+                    <DataTemplate x:DataType="vms:StringOptionViewModel">
+						<TextBox Classes="common" Text="{Binding Value}"/>
+                    </DataTemplate>
+                    <DataTemplate x:DataType="vms:ColorOptionViewModel">
+						<ColorPicker Color="{Binding Value}"/>
+                    </DataTemplate>
+                    <DataTemplate x:DataType="vms:LanguageOptionViewModel">
+						<ComboBox ItemsSource="{Binding AvailableLanguages}" SelectedValue="{Binding Value}" DisplayMemberBinding="{Binding NativeName}">
+                        </ComboBox>
+                    </DataTemplate>
+                </Grid.DataTemplates>
+				<Rectangle RadiusX="4" RadiusY="4" Fill="{StaticResource PxWhiteBrush}"/>
+                <Grid HorizontalAlignment="Stretch">
+					<TextBlock Text="{h:Loc Key = {Binding Name}}" Margin="8, 0, 8, 0" Grid.Column="0" VerticalAlignment="Center" Classes="common"/>
+                    <ContentControl VerticalAlignment="Stretch" Content="{Binding}" HorizontalAlignment="Right" Margin="8, 4, 8, 4"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <TreeDataTemplate x:DataType="vms:SettingsGroupViewModel">
+					<Grid RowDefinitions="Auto,Auto,Auto">
+                        <TextBlock Text="{h:Loc Key = {Binding Name}}" Classes="common"/>
+						<ItemsControl ItemsSource="{Binding Options}" Grid.Row="1">							 
+                        <ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <ItemsControl ItemsSource="{Binding SubGroups}" Grid.Row="2">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<StackPanel Margin="16, 0, 0, 0"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </Grid>
+        </TreeDataTemplate>
+    </UserControl.DataTemplates>
+      <Grid Background="{StaticResource PxBlue0Brush}" RowDefinitions="Auto,*,Auto">
+            <TextBlock Text="{h:Loc App_Settings}" TextAlignment="Center" Classes="common" Background="{StaticResource PxWhiteBrush}"/>
+            <TabControl ItemsSource="{Binding MainSettingsGroup.SubGroups}" Grid.Row="1" Margin="8">
+	            <TabControl.ItemTemplate>
+		            <DataTemplate x:DataType="vms:SettingsGroupViewModel">
+                        <TextBlock Text="{h:Loc Key = {Binding Name}}" Classes="common"/>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <ScrollViewer>
+							<ContentControl Content="{Binding}" Margin="8"/>
+                        </ScrollViewer>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+            <Grid Grid.Row="2" ColumnDefinitions="*,*,*">
+				<Button Classes="base" Grid.Column="0" Command="{Binding OkCommand}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Margin="8">
+                            <TextBlock Text="{h:Loc Ok}"/>
+                            <mdi:MaterialIcon Kind="Check" Width="16" Margin="4, 0, 0, 0" Classes="common"/>
+                            <mdi:MaterialIcon Kind="Home" Width="16" Classes="common"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Classes="base" Grid.Column="1" Command="{Binding ApplyCommand}" IsEnabled="{Binding IsSettingsChanged}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Margin="8">
+                            <TextBlock Text="{h:Loc Apply}"/>
+                            <mdi:MaterialIcon Kind="Check" Width="16" Margin="4, 0, 0, 0" Classes="common"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Classes="base" Grid.Column="2" Command="{Binding CancelCommand}">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal" Margin="8">
+                            <TextBlock Text="{h:Loc Cancel}"/>
+                            <mdi:MaterialIcon Kind="Cancel" Width="16" Margin="4, 0, 0, 0" Classes="common"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </Grid>
+    </Grid>
+</UserControl>

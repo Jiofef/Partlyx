@@ -4,6 +4,7 @@ using DynamicData.Binding;
 using Partlyx.Core;
 using Partlyx.Core.Contracts;
 using Partlyx.Infrastructure.Events;
+using Partlyx.UI.Avalonia.Helpers;
 using Partlyx.ViewModels.ItemProperties;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
@@ -214,6 +215,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public void Dispose()
         {
             _focusedPartChangedSubscription.Dispose();
+
+            Properties.ClearAndDispose();
         }
     }
 }

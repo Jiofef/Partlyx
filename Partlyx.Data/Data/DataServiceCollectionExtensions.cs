@@ -11,17 +11,31 @@ namespace Partlyx.Infrastructure.Data
     {
         public static IServiceCollection AddDataServices(this IServiceCollection services)
         {
-            services.AddSingleton<IDBProvider, DBProvider>();
+            // Partlyx DB setting
+            services.AddSingleton<IPartlyxDBProvider, PartlyxDBProvider>();
 
             services.AddTransient<IDBLoader, DBLoader>();
             services.AddTransient<IDBSaver, DBSaver>();
 
             var dbDefaultPath = DirectoryManager.DefaultDBPath;
-            var defaultConnectionString = @$"Data Source={dbDefaultPath}";
+            var defaultDBConnectionString = @$"Data Source={dbDefaultPath}";
 
             services.AddDbContextFactory<PartlyxDBContext>((sp, options) =>
             {
-                var connStr = sp.GetRequiredService<IDBProvider>().ConnectionString ?? defaultConnectionString;
+                var connStr = sp.GetRequiredService<IPartlyxDBProvider>().ConnectionString ?? defaultDBConnectionString;
+
+                options.UseSqlite(connStr);
+            });
+
+            // Settings DB setting
+            services.AddSingleton<ISettingsDBProvider, SettingsDBProvider>();
+
+            var settingsDbDefaultPath = DirectoryManager.DefaultSettingsDBPath;
+            var defaultSettingsDBConnectionString = @$"Data Source = {settingsDbDefaultPath}";
+
+            services.AddDbContextFactory<SettingsDBContext>((sp, options) =>
+            {
+                var connStr = sp.GetRequiredService<ISettingsDBProvider>().ConnectionString ?? defaultSettingsDBConnectionString;
 
                 options.UseSqlite(connStr);
             });

@@ -17,9 +17,9 @@ namespace Partlyx.Infrastructure.Data.Implementations
 
     public class DBSaver : IDBSaver
     {
-        private readonly IDBProvider _dbProvider;
+        private readonly IPartlyxDBProvider _dbProvider;
 
-        public DBSaver(IDBProvider dbProvider)
+        public DBSaver(IPartlyxDBProvider dbProvider)
         {
             _dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
         }
