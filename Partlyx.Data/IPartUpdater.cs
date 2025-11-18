@@ -1,4 +1,4 @@
-﻿using Partlyx.Core;
+﻿using Partlyx.Core.Partlyx;
 
 namespace Partlyx.Infrastructure
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Partlyx.Core
+namespace Partlyx.Core.Partlyx
 {
     public class RecipeComponent : ICopiable<Recipe>, IPart
     {

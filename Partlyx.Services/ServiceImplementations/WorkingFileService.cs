@@ -9,7 +9,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
     /// <summary>
     /// Facade for IDBSaver, IDBLoader and IResourceRepository
     /// </summary>
-    public class FileService : IFileService
+    public class WorkingFileService : IWorkingFileService
     {
         private readonly IDBSaver _saver;
         private readonly IDBLoader _loader;
@@ -20,10 +20,10 @@ namespace Partlyx.Infrastructure.Data.Implementations
         public string? CurrentPartreePath { get; private set; }
         public bool IsChangesSaved { get; private set; } = true;
 
-        // Will be needed if we need to return the IsChangesSaved when Undo until saved
+        // Will be needed if we need to return the IsChangesSaved when Undo until saved state
         private ICommand? _lastExcecutedCommand;
 
-        public FileService(IDBSaver dbs, IDBLoader dbl, IPartlyxRepository repo, IEventBus bus)
+        public WorkingFileService(IDBSaver dbs, IDBLoader dbl, IPartlyxRepository repo, IEventBus bus)
         {
             _saver = dbs;
             _loader = dbl;

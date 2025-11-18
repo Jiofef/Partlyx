@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Partlyx.Core;
+using Partlyx.Core.Partlyx;
 using System.Diagnostics;
 using System.Reflection.Metadata;
 

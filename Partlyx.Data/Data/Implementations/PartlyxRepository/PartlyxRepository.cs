@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Partlyx.Core;
+using Partlyx.Core.Partlyx;
 using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;

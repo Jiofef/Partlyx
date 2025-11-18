@@ -1,5 +1,4 @@
-﻿
-namespace Partlyx.Core
+﻿namespace Partlyx.Core.Partlyx
 {
     public interface IPart { }
 }

@@ -1,7 +1,7 @@
 ﻿using Partlyx.Core.VisualsInfo;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Partlyx.Core
+namespace Partlyx.Core.Partlyx
 {
     public class Resource : ICloneable, IIconHolder, IPart
     {

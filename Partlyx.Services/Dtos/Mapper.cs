@@ -1,4 +1,4 @@
-﻿using Partlyx.Core;
+﻿using Partlyx.Core.Partlyx;
 using Partlyx.Core.Settings;
 using Partlyx.Core.Technical;
 using Partlyx.Core.VisualsInfo;

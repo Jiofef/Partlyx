@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Partlyx.Core
+namespace Partlyx.Core.Partlyx
 {
     public class Recipe : ICopiable<Resource>, IIconHolder, IPart
     {

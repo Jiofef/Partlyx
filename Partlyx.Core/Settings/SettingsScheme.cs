@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Partlyx.Core.Technical;
+using Microsoft.Extensions.Options;
 
 namespace Partlyx.Core.Settings
 {
@@ -16,10 +17,10 @@ namespace Partlyx.Core.Settings
         public static SettingsScheme ApplicationSettings { get; }
         static SettingsScheme()
         {
-            var optionsGroup = new SchematicOptionsGroupEntity("Options")
+            var optionsGroup = new SchematicOptionsGroup("Options")
                 .WithSubGroups
                 ([
-                    new SchematicOptionsGroupEntity("settings_General").WithOptions([
+                    new SchematicOptionsGroup("settings_General").WithOptions([
                         new SchematicOption(Key: SettingKeys.Language, Name: "Language", DefaultValueJson: Serialize(CultureInfo.CurrentCulture.Name), TypeName: TypeNames.Language),
                         ]),
                 ]);
@@ -27,9 +28,9 @@ namespace Partlyx.Core.Settings
             ApplicationSettings = new SettingsScheme(optionsGroup);
         }
 
-        public SettingsScheme(SchematicOptionsGroupEntity optionsGroup)
+        public SettingsScheme(SchematicOptionsGroup optionsGroup)
         {
-            OptionsGroup = optionsGroup.ToReadOnly();
+            OptionsGroup = optionsGroup.ToReadOnlyGroup();
 
             _options = optionsGroup.GetAsOneLevelOptionsList();
             UpdateDictionaryFromOptionsList();
@@ -45,7 +46,7 @@ namespace Partlyx.Core.Settings
         private Dictionary<string, SchematicOption> _optionsDictionary = new();
         public ReadOnlyDictionary<string, SchematicOption> OptionsDictionary => new(_optionsDictionary);
 
-        public ReadonlyOptionsGroupEntity OptionsGroup { get; }
+        public ReadonlyGroup<SchematicOption> OptionsGroup { get; }
 
         private List<SchematicOption> _options = new();
         public IReadOnlyList<SchematicOption> Options => _options;

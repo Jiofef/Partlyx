@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core;
+using Partlyx.Core.Partlyx;
 using Partlyx.Infrastructure.Data.Implementations;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Tests.DataTests;

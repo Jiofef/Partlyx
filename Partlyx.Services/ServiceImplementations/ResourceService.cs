@@ -1,4 +1,5 @@
 ﻿using Partlyx.Core;
+using Partlyx.Core.Partlyx;
 using Partlyx.Core.VisualsInfo;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;

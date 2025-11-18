@@ -1,8 +1,10 @@
-﻿namespace Partlyx.Services
+﻿using Partlyx.Core.Partlyx;
+
+namespace Partlyx.Services
 {
     public class RecipeDebugger
     {
-        public static void DumpRecipeToConsole(Core.Recipe recipe)
+        public static void DumpRecipeToConsole(Recipe recipe)
         {
             string toPrint = $"Here is {recipe.ParentResource.Name} recipe components:\n";
 

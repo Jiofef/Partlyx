@@ -67,7 +67,7 @@ namespace Partlyx.Tests.Utils
             services.AddTransient<IServiceProvider, ServiceProvider>();
 
             services.AddSingleton<IPartsLoader, PartsLoader>();
-            services.AddSingleton<IFileService, FileService>();
+            services.AddSingleton<IWorkingFileService, WorkingFileService>();
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<IServicesResponsibilitySettingsHandler, ServicesResponsibilitySettingsHandler>();
 

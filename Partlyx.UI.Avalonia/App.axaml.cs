@@ -27,6 +27,7 @@ using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Partlyx.UI.Avalonia
 {
@@ -61,9 +62,12 @@ namespace Partlyx.UI.Avalonia
             }
 
             DirectoryManager.CreatePartlyxFolder();
+            LoadJsonSavesAsync();
             InitializeDatabaseAsync();
 
             base.OnFrameworkInitializationCompleted();
+
+            _ = mainVM.OnInitializeFinished();
         }
 
 
@@ -88,9 +92,10 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<IServiceProvider, ServiceProvider>();
 
             services.AddSingleton<IPartsLoader, PartsLoader>();
-            services.AddSingleton<IFileService, FileService>();
+            services.AddSingleton<IWorkingFileService, WorkingFileService>();
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<IServicesResponsibilitySettingsHandler, ServicesResponsibilitySettingsHandler>();
+            services.AddSingleton<IJsonSavesService, JsonSavesService>();
 
             services.AddTransient<IResourceService, ResourceService>();
             services.AddTransient<IRecipeService, RecipeService>();
@@ -122,8 +127,12 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<MenuPanelFileViewModel>();
             services.AddTransient<MenuPanelEditViewModel>();
             services.AddTransient<MenuPanelSettingsViewModel>();
+            services.AddTransient<MenuPanelHelpViewModel>();
 
             services.AddTransient<ComponentCreateViewModel>();
+
+            services.AddTransient<AboutUsWindowViewModel>();
+            services.AddTransient<HelpWindowViewModel>();
 
             services.AddTransient<MainWindow>();
 
@@ -202,6 +211,12 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<DuplicateRecipeComponentCommand>();
             services.AddTransient<SetRecipeComponentQuantityCommand>();
             services.AddTransient<SetRecipeComponentResourceCommand>();
+        }
+
+        private async void LoadJsonSavesAsync()
+        {
+            var jss = Services.GetRequiredService<IJsonSavesService>();
+            await jss.LoadGlobalSchemesAsync();
         }
 
         private async void InitializeDatabaseAsync()

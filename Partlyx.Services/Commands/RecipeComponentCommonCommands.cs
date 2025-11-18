@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Partlyx.Core;
+using Partlyx.Core.Partlyx;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;

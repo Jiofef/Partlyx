@@ -15,14 +15,14 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 {
     public class VMFileService : IVMFileService
     {
-        private readonly IFileService _fileService;
+        private readonly IWorkingFileService _fileService;
         private readonly IFileDialogService _dialogService;
         private readonly INotificationService _notificationService;
         private readonly IEventBus _bus;
         private readonly MainWindowNameController _mainWindowNameController;
         private readonly ILocalizationService _loc;
 
-        public VMFileService(IFileService dbfm, IFileDialogService fds, INotificationService ns, IEventBus bus, MainWindowNameController mwnc, ILocalizationService loc)
+        public VMFileService(IWorkingFileService dbfm, IFileDialogService fds, INotificationService ns, IEventBus bus, MainWindowNameController mwnc, ILocalizationService loc)
         {
             _fileService = dbfm;
             _dialogService = fds;

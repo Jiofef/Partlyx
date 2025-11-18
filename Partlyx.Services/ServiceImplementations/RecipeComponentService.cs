@@ -1,10 +1,10 @@
-﻿using Partlyx.Core;
-using Partlyx.Infrastructure.Data.Interfaces;
+﻿using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.Infrastructure.Data.Implementations;
+using Partlyx.Core.Partlyx;
 
 namespace Partlyx.Services.ServiceImplementations
 {

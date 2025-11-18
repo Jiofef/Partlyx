@@ -1,4 +1,4 @@
-﻿namespace Partlyx.Core
+﻿namespace Partlyx.Core.Partlyx
 {
     // Not implemented yet
     //public interface IRecipeComponentContent

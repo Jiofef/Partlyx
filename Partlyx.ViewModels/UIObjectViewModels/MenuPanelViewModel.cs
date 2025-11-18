@@ -14,12 +14,14 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public MenuPanelFileViewModel FileMenu { get; }
         public MenuPanelEditViewModel EditMenu { get; }
         public MenuPanelSettingsViewModel SettingsMenu { get; }
+        public MenuPanelHelpViewModel HelpMenu { get; }
 
-        public MenuPanelViewModel(MenuPanelFileViewModel fileMenu, MenuPanelEditViewModel editMenu, MenuPanelSettingsViewModel settingsMenu)
+        public MenuPanelViewModel(MenuPanelFileViewModel fileMenu, MenuPanelEditViewModel editMenu, MenuPanelSettingsViewModel settingsMenu, MenuPanelHelpViewModel helpMenu)
         {
             FileMenu = fileMenu;
             EditMenu = editMenu;
             SettingsMenu = settingsMenu;
+            HelpMenu = helpMenu;
         }
     }
 }

@@ -7,11 +7,11 @@ namespace Partlyx.ViewModels.Settings
 {
     public class SettingsGroupViewModel : ObservableObject
     {
-        public SettingsGroupViewModel(ReadonlyOptionsGroupEntity scheme)
+        public SettingsGroupViewModel(ReadonlyGroup<SchematicOption> scheme)
         {
             // This constructor recursively transforms the core structure, taking into account the child groups and their options
             Name = scheme.Name;
-            Options = new(scheme.Options.Select(o => OptionViewModel.Create(o)));
+            Options = new(scheme.ContentList.Select(o => OptionViewModel.Create(o)));
             SubGroups = new(scheme.SubGroups.Select(g => new SettingsGroupViewModel(g)));
         }
 

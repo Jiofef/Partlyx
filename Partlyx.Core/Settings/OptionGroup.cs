@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,56 +7,19 @@ using System.Threading.Tasks;
 
 namespace Partlyx.Core.Settings
 {
-    public class SchematicOptionsGroupEntity
+    public class SchematicOptionsGroup : GroupBase<SchematicOption>
     {
-        public string Name;
-        public List<SchematicOption> Options = new();
-        public List<SchematicOptionsGroupEntity> SubGroups = new();
+        public List<SchematicOption> Options { get => ContentList; set => ContentList = value; }
 
-        public SchematicOptionsGroupEntity(string name) 
+        public SchematicOptionsGroup(string name) 
         {
             Name = name;
         }
-        public SchematicOptionsGroupEntity WithOptions(IEnumerable<SchematicOption> options)
-        {
-            Options.AddRange(options);
-            return this;
-        }
-        public SchematicOptionsGroupEntity WithSubGroups(IEnumerable<SchematicOptionsGroupEntity> groups)
-        {
-            SubGroups.AddRange(groups);
-            return this;
-        }
-        public List<SchematicOption> GetAsOneLevelOptionsList()
-        {
-            var list = new List<SchematicOption>();
+        public SchematicOptionsGroup WithOptions(IEnumerable<SchematicOption> options)
+            => (SchematicOptionsGroup)WithContent(options);
+        public List<SchematicOption> GetAsOneLevelOptionsList() => GetAsOneLevelContentList();
 
-            RecursiveAddToList(this);
-
-            void RecursiveAddToList(SchematicOptionsGroupEntity group)
-            {
-                list.AddRange(group.Options);
-                foreach (var subGroup in group.SubGroups)
-                    RecursiveAddToList(subGroup);
-            }
-
-            return list;
-        }
-
-        public ReadonlyOptionsGroupEntity ToReadOnly()
-            => new ReadonlyOptionsGroupEntity(Name, Options, SubGroups);
-    }
-
-    public class ReadonlyOptionsGroupEntity
-    {
-        public ReadonlyOptionsGroupEntity(string name, List<SchematicOption> options, List<SchematicOptionsGroupEntity> subGroups) 
-        {
-            Name = name;
-            Options = options;
-            SubGroups = subGroups.Select(sg => sg.ToReadOnly()).ToList(); // Making all the subgroups readonly
-        }
-        public string Name { get; }
-        public IReadOnlyList<SchematicOption> Options;
-        public IReadOnlyList<ReadonlyOptionsGroupEntity> SubGroups;
+        new public SchematicOptionsGroup WithSubGroups(IEnumerable<GroupBase<SchematicOption>> groups)
+            => (SchematicOptionsGroup)base.WithSubGroups(groups);
     }
 }

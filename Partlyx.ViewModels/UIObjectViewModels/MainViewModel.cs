@@ -1,4 +1,7 @@
-﻿using Partlyx.Core.Contracts;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Partlyx.Core.Contracts;
+using Partlyx.Core.Help;
+using Partlyx.Core.OtherSaves;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.Settings;
@@ -35,6 +38,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly ILocalizationService _loc;
         private readonly IServicesResponsibilitySettingsHandler _servicesSettingsHandler;
         private readonly IGlobalApplicationSettingsServiceViewModelContainer _appSettingsContainer;
+        private readonly IJsonSavesService _jsonSavesService;
 
         public MainViewModel(
             PartsTreeViewModel partsTree,
@@ -50,7 +54,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             IVMPartsStoreCleaner vmpsc,
             ILocalizationService loc,
             IServicesResponsibilitySettingsHandler srsh,
-            IGlobalApplicationSettingsServiceViewModelContainer gassvmc
+            IGlobalApplicationSettingsServiceViewModelContainer gassvmc,
+            IJsonSavesService jss
             )
         {
             PartsTree = partsTree;
@@ -68,9 +73,28 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _loc = loc;
             _servicesSettingsHandler = srsh;
             _appSettingsContainer = gassvmc;
+            _jsonSavesService = jss;
         }
 
         private const bool DISABLE_DB_DELETE_ON_EXIT = true; // During development, it is inconvenient to reopen the file every time you restart. However, don't forget to disable this when releasing the application.
+        
+        public async Task OnInitializeFinished()
+        {
+            var isMainAppJsonSchemeLoaded = await _jsonSavesService.WaitUntilSchemeIsLoaded(SaveScheme.AppUsingSave);
+
+            if (!isMainAppJsonSchemeLoaded)
+                return;
+
+            var isAppStartedFirstTime = _jsonSavesService.GetValue<bool?>(SaveScheme.AppUsingSave.SchemeName, "is_first_time_opened");
+            if (isAppStartedFirstTime == true)
+            {
+                await _jsonSavesService.SetValueAndSaveAsync(SaveScheme.AppUsingSave.SchemeName, "is_first_time_opened", false);
+
+                // Opening help window with a greeting section
+                await Task.Delay(1000);
+                await MenuPanel.HelpMenu.OpenHelp();
+            }
+        }
         public async Task<bool> ConfirmClosingAsync()
         {
             // Saving changes notification

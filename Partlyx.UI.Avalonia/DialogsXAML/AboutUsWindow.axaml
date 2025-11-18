@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:md="https://github.com/AvaloniaUtils/Material.Avalonia"
+             xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:fa="clr-namespace:Meziantou.WpfFontAwesome;assembly=Meziantou.WpfFontAwesome"
+             xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels.Implementations"
+             xmlns:vms="using:Partlyx.ViewModels.Settings"
+             xmlns:dh="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="400"
+             Width="640" Height="400"
+             x:Class="Partlyx.UI.Avalonia.DialogsXAML.AboutUsWindow"
+             x:DataType="vmo:AboutUsWindowViewModel">
+    
+    <Grid Background="{StaticResource PxBlue0Brush}" RowDefinitions="Auto,*,Auto">
+        <TextBlock Text="{h:Loc About_Us}" TextAlignment="Center" Classes="common" Background="{StaticResource PxWhiteBrush}"/>
+        <Grid Grid.Row="1" Margin="24">
+            <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="16" RadiusY="16"/>
+            <Grid Margin="16">
+			    <TextBlock Text="{h:Loc info_text_About_Us}" Classes="common"/>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="2" Margin="8">
+		    <Button Classes="base" Grid.Column="0" IsEnabled="True" Command="{Binding CloseDialogCommand}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal" Margin="8">
+                        <TextBlock Text="{h:Loc Ok}"/>
+                        <mdi:MaterialIcon Kind="Check" Width="16" Margin="4, 0, 0, 0" Classes="common"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

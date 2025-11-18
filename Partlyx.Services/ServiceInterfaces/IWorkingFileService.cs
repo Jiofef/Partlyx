@@ -2,7 +2,7 @@
 
 namespace Partlyx.Services.ServiceInterfaces
 {
-    public interface IFileService
+    public interface IWorkingFileService
     {
         string? CurrentPartreePath { get; }
         bool IsChangesSaved { get; }

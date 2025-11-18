@@ -11,6 +11,10 @@ namespace Partlyx.Infrastructure.Data
     {
         public static IServiceCollection AddDataServices(this IServiceCollection services)
         {
+            services.AddSingleton<IJsonInfoProvider, JsonInfoProvider>();
+            services.AddTransient<IJsonLoader, JsonLoader>();
+            services.AddTransient<IJsonSaver, JsonSaver>();
+
             // Partlyx DB setting
             services.AddSingleton<IPartlyxDBProvider, PartlyxDBProvider>();
 

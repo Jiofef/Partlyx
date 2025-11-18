@@ -54,6 +54,10 @@
                     <MenuItem Header="{h:Loc Settings}" Height="32" DataContext="{Binding SettingsMenu}">
                         <MenuItem Header="{h:Loc App_Settings}" Command="{Binding OpenSettingsCommand}"/>
                     </MenuItem>
+                    <MenuItem Header="{h:Loc Help}" Height="32" DataContext="{Binding HelpMenu}">
+						<MenuItem Header="{h:Loc View_Help}" Command="{Binding OpenHelpCommand}"/>
+                        <MenuItem Header="{h:Loc About_Us}" Command="{Binding OpenAboutUsCommand}"/>
+                    </MenuItem>
                 </Menu>
 
             </DockPanel>
