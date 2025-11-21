@@ -1,0 +1,134 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:vmgi="using:Partlyx.ViewModels.GraphicsViewModels.IconViewModels"
+             xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
+             xmlns:avlp="using:Avalonia.Labs.Panels"
+             mc:Ignorable="d" d:DesignWidth="1080" d:DesignHeight="720"
+             Width="1080" Height="720"
+             x:Class="Partlyx.UI.Avalonia.DialogsXAML.IconsWindow"
+             x:DataType="vmo:IconsMenuViewModel">
+
+      <Grid Background="{StaticResource PxBlue0Brush}" RowDefinitions="Auto,*,Auto" Margin="4">
+        <TextBlock Text="{h:Loc Icons}" TextAlignment="Center" Classes="common" Background="{StaticResource PxWhiteBrush}"/>
+        <Border Grid.Row="1" BorderBrush="{StaticResource PxBlue1Brush}" BorderThickness="4" CornerRadius="8" Margin="8">
+			<Grid Margin="8" ColumnDefinitions="*, 4, *">
+                <Grid Grid.Column="0" RowDefinitions="Auto, *" Margin="8">
+                    <TextBlock Text="{h:Loc BuiltIn_Icons}" TextAlignment="Center" Classes="common"/>
+                    <ListBox Grid.Row="1" SelectedItem="{Binding SelectedIcon}">
+					    <ListBox.ItemsPanel>
+						    <ItemsPanelTemplate>
+							    <avlp:FlexPanel Wrap="Wrap" Direction="Row" ColumnSpacing="8" RowSpacing="8"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+
+                        <ListBox.ItemTemplate>
+						    <DataTemplate>
+							    <Border Background="{StaticResource PxWhiteBrush}" CornerRadius="16">
+									
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+
+                <GridSplitter Grid.Column="1"/>
+
+                <Grid Grid.Column="2" RowDefinitions="Auto,*" Margin="8">
+                    <Grid.DataTemplates>
+						<DataTemplate DataType="vmgi:ImageViewModel">
+							<Border Background="{StaticResource PxWhiteBrush}" CornerRadius="16" Height="128" Width="96" Focusable="True">
+                                <Border.ContextMenu>
+									<ContextMenu>
+										<MenuItem Header="{h:Loc Rename}" Command="{Binding UiItem.StartRenamingCommand}" InputGesture="F2"/>
+                                        <MenuItem Header="{h:Loc Delete}" Command="{Binding UiItem.DeleteImageCommand}" InputGesture="Delete"/>
+                                    </ContextMenu>
+                                </Border.ContextMenu>
+                                <Grid VerticalAlignment="Stretch" RowDefinitions="96,Auto" HorizontalAlignment="Stretch">
+                                    <Grid Grid.Row="0">
+								        <Image Margin="8" Source="{Binding Compressed, Converter={StaticResource ByteArrayToBitmapConv}}"
+                                            VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                                    </Grid>
+
+                                    <i:Interaction.Behaviors>
+                                        <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                            <ia:InvokeCommandAction Command="{Binding UiItem.StartRenamingCommand}"/>
+                                        </ia:EventTriggerBehavior>
+                                   </i:Interaction.Behaviors>
+                                    <Grid Grid.Row="1" Height="32">
+									    <TextBlock Text="{Binding Name}" VerticalAlignment="Stretch" TextAlignment="Center" Classes="common" IsVisible="{Binding !UiItem.IsRenaming}"/>
+                                    
+                                        <TextBox VerticalAlignment="Stretch" Text="{Binding UiItem.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" IsVisible="{Binding UiItem.IsRenaming}" Classes="common">
+                                            <TextBox.KeyBindings>
+						                        <KeyBinding Gesture="Enter" Command="{Binding UiItem.CommitNameChangeCommand}"/>
+                                                <KeyBinding Gesture="Escape" Command="{Binding UiItem.CancelNameChangeCommand}"/>
+                                            </TextBox.KeyBindings>
+                                            <i:Interaction.Behaviors>
+                                                    <ia:EventTriggerBehavior EventName="LostFocus">
+                                                        <ia:InvokeCommandAction Command="{Binding UiItem.CommitNameChangeCommand}"/>
+                                                    </ia:EventTriggerBehavior>
+                                                <beh:TextBoxFocusAndSelectBehavior IsActive="{Binding UiItem.IsRenaming}"/>
+                                            </i:Interaction.Behaviors>  
+                                        </TextBox>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                        <DataTemplate DataType="vmo:CreateNewElementButton">
+							<Button Background="{StaticResource PxBlue1Brush}" Command="{Binding ClickedCommand}" CornerRadius="16" Height="96" Width="96">
+							    <mdi:MaterialIcon Kind="Plus" Width="48" Height="48" Classes="common"/>
+                            </Button>
+                        </DataTemplate>
+                    </Grid.DataTemplates>
+
+                    <TextBlock Text="{h:Loc User_Icons}" TextAlignment="Center" Classes="common"/>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding ImagesToShow}" SelectedItem="{Binding SelectedIcon}">
+                        <ListBox.KeyBindings>
+							<KeyBinding Gesture="F2" Command="{Binding TryStartRenamingSelectedImageCommand}"/>
+                            <KeyBinding Gesture="Delete" Command="{Binding TryDeleteSelectedImageCommand}"/>
+                        </ListBox.KeyBindings>
+					    <ListBox.ItemsPanel>
+						    <ItemsPanelTemplate>
+							    <avlp:FlexPanel Wrap="Wrap" Direction="Row" ColumnSpacing="8" RowSpacing="8"
+                                AlignContent="FlexStart"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2" Margin="4">
+		    <Button Classes="base" Grid.Column="1" IsVisible="{Binding !EnableIconSelection}" Command="{Binding OkCommand}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal" Margin="8">
+                        <TextBlock Text="{h:Loc Ok}"/>
+                        <mdi:MaterialIcon Kind="Check" Width="16" Margin="4, 0, 0, 0" Classes="common"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Classes="base" IsVisible="{Binding EnableIconSelection}" Command="{Binding SelectCommand}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal" Margin="8">
+                        <TextBlock Text="{h:Loc Select}"/>
+                        <mdi:MaterialIcon Kind="Check" Width="16" Margin="4, 0, 0, 0" Classes="common"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Classes="base" IsVisible="{Binding EnableIconSelection}" Command="{Binding CancelCommand}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal" Margin="8">
+                        <TextBlock Text="{h:Loc Cancel}"/>
+                        <mdi:MaterialIcon Kind="Cancel" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

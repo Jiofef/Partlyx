@@ -17,63 +17,67 @@
              x:DataType="vmo:ComponentCreateViewModel"
              x:Name="Root"
              x:Class="Partlyx.UI.Avalonia.DialogsXAML.ComponentCreate">
-    <Grid Background="{StaticResource PxBlue0Brush}">
-        <Grid Margin="4" RowDefinitions="Auto,*,Auto">
-            <TextBox Classes="common" Watermark="{h:Loc Search___}" Background="{StaticResource PxWhiteBrush}" Grid.Row="0"/>
-            <ListBox ItemsSource="{Binding Search.UnfilteredResources}"
-                            Margin="0,0,10,0" Classes="common"
-                            BorderThickness="0" Background="{StaticResource PxBlue0Brush}"
-                            Grid.Row="1"
-                            beh:ListViewSelectionBehavior.BindableSelectedItems="{Binding SelectedParts.Resources}">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
+    
+    <Grid Background="{StaticResource PxBlue0Brush}" RowDefinitions="Auto,*" Margin="4">
+        <TextBlock Text="{h:Loc Component_Creating}" TextAlignment="Center" Classes="common" Background="{StaticResource PxWhiteBrush}"/>
+        <Grid Background="{StaticResource PxBlue0Brush}" Grid.Row="1">
+            <Grid Margin="4" RowDefinitions="Auto,*,Auto">
+                <TextBox Classes="common" Watermark="{h:Loc Search___}" Background="{StaticResource PxWhiteBrush}" Grid.Row="0"/>
+                <ListBox ItemsSource="{Binding Search.UnfilteredResources}"
+                                Margin="0,0,10,0" Classes="common"
+                                BorderThickness="0" Background="{StaticResource PxBlue0Brush}"
+                                Grid.Row="1"
+                                beh:ListViewSelectionBehavior.BindableSelectedItems="{Binding SelectedParts.Resources}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
 
-                <ListBox.ItemTemplate>
-				    <DataTemplate DataType="vmp:ResourceViewModel">
-                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4,2,4,2" Height="32">
-                            <i:Interaction.Behaviors>
-                                <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                    <ia:InvokeCommandAction 
-                                        Command="{Binding $parent[UserControl].DataContext.CloseDialogCommand}"
-                                        CommandParameter="{Binding $parent[UserControl].DataContext.SelectedParts}"/>
-                                </ia:EventTriggerBehavior>
-                            </i:Interaction.Behaviors>
-                            <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                            <Grid HorizontalAlignment="Stretch" ColumnDefinitions="Auto,*,Auto">
-                                <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
-                                <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Classes="common">
-                                </TextBlock>
+                    <ListBox.ItemTemplate>
+				        <DataTemplate DataType="vmp:ResourceViewModel">
+                            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="4,2,4,2" Height="32">
+                                <i:Interaction.Behaviors>
+                                    <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                        <ia:InvokeCommandAction 
+                                            Command="{Binding $parent[UserControl].DataContext.CloseDialogCommand}"
+                                            CommandParameter="{Binding $parent[UserControl].DataContext.SelectedParts}"/>
+                                    </ia:EventTriggerBehavior>
+                                </i:Interaction.Behaviors>
+                                <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                <Grid HorizontalAlignment="Stretch" ColumnDefinitions="Auto,*,Auto">
+                                    <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                                    <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Classes="common">
+                                    </TextBlock>
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
-            <Grid Grid.Row="2" ColumnDefinitions="*,*">
-                <Button HorizontalAlignment="Stretch" Classes="base" Grid.Column="0" IsEnabled="{Binding SelectedParts.IsResourcesSelected}"
-                        Command="{Binding CloseDialogCommand}" 
-                        CommandParameter="{Binding SelectedParts}">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal" Margin="8">
-                            <TextBlock Text="{h:Loc Select}"/>
-                            <mdi:MaterialIcon Kind="Plus" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Classes="base" Grid.Column="1"
-                        Command="{Binding CloseDialogCommand}" 
-                        CommandParameter="{x:Null}">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal" Margin="8">
-                            <TextBlock Text="{h:Loc Cancel}"/>
-                            <mdi:MaterialIcon Kind="Cancel" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
+                <UniformGrid Columns="2" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                    <Button HorizontalAlignment="Stretch" Classes="base" IsEnabled="{Binding SelectedParts.IsResourcesSelected}"
+                            Command="{Binding CloseDialogCommand}" 
+                            CommandParameter="{Binding SelectedParts}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal" Margin="8">
+                                <TextBlock Text="{h:Loc Select}"/>
+                                <mdi:MaterialIcon Kind="Plus" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Classes="base"
+                            Command="{Binding CloseDialogCommand}" 
+                            CommandParameter="{x:Null}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal" Margin="8">
+                                <TextBlock Text="{h:Loc Cancel}"/>
+                                <mdi:MaterialIcon Kind="Cancel" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
 
+                </UniformGrid>
             </Grid>
         </Grid>
     </Grid>

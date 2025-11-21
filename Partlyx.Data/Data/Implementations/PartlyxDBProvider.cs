@@ -54,7 +54,14 @@ namespace Partlyx.Infrastructure.Data.Implementations
             using var scope = _services.CreateScope();
             var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<PartlyxDBContext>>();
             using var ctx = factory.CreateDbContext();
-            ctx.Database.Migrate();
+            try
+            {
+                ctx.Database.Migrate();
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine("There was an error while migrating a db: " + ex.Message);
+            }
 
             IsInitialized = true;
 

@@ -14,6 +14,7 @@ using static Partlyx.ViewModels.PartsViewModels.VMPartExtensions;
 using System.Runtime.CompilerServices;
 using UJL.CSharp.Collections;
 using Partlyx.UI.Avalonia.Helpers;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Partlyx.ViewModels.Graph
 {
@@ -22,6 +23,8 @@ namespace Partlyx.ViewModels.Graph
         private List<IDisposable> _subscriptions = new();
 
         private IVMPartsStore _store;
+
+        public RelayCommand? OnGraphBuilded { get; set; }
 
         public PartsGraphTreeBuilderViewModel(IGlobalFocusedPart focusedPart, IEventBus bus, IVMPartsStore store)
         {
@@ -125,6 +128,12 @@ namespace Partlyx.ViewModels.Graph
 
             Edges = mainNode.GetBranchLinesMultiCollection();
             BuildEdgesFor(mainNode);
+
+            
+            if (OnGraphBuilded != null)
+            {
+                OnGraphBuilded.Execute(null);
+            }
         }
 
         protected override void OnTreeDestroyed()

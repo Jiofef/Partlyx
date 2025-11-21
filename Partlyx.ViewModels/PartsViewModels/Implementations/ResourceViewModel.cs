@@ -162,8 +162,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             foreach (var recipe in  Recipes)
                 recipe.Dispose();
-
-            _store.RemoveResource(Uid);
         }
 
         // Commands

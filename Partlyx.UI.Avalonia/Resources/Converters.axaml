@@ -4,4 +4,5 @@
     <conv:BooleanToSelectionModeConverter x:Key="BoolToSelectionModeConv"/>
     <conv:SelectedEqualsConverter x:Key="SelectedEqualsConv"/>
     <conv:ColorToSolidColorBrushValueConverter x:Key="ColorToBrushConv"/>
+    <conv:ByteArrayToBitmapConverter x:Key="ByteArrayToBitmapConv"/>
 </ResourceDictionary>

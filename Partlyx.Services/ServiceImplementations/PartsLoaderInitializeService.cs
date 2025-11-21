@@ -13,16 +13,18 @@ using System.Threading.Tasks;
 
 namespace Partlyx.Services.ServiceImplementations
 {
-    public class PartsLoader : IPartsLoader
+    public class PartsLoaderInitializeService : IPartsLoaderInitializeService, IDisposable
     {
         private readonly IEventBus _bus;
         private readonly IPartlyxRepository _repo;
-        public PartsLoader(IEventBus bus, IPartlyxRepository repo)
+
+        private IDisposable _partlyxDbInitializeSubscription;
+        public PartsLoaderInitializeService(IEventBus bus, IPartlyxRepository repo)
         {
             _bus = bus;
             _repo = repo;
 
-            _bus.SubscribeAsync<PartlyxDBInitializedEvent>(OnDBInitialized);
+            _partlyxDbInitializeSubscription = _bus.SubscribeAsync<PartlyxDBInitializedEvent>(OnDBInitialized);
         }
 
         private async Task OnDBInitialized(PartlyxDBInitializedEvent ev)
@@ -42,6 +44,11 @@ namespace Partlyx.Services.ServiceImplementations
             _bus.Publish(new RecipeComponentsBulkLoadedEvent(cDtos));
 
             _bus.Publish(new PartsInitializationFinishedEvent());
+        }
+
+        public void Dispose()
+        {
+            _partlyxDbInitializeSubscription.Dispose();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
     public class VMFileService : IVMFileService
     {
         private readonly IWorkingFileService _fileService;
-        private readonly IFileDialogService _dialogService;
+        private readonly IFileDialogService _fileDialogService;
         private readonly INotificationService _notificationService;
         private readonly IEventBus _bus;
         private readonly MainWindowNameController _mainWindowNameController;
@@ -25,7 +25,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         public VMFileService(IWorkingFileService dbfm, IFileDialogService fds, INotificationService ns, IEventBus bus, MainWindowNameController mwnc, ILocalizationService loc)
         {
             _fileService = dbfm;
-            _dialogService = fds;
+            _fileDialogService = fds;
             _notificationService = ns;
             _bus = bus;
             _mainWindowNameController = mwnc;
@@ -105,7 +105,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
         public async Task<bool> SaveProjectAsAsync()
         {
-            var path = await _dialogService.ShowSaveFileDialogAsync(new FileDialogOptions()
+            var path = await _fileDialogService.ShowSaveFileDialogAsync(new FileDialogOptions()
             {
                 Title = _loc["partree_Save_Project"],
                 Filter = _loc["filter_Partree_files"],
@@ -128,7 +128,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
         public async Task OpenProjectAsync()
         {
-            var path = await _dialogService.ShowOpenFileDialogAsync(new FileDialogOptions()
+            var path = await _fileDialogService.ShowOpenFileDialogAsync(new FileDialogOptions()
             {
                 Title = _loc["partree_Open_Project"],
                 Filter = _loc["filter_Partree_files"],

@@ -15,6 +15,9 @@ namespace Partlyx.Infrastructure.Data
             services.AddTransient<IJsonLoader, JsonLoader>();
             services.AddTransient<IJsonSaver, JsonSaver>();
 
+            services.AddTransient<IImageLoader, ImageLoader>();
+            services.AddTransient<IImagesRepository, ImageDBRepository>();
+
             // Partlyx DB setting
             services.AddSingleton<IPartlyxDBProvider, PartlyxDBProvider>();
 

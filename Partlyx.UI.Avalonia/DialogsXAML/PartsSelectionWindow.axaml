@@ -84,14 +84,14 @@
                 </ListBox.ItemContainerTheme>
             </ListBox>
 
-            <Grid Grid.Row="2" ColumnDefinitions="*,*">
+            <UniformGrid Grid.Row="2" Columns="2" HorizontalAlignment="Right">
                 <Button HorizontalAlignment="Stretch" Classes="base" Grid.Column="0" IsEnabled="{Binding AllowConfirmSelection}"
                         Command="{Binding CloseDialogCommand}" 
                         CommandParameter="{Binding SelectedParts}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Margin="8">
                             <TextBlock Text="{h:Loc Select}"/>
-                            <mdi:MaterialIcon Kind="Plus" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
+                            <mdi:MaterialIcon Kind="Check" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
                         </StackPanel>
                     </Button.Content>
                 </Button>
@@ -105,7 +105,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-            </Grid>
+            </UniformGrid>
         </Grid>
     </Grid>
 </UserControl>

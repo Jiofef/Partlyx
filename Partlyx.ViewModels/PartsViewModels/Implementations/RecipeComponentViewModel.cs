@@ -9,6 +9,7 @@ using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.GlobalNavigations;
+using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
@@ -95,6 +96,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private ObservableCollection<RecipeComponentViewModel>? _selectedRecipeComponents;
         public ObservableCollection<RecipeComponentViewModel>? SelectedRecipeComponents { get => _selectedRecipeComponents; private set => SetProperty(ref _selectedRecipeComponents, value); }
 
+        public IconViewModel Icon { get => LinkedResource?.Value?.Icon!; }
+
 
         // Info updating
         protected override Dictionary<string, Action<RecipeComponentDto>> ConfigureUpdaters() => new()
@@ -126,8 +129,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _updatedSubscription.Dispose(); 
             _childComponentsDefaultRecipeUpdateSubscribe.Dispose();
             _childComponentsSelectedRecipeUpdateSubscribe.Dispose();
-
-            _store.RemoveRecipeComponent(Uid);
         }
 
         // For UI

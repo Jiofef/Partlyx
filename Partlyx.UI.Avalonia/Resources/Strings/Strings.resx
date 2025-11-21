@@ -318,4 +318,16 @@
   <data name="Language" xml:space="preserve">
     <value>Language</value>
   </data>
+  <data name="Invalid_image_error" xml:space="preserve">
+    <value>Invalid image error</value>
+  </data>
+  <data name="An_error_occured_during_loading_an_image_Image_wasnt_loaded" xml:space="preserve">
+    <value>An error occured during loading an image Image wasnt loaded</value>
+  </data>
+  <data name="Load_image" xml:space="preserve">
+    <value>Load image</value>
+  </data>
+  <data name="filter_Image_files" xml:space="preserve">
+    <value>Image files</value>
+  </data>
 </root>

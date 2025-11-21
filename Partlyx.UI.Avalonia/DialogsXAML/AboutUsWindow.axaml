@@ -20,13 +20,13 @@
     
     <Grid Background="{StaticResource PxBlue0Brush}" RowDefinitions="Auto,*,Auto">
         <TextBlock Text="{h:Loc About_Us}" TextAlignment="Center" Classes="common" Background="{StaticResource PxWhiteBrush}"/>
-        <Grid Grid.Row="1" Margin="24">
+        <Grid Grid.Row="1" Margin="16">
             <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="16" RadiusY="16"/>
             <Grid Margin="16">
 			    <TextBlock Text="{h:Loc info_text_About_Us}" Classes="common"/>
             </Grid>
         </Grid>
-        <Grid Grid.Row="2" Margin="8">
+        <UniformGrid Grid.Row="2" Margin="16, 0, 16, 16" Columns="1" HorizontalAlignment="Right">
 		    <Button Classes="base" Grid.Column="0" IsEnabled="True" Command="{Binding CloseDialogCommand}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
@@ -35,6 +35,6 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
-        </Grid>
+        </UniformGrid>
     </Grid>
 </UserControl>

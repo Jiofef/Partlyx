@@ -89,8 +89,8 @@
                     </DataTemplate>
                 </TabControl.ContentTemplate>
             </TabControl>
-            <Grid Grid.Row="2" ColumnDefinitions="*,*,*">
-				<Button Classes="base" Grid.Column="0" Command="{Binding OkCommand}">
+            <UniformGrid Grid.Row="2" Columns="3" HorizontalAlignment="Right">
+				<Button Classes="base" Command="{Binding OkCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Margin="8">
                             <TextBlock Text="{h:Loc Ok}"/>
@@ -99,7 +99,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button Classes="base" Grid.Column="1" Command="{Binding ApplyCommand}" IsEnabled="{Binding IsSettingsChanged}">
+                <Button Classes="base" Command="{Binding ApplyCommand}" IsEnabled="{Binding IsSettingsChanged}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Margin="8">
                             <TextBlock Text="{h:Loc Apply}"/>
@@ -107,7 +107,7 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-                <Button Classes="base" Grid.Column="2" Command="{Binding CancelCommand}">
+                <Button Classes="base" Command="{Binding CancelCommand}">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal" Margin="8">
                             <TextBlock Text="{h:Loc Cancel}"/>
@@ -115,6 +115,6 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
-            </Grid>
+            </UniformGrid>
     </Grid>
 </UserControl>

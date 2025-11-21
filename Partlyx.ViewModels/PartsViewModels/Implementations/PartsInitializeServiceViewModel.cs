@@ -9,7 +9,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
     // Previously, this class created recipes and their components by itself, but it turned out to be a bug, since they are created in the constructors of their ancestors during initialization.
     // So the variables associated with loading recipes and components here are rudimentary, they are left for the sake of the dependency inversion.
-    public class PartsInitializeService : IPartsInitializeService
+    public class PartsInitializeServiceViewModel : IPartsInitializeServiceViewModel, IDisposable
     {
         private readonly IEventBus _bus;
         private readonly IVMPartsFactory _factory;
@@ -27,7 +27,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public bool InitializationFinished { get; private set; }
 
-        public PartsInitializeService(IEventBus bus, IVMPartsFactory vmpf, IVMPartsStore vmps)
+        public PartsInitializeServiceViewModel(IEventBus bus, IVMPartsFactory vmpf, IVMPartsStore vmps)
         {
             _bus = bus;
             _factory = vmpf;

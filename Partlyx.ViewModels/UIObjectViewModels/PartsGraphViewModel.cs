@@ -3,11 +3,13 @@ using CommunityToolkit.Mvvm.Input;
 using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Events;
 using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using ReactiveUI;
+using System.Diagnostics;
 
 namespace Partlyx.ViewModels.UIObjectViewModels
 {
@@ -27,21 +29,24 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public ComponentSumController SumController { get; }
         private readonly ComponentSumControllerBinder _componentSumBinder;
 
-        private readonly IVMPartsStore _store;
+        private readonly IVMPartsStore _partsStore;
+        private readonly IImagesStoreViewModel _imagesStore;
 
-        public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IMainWindowController mwc, PanAndZoomControllerViewModel pazc, PartsGraphTreeBuilderViewModel graph, IVMPartsStore store, IEventBus bus)
+        public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IMainWindowController mwc, PanAndZoomControllerViewModel pazc, PartsGraphTreeBuilderViewModel graph, IVMPartsStore store, 
+            IImagesStoreViewModel imagesStore, IEventBus bus)
         {
             SelectedParts = selectedParts;
             MainWindowController = mwc;
             PanAndZoomController = pazc;
             Graph = graph;
 
-            _store = store;
+            _partsStore = store;
+            _imagesStore = imagesStore;
 
             var focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedPartChangedEvent>(ev =>
                 {
-                    _store.TryGet(ev.FocusedPartUid, out var focused);
-                    _store.TryGet(ev.PreviousSelectedPartUid, out var previous);
+                    _partsStore.TryGet(ev.FocusedPartUid, out var focused);
+                    _partsStore.TryGet(ev.PreviousSelectedPartUid, out var previous);
                     var focusedRecipe = focused?.GetRelatedRecipe();
                     var previousRecipe = previous?.GetRelatedRecipe();
 
@@ -52,6 +57,27 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             SumController = new();
             _componentSumBinder = new ComponentSumControllerBinder(graph.ComponentLeafs, SumController);
+
+            Graph.OnGraphBuilded = new(async () => 
+            {
+                // We find all the unique images among the displayed nodes, and send a request to download the full version of the image instead of the compressed one.
+
+                List<Guid> nodeImagesUids = new();
+                HashSet<Guid> nodeImagesUidsHashed = new();
+                foreach (var node in Graph.Nodes)
+                {
+                    if (node.Value is not IVMPart part) continue;
+                    if (part.Icon.Content is not ImageViewModel image) continue;
+                    if (nodeImagesUidsHashed.Contains(image.Uid)) continue;
+                    
+                    nodeImagesUidsHashed.Add(image.Uid);
+                    nodeImagesUids.Add(image.Uid);
+                }
+
+                if (nodeImagesUids.Count <= 0) return;
+
+                await imagesStore.LoadFullImages(nodeImagesUids.ToArray());
+            });
         }
 
         public void Dispose()

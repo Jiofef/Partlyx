@@ -56,6 +56,10 @@
             <dialogs:ApplicationSettingsMenu/>
         </DataTemplate>
 
+        <DataTemplate DataType="vmo:IconsMenuViewModel">
+			<dialogs:IconsWindow/>
+        </DataTemplate>
+
         <DataTemplate DataType="vmo:HelpWindowViewModel">
 			<dialogs:HelpWindow/>
         </DataTemplate>

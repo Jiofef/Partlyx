@@ -3,6 +3,7 @@ using Partlyx.Core.Contracts;
 using Partlyx.Core.Help;
 using Partlyx.Core.OtherSaves;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.Settings;
 using Partlyx.ViewModels.UIServices;
@@ -30,8 +31,10 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public IMainWindowController WindowController { get; }
 
-        private readonly IPartsLoader _partsLoader;
-        private readonly IPartsInitializeService _partsInitializeService;
+        private readonly IPartsLoaderInitializeService _partsLoaderIntialize;
+        private readonly IImagesLoaderInitializeService _imagesLoaderInitialize;
+        private readonly IPartsInitializeServiceViewModel _partsInitializeVM;
+        private readonly ImagesInitializeServiceViewModel _imagesInitializeVM;
         private readonly IVMFileService _fileService;
         private readonly INotificationService _notificationService;
         private readonly IVMPartsStoreCleaner _cleaner;
@@ -47,8 +50,10 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             MenuPanelViewModel menuPanel,
             IMainWindowController windowController,
             IGlobalSelectedParts selectedParts,
-            IPartsLoader pl,
-            IPartsInitializeService pis,
+            IPartsLoaderInitializeService plis,
+            IImagesLoaderInitializeService ilis,
+            IPartsInitializeServiceViewModel pis,
+            ImagesInitializeServiceViewModel iis,
             IVMFileService vmfs,
             INotificationService ns,
             IVMPartsStoreCleaner vmpsc,
@@ -65,8 +70,10 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             SelectedParts = selectedParts;
             WindowController = windowController;
 
-            _partsLoader = pl;
-            _partsInitializeService = pis;
+            _partsLoaderIntialize = plis;
+            _imagesLoaderInitialize = ilis;
+            _partsInitializeVM = pis;
+            _imagesInitializeVM = iis;
             _fileService = vmfs;
             _notificationService = ns;
             _cleaner = vmpsc;

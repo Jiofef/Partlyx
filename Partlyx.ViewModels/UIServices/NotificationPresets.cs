@@ -5,6 +5,7 @@
         // Errors
         public static readonly NotificationErrorOptions InvalidFileErrorPreset = new("Invalid_file_error", "An_error_occured_during_opening_a_file_File_wasnt_opened");
         public static readonly NotificationErrorOptions SavingFileErrorPreset = new("Saving_error", "An_error_occured_during_saving_a_file_File_wasnt_saved");
+        public static readonly NotificationErrorOptions InvalidImageLoadingErrorPreset = new("Invalid_image_error", "An_error_occured_during_loading_an_image_Image_wasnt_loaded");
 
         // Info
 

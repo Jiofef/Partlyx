@@ -166,8 +166,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             foreach(var component in Components)
                 component.Dispose();
-
-            _store.RemoveRecipe(Uid);
         }
 
         // For UI

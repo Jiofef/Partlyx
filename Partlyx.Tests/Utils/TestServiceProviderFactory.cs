@@ -66,7 +66,7 @@ namespace Partlyx.Tests.Utils
             // Services
             services.AddTransient<IServiceProvider, ServiceProvider>();
 
-            services.AddSingleton<IPartsLoader, PartsLoader>();
+            services.AddSingleton<IPartsLoaderInitializeService, PartsLoaderInitializeService>();
             services.AddSingleton<IWorkingFileService, WorkingFileService>();
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<IServicesResponsibilitySettingsHandler, ServicesResponsibilitySettingsHandler>();
@@ -112,7 +112,7 @@ namespace Partlyx.Tests.Utils
 
             services.AddTransient<IVMPartsFactory, VMPartsFactory>();
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
-            services.AddSingleton<IPartsInitializeService, PartsInitializeService>();
+            services.AddSingleton<IPartsInitializeServiceViewModel, PartsInitializeServiceViewModel>();
             services.AddSingleton<IVMPartsStoreCleaner, VMPartsStoreCleaner>();
             services.AddSingleton<IGuidLinkedPartFactory, GuidLinkedPartFactory>();
             services.AddSingleton<ILinkedPartsManager, LinkedPartsManager>();

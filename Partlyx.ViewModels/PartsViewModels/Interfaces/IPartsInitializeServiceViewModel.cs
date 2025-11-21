@@ -1,6 +1,6 @@
 ﻿namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
-    public interface IPartsInitializeService
+    public interface IPartsInitializeServiceViewModel
     {
         bool InitializationFinished { get; }
         bool IsRecipeComponentsLoaded { get; }

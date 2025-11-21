@@ -318,4 +318,16 @@
   <data name="Language" xml:space="preserve">
     <value>Язык</value>
   </data>
+  <data name="Invalid_image_error" xml:space="preserve">
+    <value>Ошибка: невалидное изображение</value>
+  </data>
+  <data name="An_error_occured_during_loading_an_image_Image_wasnt_loaded" xml:space="preserve">
+    <value>При загрузке изображения возникла ошибка. Изображение не было загружено</value>
+  </data>
+  <data name="Load_image" xml:space="preserve">
+    <value>Загрузить изображение</value>
+  </data>
+  <data name="filter_Image_files" xml:space="preserve">
+    <value>Изображения (*.png;*.jpg;*.jpeg;*.webp)|*.png;*.jpg;*.jpeg;*.webp</value>
+  </data>
 </root>

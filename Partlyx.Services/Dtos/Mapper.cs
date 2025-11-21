@@ -1,4 +1,5 @@
-﻿using Partlyx.Core.Partlyx;
+﻿using Partlyx.Core;
+using Partlyx.Core.Partlyx;
 using Partlyx.Core.Settings;
 using Partlyx.Core.Technical;
 using Partlyx.Core.VisualsInfo;
@@ -58,6 +59,18 @@ namespace Partlyx.Services.Dtos
                 default:
                     return new NullIconDto();
             }
+        }
+
+        public static ImageDto ToDto(this PartlyxImage img)
+        {
+            return new ImageDto(
+                img.Uid,
+                img.Name,
+                img.Mime,
+                img.Hash,
+                img.Content,
+                img.CompressedContent
+                );
         }
 
         public static OptionDto ToDto(this OptionEntity o, object? value = null)

@@ -47,8 +47,8 @@
                 </Grid>
             </Grid>
         </Grid>
-        <Grid Grid.Row="2" Margin="4">
-		    <Button Classes="base" Grid.Column="0" Command="{Binding CloseDialogCommand}">
+        <UniformGrid Grid.Row="2" Margin="16, 0, 16, 16" HorizontalAlignment="Right">
+		    <Button Classes="base" Command="{Binding CloseDialogCommand}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
                         <TextBlock Text="{h:Loc Ok}"/>
@@ -56,6 +56,6 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
-        </Grid>
+        </UniformGrid>
     </Grid>
 </UserControl>

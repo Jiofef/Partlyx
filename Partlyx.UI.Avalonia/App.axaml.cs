@@ -18,6 +18,7 @@ using Partlyx.UI.Avalonia.Resources;
 using Partlyx.UI.Avalonia.VMImplementations;
 using Partlyx.ViewModels.GlobalNavigations;
 using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.Settings;
@@ -25,6 +26,7 @@ using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using Partlyx.ViewModels.UIStates;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -91,7 +93,8 @@ namespace Partlyx.UI.Avalonia
             // Services
             services.AddTransient<IServiceProvider, ServiceProvider>();
 
-            services.AddSingleton<IPartsLoader, PartsLoader>();
+            services.AddSingleton<IPartsLoaderInitializeService, PartsLoaderInitializeService>();
+            services.AddSingleton<IImagesLoaderInitializeService, ImagesLoaderInitializeService>();
             services.AddSingleton<IWorkingFileService, WorkingFileService>();
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<IServicesResponsibilitySettingsHandler, ServicesResponsibilitySettingsHandler>();
@@ -112,6 +115,8 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<ICommandFactory, DICommandFactory>();
             services.AddTransient<ICommandServices, CommandServices>();
 
+            services.AddTransient<IPartlyxImageService, PartlyxImageService>();
+
             services.AddSingleton(LocService);
 
             InitializeCommands(services);
@@ -126,13 +131,18 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<MenuPanelViewModel>();
             services.AddTransient<MenuPanelFileViewModel>();
             services.AddTransient<MenuPanelEditViewModel>();
+            services.AddTransient<MenuPanelProjectViewModel>();
             services.AddTransient<MenuPanelSettingsViewModel>();
             services.AddTransient<MenuPanelHelpViewModel>();
 
             services.AddTransient<ComponentCreateViewModel>();
 
+            services.AddTransient<IconsMenuViewModel>();
+
             services.AddTransient<AboutUsWindowViewModel>();
             services.AddTransient<HelpWindowViewModel>();
+
+            services.AddTransient<IconsMenuViewModel>();
 
             services.AddTransient<MainWindow>();
 
@@ -144,7 +154,7 @@ namespace Partlyx.UI.Avalonia
 
             services.AddTransient<IVMPartsFactory, VMPartsFactory>();
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
-            services.AddSingleton<IPartsInitializeService, PartsInitializeService>();
+            services.AddSingleton<IPartsInitializeServiceViewModel, PartsInitializeServiceViewModel>();
             services.AddSingleton<IVMPartsStoreCleaner, VMPartsStoreCleaner>();
             services.AddSingleton<IGuidLinkedPartFactory, GuidLinkedPartFactory>();
             services.AddSingleton<ILinkedPartsManager, LinkedPartsManager>();
@@ -179,6 +189,13 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<IRecipeItemUiStateService, RecipeItemUiStateService>();
             services.AddTransient<IRecipeComponentItemUiStateService, RecipeComponentItemUiStateService>();
             services.AddTransient<IResourceSearchService, ResourceSearchService>();
+
+            services.AddTransient<ImageViewModel>();
+            services.AddTransient<ImageUiItemStateViewModel>();
+            services.AddSingleton<IImagesStoreViewModel, ImagesStoreViewModel>();
+            services.AddSingleton<ImagesInitializeServiceViewModel>();
+            services.AddTransient<ImageFactoryViewModel>();
+            services.AddSingleton<ImageUiItemStateFactoryViewModel>();
 
             services.AddTransient<IFileDialogService, AvaloniaFileDialogService>();
             services.AddTransient<IVMFileService, VMFileService>();
