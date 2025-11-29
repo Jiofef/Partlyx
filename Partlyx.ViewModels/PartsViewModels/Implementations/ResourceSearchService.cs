@@ -48,4 +48,5 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         [ObservableProperty]
         private string _searchText = "";
     }
+
 }

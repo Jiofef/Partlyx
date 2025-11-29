@@ -1,10 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DynamicData.Binding;
-using Partlyx.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core.Contracts;
+using Partlyx.Core.Partlyx;
 using Partlyx.Infrastructure.Events;
 using Partlyx.UI.Avalonia.Helpers;
+using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.ItemProperties;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
@@ -12,12 +13,7 @@ using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using ReactiveUI;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.UIObjectViewModels
 {
@@ -26,6 +22,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly PartsServiceViewModel _services;
         private readonly IDialogService _dialogService;
         private readonly ILocalizationService _loc;
+        private readonly IServiceProvider _serviceProvider; // Only for creating VM windows
 
         private readonly IDisposable _focusedPartChangedSubscription;
 
@@ -36,8 +33,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public string FocusedPartTextAnnotation { get => _focusedPartTextAnnotation; set => SetProperty(ref _focusedPartTextAnnotation, value); }
 
 
-
-        public ItemPropertiesViewModel(PartsServiceViewModel services, IDialogService ds, IGlobalFocusedPart focusedPart, IEventBus bus, ILocalizationService loc)
+        public ItemPropertiesViewModel(PartsServiceViewModel services, IDialogService ds, IGlobalFocusedPart focusedPart, IEventBus bus, ILocalizationService loc, IServiceProvider serviceProvider)
         {
             _services = services;
             _dialogService = ds;
@@ -46,6 +42,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedPartChangedEvent>(ev => OnFocusedPartChanged());
 
             FocusedPart = focusedPart;
+            _serviceProvider = serviceProvider;
         }
 
         public void OnFocusedPartChanged()
@@ -104,6 +101,32 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             nameProperty.Subscriptions.Add(nameUpdateSubscription);
             Properties.Add(nameProperty);
 
+            // Creating "Icon" property
+            var iconProperty = new IconItemPropertyViewModel(resource.Icon) { Name = _loc["Icon"], Item = resource };
+            iconProperty.SaveChangesTask = new(
+                async (arg) =>
+                {
+                    if (arg is not IconViewModel icon) return;
+                    await _services.ResourceService.SetIcon(resource, icon);
+                });
+            iconProperty.SelectButtonPressedTask = new(
+                async (arg) =>
+                {
+                    var dialogVM = _serviceProvider.GetRequiredService<IconsMenuViewModel>();
+                    dialogVM.EnableIconSelection = true;
+                    if (resource.Icon.Content != null)
+                        dialogVM.SelectItemWith(resource.Icon.Content);
+
+                    var result = await _dialogService.ShowDialogAsync(dialogVM);
+
+                    if (result is not IconViewModel icon) return;
+                    await _services.ResourceService.SetIcon(resource, icon);
+                });
+            var iconUpdateSubscription = resource.WhenAnyValue(r => r.Icon).Subscribe((args) => iconProperty.Icon = resource.Icon);
+            iconProperty.Subscriptions.Add(iconUpdateSubscription);
+            Properties.Add(iconProperty);
+
+
             // Creating "Default recipe" property
             var defaultRecipeProperty = new RecipeItemPropertyViewModel() { Name = _loc["Default_recipe"], Item = resource, Part = resource.LinkedDefaultRecipe?.Value };
             defaultRecipeProperty.SelectButtonPressedTask = new(
@@ -152,6 +175,31 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             var nameUpdateSubscription = recipe.WhenAnyValue(r => r.Name).Subscribe((args) => nameProperty.Text = recipe.Name);
             nameProperty.Subscriptions.Add(nameUpdateSubscription);
             Properties.Add(nameProperty);
+
+            // Creating "Icon" property
+            var iconProperty = new IconItemPropertyViewModel(recipe.Icon) { Name = _loc["Icon"], Item = recipe };
+            iconProperty.SaveChangesTask = new(
+                async (arg) =>
+                {
+                    if (arg is not IconViewModel icon) return;
+                    await _services.RecipeService.SetIcon(recipe, icon);
+                });
+            iconProperty.SelectButtonPressedTask = new(
+                async (arg) =>
+                {
+                    var dialogVM = _serviceProvider.GetRequiredService<IconsMenuViewModel>();
+                    dialogVM.EnableIconSelection = true;
+                    if (recipe.Icon.Content != null)
+                        dialogVM.SelectItemWith(recipe.Icon.Content);
+
+                    var result = await _dialogService.ShowDialogAsync(dialogVM);
+
+                    if (result is not IconViewModel icon) return;
+                    await _services.RecipeService.SetIcon(recipe, icon);
+                });
+            var iconUpdateSubscription = recipe.WhenAnyValue(r => r.Icon).Subscribe((args) => iconProperty.Icon = recipe.Icon);
+            iconProperty.Subscriptions.Add(iconUpdateSubscription);
+            Properties.Add(iconProperty);
 
             // Creating "Craft amount" property
             var amountProperty = new SpinBoxItemPropertyViewModel() { Name = _loc["Product_amount"], Item = recipe};

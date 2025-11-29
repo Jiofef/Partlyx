@@ -5,6 +5,8 @@ public sealed partial class EventBus : IEventBus, IDisposable
 
     public async Task PublishAsync<TEvent>(TEvent @event)
     {
+        NotifyWaiters(@event);
+
         var type = typeof(TEvent);
         if (!_subs.TryGetValue(type, out var list)) return;
 

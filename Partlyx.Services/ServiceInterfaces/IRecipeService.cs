@@ -11,6 +11,7 @@ namespace Partlyx.Services.ServiceInterfaces
         Task<RecipeDto?> GetRecipeAsync(Guid parentResourceUid, Guid recipeUid);
         Task MoveRecipeAsync(Guid parentResourceUid, Guid newParentResourceUid, Guid recipeUid);
         Task QuantifyRecipeAsync(Guid parentResourceUid, Guid recipeUid);
+        Task SetRecipeIconAsync(Guid resourceUid, Guid recipeUid, IconDto iconDto);
         Task SetRecipeCraftAmountAsync(Guid parentResourceUid, Guid recipeUid, double craftAmount);
         Task SetRecipeNameAsync(Guid parentResourceUid, Guid recipeUid, string name);
     }

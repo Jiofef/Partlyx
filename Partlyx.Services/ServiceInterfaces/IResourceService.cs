@@ -15,5 +15,6 @@ namespace Partlyx.Services.ServiceInterfaces
         Task<List<ResourceDto>> GetAllTheResourcesAsync();
         Task<List<Guid>> SearchResourcesUidsAsync(string query);
         Task<int> GetResourcesCountAsync();
+        Task SetResourceIconAsync(Guid resourceUid, IconDto iconDto);
     }
 }

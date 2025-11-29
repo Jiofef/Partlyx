@@ -11,6 +11,9 @@ namespace Partlyx.Services.ServiceImplementations
         private readonly IEventBus _bus;
         private readonly IImagesRepository _repo;
         private IDisposable _partlyxDbInitializeSubscription;
+        private IDisposable _fileClosedSubscription;
+
+        public bool IsImagesLoaded { get; private set; } = false;
 
         public ImagesLoaderInitializeService(IEventBus bus, IImagesRepository repo)
         {
@@ -18,22 +21,26 @@ namespace Partlyx.Services.ServiceImplementations
             _repo = repo;
 
             _partlyxDbInitializeSubscription = _bus.SubscribeAsync<PartlyxDBInitializedEvent>(OnDBInitialized);
+            _fileClosedSubscription = _bus.Subscribe<FileClosedEvent>(_ => IsImagesLoaded = false);
         }
 
         private async Task OnDBInitialized(PartlyxDBInitializedEvent ev)
         {
-            _bus.Publish(new ImagesDBInitializationStartedEvent());
+            await _bus.PublishAsync(new ImagesDBInitializationStartedEvent());
             var images = await _repo.GetAllTheImagesAsync(true, false);
 
             var dtos = images.Select(x => x.ToDto()).ToArray();
-            _bus.Publish(new ImagesBulkLoadedEvent(dtos));
+            await _bus.PublishAsync(new ImagesBulkLoadedEvent(dtos));
 
-            _bus.Publish(new ImagesDBInitializationFinishedEvent());
+            await _bus.PublishAsync(new ImagesDBInitializationFinishedEvent());
+
+            IsImagesLoaded = true;
         }
 
         public void Dispose()
         {
             _partlyxDbInitializeSubscription.Dispose();
+            _fileClosedSubscription.Dispose();
         }
     }
 }

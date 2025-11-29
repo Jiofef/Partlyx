@@ -61,6 +61,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на About us.
+        /// </summary>
+        public static string About_Us {
+            get {
+                return ResourceManager.GetString("About_Us", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на An error occured during loading an image Image wasnt loaded.
         /// </summary>
         public static string An_error_occured_during_loading_an_image_Image_wasnt_loaded {
@@ -102,6 +111,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Apply {
             get {
                 return ResourceManager.GetString("Apply", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Built in icons.
+        /// </summary>
+        public static string BuiltIn_Icons {
+            get {
+                return ResourceManager.GetString("BuiltIn_Icons", resourceCulture);
             }
         }
         
@@ -313,6 +331,132 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Help.
+        /// </summary>
+        public static string Help {
+            get {
+                return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Help.
+        /// </summary>
+        public static string help_Help {
+            get {
+                return ResourceManager.GetString("help_Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на How to use Partlyx.
+        /// </summary>
+        public static string help_HowToUsePartlyx {
+            get {
+                return ResourceManager.GetString("help_HowToUsePartlyx", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Parts tree.
+        /// </summary>
+        public static string help_Parts_tree {
+            get {
+                return ResourceManager.GetString("help_Parts_tree", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Some Quality Of Life features.
+        /// </summary>
+        public static string help_Some_QOL_Features {
+            get {
+                return ResourceManager.GetString("help_Some_QOL_Features", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на How to use Partlyx text.
+        /// </summary>
+        public static string help_text_HowToUsePartlyx {
+            get {
+                return ResourceManager.GetString("help_text_HowToUsePartlyx", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Parts tree text.
+        /// </summary>
+        public static string help_text_Parts_tree {
+            get {
+                return ResourceManager.GetString("help_text_Parts_tree", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Some QOL features text.
+        /// </summary>
+        public static string help_text_Some_QOL_Features {
+            get {
+                return ResourceManager.GetString("help_text_Some_QOL_Features", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на What is Partlyx text.
+        /// </summary>
+        public static string help_text_What_is_Partlyx {
+            get {
+                return ResourceManager.GetString("help_text_What_is_Partlyx", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на What is Partlyx.
+        /// </summary>
+        public static string help_What_is_Partlyx {
+            get {
+                return ResourceManager.GetString("help_What_is_Partlyx", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Icon.
+        /// </summary>
+        public static string Icon {
+            get {
+                return ResourceManager.GetString("Icon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Icon color.
+        /// </summary>
+        public static string Icon_Color {
+            get {
+                return ResourceManager.GetString("Icon_Color", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Icons.
+        /// </summary>
+        public static string Icons {
+            get {
+                return ResourceManager.GetString("Icons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на About us text.
+        /// </summary>
+        public static string info_text_About_Us {
+            get {
+                return ResourceManager.GetString("info_text_About_Us", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Invalid file error.
         /// </summary>
         public static string Invalid_file_error {
@@ -466,6 +610,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Project.
+        /// </summary>
+        public static string Project {
+            get {
+                return ResourceManager.GetString("Project", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Properties.
         /// </summary>
         public static string Properties {
@@ -601,6 +754,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Selected icon.
+        /// </summary>
+        public static string Selected_Icon {
+            get {
+                return ResourceManager.GetString("Selected_Icon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Selected recipe.
         /// </summary>
         public static string Selected_recipe {
@@ -633,6 +795,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string settings_General {
             get {
                 return ResourceManager.GetString("settings_General", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Show all built in icons.
+        /// </summary>
+        public static string Show_all_built_in_icons {
+            get {
+                return ResourceManager.GetString("Show_all_built_in_icons", resourceCulture);
             }
         }
         
@@ -678,6 +849,24 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Undo {
             get {
                 return ResourceManager.GetString("Undo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на User icons.
+        /// </summary>
+        public static string User_Icons {
+            get {
+                return ResourceManager.GetString("User_Icons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на View help.
+        /// </summary>
+        public static string View_Help {
+            get {
+                return ResourceManager.GetString("View_Help", resourceCulture);
             }
         }
         

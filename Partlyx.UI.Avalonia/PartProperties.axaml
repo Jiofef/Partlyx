@@ -60,7 +60,21 @@
                     <TextBlock Text="{Binding DisplayableName}" Grid.Column="0" VerticalAlignment="Center" Classes="common" Margin="4"/>
                     <TextBlock Text="{Binding Part.Name, Mode=OneWay}" Grid.Column="1" VerticalAlignment="Center" Classes="common" Background="{StaticResource PxWhiteBrush}" Margin="4"/>
 
-                    <Button Content="Select" Classes="darker-focus" Command="{Binding SelectButtonPressedCommand}" Grid.Column="2"/>
+                    <Button Content="{h:Loc Select}" Classes="darker-focus" Command="{Binding SelectButtonPressedCommand}" Grid.Column="2"/>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="vmprop:IconItemPropertyViewModel">
+            <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
+                <i:Interaction.Behaviors>
+					<localdnd:PartlyxContextDropBehavior DropHandler="{Binding DropHandler}"/>
+                </i:Interaction.Behaviors>
+                <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBlock Text="{Binding DisplayableName}" Grid.Column="0" VerticalAlignment="Center" Classes="common" Margin="4"/>
+                    <local:IconControl Grid.Column="1" IconContent="{Binding Icon}" Width="24" Height="24" HorizontalAlignment="Left"/>
+                    <Button Content="{h:Loc Select}" Classes="darker-focus" Command="{Binding SelectButtonPressedCommand}" Grid.Column="2"/>
                 </Grid>
             </Grid>
         </DataTemplate>

@@ -80,10 +80,6 @@ namespace Partlyx.Core.Partlyx
         // Icon features
         public IconTypeEnum IconType { get; private set; }
         public string IconData { get; private set; } = "{}";
-        public void SetIcon(IIcon icon, IconInfo info)
-        {
-            UpdateIconInfo(info);
-        }
         public void UpdateIconInfo(IconInfo info)
         {
             IconType = info.Type;

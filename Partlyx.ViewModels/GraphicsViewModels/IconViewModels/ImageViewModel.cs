@@ -10,7 +10,7 @@ using Partlyx.ViewModels.UIStates;
 
 namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
 {
-    public class ImageViewModel : UpdatableViewModel<ImageDto>, IDisposable
+    public class ImageViewModel : UpdatableViewModel<ImageDto>, IIconContentViewModel, IDisposable
     {
         private readonly ImageUiItemStateFactoryViewModel _stateFactoryViewModel;
         private IDisposable _imageUpdatedSubscription;
@@ -87,7 +87,11 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
         public void Dispose()
         {
             _imageUpdatedSubscription?.Dispose();
+
+            Compressed = Original = null;
         }
+
+        public IconTypeEnumViewModel ContentIconType => IconTypeEnumViewModel.Image;
 
         // For UI
         public ImageUiItemStateViewModel UiItem => _stateFactoryViewModel.GetOrCreateItemUi(this);

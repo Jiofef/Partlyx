@@ -160,4 +160,26 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
             });
         }
     }
+
+    public class SetResourceIconCommand : SetValueUndoableCommand<IconDto>
+    {
+        private SetResourceIconCommand(IconDto newValue, IconDto savedValue, Func<IconDto, Task> setter)
+            : base(newValue, savedValue, setter!) { }
+
+        public static async Task<SetResourceIconCommand?> CreateAsync(IServiceProvider serviceProvider, Guid resourceUid, IconDto icon)
+        {
+            var resourceService = serviceProvider.GetRequiredService<IResourceService>();
+
+            var res = await resourceService.GetResourceAsync(resourceUid);
+            if (res == null)
+                throw new ArgumentNullException("Resource doesn't exist with Uid: " + resourceUid);
+
+            IconDto previousName = res.Icon;
+
+            return new SetResourceIconCommand(icon, previousName, async (icon) =>
+            {
+                await resourceService.SetResourceIconAsync(resourceUid, icon);
+            });
+        }
+    }
 }

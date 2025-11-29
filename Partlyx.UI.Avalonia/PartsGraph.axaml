@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:vmoi="using:Partlyx.ViewModels.GraphicsViewModels.IconViewModels"
              mc:Ignorable="d"
              x:Class="Partlyx.UI.Avalonia.PartsGraph"
              xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
@@ -17,6 +18,13 @@
              x:CompileBindings="false"
              d:DesignHeight="500"
              d:DesignWidth="500">
+
+    <UserControl.DataTemplates>
+		<!-- Override image icon template -->
+        <DataTemplate DataType="vmoi:ImageViewModel"> 
+            <Image Source="{Binding ToDraw, Converter={StaticResource ByteArrayToBitmapConv}}"/>
+        </DataTemplate>
+    </UserControl.DataTemplates>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -69,8 +77,9 @@
                                 <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
                                         Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}"
                             BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2" VerticalContentAlignment="Stretch">
-                                    <Grid VerticalAlignment="Stretch">
-                                        <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
+                                    <Grid VerticalAlignment="Stretch" RowDefinitions="*,Auto">
+                                        <local:IconControl Grid.Row="0" IconContent="{Binding Value.Icon}"/>
+                                        <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
                                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.ColumnText}"/>
                                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.SecondaryColumnText}"/>
                                         </StackPanel>
@@ -89,8 +98,9 @@
                                 BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2"
                                     Command="{Binding Value.UiNode.SetNextSelectedRecipeCommand }" VerticalContentAlignment="Stretch"
                                     Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}">
-                                    <Grid VerticalAlignment="Stretch">
-                                        <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
+                                    <Grid VerticalAlignment="Stretch" RowDefinitions="*,Auto">
+                                        <local:IconControl Grid.Row="0" IconContent="{Binding Value.Icon}"/>
+                                        <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
                                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.BottomColumnText}"/>
                                             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ColumnText}"/>
                                         </StackPanel>
@@ -143,8 +153,9 @@
                                 Margin="8, 0, 8, 0"
                                 BorderBrush="{StaticResource PxBlue1Brush}" BorderThickness="4"
                                 VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                                        <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
+                                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" RowDefinitions="*,Auto">
+                                        <local:IconControl Grid.Row="0" IconContent="{Binding ComponentsResource.Icon}"/>
+                                        <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
                                             <TextBlock HorizontalAlignment="Center" Text="{Binding ColumnText}"/>
                                             <TextBlock HorizontalAlignment="Center" Text="{Binding BottomColumnText}"/>
                                         </StackPanel>

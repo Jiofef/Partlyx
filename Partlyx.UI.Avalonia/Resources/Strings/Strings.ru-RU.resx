@@ -330,4 +330,56 @@
   <data name="filter_Image_files" xml:space="preserve">
     <value>Изображения (*.png;*.jpg;*.jpeg;*.webp)|*.png;*.jpg;*.jpeg;*.webp</value>
   </data>
+  <data name="Icon" xml:space="preserve">
+    <value>Иконка</value>
+  </data>
+  <data name="Selected_Icon" xml:space="preserve">
+    <value>Выбранная иконка</value>
+  </data>
+  <data name="Icon_Color" xml:space="preserve">
+    <value>Цвет иконки</value>
+  </data>
+  <data name="BuiltIn_Icons" xml:space="preserve">
+    <value>Встроенные иконки</value>
+  </data>
+  <data name="User_Icons" xml:space="preserve">
+    <value>Пользовательские иконки</value>
+  </data>
+  <data name="Icons" xml:space="preserve">
+    <value>Иконки</value>
+  </data>
+  <data name="Show_all_built_in_icons" xml:space="preserve">
+    <value>Показать все встроенные иконки</value>
+  </data>
+  <data name="Project" xml:space="preserve">
+    <value>Проект</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Справка</value>
+  </data>
+  <data name="View_Help" xml:space="preserve">
+    <value>Посмотреть справку</value>
+  </data>
+  <data name="About_Us" xml:space="preserve">
+    <value>О нас</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="info_text_About_Us" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="help_HowToUsePartlyx" xml:space="preserve">
+    <value>Как использовать Partlyx</value>
+  </data>
+  <data name="help_What_is_Partlyx" xml:space="preserve">
+    <value>Что такое Partlyx</value>
+  </data>
+  <data name="help_Some_QOL_Features" xml:space="preserve">
+    <value>Некоторые фичи для удобства</value>
+  </data>
+  <data name="help_Parts_tree" xml:space="preserve">
+    <value>Дерево элементов</value>
+  </data>
+  <data name="help_Help" xml:space="preserve">
+    <value>Справка</value>
+  </data>
 </root>

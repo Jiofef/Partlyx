@@ -9,23 +9,24 @@ namespace Partlyx.UI.Avalonia.Converters
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (null == value)
+            if (value is System.Drawing.Color)
             {
-                return null;
+                var color = (System.Drawing.Color)value;
+                var avaloniaColor = new Color(color.A, color.R, color.G, color.B);
+                return new SolidColorBrush(avaloniaColor);
             }
-            if (value is Color)
-            {
-                Color color = (Color)value;
-                return new SolidColorBrush(color);
-            }
-
-            Type type = value.GetType();
-            throw new InvalidOperationException("Unsupported type [" + type.Name + "]");
+            return default!;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            throw new NotImplementedException();
+            if (value is SolidColorBrush brush)
+            {
+                var avaloniaColor = brush.Color;
+                var systemColor = System.Drawing.Color.FromArgb(avaloniaColor.A, avaloniaColor.R, avaloniaColor.G, avaloniaColor.B);
+                return systemColor;
+            }
+            return default!;
         }
     }
 }

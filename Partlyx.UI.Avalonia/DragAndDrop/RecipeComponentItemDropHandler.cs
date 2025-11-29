@@ -1,5 +1,6 @@
 ﻿using Avalonia.Input;
 using Avalonia.Xaml.Interactions.DragAndDrop;
+using Partlyx.UI.Avalonia.DragAndDrop;
 
 namespace Partlyx.UI.Avalonia.DragAndDrop
 {

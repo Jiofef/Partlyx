@@ -330,4 +330,56 @@
   <data name="filter_Image_files" xml:space="preserve">
     <value>Images (*.png;*.jpg;*.jpeg;*.webp)|*.png;*.jpg;*.jpeg;*.webp</value>
   </data>
+  <data name="Icon" xml:space="preserve">
+    <value>Icon</value>
+  </data>
+  <data name="Selected_Icon" xml:space="preserve">
+    <value>Selected icon</value>
+  </data>
+  <data name="Icon_Color" xml:space="preserve">
+    <value>Icon color</value>
+  </data>
+  <data name="BuiltIn_Icons" xml:space="preserve">
+    <value>Built in icons</value>
+  </data>
+  <data name="User_Icons" xml:space="preserve">
+    <value>User icons</value>
+  </data>
+  <data name="Icons" xml:space="preserve">
+    <value>Icons</value>
+  </data>
+  <data name="Show_all_built_in_icons" xml:space="preserve">
+    <value>Show all built in icons</value>
+  </data>
+  <data name="Project" xml:space="preserve">
+    <value>Project</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="View_Help" xml:space="preserve">
+    <value>View help</value>
+  </data>
+  <data name="About_Us" xml:space="preserve">
+    <value>About us</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="info_text_About_Us" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="help_HowToUsePartlyx" xml:space="preserve">
+    <value>How to use Partlyx</value>
+  </data>
+  <data name="help_What_is_Partlyx" xml:space="preserve">
+    <value>What is Partlyx</value>
+  </data>
+  <data name="help_Some_QOL_Features" xml:space="preserve">
+    <value>Some Quality Of Life features</value>
+  </data>
+  <data name="help_Parts_tree" xml:space="preserve">
+    <value>Parts tree</value>
+  </data>
+  <data name="help_Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
 </root>

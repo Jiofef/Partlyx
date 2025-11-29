@@ -3,6 +3,7 @@ using Partlyx.Core.Partlyx;
 using Partlyx.Core.VisualsInfo;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
+using Partlyx.Services.CoreExtensions;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
@@ -30,7 +31,7 @@ namespace Partlyx.Services.ServiceImplementations
 
             var icon = new FigureIcon();
             var iconInfo = _infoProvider.GetInfo(icon);
-            resource.SetIcon(icon, iconInfo);
+            resource.UpdateIconInfo(iconInfo);
             
             var Uid = await _repo.AddResourceAsync(resource);
 
@@ -114,6 +115,20 @@ namespace Partlyx.Services.ServiceImplementations
             var resource = await GetResourceAsync(resourceUid);
             if (resource != null)
                 _eventBus.Publish(new ResourceUpdatedEvent(resource, new[]{"Name"}));
+        }
+
+        public async Task SetResourceIconAsync(Guid resourceUid, IconDto iconDto)
+        {
+            var iconInfo = iconDto.ToIconInfo();
+            await _repo.ExecuteOnResourceAsync(resourceUid, resource =>
+            {
+                resource.UpdateIconInfo(iconInfo);
+                return Task.CompletedTask;
+            });
+
+            var resource = await GetResourceAsync(resourceUid);
+            if (resource != null)
+                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[] { "Icon" }));
         }
 
         public async Task<int> GetResourcesCountAsync()

@@ -5,6 +5,7 @@ using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
 using Partlyx.Services.ServiceInterfaces;
+using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -84,5 +85,18 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
         public async Task SetDefaultRecipe(ResourceViewModel resource, RecipeViewModel recipe) =>
             await _commands.CreateAsyncEndExcecuteAsync<SetDefaultRecipeToResourceCommand>(resource.Uid, recipe.Uid);
+
+        [RelayCommand]
+        public async Task SetIcon(PartSetValueInfo<ResourceViewModel, IconViewModel> info)
+        {
+            if (info == null || info.Part == null || info.Value == null) return;
+
+            var targetResource = info.Part;
+            var valueIcon = info.Value;
+
+            await SetIcon(targetResource, valueIcon);
+        }
+        public async Task SetIcon(ResourceViewModel resource, IconViewModel icon) =>
+            await _commands.CreateAsyncEndExcecuteAsync<SetResourceIconCommand>(resource.Uid, icon.ToDto());
     }
 }

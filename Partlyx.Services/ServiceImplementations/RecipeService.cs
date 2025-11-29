@@ -1,6 +1,7 @@
 ﻿using Partlyx.Core.Partlyx;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
+using Partlyx.Services.CoreExtensions;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
@@ -188,6 +189,20 @@ namespace Partlyx.Services.ServiceImplementations
             var recipe = await GetRecipeAsync(parentResourceUid, recipeUid);
             if (recipe != null)
                 _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "CraftAmount" }));
+        }
+
+        public async Task SetRecipeIconAsync(Guid resourceUid, Guid recipeUid, IconDto iconDto)
+        {
+            var iconInfo = iconDto.ToIconInfo();
+            await _repo.ExecuteOnRecipeAsync(resourceUid, recipeUid, recipe =>
+            {
+                recipe.UpdateIconInfo(iconInfo);
+                return Task.CompletedTask;
+            });
+
+            var recipe = await GetRecipeAsync(resourceUid, recipeUid);
+            if (recipe != null)
+                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "Icon" }));
         }
     }
 }

@@ -1,4 +1,7 @@
 ﻿namespace Partlyx.Services.ServiceInterfaces
 {
-    public interface IImagesLoaderInitializeService { }
+    public interface IImagesLoaderInitializeService
+    {
+        bool IsImagesLoaded { get; }
+    }
 }

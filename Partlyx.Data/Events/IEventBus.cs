@@ -1,4 +1,5 @@
-﻿namespace Partlyx.Infrastructure.Events
+﻿
+namespace Partlyx.Infrastructure.Events
 {
     public interface IEventBus
     {
@@ -9,5 +10,9 @@
 
         void Publish<TEvent>(TEvent @event);
         Task PublishAsync<TEvent>(TEvent @event);
+        Task<TEvent> WaitUntil<TEvent>(CancellationToken cancellationToken = default);
+        Task<TEvent> WaitUntil<TEvent>(TimeSpan timeout, CancellationToken cancellationToken = default);
+        Task<TEvent> WaitUntil<TEvent>(Func<TEvent, bool> predicate, CancellationToken cancellationToken = default);
+        Task<TEvent> WaitUntil<TEvent>(Func<TEvent, bool> predicate, TimeSpan timeout, CancellationToken cancellationToken = default);
     }
 }

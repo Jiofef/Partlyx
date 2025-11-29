@@ -55,7 +55,7 @@ namespace Partlyx.Services.Dtos
                     return new FigureIconDto(figureIcon.Color, figureIcon.FigureType);
                 case IconTypeEnum.Image:
                     var imageIcon = (ImageIcon)ii.GetIcon();
-                    return new ImageIconDto(imageIcon.Uid, imageIcon.Name);
+                    return new ImageIconDto(imageIcon.Uid);
                 default:
                     return new NullIconDto();
             }

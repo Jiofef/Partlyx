@@ -190,6 +190,7 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<IRecipeComponentItemUiStateService, RecipeComponentItemUiStateService>();
             services.AddTransient<IResourceSearchService, ResourceSearchService>();
 
+            services.AddTransient<IconServiceViewModel>();
             services.AddTransient<ImageViewModel>();
             services.AddTransient<ImageUiItemStateViewModel>();
             services.AddSingleton<IImagesStoreViewModel, ImagesStoreViewModel>();
@@ -201,6 +202,7 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<IVMFileService, VMFileService>();
             services.AddTransient<INotificationService, AvaloniaNotificationService>();
             services.AddTransient<IDialogService, DialogService>();
+            services.AddSingleton<IIconVectorCatalog, MaterialAvaloniaVectorIconCatalog>();
 
             services.AddSingleton<IDispatcherInvoker, AvaloniaDispatcherInvoker>(sp => new AvaloniaDispatcherInvoker());
 
@@ -243,6 +245,10 @@ namespace Partlyx.UI.Avalonia
 
             var sdbp = Services.GetRequiredService<ISettingsDBProvider>();
             await sdbp.InitializeAsync();
+        }
+
+        private void MaterialIcon_ActualThemeVariantChanged(object? sender, EventArgs e)
+        {
         }
     }
 }

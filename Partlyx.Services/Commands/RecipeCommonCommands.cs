@@ -219,4 +219,23 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
             });
         }
     }
+
+    public class SetRecipeIconCommand : SetValueUndoableCommand<IconDto>
+    {
+        private SetRecipeIconCommand(IconDto icon, IconDto savedValue, Func<IconDto, Task> setter)
+            : base(icon, savedValue, setter!) { }
+
+        public static async Task<SetRecipeIconCommand?> CreateAsync(IServiceProvider serviceProvider, Guid parentResourceUid, Guid recipeUid, IconDto icon)
+        {
+            var recipeService = serviceProvider.GetRequiredService<IRecipeService>();
+            var recipe = await recipeService.GetRecipeAsync(parentResourceUid, recipeUid);
+            if (recipe == null)
+                throw new ArgumentException("Recipe not found with Uid: " + recipeUid);
+
+            return new SetRecipeIconCommand(icon, recipe.Icon, async (value) =>
+            {
+                await recipeService.SetRecipeIconAsync(parentResourceUid, recipeUid, value);
+            });
+        }
+    }
 }

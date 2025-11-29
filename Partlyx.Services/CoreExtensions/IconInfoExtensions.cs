@@ -1,5 +1,5 @@
 ﻿using Partlyx.Core.VisualsInfo;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Partlyx.Services.CoreExtensions
 {
@@ -15,10 +15,10 @@ namespace Partlyx.Services.CoreExtensions
             switch (info.Type)
             {
                 case IconTypeEnum.Image:
-                    result = JsonSerializer.Deserialize<ImageIcon>(info.Data);
+                    result = JsonConvert.DeserializeObject<ImageIcon>(info.Data);
                     break;
                 case IconTypeEnum.Figure:
-                    result = JsonSerializer.Deserialize<FigureIcon>(info.Data);
+                    result = JsonConvert.DeserializeObject<FigureIcon>(info.Data);
                     break;
             }
 

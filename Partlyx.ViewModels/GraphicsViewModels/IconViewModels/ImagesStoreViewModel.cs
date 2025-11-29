@@ -9,9 +9,8 @@ using System.Reactive.Disposables;
 
 namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
 {
-    public partial class ImagesStoreViewModel : ObservableObject, IImagesStoreViewModel, IDisposable
+    public partial class ImagesStoreViewModel : PartlyxObservable, IImagesStoreViewModel
     {
-        private readonly CompositeDisposable _disposables = new();
         public ObservableCollection<ImageViewModel> Images { get; } = new();
 
         private readonly Dictionary<Guid, ImageViewModel> _imagesDic = new();
@@ -27,10 +26,10 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
             ImagesDic = new(_imagesDic);
 
             var imageLoadedSubscription = bus.SubscribeAsync<ImageAddedToDbEvent>(OnImageAdded);
-            _disposables.Add(imageLoadedSubscription);
+            Disposables.Add(imageLoadedSubscription);
 
             var imageRemovedSubscription = bus.SubscribeAsync<ImageDeletedFromDbEvent>(OnImageRemoved);
-            _disposables.Add(imageRemovedSubscription);
+            Disposables.Add(imageRemovedSubscription);
 
             var fileClosedSubscription = bus.Subscribe<FileClosedUIEvent>((ev) => ClearStore(), true);
         }
@@ -84,11 +83,6 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
 
         public ImageViewModel? GetImageOrNull(Guid uid)
             => ImagesDic.GetValueOrDefault(uid);
-        
-        public void Dispose()
-        {
-            _disposables?.Dispose();
-        }
 
         // Original image loading section
         private const int MAX_CACHED_FULL_IMAGES_DEFAULT_AMOUNT = 96;

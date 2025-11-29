@@ -6,7 +6,7 @@
              xmlns:local="using:Partlyx.UI.Avalonia"
              xmlns:localo="using:Partlyx.UI.Avalonia.OtherControls"
              xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
-             xmlns:vmoi="using:Partlyx.ViewModels.GraphicsViewModels.IconViewModels"
+             xmlns:vmgi="using:Partlyx.ViewModels.GraphicsViewModels.IconViewModels"
              xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels.Implementations"
              xmlns:vms="using:Partlyx.ViewModels.Settings"
              xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
@@ -21,6 +21,8 @@
              xmlns:conv="using:Partlyx.UI.Avalonia.Converters"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:graphvm="using:Partlyx.ViewModels.Graph"
+             xmlns:md="using:Material.Avalonia"
+             xmlns:mdc="using:Material.Controls"
              xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia">
     <Application.Resources>
         <ResourceDictionary>
@@ -36,6 +38,8 @@
 
     <Application.Styles>
         <FluentTheme/>
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+
         <!--External themes-->
          <themes:MaterialTheme BaseTheme="Light" PrimaryColor="LightBlue" SecondaryColor="Blue" />
          <mdi:MaterialIconStyles/>
@@ -84,18 +88,21 @@
             <dialogs:PartsSelectionWindow/>
         </DataTemplate>
 
-        <!--Icon drawing templates (Not finished yet)
-        <DataTemplate DataType="vmoi:IconViewModel">
-            <Image Source="{Binding}" Stretch="Uniform" Width="24" Height="24"/>
+        <!-- Icon templates -->
+        <DataTemplate DataType="vmgi:IconNullContentViewModel">
         </DataTemplate>
 
-        <DataTemplate DataType="vmoi:IconFigureItem">
-            <Image Width="24" Height="24" Stretch="Uniform">
-                <Image.Source>
-                    <DrawingImage Drawing="{Binding}" />
-                </Image.Source>
-            </Image>
+        <DataTemplate DataType="vmgi:IconVectorContentViewModel">
+            <Viewbox>
+			    <mdi:MaterialIcon Classes="common"
+                    Kind="{Binding FigureType, Converter={StaticResource StringToMaterialIconKindConv}}" 
+                    Foreground="{Binding FigureColor, Converter={StaticResource ColorToBrushConv}}"/>
+            </Viewbox>
         </DataTemplate>
-        -->
+        <DataTemplate DataType="vmgi:ImageViewModel"> 
+        <!-- Image icon template uses compressed texture by default.
+        You can override this datatemplate in some context if you want to use the full texture -->
+            <Image Source="{Binding Compressed, Converter={StaticResource ByteArrayToBitmapConv}}"/>
+        </DataTemplate>
     </Application.DataTemplates>
 </Application>

@@ -4,13 +4,14 @@ using Avalonia.Threading;
 using Avalonia.Xaml.Interactivity;
 using System;
 using Avalonia.Input;
+using System.Reactive.Linq;
 
 namespace Partlyx.UI.Avalonia.Behaviors
 {
     public class TextBoxFocusAndSelectBehavior : Behavior<TextBox>
     {
         public static readonly StyledProperty<bool> IsActiveProperty =
-            AvaloniaProperty.Register<TextBoxFocusAndSelectBehavior, bool>(nameof(IsActive));
+            AvaloniaProperty.Register<TextBoxFocusAndSelectBehavior, bool>(nameof(IsActive), defaultValue: false);
 
         /// <summary>
         /// If true, Focus() + selectAll() will be called when switching to true.
@@ -33,8 +34,10 @@ namespace Partlyx.UI.Avalonia.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
-            // We monitor the change of the IsActive property inside the behavior
-            this.GetObservable(IsActiveProperty).Subscribe(OnIsActiveChanged);
+
+            this.GetObservable(IsActiveProperty)
+                .Skip(1)
+                .Subscribe(OnIsActiveChanged);
 
             if (IsActive)
                 PostFocusSelect();

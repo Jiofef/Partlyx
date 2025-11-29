@@ -1,5 +1,6 @@
 ﻿using Partlyx.Core.VisualsInfo;
-using System.Text.Json;
+using Partlyx.Services.Dtos;
+using Newtonsoft.Json;
 
 namespace Partlyx.Services.CoreExtensions
 {
@@ -15,9 +16,26 @@ namespace Partlyx.Services.CoreExtensions
             else
                 throw new NotSupportedException();
 
-            string data = JsonSerializer.Serialize(icon);
+            string data = JsonConvert.SerializeObject(icon);
 
             return new IconInfo(type, data);
+        }
+
+
+        public static IconInfo ToIconInfo(this IconDto dto)
+        {
+            if (dto is FigureIconDto fidto)
+            {
+                var icon = new FigureIcon(fidto.Color, fidto.FigureType);
+                return icon.GetInfo();
+            }
+            else if (dto is ImageIconDto iidto)
+            {
+                var icon = new ImageIcon(iidto.ImageUid);
+                return icon.GetInfo();
+            }
+            else
+                return new NullIcon().GetInfo();
         }
     }
 }

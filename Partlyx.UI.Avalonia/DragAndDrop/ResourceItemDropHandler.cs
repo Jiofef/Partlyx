@@ -1,11 +1,6 @@
 ﻿using Avalonia.Input;
 using Avalonia.Xaml.Interactions.DragAndDrop;
-using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Partlyx.UI.Avalonia.DragAndDrop

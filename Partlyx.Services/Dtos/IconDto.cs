@@ -5,7 +5,7 @@ namespace Partlyx.Services.Dtos
 
     public record NullIconDto() : IconDto;
 
-    public record ImageIconDto(Guid ImageUid, string ImageName) : IconDto;
+    public record ImageIconDto(Guid ImageUid) : IconDto;
 
     public record FigureIconDto(Color Color, string FigureType) : IconDto;
 }

@@ -25,6 +25,7 @@
         <KeyBinding Gesture="CTRL+Z" Command="{Binding MenuPanel.EditMenu.UndoCommand}"/>
         <KeyBinding Gesture="CTRL+SHIFT+Z" Command="{Binding MenuPanel.EditMenu.RedoCommand}"/>
         <KeyBinding Gesture="CTRL+Y" Command="{Binding MenuPanel.EditMenu.RedoCommand}"/>
+        <KeyBinding Gesture="F1" Command="{Binding MenuPanel.HelpMenu.OpenHelp}"/>
     </Window.KeyBindings>
 
     <Grid>
@@ -58,7 +59,7 @@
 						<MenuItem Header="{h:Loc Icons}" Command="{Binding OpenIconsCommand}"/>
                     </MenuItem>
                     <MenuItem Header="{h:Loc Help}" Height="32" DataContext="{Binding HelpMenu}">
-						<MenuItem Header="{h:Loc View_Help}" Command="{Binding OpenHelpCommand}"/>
+						<MenuItem Header="{h:Loc View_Help}" Command="{Binding OpenHelpCommand}" InputGesture="F1"/>
                         <MenuItem Header="{h:Loc About_Us}" Command="{Binding OpenAboutUsCommand}"/>
                     </MenuItem>
                 </Menu>

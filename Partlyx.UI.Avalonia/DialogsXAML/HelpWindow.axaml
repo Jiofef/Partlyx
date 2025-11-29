@@ -20,15 +20,15 @@
              x:DataType="vmo:HelpWindowViewModel">
     <UserControl.DataTemplates>
 		<TreeDataTemplate x:DataType="vminf:InfoSectionsGroupViewModel" ItemsSource="{Binding SectionsAndGroups}">
-			<Grid>
+			<Grid Height="32">
                 <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="16" RadiusY="16"/>
-			    <TextBlock Text="{h:Loc Key = {Binding Name}}" Classes="common"/>
+			    <TextBlock Text="{h:Loc Key = {Binding Name}}" Classes="common" Margin="4" VerticalAlignment="Center"/>
             </Grid>
         </TreeDataTemplate>
         <TreeDataTemplate x:DataType="vminf:InfoSectionViewModel">
-            <Grid>
+            <Grid Height="32">
                 <Rectangle Fill="{StaticResource PxWhiteBrush}" RadiusX="16" RadiusY="16"/>
-			    <TextBlock Text="{h:Loc Key = {Binding Key}}" Classes="common"/>
+			    <TextBlock Text="{h:Loc Key = {Binding Key}}" Classes="common" Margin="4" VerticalAlignment="Center"/>
             </Grid>
         </TreeDataTemplate>
     </UserControl.DataTemplates>

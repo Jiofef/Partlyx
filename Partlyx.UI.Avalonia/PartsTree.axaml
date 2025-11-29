@@ -6,7 +6,7 @@
              xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels.Implementations"
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
-             xmlns:dnd="using:Avalonia.Xaml.Interactions.DragAndDrop"
+             xmlns:dnd="using:Partlyx.UI.Avalonia.DragAndDrop"
              x:Class="Partlyx.UI.Avalonia.PartsTree"
              xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
              xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
@@ -45,7 +45,7 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Margin="4"/>
+                    <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 8, 2"/>
                     <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent">
                         <i:Interaction.Behaviors>
                             <ia:EventTriggerBehavior EventName="DoubleTapped">
@@ -116,7 +116,7 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                    <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 8, 2"/>
                     <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent">
                         <i:Interaction.Behaviors>
                             <ia:EventTriggerBehavior EventName="DoubleTapped">
@@ -201,7 +201,7 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Ellipse Grid.Column="0" Fill="{StaticResource PxBlue0Brush}" Width="24" Height="24" Margin="4"/>
+                        <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 8, 2"/>
                         <TextBlock Text="{Binding LinkedResource.Value.Name}" Grid.Column="1" VerticalAlignment="Center" Classes="common"/>
 
                     <ToggleButton Grid.Column="2" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"

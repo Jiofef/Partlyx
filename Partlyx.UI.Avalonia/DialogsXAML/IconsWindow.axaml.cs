@@ -18,4 +18,8 @@ public partial class IconsWindow : UserControl
     private void Image_ActualThemeVariantChanged(object? sender, System.EventArgs e)
     {
     }
+
+    private void MaterialIcon_ActualThemeVariantChanged(object? sender, System.EventArgs e)
+    {
+    }
 }
