@@ -2,6 +2,7 @@
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using System.Runtime.CompilerServices;
 
 namespace Partlyx.ViewModels.UIServices.Implementations
 {
@@ -68,6 +69,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             var singleSelected = selectedPartsList.Single();
             singleSelected.UiItem.ToggleGlobalFocus();
+        }
+
+        [RelayCommand]
+        public async Task RemoveAsync(IVMPart part)
+        {
+            if (part is ResourceViewModel resource)
+                await ResourceService.RemoveAsync(resource);
+            else if (part is RecipeViewModel recipe)
+                await RecipeService.RemoveAsync(recipe);
+            else if (part is RecipeComponentViewModel component)
+                await ComponentService.RemoveAsync(component);
         }
     }
 }

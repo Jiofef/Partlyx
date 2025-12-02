@@ -1,17 +1,21 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Partlyx.ViewModels.GraphicsViewModels;
 using System.Drawing;
+using System.Numerics;
 
 namespace Partlyx.ViewModels.UIServices
 {
-    public partial class PanAndZoomControllerViewModel : ObservableObject
+    public partial class PanAndZoomControllerViewModel : ObservableObject, IPositionObject
     {
-        private double _panPositionX, _panPositionY;
+        private float _panPositionX, _panPositionY;
 
-        public double PanPositionX { get => _panPositionX; set => SetProperty(ref _panPositionX, value); }
-        public double PanPositionY { get => _panPositionY; set => SetProperty(ref _panPositionY, value); }
+        /// <summary> Pan position X </summary>
+        public float X { get => _panPositionX; set => SetProperty(ref _panPositionX, value); }
+        /// <summary> Pan position Y </summary>
+        public float Y { get => _panPositionY; set => SetProperty(ref _panPositionY, value); }
 
-        private double _elementWidth;
-        public double ElementWidth
+        private float _elementWidth;
+        public float ElementWidth
         {
             get => _elementWidth;
             set 
@@ -20,8 +24,8 @@ namespace Partlyx.ViewModels.UIServices
             }
         }
 
-        private double _elementHeight;
-        public double ElementHeight
+        private float _elementHeight;
+        public float ElementHeight
         {
             get => _elementHeight;
             set
@@ -42,8 +46,8 @@ namespace Partlyx.ViewModels.UIServices
         public void CenterizePanPosition(Point where)
         {
             ZoomLevel = 1.0;
-            PanPositionX = -where.X + ElementWidth / 2;
-            PanPositionY = -where.Y + ElementHeight / 2;
+            X = -where.X + ElementWidth / 2;
+            Y = -where.Y + ElementHeight / 2;
         }
     }
 }

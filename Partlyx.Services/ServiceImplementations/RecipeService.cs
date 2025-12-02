@@ -51,6 +51,9 @@ namespace Partlyx.Services.ServiceImplementations
             return result;
         }
 
+        public async Task<bool> IsRecipeExists(Guid parentResourceUid, Guid recipeUid) 
+            => await GetRecipeAsync(parentResourceUid, recipeUid) != null;
+
         public async Task<Guid> DuplicateRecipeAsync(Guid parentResourceUid, Guid recipeUid)
         {
             var result = await _repo.ExecuteOnRecipeAsync(parentResourceUid, recipeUid, recipe =>

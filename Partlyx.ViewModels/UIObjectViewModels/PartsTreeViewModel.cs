@@ -1,15 +1,19 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
+using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIStates;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,9 +38,12 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public IGlobalFocusedPart FocusedPart { get; }
         public IResourceSearchService Search { get; }
         public PartsServiceViewModel Service { get; }
+        public PartsTreeViewContextMenuCommands ContextMenuCommands { get; }
 
         private IGlobalResourcesVMContainer _resourcesContainer { get; }
         public ObservableCollection<ResourceViewModel> Resources => _resourcesContainer.Resources;
+        public ObservableCollection<IVMPart> SelectedPartsCollection { get; } = new();
+        public PartsSelectionState SelectedPartsDetails { get; }
 
         public PartsTreeViewModel(IGlobalResourcesVMContainer grvmc, IGlobalSelectedParts sp, IGlobalFocusedPart fp, IEventBus bus, IVMPartsFactory vmpf,
                 IVMPartsStore vmps, IResourceSearchService rss, PartsServiceViewModel service)
@@ -56,6 +63,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _initializationFinishedSubscription = bus.Subscribe<PartsVMInitializationFinishedEvent>((ev) => UpdateList(), true);
             _fileClearedSubscription = bus.Subscribe<FileClearedEvent>((ev) => Resources.Clear(), true);
             _treeSearchQuerySubscription = bus.Subscribe<TreeSearchQueryEvent>(SearchQueryHandler);
+
+            SelectedPartsDetails = new PartsSelectionState(SelectedPartsCollection);
+            ContextMenuCommands = new PartsTreeViewContextMenuCommands(this);
         }
 
         private void AddFromDto(ResourceDto dto)
@@ -166,6 +176,183 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             CollapseAllTheResources();
 
             CollapseAllTheRecipes();
+        }
+
+        [RelayCommand]
+        public async Task CreateChildForSelected()
+        {
+            // If any recipe selected, we want to know what components user wants to create for them
+            ResourceViewModel[]? resourcesForComponentsCreate = null;
+            if (SelectedPartsCollection.Any(p => p is RecipeViewModel))
+            {
+                var selected = await Service.ComponentService.ShowComponentCreateMenuAsync();
+                if (selected != null)
+                    resourcesForComponentsCreate = selected.Resources.ToArray();
+            }
+
+            foreach (var part in SelectedPartsCollection)
+            {
+                if (part is ResourceViewModel resource)
+                {
+                    await Service.RecipeService.CreateRecipeAsync(resource);
+                }
+                else if (part is RecipeViewModel recipe && resourcesForComponentsCreate != null)
+                {
+                    await Service.ComponentService.CreateComponentsFromAsync(recipe, resourcesForComponentsCreate);
+                }
+            }
+        }
+    }
+
+    public partial class PartsTreeViewContextMenuCommands : ContextMenuCommands, IDisposable
+    {
+        private readonly PartsServiceViewModel _service;
+        private readonly ObservableCollection<IVMPart> _selected;
+
+        public PartsTreeViewModel PartsTree;
+
+        [ObservableProperty] private bool _allowCreateResource;
+        [ObservableProperty] private bool _allowCreateRecipe;
+        [ObservableProperty] private bool _allowCreateComponent;
+        [ObservableProperty] private bool _allowToggleFocus;
+        [ObservableProperty] private bool _allowExpandBranch;
+        [ObservableProperty] private bool _allowCollapseBranch;
+        [ObservableProperty] private bool _allowFindResourceInTree;
+        [ObservableProperty] private bool _allowFindRecipeInTree;
+        [ObservableProperty] private bool _allowFindComponentInTree;
+        [ObservableProperty] private bool _allowDelete;
+
+        public PartsTreeViewContextMenuCommands(PartsTreeViewModel partsTree)
+        {
+            PartsTree = partsTree;
+
+            _service = PartsTree.Service;
+            _selected = PartsTree.SelectedPartsCollection;
+            _details = PartsTree.SelectedPartsDetails;
+
+            _details.FlagsUpdated += UpdateAllowed;
+            UpdateAllowed();
+        }
+
+        public override void AllowAll()
+        {
+            AllowToggleFocus = AllowExpandBranch = AllowCollapseBranch = AllowFindResourceInTree = AllowFindRecipeInTree = AllowFindComponentInTree = AllowDelete = true;
+        }
+
+        private readonly PartsSelectionState _details;
+        public override void UpdateAllowed()
+        {
+            AllowDelete = _details.HasAnything;
+            AllowExpandBranch = AllowCollapseBranch = _details.HasAnything && !_details.HasOnlyComponents;
+
+            AllowCreateResource = !_details.HasAnything;
+            AllowCreateRecipe = _details.HasOnlyResources;
+            AllowCreateComponent = _details.HasOnlyRecipes;
+
+            bool singleSelect = _details.PartsCount == 1;
+            AllowToggleFocus = singleSelect;
+
+            AllowFindResourceInTree = (_details.HasOnlyResources || _details.HasOnlyComponents) && singleSelect;
+            AllowFindRecipeInTree = _details.HasOnlyRecipes && singleSelect;
+            AllowFindComponentInTree = _details.HasOnlyComponents && singleSelect;
+        }
+
+        new public void Dispose()
+        {
+            base.Dispose();
+
+            _details.FlagsUpdated -= UpdateAllowed;
+        }
+
+        [RelayCommand]
+        public async Task CreateResourceAsync() => await _service.ResourceService.CreateResourceAsync();
+        [RelayCommand]
+        public async Task CreateRecipeAsync()
+        {
+            foreach (var part in _selected)
+            {
+                if (part is ResourceViewModel resource)
+                    await _service.RecipeService.CreateRecipeAsync(resource);
+            }
+        }
+        [RelayCommand]
+        public async Task CreateComponentAsync()
+        {
+            var recipes = _selected.Where(p => p is RecipeViewModel).Cast<RecipeViewModel>();
+            if (recipes.Any())
+            {
+                var selected = await _service.ComponentService.ShowComponentCreateMenuAsync();
+                ResourceViewModel[]? resourcesForComponentsCreate = null;
+                if (selected != null)
+                    resourcesForComponentsCreate = selected.Resources.ToArray();
+
+                if (resourcesForComponentsCreate == null)
+                    return;
+
+                foreach (var recipe in recipes)
+                    await _service.ComponentService.CreateComponentsFromAsync(recipe, resourcesForComponentsCreate);
+            }
+        }
+
+        [RelayCommand]
+        public void ToggleFocus() => _selected.SingleOrDefault()?.UiItem.ToggleGlobalFocus();
+
+        [RelayCommand]
+        public void ExpandBranch()
+        {
+            foreach (var part in _selected)
+            {
+                part.UiItem.Expand();
+                if (part is ResourceViewModel resource)
+                    foreach (var recipe in resource.Recipes)
+                        recipe.UiItem.Expand();
+            }
+        }
+
+        [RelayCommand]
+        public void CollapseBranch()
+        {
+            foreach (var part in _selected)
+            {
+                part.UiItem.Collapse();
+                if (part is ResourceViewModel resource)
+                    foreach (var recipe in resource.Recipes)
+                        recipe.UiItem.Collapse();
+            }
+        }
+
+        [RelayCommand]
+        public void FindResourceInTree()
+        {
+            var singlePart = _selected.SingleOrDefault();
+            if (singlePart is ResourceViewModel resource)
+                resource.UiItem.FindInTree();
+            else if (singlePart is RecipeComponentViewModel component)
+                component.UiItem.FindResourceInTree();
+        }
+
+        [RelayCommand]
+        public void FindRecipeInTree()
+        {
+            var singlePart = _selected.SingleOrDefault();
+            if (singlePart is RecipeViewModel recipe)
+                recipe.UiItem.FindInTree();
+        }
+        [RelayCommand]
+        public void FindComponentInTree()
+        {
+            var singlePart = _selected.SingleOrDefault();
+            if (singlePart is RecipeComponentViewModel component)
+                component.UiItem.FindInTree();
+        }
+
+        [RelayCommand]
+        public async Task Delete()
+        {
+            foreach (var part in _selected)
+            {
+                await _service.RemoveAsync(part);
+            }
         }
     }
 }

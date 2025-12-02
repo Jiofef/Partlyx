@@ -10,7 +10,7 @@ namespace Partlyx.Core.VisualsInfo
 
         public FigureIcon()
         {
-            Color = Color.GreenYellow;
+            Color = StandardVisualSettings.StandardMainPartlyxColor;
             FigureType = FigureTypes.Circle;
         }
         

@@ -7,6 +7,7 @@ using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices.Implementations;
 using SQLitePCL;
 namespace Partlyx.ViewModels.UIStates
@@ -27,7 +28,7 @@ namespace Partlyx.ViewModels.UIStates
             AttachedComponent = vm;
 
             var expandAllRecipeComponentItemsSubscription = bus.Subscribe<SetAllTheRecipeComponentItemsExpandedEvent>(ev => SetExpanded(ev.expand));
-            Subscriptions.Add(expandAllRecipeComponentItemsSubscription);
+            Disposables.Add(expandAllRecipeComponentItemsSubscription);
         }
 
         [RelayCommand]
@@ -38,25 +39,22 @@ namespace Partlyx.ViewModels.UIStates
 
             resource.UiItem.FindInTree();
         }
+        [RelayCommand]
+        public override void FindInTree()
+        {
+            var resource = AttachedComponent.LinkedResource?.Value;
+            if (resource == null) return;
 
+            var query = resource.Name;
+            var ev = new TreeSearchQueryEvent(query, PartTypeEnumVM.Component);
+            _bus.Publish(ev);
+            IsSelected = true;
+        }
         [RelayCommand]
         public async Task SetQuantityAsync(double value)
         {
             var args = new PartSetValueInfo<RecipeComponentViewModel, double>(AttachedComponent, value);
             await _services.ComponentService.SetQuantityAsync(args);
-        }
-
-        [RelayCommand]
-        public override void ToggleGlobalFocus()
-        {
-            var globalFocusedPart = AttachedComponent.GlobalNavigations.FocusedPart;
-            ToggleFocused(globalFocusedPart);
-        }
-
-        [RelayCommand]
-        public override void ToggleLocalFocus(IIsolatedFocusedPart target)
-        {
-            ToggleFocused(target);
         }
     }
 }

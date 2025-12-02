@@ -95,5 +95,9 @@ namespace Partlyx.ViewModels.UIStates
 
             resource.UiItem.FindInTree();
         }
+
+        [RelayCommand]
+        public void FindInTree()
+            => _componentVM.UiItem.FindInTree();
     }
 }

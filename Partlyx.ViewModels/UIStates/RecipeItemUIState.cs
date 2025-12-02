@@ -27,7 +27,7 @@ namespace Partlyx.ViewModels
             _unConfirmedName = vm.Name;
 
             var expandAllRecipeItemsSubscription = bus.Subscribe<SetAllTheRecipeItemsExpandedEvent>(ev => SetExpanded(ev.expand));
-            Subscriptions.Add(expandAllRecipeItemsSubscription);
+            Disposables.Add(expandAllRecipeItemsSubscription);
         }
 
         private bool _isRenaming;
@@ -88,24 +88,12 @@ namespace Partlyx.ViewModels
         }
 
         [RelayCommand]
-        public void FindInTree()
+        public override void FindInTree()
         {
             var query = AttachedRecipe.Name;
             var ev = new TreeSearchQueryEvent(query, PartTypeEnumVM.Recipe);
             _bus.Publish(ev);
-        }
-
-        [RelayCommand]
-        public override void ToggleGlobalFocus()
-        {
-            var globalFocusedPart = AttachedPart.GlobalNavigations.FocusedPart;
-            ToggleFocused(globalFocusedPart);
-        }
-
-        [RelayCommand]
-        public override void ToggleLocalFocus(IIsolatedFocusedPart target)
-        {
-            ToggleFocused(target);
+            IsSelected = true;
         }
     }
 }

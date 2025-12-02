@@ -31,7 +31,7 @@ namespace Partlyx.ViewModels
             var expandAllResourceItemsSubscription = bus.Subscribe<SetAllTheResourceItemsExpandedEvent>(
                 ev => 
                 SetExpanded(ev.expand));
-            Subscriptions.Add(expandAllResourceItemsSubscription);
+            Disposables.Add(expandAllResourceItemsSubscription);
         }
 
         private bool _isRenaming;
@@ -93,24 +93,12 @@ namespace Partlyx.ViewModels
         }
 
         [RelayCommand]
-        public void FindInTree()
+        public override void FindInTree()
         {
             var query = AttachedResource.Name;
             var ev = new TreeSearchQueryEvent(query, PartTypeEnumVM.Resource);
             _bus.Publish(ev);
-        }
-
-        [RelayCommand]
-        public override void ToggleGlobalFocus()
-        {
-            var globalFocusedPart = AttachedResource.GlobalNavigations.FocusedPart;
-            ToggleFocused(globalFocusedPart);
-        }
-
-        [RelayCommand]
-        public override void ToggleLocalFocus(IIsolatedFocusedPart target)
-        {
-            ToggleFocused(target);
+            IsSelected = true;
         }
     }
 }

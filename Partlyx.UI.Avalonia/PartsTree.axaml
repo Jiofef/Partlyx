@@ -22,35 +22,19 @@
          <!-- Resource item -->
         <TreeDataTemplate DataType="vmp:ResourceViewModel" ItemsSource="{Binding Recipes}">
             <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
-                <Grid.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding UiItem.ToggleGlobalFocusCommand}" InputGesture="F"/>
-                        <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding UiItem.ExpandBranchCommand}" Classes="common"/>
-                        <MenuItem Header="{h:Loc Collapse_branch}" Command="{Binding UiItem.CollapseBranchCommand}" Classes="common"/>
-                        <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding UiItem.FindInTreeCommand}" Classes="common" />
-                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.ResourceService.RemoveCommand}" CommandParameter="{Binding}"/>
-                    </ContextMenu>
-                </Grid.ContextMenu>
-
                 <i:Interaction.Behaviors>
 					<dnd:ContextDragBehavior Context="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=SelectedItems}"/>
                     <dnd:ContextDropBehavior Handler="{StaticResource ResourceItemDropHandler}"/>
+                    <beh:DragHoverCommandBehavior Command="{Binding UiItem.ExpandCommand}" Enabled="{Binding !UiItem.IsExpanded}"/>
+                    <beh:TreeViewItemContainerSelectionSyncBehavior TargetPropertyName="UiItem.IsSelected"/>
                 </i:Interaction.Behaviors>
 
                 <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <Grid HorizontalAlignment="Stretch" ColumnDefinitions="Auto,*,Auto,Auto">
                     <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 8, 2"/>
                     <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent">
                         <i:Interaction.Behaviors>
-                            <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                <ia:InvokeCommandAction Command="{Binding UiItem.StartRenamingCommand}"/>
-                            </ia:EventTriggerBehavior>
+                            <beh:DoubleTappedBehavior Command="{Binding UiItem.StartRenamingCommand}"/>
                        </i:Interaction.Behaviors>
 
 					    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" Classes="common" IsVisible="{Binding !UiItem.IsRenaming}"/>
@@ -72,17 +56,27 @@
                     <ToggleButton Grid.Column="2" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
                                   IsHitTestVisible="True"
                                   Command="{Binding UiItem.ToggleGlobalFocus}"
-                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}"/>
+                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}">
+                        <i:Interaction.Behaviors>
+                            <beh:DragHoverCommandBehavior Command="{Binding UiItem.FocusGlobalCommand}" DelayMs="0"/>
+                        </i:Interaction.Behaviors>
+                    </ToggleButton>
 
                     <Button HorizontalAlignment="Stretch" Classes="darker-focus" 
                             Command="{Binding Services.RecipeService.CreateRecipeCommand}" Grid.Column="3"
                             CommandParameter="{Binding}"
                             Width="32"
-                            Height="32"
-                            ToolTip.Tip="{h:Loc Create_a_recipe_for_this_resource }">
+                            Height="32">
                         <Button.Content>
                             <mdi:MaterialIcon Kind="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
                         </Button.Content>
+                         <ToolTip.Tip>
+					        <StackPanel>
+						        <TextBlock Text="{h:Loc Create_a_recipe_for_this_resource }"/>
+                                <Separator/>
+                                <TextBlock Text="(Ctrl + Shift + =)"/>
+                            </StackPanel>
+                        </ToolTip.Tip>
                     </Button>
                 </Grid>
             </Grid>
@@ -91,37 +85,19 @@
         <!-- Recipe item-->
         <TreeDataTemplate DataType="vmp:RecipeViewModel" ItemsSource="{Binding Components}">
             <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
-                <Grid.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding UiItem.ToggleGlobalFocusCommand}" InputGesture="F"/>
-                        <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding UiItem.ExpandBranchCommand}" Classes="common"/>
-                        <MenuItem Header="{h:Loc Collapse_branch}" Command="{Binding UiItem.CollapseBranchCommand}" Classes="common"/>
-                        <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding UiItem.FindInTreeCommand}" Classes="common"/>
-                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.RecipeService.RemoveCommand}" CommandParameter="{Binding}" Classes="common"/>
-                    </ContextMenu>
-                </Grid.ContextMenu>
-
                 <i:Interaction.Behaviors>
 					<dnd:ContextDragBehavior Context="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=SelectedItems}"/>
                     <dnd:ContextDropBehavior Handler="{StaticResource RecipeItemDropHandler}"/>
+                    <beh:DragHoverCommandBehavior Command="{Binding UiItem.ExpandCommand}" Enabled="{Binding !UiItem.IsExpanded}"/>
+                    <beh:TreeViewItemContainerSelectionSyncBehavior TargetPropertyName="UiItem.IsSelected"/>
                 </i:Interaction.Behaviors>
 
                 <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
-                <Grid HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <Grid HorizontalAlignment="Stretch" ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto">
                     <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 8, 2"/>
                     <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent">
                         <i:Interaction.Behaviors>
-                            <ia:EventTriggerBehavior EventName="DoubleTapped">
-                                <ia:InvokeCommandAction Command="{Binding UiItem.StartRenamingCommand}"/>
-                            </ia:EventTriggerBehavior>
+                            <beh:DoubleTappedBehavior Command="{Binding UiItem.StartRenamingCommand}"/>
                        </i:Interaction.Behaviors>
 
 					    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" Classes="common" IsVisible="{Binding !UiItem.IsRenaming}"/>
@@ -157,17 +133,27 @@
 
                     <ToggleButton Grid.Column="3" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
                                     Command="{Binding UiItem.ToggleGlobalFocus}"
-                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}"/>
+                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}">
+                        <i:Interaction.Behaviors>
+                            <beh:DragHoverCommandBehavior Command="{Binding UiItem.FocusGlobalCommand}" DelayMs="0"/>
+                        </i:Interaction.Behaviors>
+                    </ToggleButton>
                 
                     <Button HorizontalAlignment="Stretch" Classes="darker-focus" 
                             Command="{Binding Services.ComponentService.CreateComponentCommand}" Grid.Column="4"
                             CommandParameter="{Binding}"
                             Width="32"
-                            Height="32"
-                            ToolTip.Tip="{ h:Loc Create_a_component_for_this_recipe }">
+                            Height="32">
                         <Button.Content>
                             <mdi:MaterialIcon Kind="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
                         </Button.Content>
+                         <ToolTip.Tip>
+					        <StackPanel>
+						        <TextBlock Text="{h:Loc Create_a_component_for_this_recipe}"/>
+                                <Separator/>
+                                <TextBlock Text="(Ctrl + Shift + =)"/>
+                            </StackPanel>
+                        </ToolTip.Tip>
                     </Button>
                 </Grid>
             </Grid>
@@ -176,37 +162,26 @@
         <!-- Recipe component item-->
         <TreeDataTemplate DataType="vmp:RecipeComponentViewModel" ItemsSource="{x:Null}" >
             <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2">
-                <Grid.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding UiItem.ToggleGlobalFocusCommand}" InputGesture="F"/>
-                        <MenuItem Header="{h:Loc Find_setted_resource_in_tree}" Command="{Binding UiItem.FindResourceInTreeCommand}" Classes="common"/>
-                        <MenuItem Header="{h:Loc Delete}" Command="{Binding Services.ComponentService.RemoveCommand}" CommandParameter="{Binding}" Classes="common"/>
-                    </ContextMenu>
-                </Grid.ContextMenu>
-
                 <i:Interaction.Behaviors>
 					<dnd:ContextDragBehavior Context="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}, Path=SelectedItems}"/>
                     <dnd:ContextDropBehavior Handler="{StaticResource RecipeComponentItemDropHandler}"/>
+                    <beh:TreeViewItemContainerSelectionSyncBehavior TargetPropertyName="UiItem.IsSelected"/>
                 </i:Interaction.Behaviors>
 
                 <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid HorizontalAlignment="Stretch" Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                <Grid RowDefinitions="Auto, Auto">
+                    <Grid HorizontalAlignment="Stretch" Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
                         <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 8, 2"/>
                         <TextBlock Text="{Binding LinkedResource.Value.Name}" Grid.Column="1" VerticalAlignment="Center" Classes="common"/>
 
                     <ToggleButton Grid.Column="2" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
                                     Command="{Binding UiItem.ToggleGlobalFocus}"
-                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}"/>
+                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}">
+                        <i:Interaction.Behaviors>
+                            <beh:DragHoverCommandBehavior Command="{Binding UiItem.FocusGlobalCommand}" CommandParameter="{x:True}" DelayMs="0"/>
+                        </i:Interaction.Behaviors>
+                    </ToggleButton>
+
                     </Grid>
                     <NumericUpDown Value="{Binding Quantity, Mode=TwoWay}" Grid.Row="1" Height="32" HorizontalAlignment="Stretch">
 						<i:Interaction.Behaviors>
@@ -223,22 +198,38 @@
         </TreeDataTemplate>
     </UserControl.DataTemplates>
 
-    <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch" RowDefinitions="Auto,*,Auto"
+          Focusable="True">
+        <Grid.KeyBindings>
+			<KeyBinding Gesture="Ctrl+OemPlus" Command="{Binding Service.ResourceService.CreateResourceCommand}"/>
+            <KeyBinding Gesture="Ctrl+Shift+OemPlus" Command="{Binding CreateChildForSelectedCommand}"/>
+        </Grid.KeyBindings>
+
+        <Grid.ContextMenu>
+            <ContextMenu>
+				<MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding ContextMenuCommands.ToggleFocusCommand}"  Classes="common" InputGesture="F" 
+                    IsVisible="{Binding ContextMenuCommands.AllowToggleFocus}"/>
+                <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding ContextMenuCommands.ExpandBranchCommand}" Classes="common"
+                    IsVisible="{Binding ContextMenuCommands.AllowExpandBranch}"/>
+                <MenuItem Header="{h:Loc Collapse_branch}" Command="{Binding ContextMenuCommands.CollapseBranchCommand}" Classes="common"
+                    IsVisible="{Binding ContextMenuCommands.AllowCollapseBranch}"/>
+                <MenuItem Header="{h:Loc Find_resource_in_tree}" Command="{Binding ContextMenuCommands.FindResourceInTreeCommand}" Classes="common" 
+                    IsVisible="{Binding ContextMenuCommands.AllowFindResourceInTree}"/>
+                <MenuItem Header="{h:Loc Find_recipe_in_tree}" Command="{Binding ContextMenuCommands.FindRecipeInTreeCommand}" Classes="common"
+                    IsVisible="{Binding ContextMenuCommands.AllowFindRecipeInTree}"/>
+                <MenuItem Header="{h:Loc Find_component_in_tree}" Command="{Binding ContextMenuCommands.FindComponentInTreeCommand}" Classes="common"
+                    IsVisible="{Binding ContextMenuCommands.AllowFindComponentInTree}"/>
+                <MenuItem Header="{h:Loc Delete}" Command="{Binding ContextMenuCommands.DeleteCommand}" CommandParameter="{Binding}" Classes="common"
+                    IsVisible="{Binding ContextMenuCommands.AllowDelete}"/>
+            </ContextMenu>
+        </Grid.ContextMenu>
+
         <StackPanel Orientation="Vertical" Grid.Row="0">
             <Grid Height="48">
                 <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
                 <TextBlock Text="{h:Loc Parts_Tree}" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
             </Grid>
-            <Grid Margin="8, 2, 4, 2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
+            <Grid Margin="8, 2, 4, 2" ColumnDefinitions="*,Auto">
                 <TextBox Classes="common"
                      Watermark="{h:Loc Search___}" Grid.Row="0"
                      Text="{Binding Search.SearchText, UpdateSourceTrigger=PropertyChanged}"/>
@@ -261,7 +252,8 @@
                 <TreeView x:Name="TreeViewControl"
                           ItemsSource="{Binding Search.UnfilteredResources}" 
                           Margin="0,0,10,0" BorderThickness="0" Background="{StaticResource PxBlue0Brush}"
-                          SelectionMode="Multiple">
+                          SelectionMode="Multiple"
+                          SelectedItems="{Binding SelectedPartsCollection}">
                     <TreeView.Template>
                         <ControlTemplate TargetType="TreeView">
                             <Border BorderBrush="{TemplateBinding BorderBrush}"
@@ -297,19 +289,21 @@
                 </TreeView>
             </ScrollViewer>
         </Grid>
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <Button HorizontalAlignment="Stretch" Classes="base" Command="{Binding Service.ResourceService.CreateResourceCommand}" Grid.Column="0" ToolTip.Tip="{h:Loc Create_resource}">
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+            <Button HorizontalAlignment="Stretch" Classes="base" Command="{Binding Service.ResourceService.CreateResourceCommand}" Grid.Column="0">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
                         <TextBlock Text="{h:Loc Create}"/>
                        <mdi:MaterialIcon Kind="Plus" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
                     </StackPanel>
                 </Button.Content>
+                <ToolTip.Tip>
+					<StackPanel>
+						<TextBlock Text="{h:Loc Create_resource}"/>
+                        <Separator/>
+                        <TextBlock Text="(Ctrl + =)"/>
+                    </StackPanel>
+                </ToolTip.Tip>
             </Button>
         </Grid>
     </Grid>

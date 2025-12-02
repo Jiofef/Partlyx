@@ -6,7 +6,9 @@
              xmlns:vmoi="using:Partlyx.ViewModels.GraphicsViewModels.IconViewModels"
              mc:Ignorable="d"
              x:Class="Partlyx.UI.Avalonia.PartsGraph"
-             xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             xmlns:beh="using:Partlyx.UI.Avalonia.Behaviors"
              xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
              xmlns:graphvm="clr-namespace:Partlyx.ViewModels.Graph;assembly=Partlyx.ViewModels"
              xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
@@ -18,6 +20,15 @@
              x:CompileBindings="false"
              d:DesignHeight="500"
              d:DesignWidth="500">
+
+    <UserControl.KeyBindings>
+		<KeyBinding Gesture="+" Command="{Binding ZoomInCommand}"/>
+        <KeyBinding Gesture="-" Command="{Binding ZoomOutCommand}"/>
+    </UserControl.KeyBindings>
+    
+    <i:Interaction.Behaviors>
+		<beh:MovementInputBehavior Controller="{Binding PanVelocityController}" Speed="10"/>
+    </i:Interaction.Behaviors>
 
     <UserControl.DataTemplates>
 		<!-- Override image icon template -->
@@ -37,9 +48,10 @@
         <Grid h:SizeObserver.Observe="True" h:SizeObserver.BindableWidth="{Binding PanAndZoomController.ElementWidth}"
           h:SizeObserver.BindableHeight="{Binding PanAndZoomController.ElementHeight}"
           h:SizeObserver.SizeChangedCommand="{Binding CenterizePanPositionCommand}"
-          h:SizeObserver.OneShotCommand="True">
+          h:SizeObserver.OneShotCommand="True"
+          Focusable="True">
 
-            <localo:ZoomPanControl PanPositionX="{Binding PanAndZoomController.PanPositionX, Mode=TwoWay}" PanPositionY="{Binding PanAndZoomController.PanPositionY, Mode=TwoWay}" 
+            <localo:ZoomPanControl PanPositionX="{Binding PanAndZoomController.X, Mode=TwoWay}" PanPositionY="{Binding PanAndZoomController.Y, Mode=TwoWay}" 
                                ZoomLevel="{Binding PanAndZoomController.ZoomLevel, Mode=TwoWay}"
                                MinZoom="{Binding PanAndZoomController.MinZoom}"
                                MaxZoom="{Binding PanAndZoomController.MaxZoom}">
@@ -87,8 +99,8 @@
 
                                     <Button.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Find recipe in tree" Command="{Binding Value.UiNode.FindInTreeCommand}" Classes="common"/>
-                                            <MenuItem Header="Find resource in tree" Command="{Binding Value.UiNode.FindResourceInTreeCommand}" Classes="common"/>
+                                            <MenuItem Header="{h:Loc Find_recipe_in_tree}" Command="{Binding Value.UiNode.FindInTreeCommand}" Classes="common"/>
+                                            <MenuItem Header="{h:Loc Find_resource_in_tree}" Command="{Binding Value.UiNode.FindResourceInTreeCommand}" Classes="common"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                 </Button>
@@ -108,7 +120,8 @@
 
                                     <Button.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Find in tree" Command="{Binding Value.UiNode.FindResourceInTreeCommand}" Classes="common"/>
+                                            <MenuItem Header="{h:Loc Find_component_in_tree}" Command="{Binding Value.UiNode.FindInTreeCommand}" Classes="common"/>
+                                            <MenuItem Header="{h:Loc Find_resource_in_tree}" Command="{Binding Value.UiNode.FindResourceInTreeCommand}" Classes="common"/>
                                         </ContextMenu>
                                     </Button.ContextMenu>
                                 </Button>

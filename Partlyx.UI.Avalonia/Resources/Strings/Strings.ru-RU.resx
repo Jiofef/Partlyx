@@ -382,4 +382,13 @@
   <data name="help_Help" xml:space="preserve">
     <value>Справка</value>
   </data>
+  <data name="Find_resource_in_tree" xml:space="preserve">
+    <value>Найти ресурс в дереве</value>
+  </data>
+  <data name="Find_recipe_in_tree" xml:space="preserve">
+    <value>Найти рецепт в дереве</value>
+  </data>
+  <data name="Find_component_in_tree" xml:space="preserve">
+    <value>Найти компонент в дереве</value>
+  </data>
 </root>

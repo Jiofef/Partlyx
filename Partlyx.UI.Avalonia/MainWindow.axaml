@@ -7,7 +7,6 @@
         xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
         xmlns:localother="clr-namespace:Partlyx.UI.Avalonia.OtherControls"
         xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
-        xmlns:viewmodel="clr-namespace:Partlyx.ViewModels;assembly=Partlyx.ViewModels"
         xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
         xmlns:dh="using:DialogHostAvalonia"
         mc:Ignorable="d"
@@ -29,12 +28,7 @@
     </Window.KeyBindings>
 
     <Grid>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
+        <Grid RowDefinitions="Auto,*">
             <DockPanel>
                 <Menu DataContext="{Binding MenuPanel}" Background="{StaticResource PxBlue0Brush}">
                     <Menu.ItemsPanel>
@@ -74,6 +68,7 @@
                     <ColumnDefinition Width="4"/>
                     <ColumnDefinition Width="360" MinWidth="32" MaxWidth="1024"/>
                 </Grid.ColumnDefinitions>
+
                 <local:PartsTree DataContext="{Binding PartsTree}" 
                                 Grid.Row="0" Grid.Column="0" />
 

@@ -98,6 +98,9 @@ namespace Partlyx.Services.ServiceImplementations
             return component != null ? component.ToDto() : null;
         }
 
+        public async Task<bool> IsComponentExists(Guid parentResourceUid, Guid componentUid)
+            => await GetComponentAsync(parentResourceUid, componentUid) != null;
+
         public async Task<List<RecipeComponentDto>> GetAllTheComponentsAsync(Guid grandParentResourceUid, Guid parentRecipeUid)
         {
             var resource = await _repo.GetResourceByUidAsync(grandParentResourceUid);

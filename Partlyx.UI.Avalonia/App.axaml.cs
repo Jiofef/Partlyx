@@ -203,6 +203,7 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<INotificationService, AvaloniaNotificationService>();
             services.AddTransient<IDialogService, DialogService>();
             services.AddSingleton<IIconVectorCatalog, MaterialAvaloniaVectorIconCatalog>();
+            services.AddTransient<ITimerService, AvaloniaTimerService>();
 
             services.AddSingleton<IDispatcherInvoker, AvaloniaDispatcherInvoker>(sp => new AvaloniaDispatcherInvoker());
 

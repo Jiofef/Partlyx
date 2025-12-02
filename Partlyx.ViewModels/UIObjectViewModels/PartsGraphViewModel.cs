@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Events;
 using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.GraphicsViewModels;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -23,6 +24,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         // Pan/zoom
         public PanAndZoomControllerViewModel PanAndZoomController { get; }
+        public DynamicPanPositionController PanVelocityController { get; }
 
         // Core
         public PartsGraphTreeBuilderViewModel Graph { get; }
@@ -33,12 +35,14 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IImagesStoreViewModel _imagesStore;
 
         public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IMainWindowController mwc, PanAndZoomControllerViewModel pazc, PartsGraphTreeBuilderViewModel graph, IVMPartsStore store, 
-            IImagesStoreViewModel imagesStore, IEventBus bus)
+            IImagesStoreViewModel imagesStore, IEventBus bus, ITimerService timerService)
         {
             SelectedParts = selectedParts;
             MainWindowController = mwc;
             PanAndZoomController = pazc;
             Graph = graph;
+
+            PanVelocityController = new DynamicPanPositionController(PanAndZoomController, timerService);
 
             _partsStore = store;
             _imagesStore = imagesStore;

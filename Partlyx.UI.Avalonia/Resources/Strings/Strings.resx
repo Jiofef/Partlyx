@@ -393,4 +393,13 @@
   <data name="help_text_Parts_tree" xml:space="preserve">
     <value>Parts tree text</value>
   </data>
+  <data name="Find_resource_in_tree" xml:space="preserve">
+    <value>Find resource in tree</value>
+  </data>
+  <data name="Find_recipe_in_tree" xml:space="preserve">
+    <value>Find recipe in tree</value>
+  </data>
+  <data name="Find_component_in_tree" xml:space="preserve">
+    <value>Find component in tree</value>
+  </data>
 </root>

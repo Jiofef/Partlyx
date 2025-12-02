@@ -4,6 +4,7 @@ using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
+using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -16,13 +17,15 @@ namespace Partlyx.ViewModels.UIServices.Implementations
     public partial class RecipeComponentServiceViewModel
     {
         private readonly ICommandServices _commands;
+        private readonly IRecipeComponentService _service;
         private readonly IGlobalSelectedParts _selectedParts;
         private readonly IDialogService _dialogService;
         private readonly IEventBus _bus;
 
-        public RecipeComponentServiceViewModel(ICommandServices cs, IGlobalSelectedParts gsp, IDialogService ds, IEventBus bus)
+        public RecipeComponentServiceViewModel(ICommandServices cs, IRecipeComponentService service, IGlobalSelectedParts gsp, IDialogService ds, IEventBus bus)
         {
             _commands = cs;
+            _service = service;
             _selectedParts = gsp;
             _dialogService = ds;
             _bus = bus;
@@ -31,8 +34,9 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task CreateComponentAsync(RecipeViewModel parent)
         {
-            var result = await _dialogService.ShowDialogAsync<ComponentCreateViewModel>();
-            if (result is not ISelectedParts selected || !selected.IsResourcesSelected)
+            var selected = await ShowComponentCreateMenuAsync();
+
+            if (selected == null)
                 return;
 
             var selectedResources = selected.Resources.ToList();
@@ -48,7 +52,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             await CreateComponentsFromAsync(parent, resources);
         }
 
-        public async Task CreateComponentsFromAsync(RecipeViewModel parent, List<ResourceViewModel> resources)
+        public async Task CreateComponentsFromAsync(RecipeViewModel parent, IEnumerable<ResourceViewModel> resources)
         {
             var grandParentResUid = parent.LinkedParentResource!.Uid;
             var parentRecipeUid = parent!.Uid;
@@ -96,9 +100,16 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task RemoveAsync(RecipeComponentViewModel component)
         {
-            var grandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
+            var grandParentUid = component.LinkedParentRecipe!.Value?.LinkedParentResource?.Uid;
             var parentUid = component.LinkedParentRecipe!.Uid;
-            await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeComponentCommand>(grandParentUid, parentUid, component.Uid);
+
+            if (grandParentUid == null)
+                return;
+
+            bool exists = await _service.IsComponentExists((Guid)grandParentUid, component.Uid);
+            
+            if (exists)
+                await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeComponentCommand>(grandParentUid!, parentUid, component.Uid);
         }
 
         [RelayCommand]
@@ -128,6 +139,15 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             var value = info.Value;
 
             await SetQuantityAsync(targetComponent, value);
+        }
+
+        public async Task<ISelectedParts?> ShowComponentCreateMenuAsync()
+        {
+            var result = await _dialogService.ShowDialogAsync<ComponentCreateViewModel>();
+            if (result is not ISelectedParts selected || !selected.IsResourcesSelected)
+                return null;
+
+            return selected;
         }
         public async Task SetQuantityAsync(RecipeComponentViewModel targetComponent, double value)
         {

@@ -6,6 +6,7 @@ using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
+using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
@@ -18,15 +19,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         private readonly ICommandServices _commands;
         private readonly ILocalizationService _loc;
         private readonly IEventBus _bus;
+        private readonly IRecipeService _service;
 
         private readonly IGlobalSelectedParts _selectedParts;
         private readonly IGlobalFocusedPart _focusedPart;
 
-        public RecipeServiceViewModel(ICommandServices cs, ILocalizationService loc, IGlobalSelectedParts gsp, IGlobalFocusedPart gfp, IEventBus bus)
+        public RecipeServiceViewModel(ICommandServices cs, ILocalizationService loc, IGlobalSelectedParts gsp, IGlobalFocusedPart gfp, IEventBus bus, IRecipeService service)
         {
             _commands = cs;
             _loc = loc;
             _bus = bus;
+            _service = service;
             _selectedParts = gsp;
             _focusedPart = gfp;
         }
@@ -114,7 +117,10 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task RemoveAsync(RecipeViewModel recipe)
         {
-            await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeCommand>(recipe.LinkedParentResource!.Uid, recipe.Uid);
+            bool exists = await _service.IsRecipeExists(recipe.LinkedParentResource!.Uid, recipe.Uid);
+
+            if (exists)
+                await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeCommand>(recipe.LinkedParentResource!.Uid, recipe.Uid);
         }
 
         [RelayCommand]

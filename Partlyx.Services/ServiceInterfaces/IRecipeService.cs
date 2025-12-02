@@ -14,5 +14,6 @@ namespace Partlyx.Services.ServiceInterfaces
         Task SetRecipeIconAsync(Guid resourceUid, Guid recipeUid, IconDto iconDto);
         Task SetRecipeCraftAmountAsync(Guid parentResourceUid, Guid recipeUid, double craftAmount);
         Task SetRecipeNameAsync(Guid parentResourceUid, Guid recipeUid, string name);
+        Task<bool> IsRecipeExists(Guid parentResourceUid, Guid recipeUid);
     }
 }

@@ -313,11 +313,38 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Find component in tree.
+        /// </summary>
+        public static string Find_component_in_tree {
+            get {
+                return ResourceManager.GetString("Find_component_in_tree", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Find in tree.
         /// </summary>
         public static string Find_in_tree {
             get {
                 return ResourceManager.GetString("Find_in_tree", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Find recipe in tree.
+        /// </summary>
+        public static string Find_recipe_in_tree {
+            get {
+                return ResourceManager.GetString("Find_recipe_in_tree", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Find resource in tree.
+        /// </summary>
+        public static string Find_resource_in_tree {
+            get {
+                return ResourceManager.GetString("Find_resource_in_tree", resourceCulture);
             }
         }
         
