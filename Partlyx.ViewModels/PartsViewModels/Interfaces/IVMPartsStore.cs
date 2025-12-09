@@ -15,5 +15,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
         void RemoveRecipeComponent(Guid uid);
         void RemoveResource(Guid uid);
         bool TryGet(Guid? itemUid, out IVMPart? part);
+
+        /// <summary>
+        /// Await appearance of an item with the specified Uid. If item already exists - completes immediately.
+        /// If item does not exist yet - returns a task that completes when Register(...) is called for that Uid,
+        /// or when timeout elapses (defaults to 5 seconds) which yields null.
+        /// </summary>
+        public Task<IVMPart?> TryGetAsync(Guid? itemUid, TimeSpan? timeout = null);
     }
 }

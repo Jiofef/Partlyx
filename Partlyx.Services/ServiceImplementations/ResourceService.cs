@@ -15,12 +15,10 @@ namespace Partlyx.Services.ServiceImplementations
     {
         private readonly IPartlyxRepository _repo;
         private readonly IEventBus _eventBus;
-        private readonly IIconInfoProvider _infoProvider;
-        public ResourceService(IPartlyxRepository repo, IEventBus bus, IIconInfoProvider iip)
+        public ResourceService(IPartlyxRepository repo, IEventBus bus)
         {
             _repo = repo;
             _eventBus = bus;
-            _infoProvider = iip;
         }
 
         public async Task<Guid> CreateResourceAsync(string? name = null)
@@ -30,7 +28,7 @@ namespace Partlyx.Services.ServiceImplementations
                 resource.Name = name;
 
             var icon = new FigureIcon();
-            var iconInfo = _infoProvider.GetInfo(icon);
+            var iconInfo = icon.GetInfo();
             resource.UpdateIconInfo(iconInfo);
             
             var Uid = await _repo.AddResourceAsync(resource);

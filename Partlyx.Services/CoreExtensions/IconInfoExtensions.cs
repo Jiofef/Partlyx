@@ -20,6 +20,9 @@ namespace Partlyx.Services.CoreExtensions
                 case IconTypeEnum.Figure:
                     result = JsonConvert.DeserializeObject<FigureIcon>(info.Data);
                     break;
+                case IconTypeEnum.Inherited:
+                    result = JsonConvert.DeserializeObject<InheritedIcon>(info.Data);
+                    break;
             }
 
             if (result == null)

@@ -24,5 +24,5 @@ namespace Partlyx.Core.VisualsInfo
         string FigureType { get; set; }
     }
 
-    public enum IconTypeEnum { Null, Figure, Image }
+    public enum IconTypeEnum { Null, Figure, Image, Inherited }
 }

@@ -21,6 +21,12 @@ namespace Partlyx.ViewModels
 
                     var imageDto = new ImageIconDto(imageContent.Uid);
                     return imageDto;
+                case IconTypeEnumViewModel.Inherited:
+                    if (iconVM.Content is not InheritedIconContentViewModel inheritedContent)
+                        return new NullIconDto();
+
+                    var inheritedIcon = new InheritedIconDto(inheritedContent.ParentUid, inheritedContent.ParentType);
+                    return inheritedIcon;
                 default:
                     return new NullIconDto();
             }

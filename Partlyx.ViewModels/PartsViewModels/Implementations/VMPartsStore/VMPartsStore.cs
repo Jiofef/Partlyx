@@ -1,19 +1,15 @@
-﻿using Partlyx.Core;
-using Partlyx.Infrastructure.Data.CommonFileEvents;
-using Partlyx.Infrastructure.Events;
-using Partlyx.Services.PartsEventClasses;
+﻿using Partlyx.Infrastructure.Events;
 using Partlyx.UI.Avalonia.Helpers;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public class VMPartsStore : IVMPartsStore, IDisposable
+    public partial class VMPartsStore : IVMPartsStore, IDisposable
     {
         private readonly IEventBus _bus;
-
         private readonly IDisposable _fileClosedSubscription;
 
         private Dictionary<Guid, ResourceViewModel> _resources { get; }
@@ -41,6 +37,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 _resources.Add(resource.Uid, resource);
                 _bus.Publish(new ResourceVMAddedToStoreEvent(resource.Uid));
+
+                // Complete pending awaiters for this uid
+                CompletePendingAwaiters(resource.Uid, resource);
             }
         }
 
@@ -50,6 +49,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 _recipes.Add(recipe.Uid, recipe);
                 _bus.Publish(new RecipeVMAddedToStoreEvent(recipe.Uid));
+
+                CompletePendingAwaiters(recipe.Uid, recipe);
             }
         }
 
@@ -59,6 +60,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 _recipeComponents.Add(component.Uid, component);
                 _bus.Publish(new RecipeComponentVMAddedToStoreEvent(component.Uid));
+
+                CompletePendingAwaiters(component.Uid, component);
             }
         }
 
@@ -128,6 +131,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _resources.ClearAndDispose();
             _recipes.ClearAndDispose();
             _recipeComponents.ClearAndDispose();
+
+            // Notify awaiters that nothing will appear (store was cleared).
+            CompleteAllPendingWithNull();
         }
 
         public void Dispose()

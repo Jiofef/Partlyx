@@ -16,7 +16,7 @@ using System.ComponentModel;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public partial class ResourceViewModel : UpdatableViewModel<ResourceDto>, IVMPart
+    public partial class ResourceViewModel : UpdatableViewModel<ResourceDto>, IVMPart, IObservableFindableIconHolder
     {
         // Services
         private readonly IVMPartsStore _store;

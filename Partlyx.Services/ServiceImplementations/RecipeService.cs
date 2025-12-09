@@ -1,4 +1,5 @@
 ﻿using Partlyx.Core.Partlyx;
+using Partlyx.Core.VisualsInfo;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.CoreExtensions;
@@ -29,6 +30,10 @@ namespace Partlyx.Services.ServiceImplementations
                 var recipe = resource.CreateRecipe();
                 if (recipeName != null)
                     recipe.Name = recipeName;
+
+                var icon = new InheritedIcon(parentResourceUid, InheritedIcon.InheritedIconParentTypeEnum.Resource);
+                var iconInfo = icon.GetInfo();
+                recipe.UpdateIconInfo(iconInfo);
 
                 if (recipe.ParentResource?.DefaultRecipe == null)
                 {

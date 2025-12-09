@@ -99,10 +99,15 @@
                     Foreground="{Binding FigureColor, Converter={StaticResource ColorToBrushConv}}"/>
             </Viewbox>
         </DataTemplate>
+
         <DataTemplate DataType="vmgi:ImageViewModel"> 
         <!-- Image icon template uses compressed texture by default.
         You can override this datatemplate in some context if you want to use the full texture -->
             <Image Source="{Binding Compressed, Converter={StaticResource ByteArrayToBitmapConv}}"/>
+        </DataTemplate>
+
+        <DataTemplate DataType="vmgi:InheritedIconContentViewModel"> 
+            <ContentControl Content="{Binding InheritedContent}"/>
         </DataTemplate>
     </Application.DataTemplates>
 </Application>

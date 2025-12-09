@@ -17,7 +17,7 @@ using System.Xml.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public partial class RecipeViewModel : UpdatableViewModel<RecipeDto>, IVMPart
+    public partial class RecipeViewModel : UpdatableViewModel<RecipeDto>, IVMPart, IObservableFindableIconHolder
     {
         // Services
         private readonly IVMPartsStore _store;

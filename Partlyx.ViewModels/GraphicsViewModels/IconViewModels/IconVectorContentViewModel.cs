@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Partlyx.Core.VisualsInfo;
 using Partlyx.Services.Dtos;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System.Drawing;
 
 namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels

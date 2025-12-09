@@ -9,10 +9,12 @@ namespace Partlyx.Services.CoreExtensions
         public static IconInfo GetInfo(this IIcon icon)
         {
             IconTypeEnum type;
-            if (icon is ImageIcon)
-                type = IconTypeEnum.Image;
-            else if (icon is FigureIcon)
+            if (icon is FigureIcon)
                 type = IconTypeEnum.Figure;
+            else if (icon is ImageIcon)
+                type = IconTypeEnum.Image;
+            else if (icon is InheritedIcon)
+                type = IconTypeEnum.Inherited;
             else
                 throw new NotSupportedException();
 
@@ -32,6 +34,11 @@ namespace Partlyx.Services.CoreExtensions
             else if (dto is ImageIconDto iidto)
             {
                 var icon = new ImageIcon(iidto.ImageUid);
+                return icon.GetInfo();
+            }
+            else if (dto is InheritedIconDto inidto)
+            {
+                var icon = new InheritedIcon(inidto.ParentUid, inidto.ParentType);
                 return icon.GetInfo();
             }
             else

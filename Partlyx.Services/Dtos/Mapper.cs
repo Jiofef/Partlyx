@@ -56,6 +56,9 @@ namespace Partlyx.Services.Dtos
                 case IconTypeEnum.Image:
                     var imageIcon = (ImageIcon)ii.GetIcon();
                     return new ImageIconDto(imageIcon.Uid);
+                case IconTypeEnum.Inherited:
+                    var inheritedIcon = (InheritedIcon)ii.GetIcon();
+                    return new InheritedIconDto(inheritedIcon.Uid, inheritedIcon.ParentType);
                 default:
                     return new NullIconDto();
             }

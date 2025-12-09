@@ -8,5 +8,7 @@
         {
             return new IconViewModel() { Content = this, IconType = ContentIconType };
         }
+
+        bool IsEmpty { get => false; }
     }
 }

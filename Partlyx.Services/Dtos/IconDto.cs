@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using Partlyx.Core.VisualsInfo;
+using System.Drawing;
 namespace Partlyx.Services.Dtos
 {
     public abstract record IconDto();
@@ -8,4 +9,6 @@ namespace Partlyx.Services.Dtos
     public record ImageIconDto(Guid ImageUid) : IconDto;
 
     public record FigureIconDto(Color Color, string FigureType) : IconDto;
+
+    public record InheritedIconDto(Guid ParentUid, InheritedIcon.InheritedIconParentTypeEnum ParentType) : IconDto;
 }

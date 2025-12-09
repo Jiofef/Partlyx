@@ -197,6 +197,7 @@ namespace Partlyx.UI.Avalonia
             services.AddSingleton<ImagesInitializeServiceViewModel>();
             services.AddTransient<ImageFactoryViewModel>();
             services.AddSingleton<ImageUiItemStateFactoryViewModel>();
+            services.AddTransient<InheritedIconHelperServiceViewModel>();
 
             services.AddTransient<IFileDialogService, AvaloniaFileDialogService>();
             services.AddTransient<IVMFileService, VMFileService>();

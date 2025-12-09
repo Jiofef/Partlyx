@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using UJL.CSharp.Collections;
 
 namespace Partlyx.ViewModels.Graph
@@ -19,8 +20,10 @@ namespace Partlyx.ViewModels.Graph
         private readonly IDisposable _craftAmountUpdateSubscription;
         private readonly IDisposable _valueUpdateSubscription;
 
-        private string _columnText = "";
-        public string ColumnText { get => _columnText; private set => SetProperty(ref _columnText, value); }
+        private string _columnTextPart1 = "";
+        private string _columnTextPart2 = "";
+        public string ColumnTextPart1 { get => _columnTextPart1; private set => SetProperty(ref _columnTextPart1, value); }
+        public string ColumnTextPart2 { get => _columnTextPart2; private set => SetProperty(ref _columnTextPart2, value); }
 
         public ComponentGraphNodeViewModel(RecipeComponentViewModel value)
             : base(value.Uid,
@@ -114,13 +117,14 @@ namespace Partlyx.ViewModels.Graph
             string? name = _valueComponent.LinkedResource?.Value?.Name;
 
             if (name == null)
-                ColumnText = "Null";
+            {
+                ColumnTextPart1 = "Null";
+                ColumnTextPart2 = "";
+            }
             else
             {
-                string newText = name;
-
-                newText += $" x{Cost}";
-                ColumnText = newText;
+                ColumnTextPart1 = name;
+                ColumnTextPart2 = $" x{Cost}";
             }
         }
 

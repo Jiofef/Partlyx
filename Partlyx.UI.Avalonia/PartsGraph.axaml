@@ -92,8 +92,11 @@
                                     <Grid VerticalAlignment="Stretch" RowDefinitions="*,Auto">
                                         <local:IconControl Grid.Row="0" IconContent="{Binding Value.Icon}"/>
                                         <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
-                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.ColumnText}"/>
-                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Value.UiNode.SecondaryColumnText}"/>
+                                            <localo:FitTextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.ColumnText}"/>
+                                            <Grid ColumnDefinitions="*,*" HorizontalAlignment="Center">
+                                                <localo:FitTextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding Value.UiNode.SecondaryColumnTextPart1}"/>
+                                                <localo:FitTextBlock Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Value.UiNode.SecondaryColumnTextPart2}"/>
+                                            </Grid>                                        
                                         </StackPanel>
                                     </Grid>
 
@@ -113,8 +116,11 @@
                                     <Grid VerticalAlignment="Stretch" RowDefinitions="*,Auto">
                                         <local:IconControl Grid.Row="0" IconContent="{Binding Value.Icon}"/>
                                         <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
-                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.BottomColumnText}"/>
-                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ColumnText}"/>
+                                            <localo:FitTextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.BottomColumnText}"/>
+                                            <Grid ColumnDefinitions="*,*" HorizontalAlignment="Center">
+                                                <localo:FitTextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding ColumnTextPart1}"/>
+                                                <localo:FitTextBlock Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ColumnTextPart2}"/>
+                                            </Grid>
                                         </StackPanel>
                                     </Grid>
 
@@ -156,7 +162,7 @@
 
         <Grid Grid.Row="2" VerticalAlignment="Stretch"  Background="{StaticResource PxBlue0Brush}">
             <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
-                <TextBlock Text="{h:Loc Total_resources_amount}" Classes="common" HorizontalAlignment="Center"/>
+                <localo:FitTextBlock Text="{h:Loc Total_resources_amount}" Classes="common" HorizontalAlignment="Center"/>
                 
                 <ScrollViewer VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch">
                     <ItemsControl ItemsSource="{Binding SumController.Compilations}">
@@ -169,8 +175,8 @@
                                     <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" RowDefinitions="*,Auto">
                                         <local:IconControl Grid.Row="0" IconContent="{Binding ComponentsResource.Icon}"/>
                                         <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
-                                            <TextBlock HorizontalAlignment="Center" Text="{Binding ColumnText}"/>
-                                            <TextBlock HorizontalAlignment="Center" Text="{Binding BottomColumnText}"/>
+                                            <localo:FitTextBlock HorizontalAlignment="Center" Text="{Binding ColumnText}"/>
+                                            <localo:FitTextBlock HorizontalAlignment="Center" Text="{Binding BottomColumnText}"/>
                                         </StackPanel>
                                     </Grid>
 

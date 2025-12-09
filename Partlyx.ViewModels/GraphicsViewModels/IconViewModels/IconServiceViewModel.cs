@@ -1,4 +1,5 @@
-﻿using Partlyx.Infrastructure.Events;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.ServiceInterfaces;
@@ -10,11 +11,15 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
         private readonly IImagesLoaderInitializeService _imagesInitializerService;
         private readonly IImagesStoreViewModel _imagesStore;
         private readonly IEventBus _bus;
-        public IconServiceViewModel(IImagesLoaderInitializeService ins, IImagesStoreViewModel imagesStore, IEventBus bus)
+
+        // Only for creating a helper service for inherited icons
+        private readonly IServiceProvider _provider;
+        public IconServiceViewModel(IImagesLoaderInitializeService ins, IImagesStoreViewModel imagesStore, IEventBus bus, IServiceProvider provider)
         {
             _imagesInitializerService = ins;
             _imagesStore = imagesStore;
             _bus = bus;
+            _provider = provider;
         }
 
         public async Task<IIconContentViewModel?> GetImageOrNullFromStoreAsync(Guid imageUid)
@@ -48,6 +53,13 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
             {
                 var content = await GetImageOrNullFromStoreAsync(imageIconDto.ImageUid);
                 return new IconViewModel { IconType = IconTypeEnumViewModel.Image, Content = content };
+            }
+            else if (dto is InheritedIconDto inheritedIconDto)
+            {
+                var service = _provider.GetRequiredService<InheritedIconHelperServiceViewModel>();
+                var content = new InheritedIconContentViewModel(service);
+                await content.FindAndSetParent(inheritedIconDto.ParentUid, inheritedIconDto.ParentType);
+                return new IconViewModel { IconType = IconTypeEnumViewModel.Inherited, Content = content};
             }
             else
                 return new IconViewModel(); // Empty icon
