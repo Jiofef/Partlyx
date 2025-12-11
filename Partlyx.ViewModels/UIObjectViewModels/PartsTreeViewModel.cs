@@ -17,12 +17,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Partlyx.ViewModels.UIObjectViewModels
 {
     public record TreeSearchQueryEvent(string queryText, PartTypeEnumVM? searchablePartType = null);
 
-    public partial class PartsTreeViewModel
+    public partial class PartsTreeViewModel : PartlyxObservable
     {
         private readonly IVMPartsFactory _partsFactory;
         private readonly IVMPartsStore _store;
@@ -34,6 +35,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IDisposable _fileClearedSubscription;
         private readonly IDisposable _treeSearchQuerySubscription;
 
+        //
         public IGlobalSelectedParts SelectedParts { get; }
         public IGlobalFocusedPart FocusedPart { get; }
         public IResourceSearchService Search { get; }
@@ -44,6 +46,23 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public ObservableCollection<ResourceViewModel> Resources => _resourcesContainer.Resources;
         public ObservableCollection<IVMPart> SelectedPartsCollection { get; } = new();
         public PartsSelectionState SelectedPartsDetails { get; }
+
+        private bool _allowHotkeys = true;
+        public bool AllowHotkeys { get => _allowHotkeys; private set => SetProperty(ref _allowHotkeys, value); }
+        private void UpdateAllowHotkeys()
+        {
+            AllowHotkeys = _hotkeysBlockElementsAmount == 0;
+        }
+        private int _hotkeysBlockElementsAmount;
+        public int HotkeysBlockElementsAmount 
+        {
+            get => _hotkeysBlockElementsAmount;
+            set
+            {
+                if (SetProperty(ref _hotkeysBlockElementsAmount, value))
+                    UpdateAllowHotkeys();
+            }
+        }
 
         public PartsTreeViewModel(IGlobalResourcesVMContainer grvmc, IGlobalSelectedParts sp, IGlobalFocusedPart fp, IEventBus bus, IVMPartsFactory vmpf,
                 IVMPartsStore vmps, IResourceSearchService rss, PartsServiceViewModel service)
@@ -176,6 +195,12 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             CollapseAllTheResources();
 
             CollapseAllTheRecipes();
+        }
+
+        [RelayCommand(CanExecute = nameof(AllowHotkeys))]
+        public void ActivateHotkey(ICommand hotkeyCommand)
+        {
+             hotkeyCommand.Execute(null);
         }
 
         [RelayCommand]

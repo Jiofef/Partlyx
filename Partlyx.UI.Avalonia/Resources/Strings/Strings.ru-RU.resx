@@ -391,4 +391,16 @@
   <data name="Find_component_in_tree" xml:space="preserve">
     <value>Найти компонент в дереве</value>
   </data>
+  <data name="Other" xml:space="preserve">
+    <value>Другое</value>
+  </data>
+  <data name="Other2" xml:space="preserve">
+    <value>Другие</value>
+  </data>
+  <data name="icon_Empty" xml:space="preserve">
+    <value>Пустая</value>
+  </data>
+  <data name="icon_Inherited" xml:space="preserve">
+    <value>Наследованная</value>
+  </data>
 </root>

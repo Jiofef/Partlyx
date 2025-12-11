@@ -114,13 +114,17 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 {
                     var dialogVM = _serviceProvider.GetRequiredService<IconsMenuViewModel>();
                     dialogVM.EnableIconSelection = true;
+                    dialogVM.IconSetTarget = resource;
+
                     if (resource.Icon.Content != null)
                         dialogVM.SelectItemWith(resource.Icon.Content);
+
 
                     var result = await _dialogService.ShowDialogAsync(dialogVM);
 
                     if (result is not IconViewModel icon) return;
                     await _services.ResourceService.SetIcon(resource, icon);
+                    icon?.Dispose();
                 });
             var iconUpdateSubscription = resource.WhenAnyValue(r => r.Icon).Subscribe((args) => iconProperty.Icon = resource.Icon);
             iconProperty.Subscriptions.Add(iconUpdateSubscription);
@@ -189,6 +193,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 {
                     var dialogVM = _serviceProvider.GetRequiredService<IconsMenuViewModel>();
                     dialogVM.EnableIconSelection = true;
+                    dialogVM.IconSetTarget = recipe;
+
                     if (recipe.Icon.Content != null)
                         dialogVM.SelectItemWith(recipe.Icon.Content);
 
@@ -196,6 +202,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
                     if (result is not IconViewModel icon) return;
                     await _services.RecipeService.SetIcon(recipe, icon);
+                    icon?.Dispose();
                 });
             var iconUpdateSubscription = recipe.WhenAnyValue(r => r.Icon).Subscribe((args) => iconProperty.Icon = recipe.Icon);
             iconProperty.Subscriptions.Add(iconUpdateSubscription);

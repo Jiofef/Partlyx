@@ -466,6 +466,24 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Empty.
+        /// </summary>
+        public static string icon_Empty {
+            get {
+                return ResourceManager.GetString("icon_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Inherited.
+        /// </summary>
+        public static string icon_Inherited {
+            get {
+                return ResourceManager.GetString("icon_Inherited", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Icons.
         /// </summary>
         public static string Icons {
@@ -570,6 +588,24 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Open_in_editor {
             get {
                 return ResourceManager.GetString("Open_in_editor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Other.
+        /// </summary>
+        public static string Other {
+            get {
+                return ResourceManager.GetString("Other", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Other.
+        /// </summary>
+        public static string Other2 {
+            get {
+                return ResourceManager.GetString("Other2", resourceCulture);
             }
         }
         

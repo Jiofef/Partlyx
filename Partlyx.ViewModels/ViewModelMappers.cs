@@ -9,6 +9,8 @@ namespace Partlyx.ViewModels
         {
             switch(iconVM.IconType)
             {
+                case IconTypeEnumViewModel.Null:
+                    return new NullIconDto();
                 case IconTypeEnumViewModel.Vector:
                     if (iconVM.Content is not IconVectorContentViewModel iconFigureContent)
                         return new NullIconDto();

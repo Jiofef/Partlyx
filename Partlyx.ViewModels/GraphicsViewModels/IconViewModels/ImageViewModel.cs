@@ -92,6 +92,14 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
         }
 
         public IconTypeEnumViewModel ContentIconType => IconTypeEnumViewModel.Image;
+        public bool IsIdentical(IIconContentViewModel other)
+        {
+            if (other is not ImageViewModel otherImage) return false;
+
+            if (otherImage == this) return true;
+
+            return Uid == otherImage.Uid;
+        }
 
         // For UI
         public ImageUiItemStateViewModel UiItem => _stateFactoryViewModel.GetOrCreateItemUi(this);

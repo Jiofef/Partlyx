@@ -17,7 +17,7 @@ using System.Xml.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public partial class RecipeViewModel : UpdatableViewModel<RecipeDto>, IVMPart, IObservableFindableIconHolder
+    public partial class RecipeViewModel : UpdatableViewModel<RecipeDto>, IVMPart, IObservableFindableIconHolder, IInheritingIconHolderViewModel
     {
         // Services
         private readonly IVMPartsStore _store;
@@ -77,6 +77,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
         private async Task UpdateIconFromDto(IconDto dto)
         {
+            Icon?.Dispose();
             Icon = await _iconService.CreateFromDtoAsync(dto);
         }
 
@@ -100,6 +101,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         private IconViewModel _icon;
         public IconViewModel Icon { get => _icon; private set => SetProperty(ref _icon, value); }
+        public InheritedIcon.InheritedIconParentTypeEnum InheritedIconParentDefaultType => InheritedIcon.InheritedIconParentTypeEnum.Resource;
+        public Guid? InheritedIconDefaultParentUid => LinkedParentResource?.Uid;
+        public bool CanContainInheritedIcon => true;
 
         // Info updating
         protected override Dictionary<string, Action<RecipeDto>> ConfigureUpdaters() => new()

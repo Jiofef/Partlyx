@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Security.Cryptography;
 
 namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
 {
@@ -14,6 +15,15 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
         // Cached IsEmpty value to avoid repeated full-chain evaluation on every UI binding request.
         private bool _isEmpty = true;
         public bool IsEmpty { get => _isEmpty; private set => SetProperty(ref _isEmpty, value); }
+
+        public bool IsIdentical(IIconContentViewModel other)
+        {
+            if (other is not InheritedIconContentViewModel otherInherited) return false;
+
+            if (otherInherited == this) return true;
+
+            return ParentUid == otherInherited.ParentUid;
+        }
 
         public InheritedIconContentViewModel(InheritedIconHelperServiceViewModel service)
         {
@@ -78,6 +88,7 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
 
             DisposeParentSubscriptions();
             BindedParent = parent;
+            ParentUid = parent.Uid;
             HookParent(parent);
         }
 

@@ -70,8 +70,13 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             await RenameResource(resource, newName);
         }
-        public async Task RenameResource(ResourceViewModel resource, string newName) =>
+        public async Task RenameResource(ResourceViewModel resource, string newName)
+        {
+            if (resource.Name == newName)
+                return;
+
             await _commands.CreateAsyncEndExcecuteAsync<SetNameToResourceCommand>(resource.Uid, newName);
+        }
 
         [RelayCommand]
         public async Task SetDefaultRecipe(PartSetValueInfo<ResourceViewModel, RecipeViewModel> info)
@@ -83,8 +88,16 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             await SetDefaultRecipe(targetResource, valueRecipe);
         }
-        public async Task SetDefaultRecipe(ResourceViewModel resource, RecipeViewModel recipe) =>
+        public async Task SetDefaultRecipe(ResourceViewModel resource, RecipeViewModel recipe)
+        {
+            if (resource.LinkedDefaultRecipe?.Value == recipe)
+                return;
+
+            if (!resource.Recipes.Contains(recipe))
+                return;
+
             await _commands.CreateAsyncEndExcecuteAsync<SetDefaultRecipeToResourceCommand>(resource.Uid, recipe.Uid);
+        }
 
         [RelayCommand]
         public async Task SetIcon(PartSetValueInfo<ResourceViewModel, IconViewModel> info)
@@ -96,7 +109,14 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             await SetIcon(targetResource, valueIcon);
         }
-        public async Task SetIcon(ResourceViewModel resource, IconViewModel icon) =>
-            await _commands.CreateAsyncEndExcecuteAsync<SetResourceIconCommand>(resource.Uid, icon.ToDto());
+        public async Task SetIcon(ResourceViewModel resource, IconViewModel newIcon)
+        {
+            var oldIcon = resource.Icon;
+
+            if (oldIcon.IsIdentical(newIcon))
+                return;
+
+            await _commands.CreateAsyncEndExcecuteAsync<SetResourceIconCommand>(resource.Uid, newIcon.ToDto());
+        }
     }
 }

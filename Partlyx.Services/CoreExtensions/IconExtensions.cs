@@ -9,7 +9,9 @@ namespace Partlyx.Services.CoreExtensions
         public static IconInfo GetInfo(this IIcon icon)
         {
             IconTypeEnum type;
-            if (icon is FigureIcon)
+            if (icon is NullIcon)
+                type = IconTypeEnum.Null;
+            else if (icon is FigureIcon)
                 type = IconTypeEnum.Figure;
             else if (icon is ImageIcon)
                 type = IconTypeEnum.Image;

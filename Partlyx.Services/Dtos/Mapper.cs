@@ -50,6 +50,8 @@ namespace Partlyx.Services.Dtos
         {
             switch (ii.Type)
             {
+                case IconTypeEnum.Null:
+                    return new NullIconDto();
                 case IconTypeEnum.Figure:
                     var figureIcon = (FigureIcon)ii.GetIcon();
                     return new FigureIconDto(figureIcon.Color, figureIcon.FigureType);

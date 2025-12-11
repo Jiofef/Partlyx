@@ -1,11 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DynamicData;
+using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core.Contracts;
+using Partlyx.Core.Partlyx;
 using Partlyx.Core.VisualsInfo;
 using Partlyx.Services.Dtos;
+using Partlyx.Services.Helpers;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.UIServices;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
@@ -25,10 +29,34 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly INotificationService _notificationService;
         private readonly ILocalizationService _loc;
         private readonly IIconVectorCatalog _iconVectorCatalog;
+        private readonly IServiceProvider _serviceProvider; // Only for creating a service for inherited icon content
 
         private readonly CreateNewElementButton _createImageButton;
 
         public bool EnableIconSelection { get; set; } = false;
+
+        private object? _iconSetTarget;
+        public object? IconSetTarget { get => _iconSetTarget; set => SetIconSetTarget(value); }
+        private void SetIconSetTarget(object? value)
+        {
+            if (SetProperty(ref _iconSetTarget, value, nameof(IconSetTarget)))
+            {
+                if (value is IInheritingIconHolderViewModel holder && 
+                    holder.InheritedIconDefaultParentUid is Guid inheritedParentUid // if uid is not null
+                    )
+                {
+                    if (!OtherIcons.Any(i => i is InheritedIconContentViewModel))
+                    {
+                        var inheritedIconHelper = _serviceProvider.GetRequiredService<InheritedIconHelperServiceViewModel>();
+                        var inheritedIconVM = new InheritedIconContentViewModel(inheritedIconHelper);
+                        _ = inheritedIconVM.FindAndSetParent(inheritedParentUid, holder.InheritedIconParentDefaultType);
+                        OtherIcons.Add(inheritedIconVM);
+                    }
+                }
+                else
+                    OtherIcons.RemoveFirst(i => i is InheritedIconContentViewModel);
+            }
+        }
         public string DialogIdentifier { get; set; } = IDialogService.DefaultDialogIdentifier;
 
         private string _searchText = string.Empty;
@@ -71,6 +99,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public ObservableCollection<object> ImagesToShow { get; } = new();
         public IImagesStoreViewModel Images { get; }
+
+        public ObservableCollection<IIconContentViewModel> OtherIcons { get; }
 
         private bool _showAllTheIcons;
         public bool ShowAllTheIcons { get => _showAllTheIcons; set => SetShowAllTheIcons(value); }
@@ -163,6 +193,16 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                         SelectedColor = vector.FigureColor;
                     }
                     break;
+                case IconTypeEnumViewModel.Null:
+                    var nullIcon = OtherIcons.FirstOrDefault(i => i is IconNullContentViewModel);
+                    if (nullIcon != null)
+                        TrySelectIconContent(nullIcon);
+                    break;
+                case IconTypeEnumViewModel.Inherited:
+                    var inheritedIcon = OtherIcons.FirstOrDefault(i => i is InheritedIconContentViewModel);
+                    if (inheritedIcon != null)
+                        TrySelectIconContent(inheritedIcon);
+                    break;
                 default:
                     TrySelectIconContent(content);
                     break;
@@ -182,16 +222,30 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     ResultIcon.Content = vectorClone;
                     SetProperty(ref _selectedIconContent, vector, nameof(SelectedIconContent));
                     CanSetColor = true;
+                    ColorToShow = SelectedColor;
                     break;
                 case IconTypeEnumViewModel.Image:
                     ResultIcon.Content = iconContent;
                     SetProperty(ref _selectedIconContent, iconContent, nameof(SelectedIconContent));
                     CanSetColor = false;
+                    ColorToShow = SelectedColor;
+                    break;
+                case IconTypeEnumViewModel.Inherited:
+                    ResultIcon.Content = iconContent;
+                    SetProperty(ref _selectedIconContent, iconContent, nameof(SelectedIconContent));
+                    CanSetColor = false;
+
+                    var inheritedIcon = (InheritedIconContentViewModel)value;
+                    if (inheritedIcon.InheritedContent is IconVectorContentViewModel vector2)
+                    {
+                        ColorToShow = vector2.FigureColor;
+                    }
                     break;
                 default:
                     ResultIcon.Content = iconContent;
                     SetProperty(ref _selectedIconContent, iconContent, nameof(SelectedIconContent));
                     CanSetColor = false;
+                    ColorToShow = SelectedColor;
                     break;
             }
 
@@ -201,11 +255,14 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private Color _selectedColor = StandardVisualSettings.StandardMainPartlyxColor;
         public Color SelectedColor { get => _selectedColor; set => SetSelectedColor(value); }
 
+        private Color _colorToShow = StandardVisualSettings.StandardMainPartlyxColor;
+        public Color ColorToShow { get => _colorToShow; private set => SetProperty(ref _colorToShow, value); }
         private void SetSelectedColor(Color color)
         {
             if (ResultIcon.Content is IconVectorContentViewModel figureContent)
             {
                 SetProperty(ref _selectedColor, color, nameof(SelectedColor));
+                ColorToShow = color;
                 figureContent.FigureColor = color;
             }
         }
@@ -215,7 +272,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public IconViewModel ResultIcon { get => _resultIcon; }
 
         public IconsMenuViewModel(IDialogService dialogService, IPartlyxImageService imageService, IImagesStoreViewModel imagesContainer, IFileDialogService fds, INotificationService ns,
-            ILocalizationService loc, IIconVectorCatalog vectorIconsCatalog)
+            ILocalizationService loc, IIconVectorCatalog vectorIconsCatalog, IServiceProvider provider)
         {
             _dialogService = dialogService;
             _imageService = imageService;
@@ -223,20 +280,28 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _notificationService = ns;
             _loc = loc;
             _iconVectorCatalog = vectorIconsCatalog;
+            _serviceProvider = provider;
 
             Images = imagesContainer;
 
             _createImageButton = new CreateNewElementButton();
             _createImageButton.ClickedCommand = new(async () => await OpenImageLoadingDialog());
 
+            // Creating vector icons list
             var baseVectorIconsList = _iconVectorCatalog.GetBaseIconsContentForStore();
             BaseVectorIcons = new(baseVectorIconsList);
             _vectorIcons = new ObservableCollection<StoreVectorIconContentViewModel>(baseVectorIconsList);
             _baseVectorIconsDic = baseVectorIconsList.ToDictionary(i => i.FigureType);
 
+            // Creating images icons list
             RefillImagesToShow();
-
             Images.Images.CollectionChanged += OnImagesCollectionChanged;
+
+            // Creating other icons list
+            OtherIcons = new() 
+            {
+                new IconNullContentViewModel(),
+            };
         }
 
         private void OnImagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

@@ -10,16 +10,4 @@ public partial class IconsWindow : UserControl
     {
         InitializeComponent();
     }
-
-    private void FlexPanel_ActualThemeVariantChanged(object? sender, System.EventArgs e)
-    {
-    }
-
-    private void Image_ActualThemeVariantChanged(object? sender, System.EventArgs e)
-    {
-    }
-
-    private void MaterialIcon_ActualThemeVariantChanged(object? sender, System.EventArgs e)
-    {
-    }
 }

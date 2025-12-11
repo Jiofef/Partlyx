@@ -5,6 +5,7 @@
              xmlns:vmgi="using:Partlyx.ViewModels.GraphicsViewModels.IconViewModels"
              x:Name="Root"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Partlyx.UI.Avalonia.IconControl">
+             x:Class="Partlyx.UI.Avalonia.IconControl"
+             IsVisible="{Binding !#Root.IconContent.IsEmpty}">
         <ContentControl Content="{Binding #Root.IconContent.Content}"/>
 </UserControl>

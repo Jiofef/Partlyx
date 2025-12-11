@@ -10,5 +10,7 @@
         }
 
         bool IsEmpty { get => false; }
+
+        public bool IsIdentical(IIconContentViewModel other) => false;
     }
 }

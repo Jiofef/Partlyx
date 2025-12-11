@@ -85,6 +85,9 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             foreach (var component in components)
             {
+                if (component.LinkedParentRecipe?.Value == targetRecipe)
+                    continue;
+
                 var previousGrandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Value!.Uid;
                 var newGrandParentUid = targetRecipe.LinkedParentResource!.Value!.Uid;
                 var previousParentUid = component.LinkedParentRecipe.Uid;
@@ -125,6 +128,9 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
         public async Task SetSelectedRecipe(RecipeComponentViewModel targetComponent, RecipeViewModel valueRecipe)
         {
+            if (targetComponent.LinkedSelectedRecipe?.Value == valueRecipe)
+                return;
+
             var grandParentUid = targetComponent.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
 
             await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentSelectedRecipe>(grandParentUid, targetComponent.Uid, valueRecipe?.Uid!);
@@ -151,6 +157,9 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
         public async Task SetQuantityAsync(RecipeComponentViewModel targetComponent, double value)
         {
+            if (targetComponent.Quantity == value)
+                return;
+
             var grandParentUid = targetComponent.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
             var uid = targetComponent.Uid;
             await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentQuantityCommand>(grandParentUid, uid, value);

@@ -31,15 +31,15 @@
 
                 <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
                 <Grid HorizontalAlignment="Stretch" ColumnDefinitions="Auto,*,Auto,Auto">
-                    <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 8, 2"/>
-                    <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent">
+                    <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 4, 2"/>
+                    <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent" Margin="4, 0">
                         <i:Interaction.Behaviors>
                             <beh:DoubleTappedBehavior Command="{Binding UiItem.StartRenamingCommand}"/>
                        </i:Interaction.Behaviors>
 
 					    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" Classes="common" IsVisible="{Binding !UiItem.IsRenaming}"/>
 
-                        <TextBox VerticalAlignment="Center" Text="{Binding UiItem.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" IsVisible="{Binding UiItem.IsRenaming}" Classes="common">
+                        <TextBox VerticalAlignment="Center" Text="{Binding UiItem.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" IsVisible="{Binding UiItem.IsRenaming}" Classes="common" >
                             <TextBox.KeyBindings>
 						        <KeyBinding Gesture="Enter" Command="{Binding UiItem.CommitNameChangeCommand}"/>
                                 <KeyBinding Gesture="Escape" Command="{Binding UiItem.CancelNameChangeCommand}"/>
@@ -49,6 +49,7 @@
                                         <ia:InvokeCommandAction Command="{Binding UiItem.CommitNameChangeCommand}"/>
                                     </ia:EventTriggerBehavior>
                                 <beh:TextBoxFocusAndSelectBehavior IsActive="{Binding UiItem.IsRenaming}"/>
+                                <beh:FocusCountBehavior Count="{Binding $parent[UserControl].DataContext.HotkeysBlockElementsAmount, Mode=TwoWay}"/>
                             </i:Interaction.Behaviors>  
                         </TextBox>
                     </Panel>
@@ -94,8 +95,8 @@
 
                 <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
                 <Grid HorizontalAlignment="Stretch" ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto">
-                    <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 8, 2"/>
-                    <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent">
+                    <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 4, 2"/>
+                    <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent" Margin="4, 0">
                         <i:Interaction.Behaviors>
                             <beh:DoubleTappedBehavior Command="{Binding UiItem.StartRenamingCommand}"/>
                        </i:Interaction.Behaviors>
@@ -112,6 +113,7 @@
                                         <ia:InvokeCommandAction Command="{Binding UiItem.CommitNameChangeCommand}"/>
                                     </ia:EventTriggerBehavior>
                                 <beh:TextBoxFocusAndSelectBehavior IsActive="{Binding UiItem.IsRenaming}"/>
+                                <beh:FocusCountBehavior Count="{Binding $parent[UserControl].DataContext.HotkeysBlockElementsAmount, Mode=TwoWay}"/>
                             </i:Interaction.Behaviors>
                         </TextBox>
                     </Panel>
@@ -171,8 +173,8 @@
                 <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
                 <Grid RowDefinitions="Auto, Auto">
                     <Grid HorizontalAlignment="Stretch" Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
-                        <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 8, 2"/>
-                        <TextBlock Text="{Binding LinkedResource.Value.Name}" Grid.Column="1" VerticalAlignment="Center" Classes="common"/>
+                        <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 4, 2"/>
+                        <TextBlock Text="{Binding LinkedResource.Value.Name}" Grid.Column="1" VerticalAlignment="Center" Classes="common" Margin="4, 0"/>
 
                     <ToggleButton Grid.Column="2" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
                                     Command="{Binding UiItem.ToggleGlobalFocus}"
@@ -201,8 +203,10 @@
     <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch" RowDefinitions="Auto,*,Auto"
           Focusable="True">
         <Grid.KeyBindings>
-			<KeyBinding Gesture="Ctrl+OemPlus" Command="{Binding Service.ResourceService.CreateResourceCommand}"/>
-            <KeyBinding Gesture="Ctrl+Shift+OemPlus" Command="{Binding CreateChildForSelectedCommand}"/>
+			<KeyBinding Gesture="Ctrl+OemPlus" Command="{Binding ActivateHotkeyCommand}"
+               CommandParameter="{Binding Service.ResourceService.CreateResourceCommand}"/>
+            <KeyBinding Gesture="Ctrl+Shift+OemPlus" Command="{Binding ActivateHotkeyCommand}"
+                        CommandParameter="{Binding CreateChildForSelectedCommand}"/>
         </Grid.KeyBindings>
 
         <Grid.ContextMenu>
@@ -277,9 +281,12 @@
 						<beh:TreeViewPartMultiSelectionBehavior SelectedPartsContainer="{Binding SelectedParts}"/>
                     </i:Interaction.Behaviors>
                     <TreeView.KeyBindings>
-                        <KeyBinding Gesture="F2" Command="{Binding Service.TryRenamingSingleSelectedCommand}"/>
-                        <KeyBinding Gesture="Enter" Command="{Binding Service.TryRenamingSingleSelectedCommand}"/>
-                        <KeyBinding Gesture="F" Command="{Binding Service.TryToggleSingleSelectedFocusCommand}"/>
+                        <KeyBinding Gesture="F2" Command="{Binding ActivateHotkeyCommand}"
+                                    CommandParameter="{Binding Service.TryRenamingSingleSelectedCommand}"/>
+                        <KeyBinding Gesture="Enter" Command="{Binding ActivateHotkeyCommand}"
+                                    CommandParameter="{Binding Service.TryRenamingSingleSelectedCommand}"/>
+                        <KeyBinding Gesture="F" Command="{Binding ActivateHotkeyCommand}"
+                                    CommandParameter="{Binding Service.TryToggleSingleSelectedFocusCommand}" />
                     </TreeView.KeyBindings>
                     <TreeView.ItemsPanel>
                         <ItemsPanelTemplate>

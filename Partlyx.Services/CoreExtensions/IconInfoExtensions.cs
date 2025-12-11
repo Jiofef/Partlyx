@@ -14,6 +14,9 @@ namespace Partlyx.Services.CoreExtensions
 
             switch (info.Type)
             {
+                case IconTypeEnum.Null:
+                    result = null;
+                    break;
                 case IconTypeEnum.Image:
                     result = JsonConvert.DeserializeObject<ImageIcon>(info.Data);
                     break;

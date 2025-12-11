@@ -15,8 +15,8 @@
              xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
              xmlns:avlp="using:Avalonia.Labs.Panels"
-             mc:Ignorable="d" d:DesignWidth="1080" d:DesignHeight="720"
-             Width="1080" Height="720"
+             mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="720"
+             Width="1200" Height="720"
              x:Class="Partlyx.UI.Avalonia.DialogsXAML.IconsWindow"
              x:DataType="vmo:IconsMenuViewModel"
              x:Name="Root">
@@ -42,7 +42,7 @@
                          Watermark="{h:Loc Search___}" Grid.Column="1"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource PxWhiteBrush}"/>
                 </Grid>
-				<Grid Margin="8" ColumnDefinitions="*, 4, *" Grid.Row="1">
+				<Grid Margin="8" ColumnDefinitions="*, 4, *, 4, 0.5*" Grid.Row="1">
                     <Grid Grid.Column="0" RowDefinitions="Auto, *" Margin="8">
                         <TextBlock Text="{h:Loc BuiltIn_Icons}" TextAlignment="Center" Classes="common"/>
                         <ListBox Grid.Row="1" ItemsSource="{Binding VectorIcons}" SelectedItem="{Binding SelectedIconContent}">
@@ -56,7 +56,7 @@
 									<Border Background="{StaticResource PxWhiteBrush}" CornerRadius="16" Height="128" Width="96" Focusable="True">
                                         <Grid VerticalAlignment="Stretch" RowDefinitions="96,Auto" HorizontalAlignment="Stretch">
                                             <ContentControl Margin="12" Content="{Binding}" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
-                                            <TextBlock Text="{Binding FigureType}" TextAlignment="Center" Classes="common" Grid.Row="1" Height="32"/>
+                                            <localo:FitTextBlock Text="{Binding FigureType}" TextAlignment="Center" Classes="common" Grid.Row="1" Height="32"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -89,7 +89,7 @@
                                             </ia:EventTriggerBehavior>
                                        </i:Interaction.Behaviors>
                                         <Grid Grid.Row="1" Height="32">
-									        <TextBlock Text="{Binding Name}" VerticalAlignment="Stretch" TextAlignment="Center" Classes="common" IsVisible="{Binding !UiItem.IsRenaming}"/>
+									        <localo:FitTextBlock Text="{Binding Name}" VerticalAlignment="Stretch" TextAlignment="Center" Classes="common" IsVisible="{Binding !UiItem.IsRenaming}"/>
                                     
                                             <TextBox VerticalAlignment="Stretch" Text="{Binding UiItem.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" IsVisible="{Binding UiItem.IsRenaming}" Classes="common">
                                                 <TextBox.KeyBindings>
@@ -127,6 +127,56 @@
                             </ListBox.ItemsPanel>
                         </ListBox>
                     </Grid>
+
+                    <GridSplitter Grid.Column="3"/>
+
+                    <Grid Grid.Column="4" RowDefinitions="Auto,*" Margin="8">
+                        <Grid.DataTemplates>
+						    	<DataTemplate DataType="vmgi:InheritedIconContentViewModel">
+									<Border Background="{StaticResource PxWhiteBrush}" CornerRadius="16" Height="128" Width="96" Focusable="True">
+                                        <Grid VerticalAlignment="Stretch" RowDefinitions="96,Auto" HorizontalAlignment="Stretch">
+                                            <Grid.DataTemplates>
+                                                <!-- Returning overrided templates to its originals -->
+		                       	                <DataTemplate DataType="vmgi:IconNullContentViewModel">
+                                                     <Viewbox>
+			                                            <mdi:MaterialIcon Classes="common" Kind="Null" Foreground="{StaticResource PxGrayBrush}"/>
+                                                    </Viewbox>
+                                                </DataTemplate>
+                                                <DataTemplate DataType="vmgi:InheritedIconContentViewModel"> 
+                                                    <ContentControl Content="{Binding InheritedContent}"/>
+                                                </DataTemplate>
+                                            </Grid.DataTemplates>
+                                            <ContentControl Margin="12" Content="{Binding InheritedContent}" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
+                                            <localo:FitTextBlock Text="{h:Loc icon_Inherited}" TextAlignment="Center" Classes="common" Grid.Row="1" Height="32"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            	<DataTemplate DataType="vmgi:IconNullContentViewModel">
+									<Border Background="{StaticResource PxWhiteBrush}" CornerRadius="16" Height="128" Width="96" Focusable="True">
+                                        <Grid VerticalAlignment="Stretch" RowDefinitions="96,Auto" HorizontalAlignment="Stretch">
+                                            <Viewbox>
+			                                    <mdi:MaterialIcon Classes="common" Kind="Null" Foreground="{StaticResource PxGrayBrush}"/>
+                                            </Viewbox>
+                                            <localo:FitTextBlock Text="{h:Loc icon_Empty}" TextAlignment="Center" Classes="common" Grid.Row="1" Height="32"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            <DataTemplate DataType="vmo:CreateNewElementButton">
+							    <Button Background="{StaticResource PxBlue1Brush}" Command="{Binding ClickedCommand}" CornerRadius="16" Height="96" Width="96">
+							        <mdi:MaterialIcon Kind="Plus" Width="48" Height="48" Classes="common"/>
+                                </Button>
+                            </DataTemplate>
+                        </Grid.DataTemplates>
+
+                        <TextBlock Text="{h:Loc Other2}" TextAlignment="Center" Classes="common"/>
+                        <ListBox Grid.Row="1" ItemsSource="{Binding OtherIcons}" SelectedItem="{Binding SelectedIconContent}">
+					        <ListBox.ItemsPanel>
+						        <ItemsPanelTemplate>
+                                    <localo:VirtualizingWrapPanel VerticalAlignment="Top" DisableContainerReuse="True"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+                    </Grid>
                 </Grid>
             </Grid>
             
@@ -142,7 +192,7 @@
                                 <Viewbox>
 			                        <mdi:MaterialIcon Classes="common"
                                         Kind="{Binding FigureType, Converter={StaticResource StringToMaterialIconKindConv}}" 
-                                        Foreground="{Binding $parent[UserControl].DataContext.SelectedColor, Converter={StaticResource ColorToBrushConv}}"/>
+                                        Foreground="{Binding $parent[UserControl].DataContext.ColorToShow, Converter={StaticResource ColorToBrushConv}}"/>
                                 </Viewbox>
                             </DataTemplate>
                         </Grid.DataTemplates>

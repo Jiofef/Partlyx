@@ -74,6 +74,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
         private async Task UpdateIconFromDto(IconDto dto)
         {
+            Icon?.Dispose();
             Icon = await _iconService.CreateFromDtoAsync(dto);
         }
 

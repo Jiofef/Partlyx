@@ -46,5 +46,14 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
         public IconTypeEnumViewModel ContentIconType => IconTypeEnumViewModel.Vector;
 
         public IconVectorContentViewModel Clone() => new IconVectorContentViewModel(FigureType, FigureColor);
+
+        public bool IsIdentical(IIconContentViewModel other)
+        {
+            if (other is not IconVectorContentViewModel otherVector) return false;
+
+            if (otherVector == this) return true;
+
+            return FigureType == otherVector.FigureType && FigureColor == otherVector.FigureColor;
+        }
     }
 }

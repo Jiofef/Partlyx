@@ -391,4 +391,16 @@
   <data name="Find_component_in_tree" xml:space="preserve">
     <value>Find component in tree</value>
   </data>
+  <data name="Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="Other2" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="icon_Empty" xml:space="preserve">
+    <value>Empty</value>
+  </data>
+  <data name="icon_Inherited" xml:space="preserve">
+    <value>Inherited</value>
+  </data>
 </root>

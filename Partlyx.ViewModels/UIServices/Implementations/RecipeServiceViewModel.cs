@@ -56,15 +56,6 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        public void StartRenamingFocused()
-        {
-            var focused = _focusedPart.FocusedPart;
-            if (focused is not RecipeViewModel recipe) return;
-
-            recipe.UiItem.IsRenaming = true;
-        }
-
-        [RelayCommand]
         public async Task RenameRecipe(PartSetValueInfo<RecipeViewModel, string> info)
         {
             var targetRecipe = info.Part;
@@ -75,6 +66,9 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
         public async Task RenameRecipe(RecipeViewModel targetRecipe, string newName)
         {
+            if (targetRecipe.Name == newName)
+                return;
+
             await _commands.CreateAsyncEndExcecuteAsync<SetRecipeNameCommand>(targetRecipe.LinkedParentResource!.Uid, targetRecipe.Uid, newName);
         }
 
@@ -91,6 +85,8 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             foreach (var recipe in recipes)
             {
+                if (recipe.LinkedParentResource?.Value == targetResource) continue;
+
                 var previousParentUid = recipe.LinkedParentResource!.Uid;
                 var newParentUid = targetResource.Uid;
 
@@ -111,6 +107,8 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
         public async Task SetCraftableAmount(RecipeViewModel targetRecipe, double amount)
         {
+            if (targetRecipe.CraftAmount == amount) return;
+
             await _commands.CreateAsyncEndExcecuteAsync<SetRecipeCraftAmountCommand>(targetRecipe.LinkedParentResource!.Uid, targetRecipe.Uid, amount);
         }
 
@@ -133,7 +131,14 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             await SetIcon(targetRecipe, valueIcon);
         }
-        public async Task SetIcon(RecipeViewModel targetRecipe, IconViewModel icon) =>
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeIconCommand>(targetRecipe.LinkedParentResource!.Uid, targetRecipe.Uid, icon.ToDto());
+        public async Task SetIcon(RecipeViewModel targetRecipe, IconViewModel newIcon)
+        {
+            var oldIcon = targetRecipe.Icon;
+
+            if (oldIcon.IsIdentical(newIcon))
+                return;
+
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeIconCommand>(targetRecipe.LinkedParentResource!.Uid, targetRecipe.Uid, newIcon.ToDto());
+        }
     }
 }

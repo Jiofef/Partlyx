@@ -47,22 +47,22 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
             if (dto is FigureIconDto figureDto)
             {
                 var content = new IconVectorContentViewModel(figureDto);
-                return new IconViewModel { IconType = IconTypeEnumViewModel.Vector, Content = content };
+                return new IconViewModel { Content = content };
             }
             else if (dto is ImageIconDto imageIconDto)
             {
                 var content = await GetImageOrNullFromStoreAsync(imageIconDto.ImageUid);
-                return new IconViewModel { IconType = IconTypeEnumViewModel.Image, Content = content };
+                return new IconViewModel { Content = content };
             }
             else if (dto is InheritedIconDto inheritedIconDto)
             {
                 var service = _provider.GetRequiredService<InheritedIconHelperServiceViewModel>();
                 var content = new InheritedIconContentViewModel(service);
                 await content.FindAndSetParent(inheritedIconDto.ParentUid, inheritedIconDto.ParentType);
-                return new IconViewModel { IconType = IconTypeEnumViewModel.Inherited, Content = content};
+                return new IconViewModel { Content = content};
             }
             else
-                return new IconViewModel(); // Empty icon
+                return new IconViewModel() { Content = new IconNullContentViewModel() };
         }
     }
 }
