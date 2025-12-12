@@ -8,6 +8,7 @@ using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.Settings;
 using Partlyx.ViewModels.UIObjectViewModels;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using System.ComponentModel;
@@ -21,14 +22,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         private readonly IGlobalSelectedParts _selectedParts;
         private readonly IDialogService _dialogService;
         private readonly IEventBus _bus;
+        private readonly ApplicationSettingsProviderViewModel _settings;
 
-        public RecipeComponentServiceViewModel(ICommandServices cs, IRecipeComponentService service, IGlobalSelectedParts gsp, IDialogService ds, IEventBus bus)
+        public RecipeComponentServiceViewModel(ICommandServices cs, IRecipeComponentService service, IGlobalSelectedParts gsp, IDialogService ds, IEventBus bus,
+            ApplicationSettingsProviderViewModel settings)
         {
             _commands = cs;
             _service = service;
             _selectedParts = gsp;
             _dialogService = ds;
             _bus = bus;
+            _settings = settings;
         }
 
         [RelayCommand]
@@ -56,10 +60,11 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         {
             var grandParentResUid = parent.LinkedParentResource!.Uid;
             var parentRecipeUid = parent!.Uid;
+            var componentQuantity = _settings.DefaultComponentQuantity;
             foreach (var resource in resources)
             {
                 var componentResUid = resource.Uid;
-                var command = _commands.Factory.Create<CreateRecipeComponentCommand>(grandParentResUid, parentRecipeUid, componentResUid);
+                var command = _commands.Factory.Create<CreateRecipeComponentCommand>(grandParentResUid, parentRecipeUid, componentResUid, componentQuantity);
 
                 // It must be executed on a single thread so that recipients respond to events immediately after they are sent
                 await Task.Run(async () =>

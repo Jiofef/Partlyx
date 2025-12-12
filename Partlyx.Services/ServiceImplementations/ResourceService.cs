@@ -33,7 +33,7 @@ namespace Partlyx.Services.ServiceImplementations
             
             var Uid = await _repo.AddResourceAsync(resource);
 
-            _eventBus.Publish(new ResourceCreatedEvent(resource.ToDto()));
+            _eventBus.Publish(new ResourceCreatedEvent(resource.ToDto(), resource.Uid));
 
             return Uid;
         }
@@ -43,7 +43,7 @@ namespace Partlyx.Services.ServiceImplementations
 
             var resource = await GetResourceAsync(uid);
             if (resource != null)
-                _eventBus.Publish(new ResourceCreatedEvent(resource));
+                _eventBus.Publish(new ResourceCreatedEvent(resource, resource.Uid));
 
             return duplicateUid;
         }
@@ -52,7 +52,7 @@ namespace Partlyx.Services.ServiceImplementations
         {
             await _repo.DeleteResourceAsync(uid);
 
-            _eventBus.Publish(new ResourceDeletedEvent(uid));
+            _eventBus.Publish(new ResourceDeletedEvent(uid, uid));
         }
 
         public async Task<ResourceDto?> GetResourceAsync(Guid uid)
@@ -99,7 +99,7 @@ namespace Partlyx.Services.ServiceImplementations
 
             var resource = await GetResourceAsync(resourceUid);
             if (resource != null)
-                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[] { "DefaultRecipeUid" }));
+                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[] { "DefaultRecipeUid" }, resource.Uid));
         }
 
         public async Task SetNameAsync(Guid resourceUid, string name)
@@ -112,7 +112,7 @@ namespace Partlyx.Services.ServiceImplementations
 
             var resource = await GetResourceAsync(resourceUid);
             if (resource != null)
-                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[]{"Name"}));
+                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[]{"Name"}, resource.Uid));
         }
 
         public async Task SetResourceIconAsync(Guid resourceUid, IconDto iconDto)
@@ -126,7 +126,7 @@ namespace Partlyx.Services.ServiceImplementations
 
             var resource = await GetResourceAsync(resourceUid);
             if (resource != null)
-                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[] { "Icon" }));
+                _eventBus.Publish(new ResourceUpdatedEvent(resource, new[] { "Icon" }, resource.Uid));
         }
 
         public async Task<int> GetResourcesCountAsync()

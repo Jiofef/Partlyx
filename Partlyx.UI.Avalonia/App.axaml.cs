@@ -84,6 +84,7 @@ namespace Partlyx.UI.Avalonia
 
             services.AddTransient<IPartUpdater, PartUpdater>();
             services.AddSingleton<Infrastructure.Events.IEventBus, Infrastructure.Events.EventBus>();
+            services.AddSingleton<Infrastructure.Events.IRoutedEventBus, Infrastructure.Events.RoutedEventBus>();
 
             services.AddSingleton<IApplicationResourceProvider>(new Infrastructure.Data.ApplicationResources.ApplicationResourcesProvider(typeof(App).Assembly));
 
@@ -155,6 +156,7 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<IVMPartsFactory, VMPartsFactory>();
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
             services.AddSingleton<IPartsInitializeServiceViewModel, PartsInitializeServiceViewModel>();
+            services.AddSingleton<IViewModelStorePartsEventRouter, ViewModelStorePartsEventRouter>();
             services.AddSingleton<IVMPartsStoreCleaner, VMPartsStoreCleaner>();
             services.AddSingleton<IGuidLinkedPartFactory, GuidLinkedPartFactory>();
             services.AddSingleton<ILinkedPartsManager, LinkedPartsManager>();

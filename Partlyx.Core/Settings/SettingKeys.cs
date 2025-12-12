@@ -9,5 +9,8 @@ namespace Partlyx.Core.Settings
     public static class SettingKeys
     {
         public const string Language = "language";
+        public const string CreateResourceWithRecipeByDefault = "create_resource_with_recipe_by_default";
+        public const string DefaultRecipeCraftAmount = "default_recipe_craft_amount";
+        public const string DefaultComponentQuantity = "default_component_quantity";
     }
 }

@@ -403,4 +403,19 @@
   <data name="icon_Inherited" xml:space="preserve">
     <value>Наследованная</value>
   </data>
+  <data name="Create_resource_with_recipe_by_default" xml:space="preserve">
+    <value>Создавать ресурс с рецептом по умолчанию</value>
+  </data>
+  <data name="Default_recipe_craft_amount" xml:space="preserve">
+    <value>Получаемое количество ресурса из рецепта по умолчанию</value>
+  </data>
+  <data name="Default_component_quantity" xml:space="preserve">
+    <value>Количество компонента в ресурсе по умолчанию</value>
+  </data>
+  <data name="settings_Parts" xml:space="preserve">
+    <value>Элементы</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Переименовать</value>
+  </data>
 </root>

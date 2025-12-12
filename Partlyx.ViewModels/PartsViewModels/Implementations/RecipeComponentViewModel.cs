@@ -31,13 +31,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public PartsServiceViewModel Services { get; }
 
         // Events
-        private readonly IEventBus _bus;
-        private readonly IDisposable _updatedSubscription;
-        private readonly IDisposable _childComponentsDefaultRecipeUpdateSubscribe;
-        private readonly IDisposable _childComponentsSelectedRecipeUpdateSubscribe;
+        private readonly IDisposable _childComponentsDefaultRecipeUpdateSubscription;
+        private readonly IDisposable _childComponentsSelectedRecipeUpdateSubscription;
+        private readonly IDisposable _iconUpdatedSubscription;
 
         public RecipeComponentViewModel(RecipeComponentDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store,
-            IVMPartsFactory partsFactory, IEventBus bus, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
+            IVMPartsFactory partsFactory, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
         {
             Uid = dto.Uid;
 
@@ -46,7 +45,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             GlobalNavigations = nav;
             _store = store;
             _partsFactory = partsFactory;
-            _bus = bus;
             _uiStateService = uiStateS;
             _commands = cs;
             _linkedPartsManager = lpm;
@@ -58,22 +56,23 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             // SelectedRecipeComponents is a helper property for fast switching from one component to its child components in the tree.
             // His calculation requires two property chains to be taken into account, and this is carried out in two compact subscriptions
-            _childComponentsDefaultRecipeUpdateSubscribe = this
+            _childComponentsDefaultRecipeUpdateSubscription = this
                 .WhenAnyValue(x => x.LinkedResource!.Value!.LinkedDefaultRecipe!.Value)
                 .Subscribe(v => UpdateSelectedComponents());
 
-            _childComponentsSelectedRecipeUpdateSubscribe = this
+            _childComponentsSelectedRecipeUpdateSubscription = this
                 .WhenAnyValue(x => x.LinkedSelectedRecipe!.Value)
                 .Subscribe(v => UpdateSelectedComponents());
             UpdateSelectedComponents();
+
+            _iconUpdatedSubscription = this
+                .WhenAnyValue(x => x.LinkedResource!.Value!.Icon)
+                .Subscribe(r => OnPropertyChanged(nameof(Icon)));
 
 
             _quantity = dto.Quantity;
             if (dto.SelectedRecipeUid is Guid selectedUid)
                 LinkedSelectedRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(selectedUid);
-
-            // Info updating binding
-            _updatedSubscription = bus.Subscribe<RecipeComponentUpdatedEvent>(OnRecipeComponentUpdated, true);
         }
 
         // Recipe component info
@@ -115,6 +114,14 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 : null},
         };
 
+        public void HandleEvent(object @event)
+        {
+            if (@event is RecipeComponentUpdatedEvent rcue)
+            {
+                OnRecipeComponentUpdated(rcue);
+                return;
+            }
+        }
         private void OnRecipeComponentUpdated(RecipeComponentUpdatedEvent ev)
         {
             if (Uid != ev.RecipeComponent.Uid) return;
@@ -126,9 +133,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             UiItem.Dispose();
 
-            _updatedSubscription.Dispose(); 
-            _childComponentsDefaultRecipeUpdateSubscribe.Dispose();
-            _childComponentsSelectedRecipeUpdateSubscribe.Dispose();
+            _childComponentsDefaultRecipeUpdateSubscription.Dispose();
+            _childComponentsSelectedRecipeUpdateSubscription.Dispose();
+            _iconUpdatedSubscription.Dispose();
         }
 
         // For UI

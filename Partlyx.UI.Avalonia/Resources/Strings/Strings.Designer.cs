@@ -214,11 +214,38 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Create resource with recipe by default.
+        /// </summary>
+        public static string Create_resource_with_recipe_by_default {
+            get {
+                return ResourceManager.GetString("Create_resource_with_recipe_by_default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Default component quantity.
+        /// </summary>
+        public static string Default_component_quantity {
+            get {
+                return ResourceManager.GetString("Default_component_quantity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Default recipe.
         /// </summary>
         public static string Default_recipe {
             get {
                 return ResourceManager.GetString("Default_recipe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Default recipe craft amount.
+        /// </summary>
+        public static string Default_recipe_craft_amount {
+            get {
+                return ResourceManager.GetString("Default_recipe_craft_amount", resourceCulture);
             }
         }
         
@@ -736,6 +763,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Rename.
+        /// </summary>
+        public static string Rename {
+            get {
+                return ResourceManager.GetString("Rename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Resource.
         /// </summary>
         public static string Resource {
@@ -858,6 +894,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string settings_General {
             get {
                 return ResourceManager.GetString("settings_General", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Parts.
+        /// </summary>
+        public static string settings_Parts {
+            get {
+                return ResourceManager.GetString("settings_Parts", resourceCulture);
             }
         }
         

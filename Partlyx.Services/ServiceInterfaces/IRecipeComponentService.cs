@@ -4,7 +4,7 @@ namespace Partlyx.Services.ServiceInterfaces
 {
     public interface IRecipeComponentService
     {
-        Task<Guid> CreateComponentAsync(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid);
+        Task<Guid> CreateComponentAsync(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid, double? quantity = null);
         Task DeleteComponentAsync(Guid parentResourceUid, Guid componentUid);
         Task<Guid> DuplicateComponentAsync(Guid parentResourceUid, Guid componentUid);
         Task<RecipeComponentDto?> GetComponentAsync(Guid parentResourceUid, Guid componentUid);

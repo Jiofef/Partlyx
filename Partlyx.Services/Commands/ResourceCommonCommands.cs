@@ -46,7 +46,7 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
 
             await _resourceRepository.AddResourceAsync(_createdResource);
 
-            var @event = new ResourceCreatedEvent(_createdResource.ToDto());
+            var @event = new ResourceCreatedEvent(_createdResource.ToDto(), _createdResource.Uid);
             _bus.Publish(@event);
         }
     }
@@ -81,7 +81,7 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
 
             await _resourceRepository.AddResourceAsync(_deletedResource);
 
-            var @event = new ResourceCreatedEvent(_deletedResource.ToDto());
+            var @event = new ResourceCreatedEvent(_deletedResource.ToDto(), _deletedResource.Uid);
             _bus.Publish(@event);
 
             _deletedResource = null;

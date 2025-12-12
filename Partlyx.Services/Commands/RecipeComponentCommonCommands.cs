@@ -21,9 +21,10 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         public Guid RecipeComponentUid { get; private set; }
 
         private RecipeComponent? _createdRecipeComponent;
+        private double? _quantity;
 
         public CreateRecipeComponentCommand(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid, 
-            IRecipeComponentService rcs, IPartlyxRepository rr, IEventBus bus)
+            IRecipeComponentService rcs, IPartlyxRepository rr, IEventBus bus, double? quantity = null)
         {
             _recipeComponentService = rcs;
             _resourceRepository = rr;
@@ -32,11 +33,13 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
             _resourceUid = grandParentResourceUid;
             _recipeUid = parentRecipeUid;
             _componentResourceUid = componentResourceUid;
+
+            _quantity = quantity;
         }
 
         public async Task ExecuteAsync()
         {
-            Guid uid = await _recipeComponentService.CreateComponentAsync(_resourceUid, _recipeUid, _componentResourceUid);
+            Guid uid = await _recipeComponentService.CreateComponentAsync(_resourceUid, _recipeUid, _componentResourceUid, _quantity);
             RecipeComponentUid = uid;
 
             var resource = await _resourceRepository.GetResourceByUidAsync(_resourceUid);
@@ -61,7 +64,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
                     return Task.CompletedTask;
                 });
 
-            var @event = new RecipeComponentCreatedEvent(_createdRecipeComponent.ToDto());
+            var @event = new RecipeComponentCreatedEvent(_createdRecipeComponent.ToDto(), _createdRecipeComponent.Uid);
             _bus.Publish(@event);
 
             _createdRecipeComponent = null;
@@ -120,7 +123,7 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
                     return Task.CompletedTask;
                 });
 
-            var @event = new RecipeComponentCreatedEvent(_deletedRecipeComponent.ToDto());
+            var @event = new RecipeComponentCreatedEvent(_deletedRecipeComponent.ToDto(), _deletedRecipeComponent.Uid);
             _bus.Publish(@event);
 
             _deletedRecipeComponent = null;

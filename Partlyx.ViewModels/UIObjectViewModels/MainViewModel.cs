@@ -4,6 +4,7 @@ using Partlyx.Core.Help;
 using Partlyx.Core.OtherSaves;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.Settings;
 using Partlyx.ViewModels.UIServices;
@@ -34,6 +35,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IPartsLoaderInitializeService _partsLoaderIntialize;
         private readonly IImagesLoaderInitializeService _imagesLoaderInitialize;
         private readonly IPartsInitializeServiceViewModel _partsInitializeVM;
+        private readonly IViewModelStorePartsEventRouter _storePartsEventRouter;
         private readonly ImagesInitializeServiceViewModel _imagesInitializeVM;
         private readonly IVMFileService _fileService;
         private readonly INotificationService _notificationService;
@@ -53,6 +55,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             IPartsLoaderInitializeService plis,
             IImagesLoaderInitializeService ilis,
             IPartsInitializeServiceViewModel pis,
+            IViewModelStorePartsEventRouter vmsper,
             ImagesInitializeServiceViewModel iis,
             IVMFileService vmfs,
             INotificationService ns,
@@ -73,6 +76,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _partsLoaderIntialize = plis;
             _imagesLoaderInitialize = ilis;
             _partsInitializeVM = pis;
+            _storePartsEventRouter = vmsper;
             _imagesInitializeVM = iis;
             _fileService = vmfs;
             _notificationService = ns;

@@ -51,7 +51,8 @@ namespace Partlyx.ViewModels.Settings
             {
                 var changedOptionValuesDictionary = await SettingsService.SyncValuesWithDB();
                 SettingsService.ClearChangedSettings();
-                _bus.Publish(new ApplicationSettingsAppliedViewModelEvent(changedOptionValuesDictionary));
+                _bus.Publish(new ApplicationSettingsAppliedViewModelEvent(changedOptionValuesDictionary, 
+                    new HashSet<object>(changedOptionValuesDictionary.Keys)));
             });
         }
         public void Dispose()

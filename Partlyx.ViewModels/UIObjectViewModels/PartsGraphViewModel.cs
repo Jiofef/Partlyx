@@ -71,7 +71,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 foreach (var node in Graph.Nodes)
                 {
                     if (node.Value is not IVMPart part) continue;
-                    if (part.Icon.Content is not ImageViewModel image) continue;
+                    if (part.Icon?.Content is not ImageViewModel image) continue;
                     if (nodeImagesUidsHashed.Contains(image.Uid)) continue;
                     
                     nodeImagesUidsHashed.Add(image.Uid);

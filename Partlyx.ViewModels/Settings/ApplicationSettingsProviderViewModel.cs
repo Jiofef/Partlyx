@@ -29,12 +29,15 @@ namespace Partlyx.ViewModels.Settings
             _settersDictionary = new Dictionary<string, Action<object?>>()
             {
                 { SettingKeys.Language, new((arg) => { Language = (LanguageInfo)arg!; }) },
+                { SettingKeys.CreateResourceWithRecipeByDefault, new(arg => { CreateResourceWithRecipeByDefault = (bool)arg!; }) },
+                { SettingKeys.DefaultRecipeCraftAmount, new(arg => { DefaultRecipeCraftAmount = (double)arg!; }) },
+                { SettingKeys.DefaultComponentQuantity, new(arg => { DefaultComponentQuantity = (double)arg!; }) },
             };
         }
 
         private void OnSettingsApplied(ApplicationSettingsAppliedViewModelEvent ev)
         {
-            foreach (var kvp in _settersDictionary)
+            foreach (var kvp in ev.ChangedSettingsDictionary)
             {
                 var action = _settersDictionary.GetValueOrDefault(kvp.Key);
                 if (action != null)
@@ -46,7 +49,16 @@ namespace Partlyx.ViewModels.Settings
         }
 
         private LanguageInfo _language;
+
         public LanguageInfo Language { get => _language; private set => SetProperty(ref _language, value); }
+
+        private bool _createResourceWithRecipeByDefault;
+
+        public bool CreateResourceWithRecipeByDefault { get => _createResourceWithRecipeByDefault; set => SetProperty(ref _createResourceWithRecipeByDefault, value); }
+        private double _defaultRecipeCraftAmount;
+        public double DefaultRecipeCraftAmount { get => _defaultRecipeCraftAmount; set => SetProperty(ref _defaultRecipeCraftAmount, value); }
+        private double _defaultComponentQuantity;
+        public double DefaultComponentQuantity { get => _defaultComponentQuantity; set => SetProperty(ref _defaultComponentQuantity, value); }
 
         public void Dispose()
             => _disposables?.Dispose();

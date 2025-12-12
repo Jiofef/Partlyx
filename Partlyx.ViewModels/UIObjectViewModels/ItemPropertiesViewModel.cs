@@ -47,7 +47,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public void OnFocusedPartChanged()
         {
-            Properties.Clear();
+            Properties.ClearAndDispose();
 
             FocusedPartTextAnnotation = "";
 

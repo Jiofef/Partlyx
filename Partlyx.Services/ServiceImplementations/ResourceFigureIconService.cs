@@ -32,7 +32,7 @@ namespace Partlyx.Services.ServiceImplementations
                 var info = _infoProvider.GetInfo(icon);
                 res.UpdateIconInfo(info);
 
-                var ev = new ResourceUpdatedEvent(res.ToDto(), ["Icon"]);
+                var ev = new ResourceUpdatedEvent(res.ToDto(), ["Icon"], res.Uid);
                 _eventBus.Publish(ev);
             });
         }
@@ -62,7 +62,7 @@ namespace Partlyx.Services.ServiceImplementations
                 var info = _infoProvider.GetInfo(icon);
                 recipe.UpdateIconInfo(info);
 
-                var ev = new RecipeUpdatedEvent(recipe.ToDto(), ["Icon"]);
+                var ev = new RecipeUpdatedEvent(recipe.ToDto(), ["Icon"], recipe.Uid);
                 _eventBus.Publish(ev);
             });
         }

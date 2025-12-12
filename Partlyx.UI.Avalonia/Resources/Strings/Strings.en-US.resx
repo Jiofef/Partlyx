@@ -403,4 +403,19 @@
   <data name="icon_Inherited" xml:space="preserve">
     <value>Inherited</value>
   </data>
+  <data name="Create_resource_with_recipe_by_default" xml:space="preserve">
+    <value>Create resource with recipe by default</value>
+  </data>
+  <data name="Default_recipe_craft_amount" xml:space="preserve">
+    <value>Default recipe craft amount</value>
+  </data>
+  <data name="Default_component_quantity" xml:space="preserve">
+    <value>Default component quantity</value>
+  </data>
+  <data name="settings_Parts" xml:space="preserve">
+    <value>Parts</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
 </root>

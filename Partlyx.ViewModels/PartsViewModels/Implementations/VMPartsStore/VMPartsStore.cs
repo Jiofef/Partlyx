@@ -1,8 +1,10 @@
-﻿using Partlyx.Infrastructure.Events;
+﻿using Partlyx.Core.Partlyx;
+using Partlyx.Infrastructure.Events;
 using Partlyx.UI.Avalonia.Helpers;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
 using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations

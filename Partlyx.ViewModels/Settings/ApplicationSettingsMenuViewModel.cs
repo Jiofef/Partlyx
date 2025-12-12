@@ -62,13 +62,14 @@ namespace Partlyx.ViewModels.Settings
             var changedKeys = _settings.GetChangedOptionsKeys();
             await _settings.Apply();
             var changedOptionsDictionary = _settings.GetOptionsDictionaryFromKeysList(changedKeys);
-            var changedOptionValuesDictionary = 
-                changedOptionsDictionary.Select(
-                kvp => new KeyValuePair<string, object?>(
-                    kvp.Key, 
-                    kvp.Value?.Value))
-                .ToDictionary();
-            _bus.Publish(new ApplicationSettingsAppliedViewModelEvent(changedOptionValuesDictionary));
+            var changedOptionValuesDictionary =
+                 changedOptionsDictionary.Select(
+                 kvp => new KeyValuePair<string, object?>(
+                     kvp.Key,
+                     kvp.Value?.Value))
+                 .ToDictionary();
+            _bus.Publish(new ApplicationSettingsAppliedViewModelEvent(changedOptionValuesDictionary, 
+                new HashSet<object>(changedOptionsDictionary.Keys)));
         }
         [RelayCommand]
         public async Task Ok()
@@ -84,5 +85,5 @@ namespace Partlyx.ViewModels.Settings
         }
     }
 
-    public record ApplicationSettingsAppliedViewModelEvent(Dictionary<string, object?> ChangedSettingsDictionary);
+    public record ApplicationSettingsAppliedViewModelEvent(Dictionary<string, object?> ChangedSettingsDictionary, HashSet<object> ReceiverKeys) : IRoutedMultiKeyEvent;
 }

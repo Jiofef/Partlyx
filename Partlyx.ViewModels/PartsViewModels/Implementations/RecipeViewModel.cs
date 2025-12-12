@@ -27,15 +27,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IconServiceViewModel _iconService;
         public PartsServiceViewModel Services { get; }
 
-        // Events
-        private readonly IEventBus _bus;
-        private readonly IDisposable _updatedSubscription;
-        private readonly IDisposable _childAddSubscription;
-        private readonly IDisposable _childRemoveSubscription;
-        private readonly IDisposable _childMoveSubscription;
-
         public RecipeViewModel(RecipeDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store,
-            IVMPartsFactory partsFactory, IEventBus bus, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm, IconServiceViewModel iconService)
+            IVMPartsFactory partsFactory, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm, IconServiceViewModel iconService)
         {
             Uid = dto.Uid;
 
@@ -44,7 +37,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             GlobalNavigations = nav;
             _store = store;
             _partsFactory = partsFactory;
-            _bus = bus;
             _uiStateService = uiStateS;
             _linkedPartsManager = lpm;
             _iconService = iconService;
@@ -68,12 +60,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             // For the most part, we don't really care when the icon will be loaded. Until then, the icon will be empty.
             _icon = new IconViewModel();
             _ = UpdateIconFromDto(dto.Icon);
-
-            // Info updating binding
-            _updatedSubscription = bus.Subscribe<RecipeUpdatedEvent>(OnRecipeUpdated, true);
-            _childAddSubscription = bus.Subscribe<RecipeComponentCreatedEvent>(OnComponentCreated, true);
-            _childRemoveSubscription = bus.Subscribe<RecipeComponentDeletedEvent>(OnComponentDeleted, true);
-            _childMoveSubscription = bus.Subscribe<RecipeComponentMovedEvent>(OnComponentMoved, true);
         }
         private async Task UpdateIconFromDto(IconDto dto)
         {
@@ -113,6 +99,29 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             { nameof(RecipeDto.Icon), dto => _ = UpdateIconFromDto(dto.Icon) },
         };
 
+        public void HandleEvent(object @event)
+        {
+            if (@event is RecipeUpdatedEvent rue)
+            {
+                OnRecipeUpdated(rue);
+                return;
+            }
+            if (@event is RecipeComponentCreatedEvent rcce)
+            {
+                OnComponentCreated(rcce);
+                return;
+            }
+            if (@event is RecipeComponentDeletedEvent rcde)
+            {
+                OnComponentDeleted(rcde);
+                return;
+            }
+            if (@event is RecipeComponentMovedEvent rcme)
+            {
+                OnComponentMoved(rcme);
+                return;
+            }
+        }
         private void OnRecipeUpdated(RecipeUpdatedEvent ev)
         {
             if (Uid != ev.Recipe.Uid) return;
@@ -170,11 +179,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public void Dispose()
         {
             UiItem.Dispose();
-
-            _updatedSubscription.Dispose();
-            _childAddSubscription.Dispose();
-            _childRemoveSubscription.Dispose();
-            _childMoveSubscription.Dispose();
 
             foreach(var component in Components)
                 component.Dispose();

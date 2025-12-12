@@ -20,7 +20,7 @@ namespace Partlyx.Services.ServiceImplementations
             _eventBus = bus;
         }
 
-        public async Task<Guid> CreateRecipeAsync(Guid parentResourceUid, string? recipeName = null)
+        public async Task<Guid> CreateRecipeAsync(Guid parentResourceUid, string? recipeName = null, double? craftAmount = null)
         {
             // If we change DefaultRecipe in ParentResource while performing the task from below, at the end of the method we will publish the event
             ResourceUpdatedEvent? defaultRecipeChangedEvent = null;
@@ -30,6 +30,8 @@ namespace Partlyx.Services.ServiceImplementations
                 var recipe = resource.CreateRecipe();
                 if (recipeName != null)
                     recipe.Name = recipeName;
+                if (craftAmount != null)
+                    recipe.CraftAmount = (double)craftAmount;
 
                 var icon = new InheritedIcon(parentResourceUid, InheritedIcon.InheritedIconParentTypeEnum.Resource);
                 var iconInfo = icon.GetInfo();
@@ -38,7 +40,7 @@ namespace Partlyx.Services.ServiceImplementations
                 if (recipe.ParentResource?.DefaultRecipe == null)
                 {
                     resource.SetDefaultRecipe(recipe);
-                    defaultRecipeChangedEvent = new(resource.ToDto(), ["DefaultRecipeUid"]);
+                    defaultRecipeChangedEvent = new(resource.ToDto(), ["DefaultRecipeUid"], resource.Uid);
                 }
 
                 return Task.FromResult(recipe.Uid);
@@ -47,7 +49,7 @@ namespace Partlyx.Services.ServiceImplementations
             var recipe = await GetRecipeAsync(parentResourceUid, result);
             if (recipe != null)
             {
-                _eventBus.Publish(new RecipeCreatedEvent(recipe));
+                _eventBus.Publish(new RecipeCreatedEvent(recipe, recipe.Uid));
 
                 if (defaultRecipeChangedEvent != null)
                     _eventBus.Publish(defaultRecipeChangedEvent);
@@ -69,7 +71,7 @@ namespace Partlyx.Services.ServiceImplementations
 
             var recipe = await GetRecipeAsync(parentResourceUid, result);
             if (recipe != null)
-                _eventBus.Publish(new RecipeCreatedEvent(recipe));
+                _eventBus.Publish(new RecipeCreatedEvent(recipe, recipe.Uid));
 
             return result;
         }
@@ -82,19 +84,21 @@ namespace Partlyx.Services.ServiceImplementations
             await _repo.ExecuteOnRecipeAsync(parentResourceUid, recipeUid, recipe =>
             {
                 var exParent = recipe.ParentResource!;
+                var parentDefaultRecipe = exParent.DefaultRecipe;
                 recipe.Detach();
 
-                if (exParent.DefaultRecipe == recipe)
+                if (parentDefaultRecipe == recipe)
                 {
                     exParent.SetDefaultRecipe(null);
-                    defaultRecipeChangedEvent = new(exParent.ToDto(), ["DefaultRecipeUid"]);
+                    defaultRecipeChangedEvent = new(exParent.ToDto(), ["DefaultRecipeUid"], exParent.Uid);
                 }
 
                 return Task.CompletedTask;
             });
             await _repo.DeleteRecipeAsync(recipeUid);
 
-            _eventBus.Publish(new RecipeDeletedEvent(parentResourceUid, recipeUid));
+            _eventBus.Publish(new RecipeDeletedEvent(parentResourceUid, recipeUid, 
+                new HashSet<object>() { parentResourceUid, recipeUid }));
             if (defaultRecipeChangedEvent != null)
                 _eventBus.Publish(defaultRecipeChangedEvent);
         }
@@ -114,7 +118,7 @@ namespace Partlyx.Services.ServiceImplementations
                 if (exParent!.DefaultRecipe == recipe)
                 {
                     exParent.SetDefaultRecipe(null);
-                    oldParentDefaultRecipeChangedEvent = new(exParent.ToDto(), ["DefaultRecipeUid"]);
+                    oldParentDefaultRecipeChangedEvent = new(exParent.ToDto(), ["DefaultRecipeUid"], exParent.Uid);
                 }
 
                 recipe = _recipe;
@@ -127,13 +131,14 @@ namespace Partlyx.Services.ServiceImplementations
                 if (resource.DefaultRecipe == recipe)
                 {
                     resource.SetDefaultRecipe(null);
-                    newParentDefaultRecipeChangedEvent = new(resource.ToDto(), ["DefaultRecipeUid"]);
+                    newParentDefaultRecipeChangedEvent = new(resource.ToDto(), ["DefaultRecipeUid"], resource.Uid);
                 }
 
                 return Task.CompletedTask;
             });
 
-            _eventBus.Publish(new RecipeMovedEvent(parentResourceUid, newParentResourceUid, recipeUid));
+            _eventBus.Publish(new RecipeMovedEvent(parentResourceUid, newParentResourceUid, recipeUid, 
+                new HashSet<object>() { parentResourceUid, newParentResourceUid, recipeUid }));
 
             if (oldParentDefaultRecipeChangedEvent != null)
                 _eventBus.Publish(oldParentDefaultRecipeChangedEvent);
@@ -183,7 +188,7 @@ namespace Partlyx.Services.ServiceImplementations
 
             var recipe = await GetRecipeAsync(parentResourceUid, recipeUid);
             if (recipe != null)
-                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "Name" }));
+                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "Name" }, recipe.Uid));
         }
 
         public async Task SetRecipeCraftAmountAsync(Guid parentResourceUid, Guid recipeUid, double craftAmount)
@@ -196,7 +201,7 @@ namespace Partlyx.Services.ServiceImplementations
 
             var recipe = await GetRecipeAsync(parentResourceUid, recipeUid);
             if (recipe != null)
-                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "CraftAmount" }));
+                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "CraftAmount" }, recipe.Uid));
         }
 
         public async Task SetRecipeIconAsync(Guid resourceUid, Guid recipeUid, IconDto iconDto)
@@ -210,7 +215,7 @@ namespace Partlyx.Services.ServiceImplementations
 
             var recipe = await GetRecipeAsync(resourceUid, recipeUid);
             if (recipe != null)
-                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "Icon" }));
+                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "Icon" }, recipe.Uid));
         }
     }
 }

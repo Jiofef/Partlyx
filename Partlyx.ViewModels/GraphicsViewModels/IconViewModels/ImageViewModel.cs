@@ -73,16 +73,20 @@ namespace Partlyx.ViewModels.GraphicsViewModels.IconViewModels
 
         private void UpdateToDrawBytes()
         {
-            if (Original != null)
+            var sex = ToDraw?.GetHashCode();
+
+            if (Original != null && Original.Length > 0)
                 ToDraw = Original;
-            else if (Compressed != null)
+            else if (Compressed != null && Compressed.Length > 0)
                 ToDraw = Compressed;
             else
                 ToDraw = null;
         }
         private byte[]? _toDraw;
 
-        public byte[]? ToDraw { get => _toDraw; set => SetProperty(ref _toDraw, value);}
+        public byte[]? ToDraw { get => _toDraw;
+            set => SetProperty(ref _toDraw, value);
+        }
 
         public void Dispose()
         {

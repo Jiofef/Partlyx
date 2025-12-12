@@ -9,6 +9,7 @@ using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.Settings;
 
 namespace Partlyx.ViewModels.UIServices.Implementations
 {
@@ -19,14 +20,16 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         private readonly IGlobalSelectedParts _selectedParts;
         private readonly ILocalizationService _loc;
         private readonly IEventBus _bus;
+        private readonly ApplicationSettingsProviderViewModel _settings;
 
-        public ResourceServiceViewModel(ICommandServices cs, IResourceService rs, IGlobalSelectedParts gsp, ILocalizationService loc, IEventBus bus) 
+        public ResourceServiceViewModel(ICommandServices cs, IResourceService rs, IGlobalSelectedParts gsp, ILocalizationService loc, IEventBus bus, ApplicationSettingsProviderViewModel settings) 
         {
             _commands = cs;
             _resourceService = rs;
             _selectedParts = gsp;
             _loc = loc;
             _bus = bus;
+            _settings = settings;
         }
 
         [RelayCommand]
@@ -49,9 +52,12 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                     await complexDispatcher.ExcecuteAsync(createResourceCommand);
                     resourceUid = createResourceCommand.ResourceUid;
 
-                    // Default recipe creating
-                    var defaultRecipeCreateCommand = _commands.Factory.Create<CreateRecipeCommand>(resourceUid, _loc["Recipe"]);
-                    await complexDispatcher.ExcecuteAsync(defaultRecipeCreateCommand);
+                    if (_settings.CreateResourceWithRecipeByDefault)
+                    {
+                        // Default recipe creating
+                        var defaultRecipeCreateCommand = _commands.Factory.Create<CreateRecipeCommand>(resourceUid, _loc["Recipe"]);
+                        await complexDispatcher.ExcecuteAsync(defaultRecipeCreateCommand);
+                    }
                 });
             });
 

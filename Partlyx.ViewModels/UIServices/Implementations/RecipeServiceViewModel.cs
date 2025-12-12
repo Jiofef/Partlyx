@@ -11,6 +11,7 @@ using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.Settings;
 
 namespace Partlyx.ViewModels.UIServices.Implementations
 {
@@ -20,16 +21,20 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         private readonly ILocalizationService _loc;
         private readonly IEventBus _bus;
         private readonly IRecipeService _service;
+        private readonly ApplicationSettingsProviderViewModel _settings;
 
         private readonly IGlobalSelectedParts _selectedParts;
         private readonly IGlobalFocusedPart _focusedPart;
 
-        public RecipeServiceViewModel(ICommandServices cs, ILocalizationService loc, IGlobalSelectedParts gsp, IGlobalFocusedPart gfp, IEventBus bus, IRecipeService service)
+        public RecipeServiceViewModel(ICommandServices cs, ILocalizationService loc, IGlobalSelectedParts gsp, IGlobalFocusedPart gfp, IEventBus bus, IRecipeService service,
+            ApplicationSettingsProviderViewModel settings)
         {
             _commands = cs;
             _loc = loc;
             _bus = bus;
             _service = service;
+            _settings = settings;
+
             _selectedParts = gsp;
             _focusedPart = gfp;
         }
@@ -41,8 +46,9 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             var recipeName = siblingsAmount == 0
                             ? _loc["Recipe"]
                             : _loc.Get("Recipe_N", siblingsAmount + 1);
+            var craftAmount = _settings.DefaultRecipeCraftAmount;
 
-            var command = _commands.Factory.Create<CreateRecipeCommand>(parent.Uid, recipeName);
+            var command = _commands.Factory.Create<CreateRecipeCommand>(parent.Uid, recipeName, craftAmount);
 
             // It must be executed on a single thread so that recipients respond to events immediately after they are sent
             await Task.Run(async () =>

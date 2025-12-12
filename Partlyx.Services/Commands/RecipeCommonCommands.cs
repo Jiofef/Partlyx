@@ -20,8 +20,9 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
 
         private Recipe? _createdRecipe;
         private string? _recipeName;
+        private double? _craftAmount;
 
-        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceService rs2, IPartlyxRepository rr, IEventBus bus, string? recipeName = null)
+        public CreateRecipeCommand(Guid parentResourceUid, IRecipeService rs, IResourceService rs2, IPartlyxRepository rr, IEventBus bus, string? recipeName = null, double? craftAmount = null)
         {
             _recipeService = rs;
             _resourceService = rs2;
@@ -30,11 +31,12 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
             _bus = bus;
 
             _recipeName = recipeName;
+            _craftAmount = craftAmount;
         }
 
         public async Task ExecuteAsync()
         {
-            Guid uid = await _recipeService.CreateRecipeAsync(_resourceUid, _recipeName);
+            Guid uid = await _recipeService.CreateRecipeAsync(_resourceUid, _recipeName, _craftAmount);
             RecipeUid = uid;
             var resource = await _resourceRepository.GetResourceByUidAsync(_resourceUid);
             _createdRecipe = resource?.GetRecipeByUid(uid);
@@ -60,7 +62,7 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
 
             RecipeUid = _createdRecipe.Uid;
 
-            var @event = new RecipeCreatedEvent(_createdRecipe.ToDto());
+            var @event = new RecipeCreatedEvent(_createdRecipe.ToDto(), _createdRecipe.Uid);
             await _bus.PublishAsync(@event);
 
             var resource = await _resourceService.GetResourceAsync(_resourceUid);
@@ -116,7 +118,7 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
                     return Task.CompletedTask;
                 });
 
-            var @event = new RecipeCreatedEvent(_deletedRecipe.ToDto());
+            var @event = new RecipeCreatedEvent(_deletedRecipe.ToDto(), _deletedRecipe.Uid);
             _bus.Publish(@event);
 
             _deletedRecipe = null;
