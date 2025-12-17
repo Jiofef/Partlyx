@@ -42,7 +42,15 @@
                          Watermark="{h:Loc Search___}" Grid.Column="1"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource PxWhiteBrush}"/>
                 </Grid>
-				<Grid Margin="8" ColumnDefinitions="*, 4, *, 4, 0.5*" Grid.Row="1">
+				<Grid Margin="8" Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" MinWidth="40"/>
+						<ColumnDefinition Width="4"/>
+						<ColumnDefinition Width="*" MinWidth="40"/>
+						<ColumnDefinition Width="4"/>
+						<ColumnDefinition Width="0.5*" MinWidth="40"/>
+                    </Grid.ColumnDefinitions>
+
                     <Grid Grid.Column="0" RowDefinitions="Auto, *" Margin="8">
                         <TextBlock Text="{h:Loc BuiltIn_Icons}" TextAlignment="Center" Classes="common"/>
                         <ListBox Grid.Row="1" ItemsSource="{Binding VectorIcons}" SelectedItem="{Binding SelectedIconContent}">

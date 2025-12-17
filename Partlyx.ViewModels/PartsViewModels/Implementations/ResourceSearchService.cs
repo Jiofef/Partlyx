@@ -14,10 +14,15 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
     {
         private readonly IGlobalResourcesVMContainer _resourcesContainer;
 
-        private readonly ReadOnlyObservableCollection<ResourceViewModel> _filteredResources;
+        // DynamicData контейнер для ресурсов
+        private readonly SourceCache<ResourceViewModel, Guid> _resourcesCache = new(r => r.Uid);
 
-        public ReadOnlyObservableCollection<ResourceViewModel> UnfilteredResources { get; }
+        private readonly ReadOnlyObservableCollection<ResourceViewModel> _filteredResources;
         public ReadOnlyObservableCollection<ResourceViewModel> FilteredResources => _filteredResources;
+        public ReadOnlyObservableCollection<ResourceViewModel> UnfilteredResources { get; }
+
+        [ObservableProperty]
+        private string _searchText = "";
 
         public ResourceSearchService(IGlobalResourcesVMContainer grvmc)
         {
@@ -25,28 +30,32 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             UnfilteredResources = new(_resourcesContainer.Resources);
 
-            var filter = this.WhenAnyValue(x => x.SearchText)
-                .Select(search => new Func<ResourceViewModel, bool>(r => SearchByName(r)));
-
             _resourcesContainer.Resources
-                .ToObservableChangeSet()
-                .Filter(filter)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Bind(out _filteredResources)
+                .ToObservableChangeSet(r => r.Uid)
+                .PopulateInto(_resourcesCache);
+
+            var filterPredicate = this.WhenAnyValue(x => x.SearchText)
+                .Throttle(TimeSpan.FromMilliseconds(150))
+                .Select(BuildFilter);
+
+            _resourcesCache.Connect()
+                .Filter(filterPredicate)
+                .SortAndBind(out _filteredResources, SortExpressionComparer<ResourceViewModel>.Ascending(r => r.Name))
                 .DisposeMany()
                 .Subscribe();
         }
 
-        public Predicate<ResourceViewModel> SearchByName => rItem =>
+        private Func<ResourceViewModel, bool> BuildFilter(string searchText)
         {
-            if (string.IsNullOrWhiteSpace(SearchText)) return true;
-            return rItem.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
-                || rItem.Recipes.Any(rc => rc.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
-                || rItem.Recipes.Any(rc => rc.Components.Any(c => c.LinkedResource?.Value != null && c.LinkedResource.Value.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)));
-        };
+            if (string.IsNullOrWhiteSpace(searchText))
+                return _ => true;
 
-        [ObservableProperty]
-        private string _searchText = "";
+            return rItem =>
+                rItem.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+                || rItem.Recipes.Any(rc =>
+                    rc.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+                    || rc.Components.Any(c =>
+                        c.LinkedResource?.Value?.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) == true));
+        }
     }
-
 }

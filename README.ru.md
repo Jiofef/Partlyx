@@ -1,7 +1,7 @@
 ## Что такое Partlyx?
 Partlyx позволяет вам создавать схемы (рецепты) разной сложности, состоящие из компонентов, коими могут быть любые ранее созданные ресурсы.
 
-![Screenshot1Small.png](.assets\Screenshot1Small.png)
+![Screenshot1Small.png](.assets/Screenshot1Small.png)
 
 -----
 

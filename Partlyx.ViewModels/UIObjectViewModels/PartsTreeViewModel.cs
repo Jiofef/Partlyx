@@ -92,7 +92,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private void AddFromDto(ResourceDto dto)
         {
             var resourceVM = _partsFactory.GetOrCreateResourceVM(dto);
-            Resources.Add(resourceVM);
+            _resourcesContainer.AddResource(resourceVM);
         }
 
         private void OnResourceCreated(ResourceCreatedEvent ev)
@@ -105,7 +105,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             var resourceVM = Resources.FirstOrDefault(c => c.Uid == ev.ResourceUid);
             if (resourceVM != null)
             {
-                Resources.Remove(resourceVM);
+                _resourcesContainer.RemoveResource(resourceVM);
                 resourceVM.Dispose();
             }
         }
@@ -121,10 +121,10 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public void UpdateList()
         {
-            Resources.Clear();
+            _resourcesContainer.ClearResources();
 
             foreach (var resource in _store.Resources.Values)
-                Resources.Add(resource);
+                _resourcesContainer.AddResource(resource);
         }
 
         private void SearchQueryHandler(TreeSearchQueryEvent ev)

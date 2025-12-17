@@ -1,7 +1,7 @@
 ## What is Partlyx?
 Partlyx allows you to create schemes (recipes) of varying complexity, consisting of components, which can be any previously created resources.
 
-![Screenshot1Small.png](.assets\Screenshot1Small.png)
+![Screenshot1Small.png](.assets/Screenshot1Small.png)
 
 -----
 
