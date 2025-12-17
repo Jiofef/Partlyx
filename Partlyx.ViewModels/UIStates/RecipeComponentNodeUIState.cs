@@ -99,5 +99,27 @@ namespace Partlyx.ViewModels.UIStates
         [RelayCommand]
         public void FindInTree()
             => _componentVM.UiItem.FindInTree();
+
+        [RelayCommand]
+        public void OpenBranch()
+        {
+            var targetRecipe = _componentVM.LinkedSelectedRecipe?.Value ?? _componentVM.LinkedResource?.Value?.LinkedDefaultRecipe?.Value;
+            if (targetRecipe != null)
+            {
+                targetRecipe.LinkedParentResource?.Value?.UiItem.Expand();
+                targetRecipe.UiItem.Select();
+                targetRecipe.UiItem.FocusGlobal();
+                targetRecipe.UiItem.Expand();
+                return;
+            }
+
+            var fallbackTargetResource = _componentVM.LinkedResource?.Value;
+            if (fallbackTargetResource != null)
+            {
+                fallbackTargetResource.UiItem.Select();
+                fallbackTargetResource.UiItem.FocusGlobal();
+                return;
+            }
+        }
     }
 }

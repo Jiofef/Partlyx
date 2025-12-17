@@ -38,7 +38,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public RecipeComponentViewModel GetOrCreateRecipeComponentVM(RecipeComponentDto dto)
         {
-            RecipeComponentViewModel? component = _store.RecipeComponents.GetValueOrDefault(dto.Uid);
+            RecipeComponentViewModel? component = _store.Components.GetValueOrDefault(dto.Uid);
             if (component != null)
                 return component;
 

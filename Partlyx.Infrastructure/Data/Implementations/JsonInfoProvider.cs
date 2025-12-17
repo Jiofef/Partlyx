@@ -154,7 +154,11 @@ namespace Partlyx.Infrastructure.Data.Implementations
 
             void OnSchemeLoaded(bool success)
             {
-                _bus.Publish(new JsonInfoLoadingFinishedEvent(scheme.SchemeName, path, success));
+                try
+                {
+                    _bus.Publish(new JsonInfoLoadingFinishedEvent(scheme.SchemeName, path, success));
+                }
+                catch { }
                 _loadedSchemes.Add(scheme);
             }
 

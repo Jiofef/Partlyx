@@ -1,9 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DynamicData;
 using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
+using Partlyx.Services.ServiceImplementations;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -239,6 +241,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         [ObservableProperty] private bool _allowCreateResource;
         [ObservableProperty] private bool _allowCreateRecipe;
         [ObservableProperty] private bool _allowCreateComponent;
+        [ObservableProperty] private bool _allowQuantifyRecipe;
+        [ObservableProperty] private bool _allowMergeRecipe;
+        [ObservableProperty] private bool _allowDuplicate;
         [ObservableProperty] private bool _allowToggleFocus;
         [ObservableProperty] private bool _allowExpandBranch;
         [ObservableProperty] private bool _allowCollapseBranch;
@@ -267,8 +272,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly PartsSelectionState _details;
         public override void UpdateAllowed()
         {
-            AllowDelete = _details.HasAnything;
+            AllowDelete = AllowDuplicate = _details.HasAnything;
             AllowExpandBranch = AllowCollapseBranch = _details.HasAnything && !_details.HasOnlyComponents;
+            AllowDuplicate = _details.HasOnlyResources || _details.HasOnlyRecipes || _details.HasOnlyComponents;
 
             AllowCreateResource = !_details.HasAnything;
             AllowCreateRecipe = _details.HasOnlyResources;
@@ -276,6 +282,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             bool singleSelect = _details.PartsCount == 1;
             AllowToggleFocus = singleSelect;
+
+            AllowQuantifyRecipe = _details.HasOnlyRecipes;
+            AllowMergeRecipe = _details.HasOnlyRecipes;
 
             AllowFindResourceInTree = (_details.HasOnlyResources || _details.HasOnlyComponents) && singleSelect;
             AllowFindRecipeInTree = _details.HasOnlyRecipes && singleSelect;
@@ -316,6 +325,38 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
                 foreach (var recipe in recipes)
                     await _service.ComponentService.CreateComponentsFromAsync(recipe, resourcesForComponentsCreate);
+            }
+        }
+
+        [RelayCommand]
+        public async Task DuplicateAsync()
+        {
+            foreach (var part in _selected)
+            {
+                await _service.Duplicate(part);
+            }
+        }
+
+        [RelayCommand]
+        public async Task CreateQuantifiedRecipeAsync()
+        {
+            foreach (var part in _selected)
+            {
+                if (part is  RecipeViewModel recipe)
+                {
+                    await _service.CreateQuantifiedCloneAsync(recipe);
+                }
+            }
+        }
+        [RelayCommand]
+        public async Task MergeComponentsForRecipeAsync()
+        {
+            foreach (var part in _selected)
+            {
+                if (part is RecipeViewModel recipe)
+                {
+                    await _service.ComponentService.MergeSameComponentsAsync(recipe);
+                }
             }
         }
 
@@ -374,7 +415,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         [RelayCommand]
         public async Task Delete()
         {
-            foreach (var part in _selected)
+            var selectedCopy = new ObservableCollection<IVMPart>(_selected);
+
+            foreach (var part in selectedCopy)
             {
                 await _service.RemoveAsync(part);
             }

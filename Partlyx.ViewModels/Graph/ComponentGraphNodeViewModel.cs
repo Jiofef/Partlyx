@@ -1,19 +1,11 @@
-﻿using DynamicData.Binding;
-using Partlyx.Infrastructure.Events;
-using Partlyx.ViewModels.PartsViewModels.Implementations;
+﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using ReactiveUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using UJL.CSharp.Collections;
 
 namespace Partlyx.ViewModels.Graph
 {
-    public class ComponentGraphNodeViewModel : GraphTreeNodeViewModel, IDisposable
+    public class ComponentGraphNodeViewModel : GraphTreeNodeViewModel, IDisposable, ITypedVMPartHolder<RecipeComponentViewModel>
     {
         private readonly IDisposable _resourceNameUpdateSubscription;
         private readonly IDisposable _quantityUpdateSubscription;
@@ -34,11 +26,11 @@ namespace Partlyx.ViewModels.Graph
         {
             if (Value is RecipeComponentViewModel component)
             {
-                _valueComponent = component;
+                _component = component;
             }
 
             _resourceNameUpdateSubscription =
-                this.WhenAnyValue((@this => @this._valueComponent.LinkedResource.Value.Name))
+                this.WhenAnyValue((@this => @this._component.LinkedResource.Value.Name))
                 .Subscribe((o) => UpdateColumnText());
 
             _valueUpdateSubscription = 
@@ -46,20 +38,19 @@ namespace Partlyx.ViewModels.Graph
                 .Subscribe((o) => OnValueChanged());
 
             _quantityUpdateSubscription =
-                this.WhenAnyValue(@this => @this._valueComponent.Quantity)
+                this.WhenAnyValue(@this => @this._component.Quantity)
                 .Subscribe((o) => OnCostChanged());
 
             _craftAmountUpdateSubscription =
-                this.WhenAnyValue(@this => @this._valueComponent.LinkedParentRecipe.Value.CraftAmount)
+                this.WhenAnyValue(@this => @this._component.LinkedParentRecipe.Value.CraftAmount)
                 .Subscribe((o) => OnCostChanged());
         }
 
-        private RecipeComponentViewModel? _valueComponent = null;
         private void OnValueChanged()
         {
             if (Value is RecipeComponentViewModel component)
             {
-                _valueComponent = component;
+                Part = component;
             }
             OnCostChanged();
         }
@@ -67,6 +58,10 @@ namespace Partlyx.ViewModels.Graph
 
         private double _cost;
         public double Cost { get => _cost; private set => SetProperty(ref _cost, value); }
+
+        public PartTypeEnumVM? PartType => PartTypeEnumVM.Component;
+        private RecipeComponentViewModel? _component = null;
+        public RecipeComponentViewModel? Part { get => _component; private set => SetProperty(ref _component, value); }
 
         protected override void Build()
         {
@@ -77,12 +72,12 @@ namespace Partlyx.ViewModels.Graph
 
         private void UpdateCost()
         {
-            if (_valueComponent != null)
+            if (_component != null)
             {
-                if (Parent is RecipeGraphNodeViewModel || _valueComponent.LinkedParentRecipe?.Value?.CraftAmount == null)
-                    _localCost = _valueComponent.Quantity;
+                if (Parent is RecipeGraphNodeViewModel || _component.LinkedParentRecipe?.Value?.CraftAmount == null)
+                    _localCost = _component.Quantity;
                 else
-                    _localCost = _valueComponent.Quantity / _valueComponent.LinkedParentRecipe.Value.CraftAmount;
+                    _localCost = _component.Quantity / _component.LinkedParentRecipe.Value.CraftAmount;
             }
             else
                 _localCost = 1;
@@ -112,9 +107,9 @@ namespace Partlyx.ViewModels.Graph
 
         private void UpdateColumnText()
         {
-            if (_valueComponent == null) return;
+            if (_component == null) return;
 
-            string? name = _valueComponent.LinkedResource?.Value?.Name;
+            string? name = _component.LinkedResource?.Value?.Name;
 
             if (name == null)
             {

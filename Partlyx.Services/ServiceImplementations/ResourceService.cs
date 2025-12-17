@@ -41,7 +41,7 @@ namespace Partlyx.Services.ServiceImplementations
         {
             var duplicateUid = await _repo.DuplicateResourceAsync(uid);
 
-            var resource = await GetResourceAsync(uid);
+            var resource = await GetResourceAsync(duplicateUid);
             if (resource != null)
                 _eventBus.Publish(new ResourceCreatedEvent(resource, resource.Uid));
 

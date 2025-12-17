@@ -1,11 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Partlyx.Core;
+﻿using Partlyx.Core.Partlyx;
 using Partlyx.Core.VisualsInfo;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
-using Partlyx.Services.ServiceImplementations;
-using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.GlobalNavigations;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -13,11 +10,10 @@ using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIStates;
 using System.Collections.ObjectModel;
-using System.Xml.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public partial class RecipeViewModel : UpdatableViewModel<RecipeDto>, IVMPart, IObservableFindableIconHolder, IInheritingIconHolderViewModel
+    public partial class RecipeViewModel : UpdatableViewModel<RecipeDto>, IVMPart, IObservableFindableIconHolder, IInheritingIconHolderViewModel, ITypedVMPartHolder<RecipeViewModel>
     {
         // Services
         private readonly IVMPartsStore _store;
@@ -25,10 +21,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IRecipeItemUiStateService _uiStateService;
         private readonly ILinkedPartsManager _linkedPartsManager;
         private readonly IconServiceViewModel _iconService;
+        private readonly IEventBus _bus;
         public PartsServiceViewModel Services { get; }
 
         public RecipeViewModel(RecipeDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store,
-            IVMPartsFactory partsFactory, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm, IconServiceViewModel iconService)
+            IVMPartsFactory partsFactory, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm, IconServiceViewModel iconService, IEventBus bus)
         {
             Uid = dto.Uid;
 
@@ -40,6 +37,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _uiStateService = uiStateS;
             _linkedPartsManager = lpm;
             _iconService = iconService;
+            _bus = bus;
 
             // Info
             if (dto.ParentResourceUid is Guid parentUid)
@@ -50,11 +48,14 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             _name = dto.Name;
             _craftAmount = dto.CraftAmount;
-            
+
+            ComponentsDic = new(_componentsDic);
+
             foreach (var component in dto.Components)
             {
                 var vm = _partsFactory.GetOrCreateRecipeComponentVM(component);
                 _components.Add(vm);
+                _componentsDic.Add(vm.Uid, vm);
             }
 
             // For the most part, we don't really care when the icon will be loaded. Until then, the icon will be empty.
@@ -82,8 +83,27 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public double CraftAmount { get => _craftAmount; set => SetProperty(ref _craftAmount, value); }
 
         private ObservableCollection<RecipeComponentViewModel> _components = new();
-
         public ObservableCollection<RecipeComponentViewModel> Components { get => _components; } // Updates locally when component is created/removed
+
+        private readonly Dictionary<Guid, RecipeComponentViewModel> _componentsDic = new();
+        public ReadOnlyDictionary<Guid, RecipeComponentViewModel> ComponentsDic { get; }
+        public RecipeComponentViewModel? GetChildOrNull(Guid uid) => _componentsDic.GetValueOrDefault(uid);
+        private void AddComponent(RecipeComponentViewModel recipe)
+        {
+            if (_componentsDic.ContainsKey(recipe.Uid))
+                return;
+
+            Components.Add(recipe);
+            _componentsDic.Add(recipe.Uid, recipe);
+        }
+        private void RemoveComponent(RecipeComponentViewModel recipe)
+        {
+            if (!_componentsDic.ContainsKey(recipe.Uid))
+                return;
+
+            Components.Remove(recipe);
+            _componentsDic.Remove(recipe.Uid);
+        }
 
         private IconViewModel _icon;
         public IconViewModel Icon { get => _icon; private set => SetProperty(ref _icon, value); }
@@ -111,9 +131,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 OnComponentCreated(rcce);
                 return;
             }
-            if (@event is RecipeComponentDeletedEvent rcde)
+            if (@event is RecipeComponentDeletingStartedEvent rcde)
             {
-                OnComponentDeleted(rcde);
+                OnComponentDeletingStarted(rcde);
                 return;
             }
             if (@event is RecipeComponentMovedEvent rcme)
@@ -134,17 +154,19 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             if (Uid != ev.RecipeComponent.ParentRecipeUid) return;
 
             var componentVM = _partsFactory.GetOrCreateRecipeComponentVM(ev.RecipeComponent);
-            Components.Add(componentVM);
+            AddComponent(componentVM);
+
+            UiItem.IsExpanded = true;
         }
 
-        private void OnComponentDeleted(RecipeComponentDeletedEvent ev)
+        private void OnComponentDeletingStarted(RecipeComponentDeletingStartedEvent ev)
         {
             if (Uid != ev.ParentRecipeUid) return;
 
-            var componentVM = Components.FirstOrDefault(c => c.Uid == ev.RecipeComponentUid);
+            var componentVM = GetChildOrNull(ev.ComponentUid);
             if (componentVM != null)
             {
-                Components.Remove(componentVM);
+                RemoveComponent(componentVM);
                 componentVM.Dispose();
             }
         }
@@ -153,18 +175,18 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             if (Uid == ev.OldRecipeUid)
             {
-                var componentVM = Components.FirstOrDefault(c => c.Uid == ev.ComponentUid);
+                var componentVM = GetChildOrNull(ev.ComponentUid);
                 if (componentVM != null)
                 {
-                    Components.Remove(componentVM);
+                    RemoveComponent(componentVM);
                 }
             }
             else if (Uid == ev.NewRecipeUid)
             {
-                var componentVM = _store.RecipeComponents.GetValueOrDefault(ev.ComponentUid);
+                var componentVM = _store.Components.GetValueOrDefault(ev.ComponentUid);
                 if (componentVM != null)
                 {
-                    Components.Add(componentVM);
+                    AddComponent(componentVM);
                     componentVM.LinkedParentRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(Uid);
                 }
             }
@@ -173,7 +195,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         /// <summary> Used when new DB is initialized and we need to connect created VM parts to each other </summary>
         internal void InitAddChild(RecipeComponentViewModel component)
         {
-            Components.Add(component);
+            AddComponent(component);
         }
 
         public void Dispose()
@@ -184,10 +206,26 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 component.Dispose();
         }
 
+        public override void Update(RecipeDto dto, IReadOnlyList<string>? changedProperties = null)
+        {
+            base.Update(dto, changedProperties);
+
+            var eventRecieversKeys = new HashSet<object>();
+            if (changedProperties != null)
+                foreach (var property in changedProperties)
+                    eventRecieversKeys.Add(property);
+            eventRecieversKeys.Add(dto.Uid);
+            _bus.Publish(new RecipeUpdatedViewModelEvent(Uid, changedProperties, eventRecieversKeys));
+        }
+
         // For UI
         public RecipeItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
         PartItemUIState IVMPart.UiItem => UiItem;
         public RecipeNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
         public PartsGlobalNavigations GlobalNavigations { get; }
+
+        // Compatibility
+        /// <summary> Self </summary>
+        public RecipeViewModel? Part => this;
     }
 }

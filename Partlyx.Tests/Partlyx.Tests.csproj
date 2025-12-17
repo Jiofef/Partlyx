@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Partlyx.Core\Partlyx.Core.csproj" />
-    <ProjectReference Include="..\Partlyx.Data\Partlyx.Infrastructure.csproj" />
+    <ProjectReference Include="..\Partlyx.Infrastructure\Partlyx.Infrastructure.csproj" />
     <ProjectReference Include="..\Partlyx.Services\Partlyx.Services.csproj" />
     <ProjectReference Include="..\Partlyx.UI.Avalonia\Partlyx.UI.Avalonia.csproj" />
     <ProjectReference Include="..\Partlyx.ViewModels\Partlyx.ViewModels.csproj" />

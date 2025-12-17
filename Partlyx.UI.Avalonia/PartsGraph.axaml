@@ -9,6 +9,7 @@
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
              xmlns:beh="using:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:dnd="using:Partlyx.UI.Avalonia.DragAndDrop"
              xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
              xmlns:graphvm="clr-namespace:Partlyx.ViewModels.Graph;assembly=Partlyx.ViewModels"
              xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
@@ -89,6 +90,9 @@
                                 <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
                                         Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}"
                             BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2" VerticalContentAlignment="Stretch">
+                                    <i:Interaction.Behaviors>
+                                        <dnd:ContextDropBehavior Handler="{StaticResource RecipeItemDropHandler}"/>
+                                    </i:Interaction.Behaviors>
                                     <Grid VerticalAlignment="Stretch" RowDefinitions="*,Auto">
                                         <local:IconControl Grid.Row="0" IconContent="{Binding Value.Icon}"/>
                                         <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
@@ -126,6 +130,7 @@
 
                                     <Button.ContextMenu>
                                         <ContextMenu>
+                                            <MenuItem Header="{h:Loc Open_branch}" Command="{Binding Value.UiNode.OpenBranch}" Classes="common"/>
                                             <MenuItem Header="{h:Loc Find_component_in_tree}" Command="{Binding Value.UiNode.FindInTreeCommand}" Classes="common"/>
                                             <MenuItem Header="{h:Loc Find_resource_in_tree}" Command="{Binding Value.UiNode.FindResourceInTreeCommand}" Classes="common"/>
                                         </ContextMenu>

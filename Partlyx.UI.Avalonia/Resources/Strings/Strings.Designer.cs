@@ -205,6 +205,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Create indivisible copy.
+        /// </summary>
+        public static string Create_quantified_copy {
+            get {
+                return ResourceManager.GetString("Create_quantified_copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Create a resource.
         /// </summary>
         public static string Create_resource {
@@ -291,6 +300,24 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Do_you_want_to_save_your_file_before_opening_another_one {
             get {
                 return ResourceManager.GetString("Do_you_want_to_save_your_file_before_opening_another_one", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Duplicate.
+        /// </summary>
+        public static string Duplicate {
+            get {
+                return ResourceManager.GetString("Duplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Error.
+        /// </summary>
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
             }
         }
         
@@ -412,6 +439,24 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Parts and tree.
+        /// </summary>
+        public static string help_Parts_and_tree {
+            get {
+                return ResourceManager.GetString("help_Parts_and_tree", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Parts graph.
+        /// </summary>
+        public static string help_Parts_graph {
+            get {
+                return ResourceManager.GetString("help_Parts_graph", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Parts tree.
         /// </summary>
         public static string help_Parts_tree {
@@ -430,20 +475,20 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на How to use Partlyx text.
+        ///   Ищет локализованную строку, похожую на Parts and tree text.
         /// </summary>
-        public static string help_text_HowToUsePartlyx {
+        public static string help_text_Parts_and_tree {
             get {
-                return ResourceManager.GetString("help_text_HowToUsePartlyx", resourceCulture);
+                return ResourceManager.GetString("help_text_Parts_and_tree", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Parts tree text.
+        ///   Ищет локализованную строку, похожую на Parts graph text.
         /// </summary>
-        public static string help_text_Parts_tree {
+        public static string help_text_Parts_graph {
             get {
-                return ResourceManager.GetString("help_text_Parts_tree", resourceCulture);
+                return ResourceManager.GetString("help_text_Parts_graph", resourceCulture);
             }
         }
         
@@ -574,6 +619,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Merge same components.
+        /// </summary>
+        public static string Merge_same_components {
+            get {
+                return ResourceManager.GetString("Merge_same_components", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Name.
         /// </summary>
         public static string Name {
@@ -606,6 +660,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Open {
             get {
                 return ResourceManager.GetString("Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Open branch.
+        /// </summary>
+        public static string Open_branch {
+            get {
+                return ResourceManager.GetString("Open_branch", resourceCulture);
             }
         }
         

@@ -56,24 +56,37 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             await CreateComponentsFromAsync(parent, resources);
         }
 
-        public async Task CreateComponentsFromAsync(RecipeViewModel parent, IEnumerable<ResourceViewModel> resources)
+        public async Task CreateComponentsFromAsync(RecipeViewModel parent, ICollection<ResourceViewModel> resources)
+        {
+            var componentQuantity = _settings.DefaultComponentQuantity;
+
+            var resourceAmountPairs = resources
+                .Select(r => new ResourceAmountPairViewModel(r, componentQuantity))
+                .ToList();
+
+            await CreateComponentsFromAsync(parent, resourceAmountPairs);
+        }
+
+        public async Task CreateComponentsFromAsync(RecipeViewModel parent, ICollection<ResourceAmountPairViewModel> resourceAmountPairs)
         {
             var grandParentResUid = parent.LinkedParentResource!.Uid;
             var parentRecipeUid = parent!.Uid;
-            var componentQuantity = _settings.DefaultComponentQuantity;
-            foreach (var resource in resources)
+            foreach (var pair in resourceAmountPairs)
             {
+                var resource = pair.Resource;
+                var componentQuantity = pair.Amount;
                 var componentResUid = resource.Uid;
+
                 var command = _commands.Factory.Create<CreateRecipeComponentCommand>(grandParentResUid, parentRecipeUid, componentResUid, componentQuantity);
 
                 // It must be executed on a single thread so that recipients respond to events immediately after they are sent
                 await Task.Run(async () =>
                 {
                     await _commands.Dispatcher.ExcecuteAsync(command);
-                });
 
-                var componentUid = command.RecipeComponentUid;
-                _bus.Publish(new RecipeComponentCreatingCompletedVMEvent(componentUid));
+                    var componentUid = command.RecipeComponentUid;
+                    _bus.Publish(new RecipeComponentCreatingCompletedVMEvent(componentUid));
+                });
             }
         }
 
@@ -114,10 +127,48 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             if (grandParentUid == null)
                 return;
 
-            bool exists = await _service.IsComponentExists((Guid)grandParentUid, component.Uid);
+            var grandParentUidNotNull = (Guid)grandParentUid;
+
+            bool exists = await _service.IsComponentExists(grandParentUidNotNull, component.Uid);
             
             if (exists)
-                await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeComponentCommand>(grandParentUid!, parentUid, component.Uid);
+            {
+                await Task.Run(async () =>
+                {
+                    _bus.Publish(new RecipeComponentDeletingStartedEvent(component.Uid, parentUid, grandParentUidNotNull, 
+                        new HashSet<object>() { component.Uid, parentUid, grandParentUidNotNull }));
+                    await Task.Run(async () => await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeComponentCommand>(grandParentUid!, parentUid, component.Uid));
+                });
+            }
+        }
+
+        [RelayCommand]
+        public async Task<Guid> Duplicate(RecipeComponentViewModel component)
+        {
+            var parentUid = component.LinkedParentRecipe!.Uid;
+            var grandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
+            var command = await _commands.CreateSyncAndExcecuteAsync<DuplicateRecipeCommand>(grandParentUid, parentUid, component.Uid);
+
+            var componentUid = command.DuplicateUid;
+            _bus.Publish(new RecipeComponentCreatingCompletedVMEvent(componentUid));
+
+            return componentUid;
+        }
+
+        [RelayCommand]
+        public async Task MergeSameComponentsAsync(RecipeViewModel recipe)
+        {
+            var components = recipe.Components;
+            var nonUniqueComponents = components.GetWithoutUniqueComponents();
+            var mergedComponents = nonUniqueComponents.GetMerged();
+
+            await Task.Run(async () =>
+            {
+                foreach (var component in nonUniqueComponents)
+                    await RemoveAsync(component);
+
+                await CreateComponentsFromAsync(recipe, mergedComponents);
+            });
         }
 
         [RelayCommand]

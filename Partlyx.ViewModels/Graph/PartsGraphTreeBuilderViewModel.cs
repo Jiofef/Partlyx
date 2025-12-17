@@ -15,6 +15,7 @@ using System.Runtime.CompilerServices;
 using UJL.CSharp.Collections;
 using Partlyx.UI.Avalonia.Helpers;
 using CommunityToolkit.Mvvm.Input;
+using Partlyx.Services.ServiceImplementations;
 
 namespace Partlyx.ViewModels.Graph
 {
@@ -26,11 +27,13 @@ namespace Partlyx.ViewModels.Graph
 
         public RelayCommand? OnGraphBuilded { get; set; }
 
-        public PartsGraphTreeBuilderViewModel(IGlobalFocusedPart focusedPart, IEventBus bus, IVMPartsStore store)
+        public PartsGraphTreeBuilderViewModel(IGlobalFocusedPart focusedPart, IEventBus bus, IRoutedEventBus routedBus, IVMPartsStore store)
         {
             _store = store;
 
             FocusedPart = focusedPart;
+
+            _updateGraphTrottledInvoker = new(TimeSpan.FromMilliseconds(200));
 
             var focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedPartChangedEvent>(
                 (ev) =>
@@ -50,6 +53,8 @@ namespace Partlyx.ViewModels.Graph
             _subscriptions.Add(bus.Subscribe<RecipeComponentCreatingCompletedVMEvent>((ev) => UpdateGraph()));
             _subscriptions.Add(bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>((ev) => UpdateGraph()));
             _subscriptions.Add(bus.Subscribe<RecipeComponentsMovingCompletedVMEvent>((ev) => UpdateGraph()));
+            _subscriptions.Add(routedBus.Subscribe<ResourceUpdatedViewModelEvent>("DefaultRecipeUid", (ev) => UpdateGraph()));
+            _subscriptions.Add(routedBus.Subscribe<RecipeComponentUpdatedViewModelEvent>("SelectedRecipeUid", ev => UpdateGraph()));
         }
 
         public IGlobalFocusedPart FocusedPart { get; }
@@ -60,10 +65,18 @@ namespace Partlyx.ViewModels.Graph
         {
             DestroyBranch(rootNode, false);
 
+            HashSet<ResourceViewModel> parentResources = new();
+
             if (rootNode.Value is RecipeViewModel recipe)
+            {
+                parentResources.Add(recipe.LinkedParentResource!.Value!);
                 LoadChildComponentsFrom(recipe.Components, rootNode);
+            }
             else if (rootNode.Value is RecipeComponentViewModel component && component.SelectedRecipeComponents != null)
+            {
+                parentResources.Add(component.Resource);
                 LoadChildComponentsFrom(component.SelectedRecipeComponents, rootNode);
+            }
             else
                 Trace.WriteLine("Cannot build branch for node with type: " + rootNode.Value?.GetType());
 
@@ -72,6 +85,7 @@ namespace Partlyx.ViewModels.Graph
                 for (int i = 0; i < components.Count; i++)
                 {
                     var component = components[i];
+                    var componentResource = component.Resource;
 
                     var node = new ComponentGraphNodeViewModel(component);
                     AddNode(node);
@@ -80,10 +94,15 @@ namespace Partlyx.ViewModels.Graph
 
                     var edge = new TwoObjectsLineViewModel(parentNode, node);
 
-                    if (component.SelectedRecipeComponents != null && component.SelectedRecipeComponents.Count > 0)
+                    if (component.SelectedRecipeComponents != null && component.SelectedRecipeComponents.Count > 0 && !parentResources.Contains(componentResource))
+                    {
+                        parentResources.Add(componentResource);
                         LoadChildComponentsFrom(component.SelectedRecipeComponents, node);
+                    }
                     else
                         ComponentLeafs.Add(node);
+
+                    parentResources.Remove(componentResource);
                 }
             }
 
@@ -108,13 +127,18 @@ namespace Partlyx.ViewModels.Graph
             return nodes;
         }
 
+        private ThrottledInvoker _updateGraphTrottledInvoker;
         public void UpdateGraph()
+        {
+            _updateGraphTrottledInvoker.InvokeAsync(UpdateGraphPrivate);
+        }
+        private Task UpdateGraphPrivate()
         {
             DestroyTree();
 
             // Getting the part to build the tree from it
             var selectedRecipe = FocusedPart.FocusedPart?.GetRelatedRecipe();
-            if (selectedRecipe == null) return;
+            if (selectedRecipe == null) return Task.CompletedTask;
 
             // Creating the root node
             var mainNode = new RecipeGraphNodeViewModel(selectedRecipe);
@@ -129,13 +153,14 @@ namespace Partlyx.ViewModels.Graph
             Edges = mainNode.GetBranchLinesMultiCollection();
             BuildEdgesFor(mainNode);
 
-            
+
             if (OnGraphBuilded != null)
             {
                 OnGraphBuilded.Execute(null);
             }
-        }
 
+            return Task.CompletedTask;
+        }
         protected override void OnTreeDestroyed()
         {
             ComponentLeafs.ClearAndDispose();

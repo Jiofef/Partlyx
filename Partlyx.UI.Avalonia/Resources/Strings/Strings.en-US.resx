@@ -418,4 +418,96 @@
   <data name="Rename" xml:space="preserve">
     <value>Rename</value>
   </data>
+  <data name="Open_branch" xml:space="preserve">
+    <value>Open branch</value>
+  </data>
+  <data name="info_text_About_Us" xml:space="preserve">
+    <value>Partlyx
+Version: 1.0.0
+License: MIT
+Developed by Jiofef (Artyom Stepanov)</value>
+  </data>
+  <data name="help_text_Parts_graph" xml:space="preserve">
+    <value>The Parts Graph is located in the center of the screen and displays recipes.
+
+* If a resource is selected, its **Default recipe** is shown.
+* If a recipe is selected, that recipe is shown.
+* If a component is selected, its parent recipe is shown.
+
+The graph visualizes all parts from the tree as nodes and displays all required quantities, including component amounts and the amounts of resources produced by recipes.
+
+By default, the graph shows Default recipes for components, but you can change the displayed recipe for a specific component, for example by clicking its node in the graph.
+
+You can move the camera in the graph by holding the left mouse button and dragging. Zoom in and out using the mouse wheel.
+
+By right-clicking a component in the graph, you can select "Open Branch", which will expand the Default or selected recipe of that component in the graph</value>
+  </data>
+  <data name="help_text_Some_QOL_Features" xml:space="preserve">
+    <value>Some complex or time-consuming actions can be simplified
+
+* You can grab any part in the Parts Tree with the mouse and perform certain actions by releasing (dropping) it onto another compatible UI element.
+** You can drop a grabbed recipe onto the "Default Recipe" property of a resource. If the recipe is compatible, it will be assigned to that property.
+** You can drop a grabbed recipe onto the "Selected Recipe" property of a component. If the recipe is compatible, it will be assigned to that property.
+** You can drop a grabbed resource onto a recipe, in which case the resource will be added to the recipe as a component. The same can be done by dropping a grabbed resource onto the recipe node in the graph (the topmost node).
+** While dragging a part, hovering over parts in the tree for a short time will automatically expand their list of child parts.
+** While dragging a part, hovering over the focus button (eye icon) of parts will automatically activate it.
+
+* The application supports hotkeys. They are displayed when you hover the mouse over the corresponding action (button or menu item) and wait briefly.
+** In addition, some actions have hotkeys but no direct UI buttons. For example, the camera in the graph can be moved using the arrow keys (Up, Down, Left, Right). Holding Shift speeds up movement, while Ctrl slows it down.
+
+* You can select multiple parts in the tree by holding Ctrl</value>
+  </data>
+  <data name="help_text_What_is_Partlyx" xml:space="preserve">
+    <value>Partlyx allows you to create schematics (recipes) of varying complexity, composed of components that can be any previously created resources.
+
+What does Partlyx do?
+* Allows you to describe entities as a dependency graph
+* Visualizes a multi-level structure
+* Calculates total cost / weight / value across the entire graph
+* Works with abstract resource types</value>
+  </data>
+  <data name="help_text_Parts_and_tree" xml:space="preserve">
+    <value>Most actions are performed in the left panel — the Parts Tree
+
+There are three types of parts:
+* Resources — can contain recipes
+* Recipes — can contain components
+* Components — are created from resources
+
+Accordingly, the tree is divided into three levels from top to bottom: resources first, recipes inside them, and components inside recipes.
+
+To create a resource, click the button at the bottom of the tree.
+Recipes are created by clicking + on a resource in the tree.
+Components are created in the same way by clicking + on a recipe in the tree — you will be offered a list of existing resources that can be used as components.
+
+Child parts of any tree part can be collapsed or expanded by clicking the up/down arrow to the left of the part.
+
+Each resource has a default recipe. Default recipes are switched using the star-shaped button.
+
+Each part in the tree has an eye (focus) button. Clicking it toggles the focus of the part, meaning it opens or closes that part in the Parts Graph and the Properties panel.
+
+Each part has properties, such as the resource name or component amount. These properties can be edited either directly in the tree or in the Properties panel.
+
+Any changes to a resource and its parts affect all recipes that use that resource. You do not need to manually update resource amounts in every recipe after making changes.
+
+You can customize the appearance of resources and their recipes by changing their icons. This is done in the properties of the resource or recipe. A wide selection of built-in icons is available, with adjustable colors. You can also upload your own images and use them as icons</value>
+  </data>
+  <data name="help_Parts_graph" xml:space="preserve">
+    <value>Parts graph</value>
+  </data>
+  <data name="help_Parts_and_tree" xml:space="preserve">
+    <value>Parts and tree</value>
+  </data>
+  <data name="Merge_same_components" xml:space="preserve">
+    <value>Merge same components</value>
+  </data>
+  <data name="Create_quantified_copy" xml:space="preserve">
+    <value>Create indivisible copy</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Duplicate" xml:space="preserve">
+    <value>Duplicate</value>
+  </data>
 </root>

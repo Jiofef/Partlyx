@@ -1,6 +1,8 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core.Contracts;
 using Partlyx.Infrastructure;
@@ -66,6 +68,13 @@ namespace Partlyx.UI.Avalonia
             DirectoryManager.CreatePartlyxFolder();
             LoadJsonSavesAsync();
             InitializeDatabaseAsync();
+
+            Dispatcher.UIThread.UnhandledException += (s, e) =>
+            {
+                e.Handled = true;
+
+                ShowError(e.Exception);
+            };
 
             base.OnFrameworkInitializationCompleted();
 
@@ -254,5 +263,26 @@ namespace Partlyx.UI.Avalonia
         private void MaterialIcon_ActualThemeVariantChanged(object? sender, EventArgs e)
         {
         }
+
+        void ShowError(Exception ex)
+        {
+            Dispatcher.UIThread.Post(async () =>
+            {
+                var window = new Window
+                {
+                    Title = LocService.Get("Error"),
+                    Content = new TextBox
+                    {
+                        Text = ex.ToString(),
+                        IsReadOnly = true
+                    },
+                    Width = 600,
+                    Height = 400
+                };
+
+                window.Show();
+            });
+        }
+
     }
 }

@@ -1,13 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Partlyx.Core;
-using Partlyx.Infrastructure.Events;
+﻿using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
-using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
-using Partlyx.Services.ServiceImplementations;
-using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.GlobalNavigations;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -16,11 +10,10 @@ using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIStates;
 using ReactiveUI;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public partial class RecipeComponentViewModel : UpdatableViewModel<RecipeComponentDto>, IVMPart
+    public partial class RecipeComponentViewModel : UpdatableViewModel<RecipeComponentDto>, IVMPart, ITypedVMPartHolder<RecipeComponentViewModel>
     {
         // Servicess
         private readonly IVMPartsStore _store;
@@ -28,6 +21,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IRecipeComponentItemUiStateService _uiStateService;
         private readonly ICommandServices _commands;
         private readonly ILinkedPartsManager _linkedPartsManager;
+        private readonly IEventBus _bus;
         public PartsServiceViewModel Services { get; }
 
         // Events
@@ -36,7 +30,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _iconUpdatedSubscription;
 
         public RecipeComponentViewModel(RecipeComponentDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store,
-            IVMPartsFactory partsFactory, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm)
+            IVMPartsFactory partsFactory, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm, IEventBus bus)
         {
             Uid = dto.Uid;
 
@@ -48,6 +42,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _uiStateService = uiStateS;
             _commands = cs;
             _linkedPartsManager = lpm;
+            _bus = bus;
 
             // Info
             if (dto.ParentRecipeUid is Guid parentUid)
@@ -85,6 +80,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         private GuidLinkedPart<ResourceViewModel>? _resource;
         public GuidLinkedPart<ResourceViewModel>? LinkedResource { get => _resource; private set => SetProperty(ref _resource, value); }
+        public ResourceViewModel Resource => LinkedResource!.Value!;
 
         private double _quantity;
         public double Quantity { get => _quantity; set => SetProperty(ref _quantity, value); }
@@ -138,6 +134,18 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _iconUpdatedSubscription.Dispose();
         }
 
+        public override void Update(RecipeComponentDto dto, IReadOnlyList<string>? changedProperties = null)
+        {
+            base.Update(dto, changedProperties);
+
+            var eventRecieversKeys = new HashSet<object>();
+            if (changedProperties != null)
+                foreach (var property in changedProperties)
+                    eventRecieversKeys.Add(property);
+            eventRecieversKeys.Add(dto.Uid);
+            _bus.Publish(new RecipeComponentUpdatedViewModelEvent(Uid, changedProperties, eventRecieversKeys));
+        }
+
         // For UI
         public RecipeComponentItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
         PartItemUIState IVMPart.UiItem => UiItem;
@@ -149,5 +157,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 LinkedSelectedRecipe?.Value?.Components ??
                 LinkedResource?.Value?.LinkedDefaultRecipe?.Value?.Components;
         }
+
+        // Compatibility
+        /// <summary> Self </summary>
+        public RecipeComponentViewModel? Part => this;
     }
 }

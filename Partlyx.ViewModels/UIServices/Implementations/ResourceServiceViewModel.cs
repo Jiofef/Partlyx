@@ -33,7 +33,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        public async Task CreateResourceAsync()
+        public async Task<Guid> CreateResourceAsync()
         {
             Guid resourceUid = Guid.Empty;
             // It must be executed on a single thread so that recipients respond to events immediately after they are sent
@@ -62,11 +62,27 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             });
 
             _bus.Publish(new ResourceCreatingCompletedVMEvent(resourceUid));
+
+            return resourceUid;
         }
 
         [RelayCommand]
-        public async Task RemoveAsync(ResourceViewModel resource) =>
+        public async Task RemoveAsync(ResourceViewModel resource)
+        {
+            _bus.Publish(new ResourceDeletingStartedEvent(resource.Uid));
             await _commands.CreateSyncAndExcecuteAsync<DeleteResourceCommand>(resource.Uid);
+        }
+
+        [RelayCommand]
+        public async Task<Guid> Duplicate(ResourceViewModel resource)
+        {
+            var command = await _commands.CreateSyncAndExcecuteAsync<DuplicateResourceCommand>(resource.Uid);
+
+            var resourceUid = command.DuplicateUid;
+            _bus.Publish(new ResourceCreatingCompletedVMEvent(resourceUid));
+
+            return command.DuplicateUid;
+        }
 
         [RelayCommand]
         public async Task RenameResource(PartSetValueInfo<ResourceViewModel, string> info)

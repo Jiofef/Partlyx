@@ -29,7 +29,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             _bus.Subscribe<ResourceVMAddedToStoreEvent>((ev) => NotifyAdded(ev.ResourceUid, _store.Resources[ev.ResourceUid], _linkedResourcesDic));
             _bus.Subscribe<RecipeVMAddedToStoreEvent>((ev) => NotifyAdded(ev.RecipeUid, _store.Recipes[ev.RecipeUid], _linkedRecipesDic));
-            _bus.Subscribe<RecipeComponentVMAddedToStoreEvent>((ev) => NotifyAdded(ev.ComponentUid, _store.RecipeComponents[ev.ComponentUid], _linkedComponentsDic));
+            _bus.Subscribe<RecipeComponentVMAddedToStoreEvent>((ev) => NotifyAdded(ev.ComponentUid, _store.Components[ev.ComponentUid], _linkedComponentsDic));
 
             _bus.Subscribe<ResourceVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.ResourceUid, _linkedResourcesDic));
             _bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.RecipeUid, _linkedResourcesDic));
@@ -103,19 +103,27 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             linkedPart.Disposed += () => Unregister(linkedPart, dic, disorderedList);
 
-            PushCurrentValueFor(linkedPart, uid);
+            // When creating parts, sometimes a thread race occurs and the operations performed receive irrelevant data: there is no LinkedPart value, although the required item is in the store.
+            // Performing an operation on the same thread prevents a conflict.
+            PushCurrentValueFor(linkedPart, uid, false); 
         }
 
-        private void PushCurrentValueFor<TPart>(GuidLinkedPart<TPart> linkedPart, Guid uid)
+        private void PushCurrentValueFor<TPart>(GuidLinkedPart<TPart> linkedPart, Guid uid, bool dispatchToUI = true)
             where TPart : IVMPart
         {
             if (_store.TryGet(uid, out IVMPart? found))
             {
-                DispatchToUiWithoutBlock(() => linkedPart.Value = (TPart)found!);
+                if (dispatchToUI)
+                    DispatchToUiWithoutBlock(() => linkedPart.Value = (TPart)found!);
+                else
+                    linkedPart.Value = (TPart)found!;
             }
             else
             {
-                DispatchToUiWithoutBlock(() => linkedPart.Value = default);
+                if (dispatchToUI)
+                    DispatchToUiWithoutBlock(() => linkedPart.Value = default);
+                else
+                    linkedPart.Value = default;
             }
         }
 
@@ -179,7 +187,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
         private void DispatchToUi(Action action)
         {
-            if (_invoker != null)
+            if (_invoker != null && false)
             {
                 if (_invoker.CheckAccess()) _invoker.Invoke(action);
                 else _invoker.BeginInvoke(action);
@@ -193,7 +201,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         private void DispatchToUiWithoutBlock(Action action)
         {
             {
-                if (_invoker != null)
+                if (_invoker != null && false)
                 {
                     _invoker.BeginInvoke(action);
                 }

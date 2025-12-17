@@ -41,5 +41,12 @@ namespace Partlyx.UI.Avalonia.Helpers
 
             collection.Clear();
         }
+        public static void TryAddIfNotNull<T>(this ICollection<T> collection, T? value)
+        {
+            if (value != null)
+                collection.Add(value);
+        }
+        public static bool IsNullOrEmpty<T>(this ICollection<T>? collection)
+            => collection == null || collection.Count == 0;
     }
 }

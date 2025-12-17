@@ -1,18 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35521.163
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11304.174 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Partlyx.Core", "Partlyx.Core\Partlyx.Core.csproj", "{92D4F1F4-D77A-48A3-8165-227348C13E2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Partlyx.Infrastructure", "Partlyx.Data\Partlyx.Infrastructure.csproj", "{6292CAE1-5A62-4EC0-B1A3-450DC1E96592}"
-	ProjectSection(ProjectDependencies) = postProject
-		{92D4F1F4-D77A-48A3-8165-227348C13E2E} = {92D4F1F4-D77A-48A3-8165-227348C13E2E}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Partlyx.Services", "Partlyx.Services\Partlyx.Services.csproj", "{4741A7AF-F388-49B0-BF91-5B8ABF5A21CF}"
 	ProjectSection(ProjectDependencies) = postProject
-		{6292CAE1-5A62-4EC0-B1A3-450DC1E96592} = {6292CAE1-5A62-4EC0-B1A3-450DC1E96592}
 		{92D4F1F4-D77A-48A3-8165-227348C13E2E} = {92D4F1F4-D77A-48A3-8165-227348C13E2E}
 	EndProjectSection
 EndProject
@@ -20,7 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Partlyx.Tests", "Partlyx.Te
 	ProjectSection(ProjectDependencies) = postProject
 		{0002B3E7-C2D7-4D73-8691-5E7CBDB6B2BA} = {0002B3E7-C2D7-4D73-8691-5E7CBDB6B2BA}
 		{4741A7AF-F388-49B0-BF91-5B8ABF5A21CF} = {4741A7AF-F388-49B0-BF91-5B8ABF5A21CF}
-		{6292CAE1-5A62-4EC0-B1A3-450DC1E96592} = {6292CAE1-5A62-4EC0-B1A3-450DC1E96592}
 		{92D4F1F4-D77A-48A3-8165-227348C13E2E} = {92D4F1F4-D77A-48A3-8165-227348C13E2E}
 		{96562E67-0804-49B0-A54B-F635DC388352} = {96562E67-0804-49B0-A54B-F635DC388352}
 	EndProjectSection
@@ -36,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Partlyx.UI.Avalonia", "Part
 		{0002B3E7-C2D7-4D73-8691-5E7CBDB6B2BA} = {0002B3E7-C2D7-4D73-8691-5E7CBDB6B2BA}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Partlyx.Infrastructure", "Partlyx.Infrastructure\Partlyx.Infrastructure.csproj", "{18CEEF30-DA66-8677-F7D8-B695D2B896CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,10 +41,6 @@ Global
 		{92D4F1F4-D77A-48A3-8165-227348C13E2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92D4F1F4-D77A-48A3-8165-227348C13E2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92D4F1F4-D77A-48A3-8165-227348C13E2E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6292CAE1-5A62-4EC0-B1A3-450DC1E96592}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6292CAE1-5A62-4EC0-B1A3-450DC1E96592}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6292CAE1-5A62-4EC0-B1A3-450DC1E96592}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6292CAE1-5A62-4EC0-B1A3-450DC1E96592}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4741A7AF-F388-49B0-BF91-5B8ABF5A21CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4741A7AF-F388-49B0-BF91-5B8ABF5A21CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4741A7AF-F388-49B0-BF91-5B8ABF5A21CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -66,6 +57,10 @@ Global
 		{96562E67-0804-49B0-A54B-F635DC388352}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96562E67-0804-49B0-A54B-F635DC388352}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96562E67-0804-49B0-A54B-F635DC388352}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18CEEF30-DA66-8677-F7D8-B695D2B896CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18CEEF30-DA66-8677-F7D8-B695D2B896CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18CEEF30-DA66-8677-F7D8-B695D2B896CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18CEEF30-DA66-8677-F7D8-B695D2B896CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

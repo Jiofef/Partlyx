@@ -40,7 +40,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         }
 
         [RelayCommand]
-        public async Task CreateRecipeAsync(ResourceViewModel parent)
+        public async Task<Guid> CreateRecipeAsync(ResourceViewModel parent)
         {
             int siblingsAmount = parent.Recipes.Count;
             var recipeName = siblingsAmount == 0
@@ -59,6 +59,8 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             var recipeUid = command.RecipeUid;
             _bus.Publish(new RecipeCreatingCompletedVMEvent(recipeUid));
+
+            return recipeUid;
         }
 
         [RelayCommand]
@@ -124,7 +126,22 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             bool exists = await _service.IsRecipeExists(recipe.LinkedParentResource!.Uid, recipe.Uid);
 
             if (exists)
+            {
+                _bus.Publish(new RecipeDeletingStartedEvent(recipe.Uid, recipe.LinkedParentResource!.Value!.Uid,
+                    new HashSet<object>() { recipe.Uid, recipe.LinkedParentResource!.Value!.Uid }));
                 await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeCommand>(recipe.LinkedParentResource!.Uid, recipe.Uid);
+            }
+        }
+
+        public async Task<Guid> Duplicate(RecipeViewModel recipe)
+        {
+            var parentUid = recipe.LinkedParentResource!.Uid;
+            var command = await _commands.CreateSyncAndExcecuteAsync<DuplicateRecipeCommand>(parentUid, recipe.Uid);
+
+            var recipeUid = command.DuplicateUid;
+            _bus.Publish(new RecipeCreatingCompletedVMEvent(recipeUid));
+
+            return recipeUid;
         }
 
         [RelayCommand]

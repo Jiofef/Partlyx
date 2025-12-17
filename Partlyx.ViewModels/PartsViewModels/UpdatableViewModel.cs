@@ -18,7 +18,7 @@ namespace Partlyx.ViewModels.PartsViewModels
 
         protected abstract Dictionary<string, Action<TDto>> ConfigureUpdaters();
 
-        public void Update(TDto dto, IReadOnlyList<string>? changedProperties = null)
+        public virtual void Update(TDto dto, IReadOnlyList<string>? changedProperties = null)
         {
             if (changedProperties == null)
             {

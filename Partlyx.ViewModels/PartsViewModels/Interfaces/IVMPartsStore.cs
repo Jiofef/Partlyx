@@ -6,7 +6,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
     {
         IReadOnlyDictionary<Guid, ResourceViewModel> Resources { get; }
         IReadOnlyDictionary<Guid, RecipeViewModel> Recipes { get; }
-        IReadOnlyDictionary<Guid, RecipeComponentViewModel> RecipeComponents { get; }
+        IReadOnlyDictionary<Guid, RecipeComponentViewModel> Components { get; }
 
         void Register(ResourceViewModel resource);
         void Register(RecipeViewModel recipe);

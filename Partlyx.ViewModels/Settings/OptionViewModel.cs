@@ -28,6 +28,8 @@ namespace Partlyx.ViewModels.Settings
                     return new FloatOptionViewModel(scheme);
                 case TypeNames.Double:
                     return new DoubleOptionViewModel(scheme);
+                case TypeNames.Decimal:
+                    return new DecimalOptionViewModel(scheme);
                 case TypeNames.Bool:
                     return new BoolOptionViewModel(scheme);
                 case TypeNames.String:
@@ -47,27 +49,25 @@ namespace Partlyx.ViewModels.Settings
 
         private object? _value;
         public object? Value { get => _value; set => SetValue(value); }
-        public void SetValue(object? value)
+        public void SetValue(object? value, bool convertValue = true)
         {
+            var workingValue = SettingValueConverter(value);
+
             bool equals =
-                _value is double doubleValue && Value is double currentDoubleValue && Math.Abs(doubleValue - currentDoubleValue) < 1e-10
-                || _value is float floatValue && Value is float currentFloatValue && Math.Abs(floatValue - currentFloatValue) < 1e-6f
+                workingValue is decimal decimalValue && Value is decimal currentDecimalValue && Decimal.Compare(decimalValue, currentDecimalValue) == 0
+                || workingValue is double doubleValue && Value is double currentDoubleValue && Math.Abs(doubleValue - currentDoubleValue) < 1e-10
+                || workingValue is float floatValue && Value is float currentFloatValue && Math.Abs(floatValue - currentFloatValue) < 1e-6f
                 || EqualityComparer<object>.Default.Equals(Value, value);
 
-            if (!equals && (value != null || AllowNull))
+            if (!equals && (workingValue != null || AllowNull))
             {
                 ValueChanging?.Invoke(this);
-                SetProperty(ref _value, value, nameof(Value));
+                SetProperty(ref _value, workingValue, nameof(Value));
             }
         }
         public Action<OptionViewModel> ValueChanging = delegate { };
 
         public object? GetConvertedValue() => SettedValueConverter(Value);
-        public void SetValueAndConvert(object? value)
-        {
-            var convertedValue = SettingValueConverter(value);
-            Value = convertedValue;
-        }
 
         public Func<object?, object?> SettedValueConverter; // use when "this -> settings service"
         public Func<object?, object?> SettingValueConverter; // use when "settings service -> this"
@@ -91,6 +91,10 @@ namespace Partlyx.ViewModels.Settings
     public class DoubleOptionViewModel : OptionViewModel
     {
         public DoubleOptionViewModel(SchematicOption scheme) : base(scheme) { }
+    }
+    public class DecimalOptionViewModel : OptionViewModel
+    {
+        public DecimalOptionViewModel(SchematicOption scheme) : base(scheme) { }
     }
     public class BoolOptionViewModel : OptionViewModel
     {

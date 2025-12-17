@@ -62,7 +62,7 @@ namespace Partlyx.ViewModels.Settings
 
             IsOptionsChanged = false;
         }
-        public void BuildFromScheme(SettingsScheme scheme)
+        public void BuildFromScheme(SettingsScheme scheme, bool addDefaultConverters = true)
         {
             foreach (var opt in UnsortedSettings)
             {
@@ -75,6 +75,21 @@ namespace Partlyx.ViewModels.Settings
 
             UnsortedSettings = new(MainSettingsGroup.ToOneLevelOptionsList());
             UnsortedSettingsDictionary = UnsortedSettings.Select(s => new KeyValuePair<string, OptionViewModel>(s.Key, s)).ToDictionary();
+
+            if (addDefaultConverters)
+            {
+                foreach (var setting in UnsortedSettings)
+                {
+                    if (setting is DecimalOptionViewModel decimalOption)
+                        decimalOption.SettedValueConverter = new(value => value == null ? null : Convert.ToDecimal(value));
+                    else if (setting is DoubleOptionViewModel doubleOption)
+                        doubleOption.SettingValueConverter = new(value => value == null ? null : Convert.ToDouble(value));
+                    else if (setting is FloatOptionViewModel floatOption)
+                        floatOption.SettingValueConverter = new(value => value == null ? null : Convert.ToSingle(value));
+                    else if (setting is IntOptionViewModel intOption)
+                        intOption.SettingValueConverter = new(value => value == null ? null : Convert.ToInt32(value));
+                }
+            }
 
             ClearChangedSettings();
 
@@ -92,7 +107,7 @@ namespace Partlyx.ViewModels.Settings
                 var optionVM = UnsortedSettingsDictionary.GetValueOrDefault(option.Key);
                 if (optionVM == null || optionVM.Value == option.Value) continue;
 
-                optionVM.SetValueAndConvert(option.Value);
+                optionVM.SetValue(option.Value, true);
                 changedOptionValuesDic.Add(optionVM.Key, optionVM.Value);
             }
 

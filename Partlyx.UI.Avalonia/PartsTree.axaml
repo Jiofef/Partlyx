@@ -211,7 +211,17 @@
 
         <Grid.ContextMenu>
             <ContextMenu>
-				<MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding ContextMenuCommands.ToggleFocusCommand}"  Classes="common" InputGesture="F" 
+                <MenuItem Header="{h:Loc Create_resource}" Command="{Binding ContextMenuCommands.CreateResourceCommand}"  Classes="common" InputGesture="Ctrl+OemPlus" 
+                    IsVisible="{Binding ContextMenuCommands.AllowCreateResource}"/>
+                <MenuItem Header="{h:Loc Create_a_recipe_for_this_resource}" Command="{Binding ContextMenuCommands.CreateRecipeCommand}"  Classes="common" InputGesture="Ctrl+Shift+OemPlus" 
+                    IsVisible="{Binding ContextMenuCommands.AllowCreateRecipe}"/>
+                <MenuItem Header="{h:Loc Create_a_component_for_this_recipe}" Command="{Binding ContextMenuCommands.CreateComponentCommand}"  Classes="common" InputGesture="Ctrl+Shift+OemPlus" 
+                    IsVisible="{Binding ContextMenuCommands.AllowCreateComponent}"/>
+                <MenuItem Header="{h:Loc Create_quantified_copy}" Command="{Binding ContextMenuCommands.CreateQuantifiedRecipeCommand}"  Classes="common" InputGesture="Q" 
+                    IsVisible="{Binding ContextMenuCommands.AllowQuantifyRecipe}"/>
+                <MenuItem Header="{h:Loc Merge_same_components}" Command="{Binding ContextMenuCommands.MergeComponentsForRecipeCommand}"  Classes="common" InputGesture="Ctrl+M"
+                    IsVisible="{Binding ContextMenuCommands.AllowMergeRecipe}"/>
+                <MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding ContextMenuCommands.ToggleFocusCommand}"  Classes="common" InputGesture="F" 
                     IsVisible="{Binding ContextMenuCommands.AllowToggleFocus}"/>
                 <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding ContextMenuCommands.ExpandBranchCommand}" Classes="common"
                     IsVisible="{Binding ContextMenuCommands.AllowExpandBranch}"/>
@@ -223,7 +233,9 @@
                     IsVisible="{Binding ContextMenuCommands.AllowFindRecipeInTree}"/>
                 <MenuItem Header="{h:Loc Find_component_in_tree}" Command="{Binding ContextMenuCommands.FindComponentInTreeCommand}" Classes="common"
                     IsVisible="{Binding ContextMenuCommands.AllowFindComponentInTree}"/>
-                <MenuItem Header="{h:Loc Delete}" Command="{Binding ContextMenuCommands.DeleteCommand}" CommandParameter="{Binding}" Classes="common"
+                <MenuItem Header="{h:Loc Duplicate}" Command="{Binding ContextMenuCommands.DuplicateCommand}" Classes="common" InputGesture="D"
+                          IsVisible="{Binding ContextMenuCommands.AllowDuplicate}"/>
+                <MenuItem Header="{h:Loc Delete}" Command="{Binding ContextMenuCommands.DeleteCommand}" CommandParameter="{Binding}" Classes="common" InputGesture = "Delete"
                     IsVisible="{Binding ContextMenuCommands.AllowDelete}"/>
             </ContextMenu>
         </Grid.ContextMenu>
@@ -286,7 +298,15 @@
                         <KeyBinding Gesture="Enter" Command="{Binding ActivateHotkeyCommand}"
                                     CommandParameter="{Binding Service.TryRenamingSingleSelectedCommand}"/>
                         <KeyBinding Gesture="F" Command="{Binding ActivateHotkeyCommand}"
-                                    CommandParameter="{Binding Service.TryToggleSingleSelectedFocusCommand}" />
+                                    CommandParameter="{Binding Service.TryToggleSingleSelectedFocusCommand}"/>
+                        <KeyBinding Gesture="Q" Command="{Binding ActivateHotkeyCommand}"
+                                    CommandParameter="{Binding ContextMenuCommands.CreateQuantifiedRecipeCommand}"/>
+                        <KeyBinding Gesture="Ctrl+M" Command="{Binding ActivateHotkeyCommand}"
+                                    CommandParameter="{Binding ContextMenuCommands.MergeComponentsForRecipeCommand}"/>
+                        <KeyBinding Gesture="Ctrl+D" Command="{Binding ActivateHotkeyCommand}"
+                                    CommandParameter="{Binding ContextMenuCommands.DuplicateCommand}"/>
+                        <KeyBinding Gesture="Delete" Command="{Binding ActivateHotkeyCommand}"
+                                    CommandParameter="{Binding ContextMenuCommands.DeleteCommand}"/>
                     </TreeView.KeyBindings>
                     <TreeView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -300,7 +320,7 @@
             <Button HorizontalAlignment="Stretch" Classes="base" Command="{Binding Service.ResourceService.CreateResourceCommand}" Grid.Column="0">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal" Margin="8">
-                        <TextBlock Text="{h:Loc Create}"/>
+                        <TextBlock Text="{h:Loc Create_resource}"/>
                        <mdi:MaterialIcon Kind="Plus" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
                     </StackPanel>
                 </Button.Content>

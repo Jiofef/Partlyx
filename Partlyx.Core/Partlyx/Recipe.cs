@@ -181,6 +181,9 @@ namespace Partlyx.Core.Partlyx
             clone.Name = Name;
             clone.CraftAmount = CraftAmount;
 
+            clone.IconType = IconType;
+            clone.IconData = IconData;
+
             foreach (var component in _components)
                 component.CopyTo(clone);
 

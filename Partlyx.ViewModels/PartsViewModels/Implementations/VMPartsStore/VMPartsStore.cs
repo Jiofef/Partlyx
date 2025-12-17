@@ -5,6 +5,7 @@ using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
@@ -16,11 +17,13 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         private Dictionary<Guid, ResourceViewModel> _resources { get; }
         private Dictionary<Guid, RecipeViewModel> _recipes { get; }
-        private Dictionary<Guid, RecipeComponentViewModel> _recipeComponents { get; }
+        private Dictionary<Guid, RecipeComponentViewModel> _components { get; }
+        private Dictionary<Guid, List<RecipeComponentViewModel>> _componentsWithResource { get; }
 
         public IReadOnlyDictionary<Guid, ResourceViewModel> Resources => _resources;
         public IReadOnlyDictionary<Guid, RecipeViewModel> Recipes => _recipes;
-        public IReadOnlyDictionary<Guid, RecipeComponentViewModel> RecipeComponents => _recipeComponents;
+        public IReadOnlyDictionary<Guid, RecipeComponentViewModel> Components => _components;
+        public IReadOnlyDictionary<Guid, List<RecipeComponentViewModel>> ComponentsWithResource => _componentsWithResource;
 
         public VMPartsStore(IEventBus bus)
         {
@@ -28,7 +31,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             _resources = new();
             _recipes = new();
-            _recipeComponents = new();
+            _components = new();
+            _componentsWithResource = new();
 
             _fileClosedSubscription = bus.Subscribe<FileClosedUIEvent>((ev) => ClearStore(), true);
         }
@@ -58,9 +62,17 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public void Register(RecipeComponentViewModel component)
         {
-            if (!_recipeComponents.ContainsKey(component.Uid))
+            if (!_components.ContainsKey(component.Uid))
             {
-                _recipeComponents.Add(component.Uid, component);
+                var resource = component.Resource;
+                if (resource != null)
+                {
+                    if (!_componentsWithResource.ContainsKey(resource.Uid))
+                        _componentsWithResource.Add(resource.Uid, new List<RecipeComponentViewModel>());
+                    _componentsWithResource[resource.Uid].Add(component);
+                }
+
+                _components.Add(component.Uid, component);
                 _bus.Publish(new RecipeComponentVMAddedToStoreEvent(component.Uid));
 
                 CompletePendingAwaiters(component.Uid, component);
@@ -89,10 +101,22 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public void RemoveRecipeComponent(Guid uid)
         {
-            if (_recipeComponents.ContainsKey(uid))
+            if (_components.ContainsKey(uid))
             {
-                _recipeComponents[uid].Dispose();
-                _recipeComponents.Remove(uid);
+                var component = _components[uid];
+                var resource = component.Resource;
+                if (resource != null)
+                {
+                    var list = _componentsWithResource[resource.Uid];
+                    list.Remove(component);
+
+                    if (list.Count == 0)
+                        _componentsWithResource.Remove(resource.Uid);
+                }
+
+                _components[uid].Dispose();
+                _components.Remove(uid);
+
                 _bus.Publish(new RecipeComponentVMRemovedFromStoreEvent(uid));
             }
         }
@@ -116,9 +140,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 part = Recipes[itemUidNotNull];
                 return true;
             }
-            else if (RecipeComponents.ContainsKey(itemUidNotNull))
+            else if (Components.ContainsKey(itemUidNotNull))
             {
-                part = RecipeComponents[itemUidNotNull];
+                part = Components[itemUidNotNull];
                 return true;
             }
             else
@@ -132,7 +156,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             _resources.ClearAndDispose();
             _recipes.ClearAndDispose();
-            _recipeComponents.ClearAndDispose();
+            _components.ClearAndDispose();
 
             // Notify awaiters that nothing will appear (store was cleared).
             CompleteAllPendingWithNull();

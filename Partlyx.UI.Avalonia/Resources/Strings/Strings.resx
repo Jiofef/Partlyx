@@ -375,9 +375,6 @@
   <data name="help_Some_QOL_Features" xml:space="preserve">
     <value>Some Quality Of Life features</value>
   </data>
-  <data name="help_text_HowToUsePartlyx" xml:space="preserve">
-    <value>How to use Partlyx text</value>
-  </data>
   <data name="help_text_What_is_Partlyx" xml:space="preserve">
     <value>What is Partlyx text</value>
   </data>
@@ -389,9 +386,6 @@
   </data>
   <data name="help_Help" xml:space="preserve">
     <value>Help</value>
-  </data>
-  <data name="help_text_Parts_tree" xml:space="preserve">
-    <value>Parts tree text</value>
   </data>
   <data name="Find_resource_in_tree" xml:space="preserve">
     <value>Find resource in tree</value>
@@ -428,5 +422,32 @@
   </data>
   <data name="Rename" xml:space="preserve">
     <value>Rename</value>
+  </data>
+  <data name="Open_branch" xml:space="preserve">
+    <value>Open branch</value>
+  </data>
+  <data name="help_text_Parts_and_tree" xml:space="preserve">
+    <value>Parts and tree text</value>
+  </data>
+  <data name="help_Parts_graph" xml:space="preserve">
+    <value>Parts graph</value>
+  </data>
+  <data name="help_text_Parts_graph" xml:space="preserve">
+    <value>Parts graph text</value>
+  </data>
+  <data name="help_Parts_and_tree" xml:space="preserve">
+    <value>Parts and tree</value>
+  </data>
+  <data name="Merge_same_components" xml:space="preserve">
+    <value>Merge same components</value>
+  </data>
+  <data name="Create_quantified_copy" xml:space="preserve">
+    <value>Create indivisible copy</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Duplicate" xml:space="preserve">
+    <value>Duplicate</value>
   </data>
 </root>

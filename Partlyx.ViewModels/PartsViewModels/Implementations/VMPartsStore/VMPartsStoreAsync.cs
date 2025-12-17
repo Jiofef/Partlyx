@@ -29,7 +29,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 return Task.FromResult<IVMPart?>(res);
             if (_recipes.TryGetValue(uid, out var recipe))
                 return Task.FromResult<IVMPart?>(recipe);
-            if (_recipeComponents.TryGetValue(uid, out var comp))
+            if (_components.TryGetValue(uid, out var comp))
                 return Task.FromResult<IVMPart?>(comp);
 
             var tcs = new TaskCompletionSource<IVMPart?>(TaskCreationOptions.RunContinuationsAsynchronously);

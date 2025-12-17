@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Partlyx.Core\Partlyx.Core.csproj" />
-    <ProjectReference Include="..\Partlyx.Data\Partlyx.Infrastructure.csproj" />
+    <ProjectReference Include="..\Partlyx.Infrastructure\Partlyx.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
