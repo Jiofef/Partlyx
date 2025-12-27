@@ -8,16 +8,21 @@ namespace Partlyx.Infrastructure.Data.Interfaces
         Task<Guid> AddResourceAsync(Resource resource);
         Task DeleteResourceAsync(Guid uid);
         Task<Guid> DuplicateResourceAsync(Guid uid);
-        Task ExecuteOnResourceAsync(Guid resourceUid, Func<Resource, Task> action);
         Task<Resource?> GetResourceByUidAsync(Guid uid);
+        Task<Recipe?> GetRecipeByUidAsync(Guid uid);
+        Task<RecipeComponent?> GetRecipeComponentByUidAsync(Guid uid);
         Task<List<Resource>> SearchResourcesAsync(string query);
 
+        Task<Guid> AddRecipeAsync(Recipe recipe);
+        Task<Guid> DuplicateRecipeAsync(Guid uid);
+
         // ExecuteOnPart methods
-        Task<TResult> ExecuteOnComponentAsync<TResult>(Guid resourceUid, Guid componentUid, Func<RecipeComponent, Task<TResult>> action);
-        Task ExecuteOnComponentAsync(Guid resourceUid, Guid componentUid, Func<RecipeComponent, Task> action);
-        Task<TResult> ExecuteOnRecipeAsync<TResult>(Guid resourceUid, Guid recipeUid, Func<Recipe, Task<TResult>> action);
-        Task ExecuteOnRecipeAsync(Guid resourceUid, Guid recipeUid, Func<Recipe, Task> action);
         Task<TResult> ExecuteOnResourceAsync<TResult>(Guid resourceUid, Func<Resource, Task<TResult>> action);
+        Task ExecuteOnResourceAsync(Guid resourceUid, Func<Resource, Task> action);
+        Task<TResult> ExecuteOnComponentAsync<TResult>(Guid componentUid, Func<RecipeComponent, Task<TResult>> action);
+        Task ExecuteOnComponentAsync(Guid componentUid, Func<RecipeComponent, Task> action);
+        Task<TResult> ExecuteOnRecipeAsync<TResult>(Guid recipeUid, Func<Recipe, Task<TResult>> action);
+        Task ExecuteOnRecipeAsync(Guid recipeUid, Func<Recipe, Task> action);
         Task<List<Resource>> GetAllTheResourcesAsync();
         Task<List<Recipe>> GetAllTheRecipesAsync();
         Task<List<RecipeComponent>> GetAllTheRecipeComponentsAsync();

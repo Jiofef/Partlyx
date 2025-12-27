@@ -4,52 +4,27 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Partlyx.Core.Partlyx
 {
-    public class Recipe : ICopiable<Resource>, IIconHolder, IPart
+    public class Recipe : IIconHolder, IPart
     {
-        // Hierarchy
-        private Resource? _parentResource;
-        public Resource? ParentResource { get => _parentResource; private set => _parentResource = value; }
-
-        public bool IsDetached => ParentResource == null;
-
-        public static Recipe CreateForResource(Resource parentResource, string name = "Recipe")
+        public static Recipe Create(string name = "Recipe")
         {
             var recipe = new Recipe()
             {
-                ParentResource = parentResource,
                 Name = name,
             };
 
             return recipe;
         }
-        public static Recipe CreateDetached()
-        {
-            var recipe = new Recipe();
 
-            return recipe;
+        internal void AddRecipeComponentToList(RecipeComponent component)
+        {
+            Components.Add(component);
         }
 
-        public void Detach()
+        internal bool RemoveRecipeComponentFromList(RecipeComponent component)
         {
-            if (ParentResource != null)
-                ParentResource.RemoveRecipeFromList(this);
-
-            ParentResource = null;
+            return Components.Remove(component);
         }
-        public void AttachTo(Resource resource)
-        {
-            if (resource == null) throw new ArgumentNullException(nameof(resource));
-
-            if (ParentResource != null)
-                ParentResource.RemoveRecipeFromList(this);
-
-            resource.AddRecipeToList(this);
-            ParentResource = resource;
-        }
-
-        internal void AddRecipeComponentToList(RecipeComponent component) => _components.Add(component);
-
-        internal bool RemoveRecipeComponentFromList(RecipeComponent component) => _components.Remove(component);
 
         protected Recipe() { Uid = Guid.NewGuid(); Name = "Recipe"; }
 
@@ -58,24 +33,47 @@ namespace Partlyx.Core.Partlyx
 
         // Main features
         public string Name { get; set; }
-        private readonly List<RecipeComponent> _components = new List<RecipeComponent>();
+        public virtual List<RecipeComponent> Components { get; } = new List<RecipeComponent>();
 
-        public IReadOnlyList<RecipeComponent> Components => _components;
-        public double CraftAmount { get; set; } = 1;
+        public IReadOnlyList<RecipeComponent> Inputs => Components.Where(c => !c.IsOutput).ToList();
+        public IReadOnlyList<RecipeComponent> Outputs => Components.Where(c => c.IsOutput).ToList();
+        public bool IsReversible { get; set; } = false;
+
+        public RecipeComponent CreateInput(Resource componentRes, double quantity)
+        {
+            var rc = RecipeComponent.CreateForRecipe(this, componentRes, quantity);
+            rc.IsOutput = false;
+            Components.Add(rc);
+            return rc;
+        }
+
+        public RecipeComponent CreateOutput(Resource componentRes, double quantity)
+        {
+            var rc = RecipeComponent.CreateForRecipe(this, componentRes, quantity);
+            rc.IsOutput = true;
+            Components.Add(rc);
+            return rc;
+        }
 
         public RecipeComponent CreateComponent(Resource componentRes, double quantity)
         {
             var rc = RecipeComponent.CreateForRecipe(this, componentRes, quantity);
-            _components.Add(rc);
+            Components.Add(rc);
             return rc;
         }
 
-        public bool RemoveComponent(RecipeComponent component) => _components.Remove(component);
+        public bool RemoveComponent(RecipeComponent component)
+        {
+            return Components.Remove(component);
+        }
 
         /// <summary>
         /// Clears the list of components
         /// </summary>
-        public void Clear() => _components.Clear();
+        public void Clear()
+        {
+            Components.Clear();
+        }
 
         // Icon features
         public IconTypeEnum IconType { get; private set; }
@@ -97,11 +95,11 @@ namespace Partlyx.Core.Partlyx
 
             void TakeToPieces(Recipe recipe, double factor)
             {
-                foreach (var component in recipe.Components)
+                foreach (var component in recipe.Inputs)
                 {
                     var totalQuantity = component.Quantity * factor;
 
-                    if (component.ComponentResource.HasAnyRecipes())
+                    if (component.ComponentSelectedRecipe != null)
                     {
                         TakeToPieces(component.ComponentSelectedRecipe, totalQuantity);
                     }
@@ -118,15 +116,15 @@ namespace Partlyx.Core.Partlyx
 
             Clear();
             foreach (var c in quants)
-                _components.Add(c);
+                Components.Add(c);
         }
 
 
         public void MergeDuplicateComponents()
         {
-            var groups = new Dictionary<(Resource, Recipe), List<RecipeComponent>>();
+            var groups = new Dictionary<(Resource, Recipe?), List<RecipeComponent>>();
 
-            foreach (var component in _components)
+            foreach (var component in Components)
             {
                 var key = (component.ComponentResource, component.ComponentSelectedRecipe);
                 if (!groups.TryGetValue(key, out var list))
@@ -154,37 +152,22 @@ namespace Partlyx.Core.Partlyx
 
         public RecipeComponent? GetRecipeComponentByUid(Guid uid)
         {
-            var component = Components.FirstOrDefault(component => component.Uid == uid);
+            var component = Inputs.FirstOrDefault(component => component.Uid == uid);
+            if (component != null) return component;
+            component = Outputs.FirstOrDefault(component => component.Uid == uid);
             return component;
         }
 
-        /// <summary>
-        /// Returns a newly created copy of the component in the specified recipe
-        /// </summary>
-        public Recipe CopyTo(Resource resource)
+        public Recipe Clone()
         {
-            var copy = CloneDetached();
-
-            copy.ParentResource = resource;
-            resource.AddRecipeToList(copy);
-
-            return copy;
-        }
-        ICopiable<Resource> ICopiable<Resource>.CopyTo(Resource resource)
-        {
-            return CopyTo(resource);
-        }
-
-        public Recipe CloneDetached()
-        {
-            var clone = CreateDetached();
+            var clone = Create();
             clone.Name = Name;
-            clone.CraftAmount = CraftAmount;
+            clone.IsReversible = IsReversible;
 
             clone.IconType = IconType;
             clone.IconData = IconData;
 
-            foreach (var component in _components)
+            foreach (var component in Components)
                 component.CopyTo(clone);
 
             return clone;

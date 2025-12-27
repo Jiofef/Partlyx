@@ -22,12 +22,7 @@ namespace Partlyx.Infrastructure
         public async Task<Recipe?> Update(Recipe recipe)
         {
             var uid = recipe.Uid;
-            var parentUid = recipe.ParentResource?.Uid;
-
-            if (parentUid == null) return null;
-
-            var actualParent = await _repo.GetResourceByUidAsync((Guid)parentUid);
-            var result = actualParent?.GetRecipeByUid(uid);
+            var result = await _repo.GetRecipeByUidAsync(uid);
 
             return result;
         }
@@ -35,12 +30,12 @@ namespace Partlyx.Infrastructure
         public async Task<RecipeComponent?> Update(RecipeComponent component)
         {
             var uid = component.Uid;
-            var grandParentUid = component.ParentRecipe?.ParentResource?.Uid;
+            var parentRecipeUid = component.ParentRecipe?.Uid;
 
-            if (grandParentUid == null) return null;
+            if (parentRecipeUid == null) return null;
 
-            var actualGrandParent = await _repo.GetResourceByUidAsync((Guid)grandParentUid);
-            var result = actualGrandParent?.GetRecipeComponentByUid(uid);
+            var actualParent = await _repo.GetRecipeByUidAsync((Guid)parentRecipeUid);
+            var result = actualParent?.GetRecipeComponentByUid(uid);
 
             return result;
         }

@@ -68,7 +68,7 @@ namespace Partlyx.Core.Partlyx
         }
 
         // Secondary features
-        public bool IsOutput() => Quantity < 0;
+        public bool IsOutput { get; set; } = false;
 
         private Guid? _componentSelectedRecipeUid;
         public Guid? ComponentSelectedRecipeUid
@@ -77,8 +77,6 @@ namespace Partlyx.Core.Partlyx
             set
             {
                 _componentSelectedRecipeUid = value;
-                // Trying to resolve DefaultRecipe if recipes already loaded
-                _componentSelectedRecipe = value.HasValue ? ComponentResource.Recipes.FirstOrDefault(r => r.Uid == value.Value) : null;
             }
         }
 
@@ -93,15 +91,6 @@ namespace Partlyx.Core.Partlyx
 
         public void SetSelectedRecipe(Recipe? recipe)
         {
-            if (recipe is null)
-            {
-                _componentSelectedRecipe = null;
-                return;
-            }
-
-            if (!ComponentResource.HasRecipe(recipe)) 
-                throw new ArgumentException($"Attempt to set the recipe that is not in the resource. Name of the resource: {ComponentResource.Name}");
-
             _componentSelectedRecipe = recipe;
             _componentSelectedRecipeUid = recipe != null ? recipe.Uid : null;
         }

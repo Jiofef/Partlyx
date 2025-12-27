@@ -6,7 +6,6 @@ using Partlyx.Services.CoreExtensions;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceInterfaces;
-using System.Diagnostics;
 
 namespace Partlyx.Services.ServiceImplementations
 {
@@ -14,208 +13,113 @@ namespace Partlyx.Services.ServiceImplementations
     {
         private readonly IPartlyxRepository _repo;
         private readonly IEventBus _eventBus;
+        private readonly PartsCreatorService _creator;
+
         public RecipeService(IPartlyxRepository repo, IEventBus bus)
         {
             _repo = repo;
             _eventBus = bus;
+            _creator = new PartsCreatorService(repo, bus);
         }
 
-        public async Task<Guid> CreateRecipeAsync(Guid parentResourceUid, string? recipeName = null, double? craftAmount = null)
+        public async Task<Guid> CreateRecipeAsync(string? recipeName = null, Guid? inheritedIconResourceUid = null)
         {
-            // If we change DefaultRecipe in ParentResource while performing the task from below, at the end of the method we will publish the event
-            ResourceUpdatedEvent? defaultRecipeChangedEvent = null;
+            var recipe = Recipe.Create(recipeName ?? "Recipe");
 
-            var result = await _repo.ExecuteOnResourceAsync(parentResourceUid, resource =>
+            if (inheritedIconResourceUid.HasValue)
             {
-                var recipe = resource.CreateRecipe();
-                if (recipeName != null)
-                    recipe.Name = recipeName;
-                if (craftAmount != null)
-                    recipe.CraftAmount = (double)craftAmount;
-
-                var icon = new InheritedIcon(parentResourceUid, InheritedIcon.InheritedIconParentTypeEnum.Resource);
+                var icon = new InheritedIcon(inheritedIconResourceUid.Value, InheritedIcon.InheritedIconParentTypeEnum.Resource);
                 var iconInfo = icon.GetInfo();
                 recipe.UpdateIconInfo(iconInfo);
+            }
 
-                if (recipe.ParentResource?.DefaultRecipe == null)
-                {
-                    resource.SetDefaultRecipe(recipe);
-                    defaultRecipeChangedEvent = new(resource.ToDto(), ["DefaultRecipeUid"], resource.Uid);
-                }
+            return await _creator.CreateRecipeAsync(recipe);
+        }
 
-                return Task.FromResult(recipe.Uid);
-            });
+        public async Task<bool> IsRecipeExists(Guid recipeUid)
+            => await _repo.GetRecipeByUidAsync(recipeUid) != null;
 
-            var recipe = await GetRecipeAsync(parentResourceUid, result);
+        public async Task<Guid> DuplicateRecipeAsync(Guid recipeUid)
+        {
+            var result = await _repo.DuplicateRecipeAsync(recipeUid);
+
+            var recipe = await _repo.GetRecipeByUidAsync(result);
             if (recipe != null)
             {
-                _eventBus.Publish(new RecipeCreatedEvent(recipe, recipe.Uid));
-
-                if (defaultRecipeChangedEvent != null)
-                    _eventBus.Publish(defaultRecipeChangedEvent);
+                var recipeDto = recipe.ToDto();
+                _eventBus.Publish(new RecipeCreatedEvent(recipeDto, recipe.Uid));
             }
 
             return result;
         }
 
-        public async Task<bool> IsRecipeExists(Guid parentResourceUid, Guid recipeUid) 
-            => await GetRecipeAsync(parentResourceUid, recipeUid) != null;
-
-        public async Task<Guid> DuplicateRecipeAsync(Guid parentResourceUid, Guid recipeUid)
+        public async Task DeleteRecipeAsync(Guid recipeUid)
         {
-            var result = await _repo.ExecuteOnRecipeAsync(parentResourceUid, recipeUid, recipe =>
-            {
-                var duplicate = recipe.CopyTo(recipe.ParentResource!);
-                return Task.FromResult(duplicate.Uid);
-            });
-
-            var recipe = await GetRecipeAsync(parentResourceUid, result);
-            if (recipe != null)
-                _eventBus.Publish(new RecipeCreatedEvent(recipe, recipe.Uid));
-
-            return result;
-        }
-
-        public async Task DeleteRecipeAsync(Guid parentResourceUid, Guid recipeUid)
-        {
-            // If we change DefaultRecipe in ParentResource while performing the task from below, at the end of the method we will publish the event
-            ResourceUpdatedEvent? defaultRecipeChangedEvent = null;
-
-            await _repo.ExecuteOnRecipeAsync(parentResourceUid, recipeUid, recipe =>
-            {
-                var exParent = recipe.ParentResource!;
-                var parentDefaultRecipe = exParent.DefaultRecipe;
-                recipe.Detach();
-
-                if (parentDefaultRecipe == recipe)
-                {
-                    exParent.SetDefaultRecipe(null);
-                    defaultRecipeChangedEvent = new(exParent.ToDto(), ["DefaultRecipeUid"], exParent.Uid);
-                }
-
-                return Task.CompletedTask;
-            });
             await _repo.DeleteRecipeAsync(recipeUid);
 
-            _eventBus.Publish(new RecipeDeletedEvent(parentResourceUid, recipeUid, 
-                new HashSet<object>() { parentResourceUid, recipeUid }));
-            if (defaultRecipeChangedEvent != null)
-                _eventBus.Publish(defaultRecipeChangedEvent);
+            _eventBus.Publish(new RecipeDeletedEvent(recipeUid,
+                new HashSet<object>() { recipeUid }));
         }
 
-        public async Task MoveRecipeAsync(Guid parentResourceUid, Guid newParentResourceUid, Guid recipeUid)
+        public async Task QuantifyRecipeAsync(Guid recipeUid)
         {
-            Recipe? recipe = null;
-
-            // If we change DefaultRecipe in ParentResource while performing the task from below, at the end of the method we will publish the event
-            ResourceUpdatedEvent? oldParentDefaultRecipeChangedEvent = null;
-            ResourceUpdatedEvent? newParentDefaultRecipeChangedEvent = null;
-
-            await _repo.ExecuteOnRecipeAsync(parentResourceUid, recipeUid, _recipe =>
-            {
-                var exParent = _recipe.ParentResource;
-                _recipe.Detach();
-                if (exParent!.DefaultRecipe == recipe)
-                {
-                    exParent.SetDefaultRecipe(null);
-                    oldParentDefaultRecipeChangedEvent = new(exParent.ToDto(), ["DefaultRecipeUid"], exParent.Uid);
-                }
-
-                recipe = _recipe;
-                return Task.CompletedTask;
-            });
-            await _repo.ExecuteOnResourceAsync(newParentResourceUid, resource =>
-            {
-                recipe?.AttachTo(resource);
-
-                if (resource.DefaultRecipe == recipe)
-                {
-                    resource.SetDefaultRecipe(null);
-                    newParentDefaultRecipeChangedEvent = new(resource.ToDto(), ["DefaultRecipeUid"], resource.Uid);
-                }
-
-                return Task.CompletedTask;
-            });
-
-            _eventBus.Publish(new RecipeMovedEvent(parentResourceUid, newParentResourceUid, recipeUid, 
-                new HashSet<object>() { parentResourceUid, newParentResourceUid, recipeUid }));
-
-            if (oldParentDefaultRecipeChangedEvent != null)
-                _eventBus.Publish(oldParentDefaultRecipeChangedEvent);
-            if (newParentDefaultRecipeChangedEvent != null)
-                _eventBus.Publish(newParentDefaultRecipeChangedEvent);
-        }
-
-        public async Task QuantifyRecipeAsync(Guid parentResourceUid, Guid recipeUid)
-        {
-            await _repo.ExecuteOnRecipeAsync(parentResourceUid, recipeUid, recipe =>
+            await _repo.ExecuteOnRecipeAsync(recipeUid, recipe =>
             {
                 recipe.MakeQuantified();
                 return Task.CompletedTask;
             });
         }
 
-        public async Task<RecipeDto?> GetRecipeAsync(Guid parentResourceUid, Guid recipeUid)
+        public async Task<RecipeDto?> GetRecipeAsync(Guid recipeUid)
         {
-            var resource = await _repo.GetResourceByUidAsync(parentResourceUid);
-            if (resource == null) return null;
-
-            var recipe = resource.GetRecipeByUid(recipeUid);
-
-            return recipe != null ? recipe.ToDto() : null;
+            var recipe = await _repo.GetRecipeByUidAsync(recipeUid);
+            return recipe?.ToDto();
         }
 
-        public async Task<List<RecipeDto>> GetAllTheRecipesAsync(Guid parentResourceUid)
+        public async Task<List<RecipeDto>> GetAllTheRecipesAsync()
         {
-            var resource = await _repo.GetResourceByUidAsync(parentResourceUid);
-            if (resource == null) 
-                throw new InvalidOperationException("Resource not found with Uid: " + parentResourceUid);
-
-            var recipes = resource.Recipes;
-
-            var recipesDto = recipes.Select(r => r.ToDto()).ToList();
-
-            return recipesDto;
+            var recipes = await _repo.GetAllTheRecipesAsync();
+            return recipes.Select(r => r.ToDto()).ToList();
         }
 
-        public async Task SetRecipeNameAsync(Guid parentResourceUid, Guid recipeUid, string name)
+        public async Task SetRecipeNameAsync(Guid recipeUid, string name)
         {
-            await _repo.ExecuteOnRecipeAsync(parentResourceUid, recipeUid, recipe =>
+            await _repo.ExecuteOnRecipeAsync(recipeUid, recipe =>
             {
                 recipe.Name = name;
                 return Task.CompletedTask;
             });
 
-            var recipe = await GetRecipeAsync(parentResourceUid, recipeUid);
+            var recipe = await GetRecipeAsync(recipeUid);
             if (recipe != null)
                 _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "Name" }, recipe.Uid));
         }
 
-        public async Task SetRecipeCraftAmountAsync(Guid parentResourceUid, Guid recipeUid, double craftAmount)
-        {
-            await _repo.ExecuteOnRecipeAsync(parentResourceUid, recipeUid, recipe =>
-            {
-                recipe.CraftAmount = craftAmount;
-                return Task.CompletedTask;
-            });
-
-            var recipe = await GetRecipeAsync(parentResourceUid, recipeUid);
-            if (recipe != null)
-                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "CraftAmount" }, recipe.Uid));
-        }
-
-        public async Task SetRecipeIconAsync(Guid resourceUid, Guid recipeUid, IconDto iconDto)
+        public async Task SetRecipeIconAsync(Guid recipeUid, IconDto iconDto)
         {
             var iconInfo = iconDto.ToIconInfo();
-            await _repo.ExecuteOnRecipeAsync(resourceUid, recipeUid, recipe =>
+            await _repo.ExecuteOnRecipeAsync(recipeUid, recipe =>
             {
                 recipe.UpdateIconInfo(iconInfo);
                 return Task.CompletedTask;
             });
 
-            var recipe = await GetRecipeAsync(resourceUid, recipeUid);
+            var recipe = await GetRecipeAsync(recipeUid);
             if (recipe != null)
                 _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "Icon" }, recipe.Uid));
+        }
+
+        public async Task SetRecipeIsReversibleAsync(Guid recipeUid, bool isReversible)
+        {
+            await _repo.ExecuteOnRecipeAsync(recipeUid, recipe =>
+            {
+                recipe.IsReversible = isReversible;
+                return Task.CompletedTask;
+            });
+
+            var recipe = await GetRecipeAsync(recipeUid);
+            if (recipe != null)
+                _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "IsReversible" }, recipe.Uid));
         }
     }
 }

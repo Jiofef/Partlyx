@@ -59,7 +59,7 @@ namespace Partlyx.ViewModels.PartsViewModels
         }
 
         public static List<ResourceAmountPairViewModel> GetMergedComponentsList(this RecipeViewModel recipe)
-            => GetMerged(recipe.Components);
+            => GetMerged(recipe.Inputs);
 
 
         // Traverses the entire recipe tree, preventing eternal recursions. The bool value indicates whether the current component causes eternal recursion.
@@ -68,7 +68,7 @@ namespace Partlyx.ViewModels.PartsViewModels
             HashSet<ResourceViewModel> parentResources = new();
 
             parentResources.TryAddIfNotNull(recipe.LinkedParentResource?.Value);
-            Iterate(recipe.Components);
+            Iterate(recipe.Inputs);
 
             void Iterate(IList<RecipeComponentViewModel> components)
             {

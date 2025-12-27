@@ -16,7 +16,6 @@ using Partlyx.Tests.Mocks;
 using Partlyx.ViewModels.GlobalNavigations;
 using Partlyx.ViewModels.Graph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
-using Partlyx.ViewModels.PartsViewModels.Implementations.VMPartsStore;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.Settings;
 using Partlyx.ViewModels.UIObjectViewModels;
@@ -141,6 +140,8 @@ namespace Partlyx.Tests.Utils
             services.AddSingleton<IGlobalFocusedPart, GlobalFocusedPart>();
             services.AddTransient<IIsolatedResourcesVMContainer, ResourcesVMContainer>();
             services.AddSingleton<IGlobalResourcesVMContainer, ResourcesVMContainer>();
+            services.AddTransient<IIsolatedRecipesVMContainer, RecipesVMContainer>();
+            services.AddSingleton<IGlobalRecipesVMContainer, RecipesVMContainer>();
 
             services.AddSingleton<PartsGlobalNavigations>();
 

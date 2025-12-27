@@ -28,15 +28,6 @@ public class PartlyxDBContext : DbContext, IDisposable
             .ValueGeneratedOnAdd();
             rb.Property(r => r.Name).IsRequired();
             rb.Property(r => r.DefaultRecipeUid).HasColumnType("BLOB");
-            rb.HasMany(r => r.Recipes)
-                .WithOne(r => r.ParentResource)
-                .HasForeignKey("ResourceUid")
-                .OnDelete(DeleteBehavior.Cascade);
-
-            rb.Metadata.FindNavigation(nameof(Resource.Recipes))!
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
-            rb.Metadata.FindNavigation(nameof(Resource.Recipes))!
-                .SetField("_recipes");
         });
 
         modelBuilder.Entity<Recipe>(rcb =>
@@ -47,21 +38,15 @@ public class PartlyxDBContext : DbContext, IDisposable
             .HasColumnName("Uid")
             .HasColumnType("BLOB")
             .ValueGeneratedNever();
-            rcb.Property<Guid?>("ResourceUid").HasColumnType("BLOB");
+            rcb.Property(rc => rc.Name).IsRequired();
+            rcb.Property(rc => rc.IsReversible).HasDefaultValue(false);
             rcb.HasMany(rc => rc.Components)
                 .WithOne(rc => rc.ParentRecipe)
                 .HasForeignKey("RecipeUid")
                 .OnDelete(DeleteBehavior.Cascade);
 
-            rcb.Metadata.FindNavigation(nameof(Recipe.ParentResource))!
-            .SetPropertyAccessMode(PropertyAccessMode.Field);
-            rcb.Metadata.FindNavigation(nameof(Recipe.ParentResource))!
-            .SetField("_parentResource");
-
             rcb.Metadata.FindNavigation(nameof(Recipe.Components))!
             .SetPropertyAccessMode(PropertyAccessMode.Field);
-            rcb.Metadata.FindNavigation(nameof(Recipe.Components))!
-                .SetField("_components");
         });
 
         modelBuilder.Entity<RecipeComponent>(cb =>
@@ -72,6 +57,8 @@ public class PartlyxDBContext : DbContext, IDisposable
             .HasColumnName("Uid")
             .HasColumnType("BLOB")
             .ValueGeneratedNever();
+            cb.Property(c => c.Quantity);
+            cb.Property(c => c.IsOutput).HasDefaultValue(false);
             cb.Property<Guid?>("RecipeUid").HasColumnType("BLOB");
             cb.Property<Guid?>("ComponentResourceUid").HasColumnType("BLOB");
 

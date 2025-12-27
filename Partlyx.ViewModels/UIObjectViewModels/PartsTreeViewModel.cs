@@ -46,6 +46,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         private IGlobalResourcesVMContainer _resourcesContainer { get; }
         public ObservableCollection<ResourceViewModel> Resources => _resourcesContainer.Resources;
+
+        private IGlobalRecipesVMContainer _recipesContainer { get; }
+        public ObservableCollection<RecipeViewModel> Recipes => _recipesContainer.Recipes;
         public ObservableCollection<IVMPart> SelectedPartsCollection { get; } = new();
         public PartsSelectionState SelectedPartsDetails { get; }
 
@@ -66,10 +69,11 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             }
         }
 
-        public PartsTreeViewModel(IGlobalResourcesVMContainer grvmc, IGlobalSelectedParts sp, IGlobalFocusedPart fp, IEventBus bus, IVMPartsFactory vmpf,
+        public PartsTreeViewModel(IGlobalResourcesVMContainer grvmc, IGlobalRecipesVMContainer grc, IGlobalSelectedParts sp, IGlobalFocusedPart fp, IEventBus bus, IVMPartsFactory vmpf,
                 IVMPartsStore vmps, IResourceSearchService rss, PartsServiceViewModel service)
         {
             _resourcesContainer = grvmc;
+            _recipesContainer = grc;
             _partsFactory = vmpf;
             _store = vmps;
             _bus = bus;
@@ -82,7 +86,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _childAddSubscription = bus.Subscribe<ResourceCreatedEvent>(OnResourceCreated, true);
             _childRemoveSubscription = bus.Subscribe<ResourceDeletedEvent>(OnResourceDeleted, true);
             _initializationFinishedSubscription = bus.Subscribe<PartsVMInitializationFinishedEvent>((ev) => UpdateList(), true);
-            _fileClearedSubscription = bus.Subscribe<FileClearedEvent>((ev) => Resources.Clear(), true);
+            _fileClearedSubscription = bus.Subscribe<FileClearedEvent>((ev) => { Resources.Clear(); Recipes.Clear(); }, true);
             _treeSearchQuerySubscription = bus.Subscribe<TreeSearchQueryEvent>(SearchQueryHandler);
 
             SelectedPartsDetails = new PartsSelectionState(SelectedPartsCollection);
@@ -122,9 +126,13 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public void UpdateList()
         {
             _resourcesContainer.ClearResources();
+            _recipesContainer.ClearRecipes();
 
             foreach (var resource in _store.Resources.Values)
                 _resourcesContainer.AddResource(resource);
+
+            foreach (var recipe in _store.Recipes.Values)
+                _recipesContainer.AddRecipe(recipe);
         }
 
         private void SearchQueryHandler(TreeSearchQueryEvent ev)

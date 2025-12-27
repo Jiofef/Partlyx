@@ -1,6 +1,7 @@
 ﻿using Partlyx.Core;
 using Partlyx.Core.Partlyx;
 using Partlyx.Core.VisualsInfo;
+using Partlyx.Infrastructure.Data.Implementations;
 using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.CoreExtensions;
@@ -89,10 +90,14 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task SetDefaultRecipeAsync(Guid resourceUid, Guid recipeUid)
         {
-            await _repo.ExecuteOnRecipeAsync(resourceUid, recipeUid, recipe =>
+            var batchOptions = new PartlyxRepository.BatchIncludeOptions() { };
+
+            await _repo.ExecuteWithBatchAsync([resourceUid], [recipeUid], [], batchOptions,
+                batch =>
             {
-                var resource = recipe.ParentResource!;
-                resource.SetDefaultRecipe(recipe);
+                var resource = batch.Resources[resourceUid];
+                var recipe = batch.Recipes[recipeUid];
+                resource.DefaultRecipe = recipe;
 
                 return Task.CompletedTask;
             });

@@ -116,10 +116,6 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<IPartsService, PartsService>();
 
             services.AddTransient<IIconInfoProvider, IconInfoProvider>();
-            services.AddTransient<IResourceFigureIconService, ResourceFigureIconService>();
-            services.AddTransient<IResourceImageIconService, ResourceImageIconService>();
-            services.AddTransient<IRecipeFigureIconService, RecipeFigureIconService>();
-            services.AddTransient<IRecipeImageIconService, RecipeImageIconService>();
 
             services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
             services.AddTransient<ICommandFactory, DICommandFactory>();
@@ -193,6 +189,8 @@ namespace Partlyx.UI.Avalonia
             services.AddSingleton<IGlobalFocusedPart, GlobalFocusedPart>();
             services.AddTransient<IIsolatedResourcesVMContainer, ResourcesVMContainer>();
             services.AddSingleton<IGlobalResourcesVMContainer, ResourcesVMContainer>();
+            services.AddTransient<IIsolatedRecipesVMContainer, RecipesVMContainer>();
+            services.AddSingleton<IGlobalRecipesVMContainer, RecipesVMContainer>();
 
             services.AddSingleton<PartsGlobalNavigations>();
 
@@ -235,8 +233,6 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<CreateRecipeCommand>();
             services.AddTransient<DeleteRecipeCommand>();
             services.AddTransient<DuplicateRecipeCommand>();
-            services.AddTransient<SetRecipeCraftAmountCommand>();
-
             // Recipe component commands
             services.AddTransient<CreateRecipeComponentCommand>();
             services.AddTransient<DeleteRecipeComponentCommand>();

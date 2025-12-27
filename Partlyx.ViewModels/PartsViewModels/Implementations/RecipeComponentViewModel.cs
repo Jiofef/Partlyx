@@ -85,10 +85,14 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private double _quantity;
         public double Quantity { get => _quantity; set => SetProperty(ref _quantity, value); }
 
+        private bool _isOutput;
+        public bool IsOutput { get => _isOutput; set => SetProperty(ref _isOutput, value); }
+
         private GuidLinkedPart<RecipeViewModel>? _selectedRecipe;
         public GuidLinkedPart<RecipeViewModel>? LinkedSelectedRecipe { get => _selectedRecipe; private set => SetProperty(ref _selectedRecipe, value); }
 
         private ObservableCollection<RecipeComponentViewModel>? _selectedRecipeComponents;
+
         public ObservableCollection<RecipeComponentViewModel>? SelectedRecipeComponents { get => _selectedRecipeComponents; private set => SetProperty(ref _selectedRecipeComponents, value); }
 
         public IconViewModel Icon { get => LinkedResource?.Value?.Icon!; }
@@ -108,6 +112,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 dto.ResourceUid is Guid resourceUid
                 ? _linkedPartsManager.CreateAndRegisterLinkedResourceVM(resourceUid)
                 : null},
+            { nameof(RecipeComponentDto.IsOutput), dto => IsOutput = dto.IsOutput }
         };
 
         public void HandleEvent(object @event)
@@ -154,8 +159,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private void UpdateSelectedComponents()
         {
             SelectedRecipeComponents =
-                LinkedSelectedRecipe?.Value?.Components ??
-                LinkedResource?.Value?.LinkedDefaultRecipe?.Value?.Components;
+                LinkedSelectedRecipe?.Value?.Inputs ??
+                LinkedResource?.Value?.LinkedDefaultRecipe?.Value?.Inputs;
         }
 
         // Compatibility

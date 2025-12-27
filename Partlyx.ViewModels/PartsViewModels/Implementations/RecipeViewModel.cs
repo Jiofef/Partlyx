@@ -40,22 +40,23 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _bus = bus;
 
             // Info
-            if (dto.ParentResourceUid is Guid parentUid)
-            {
-                var parentLinked = _linkedPartsManager.CreateAndRegisterLinkedResourceVM(parentUid);
-                _parentResource = parentLinked;
-            }
-
             _name = dto.Name;
-            _craftAmount = dto.CraftAmount;
+            _isReversible = dto.IsReversible;
+            InputsDic = new(_inputsDic);
+            OutputsDic = new(_outputsDic);
 
-            ComponentsDic = new(_componentsDic);
-
-            foreach (var component in dto.Components)
+            foreach (var component in dto.Inputs)
             {
                 var vm = _partsFactory.GetOrCreateRecipeComponentVM(component);
-                _components.Add(vm);
-                _componentsDic.Add(vm.Uid, vm);
+                _inputs.Add(vm);
+                _inputsDic.Add(vm.Uid, vm);
+            }
+
+            foreach (var component in dto.Outputs)
+            {
+                var vm = _partsFactory.GetOrCreateRecipeComponentVM(component);
+                _outputs.Add(vm);
+                _outputsDic.Add(vm.Uid, vm);
             }
 
             // For the most part, we don't really care when the icon will be loaded. Until then, the icon will be empty.
@@ -79,30 +80,94 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private string _name;
         public string Name { get => _name; set => SetProperty(ref _name, value); }
 
-        private double _craftAmount;
-        public double CraftAmount { get => _craftAmount; set => SetProperty(ref _craftAmount, value); }
+        private bool _isReversible;
+        public bool IsReversible { get => _isReversible; set => SetProperty(ref _isReversible, value); }
 
-        private ObservableCollection<RecipeComponentViewModel> _components = new();
-        public ObservableCollection<RecipeComponentViewModel> Components { get => _components; } // Updates locally when component is created/removed
+        private ObservableCollection<RecipeComponentViewModel> _inputs = new();
+        public ObservableCollection<RecipeComponentViewModel> Inputs { get => _inputs; }
 
-        private readonly Dictionary<Guid, RecipeComponentViewModel> _componentsDic = new();
-        public ReadOnlyDictionary<Guid, RecipeComponentViewModel> ComponentsDic { get; }
-        public RecipeComponentViewModel? GetChildOrNull(Guid uid) => _componentsDic.GetValueOrDefault(uid);
-        private void AddComponent(RecipeComponentViewModel recipe)
+        private readonly Dictionary<Guid, RecipeComponentViewModel> _inputsDic = new();
+        public ReadOnlyDictionary<Guid, RecipeComponentViewModel> InputsDic { get; }
+
+        private ObservableCollection<RecipeComponentViewModel> _outputs = new();
+        public ObservableCollection<RecipeComponentViewModel> Outputs { get => _outputs; }
+
+        private readonly Dictionary<Guid, RecipeComponentViewModel> _outputsDic = new();
+        public ReadOnlyDictionary<Guid, RecipeComponentViewModel> OutputsDic { get; }
+
+        public RecipeComponentViewModel? GetChildOrNull(Guid uid)
         {
-            if (_componentsDic.ContainsKey(recipe.Uid))
-                return;
-
-            Components.Add(recipe);
-            _componentsDic.Add(recipe.Uid, recipe);
+            return _inputsDic.GetValueOrDefault(uid) ?? _outputsDic.GetValueOrDefault(uid);
         }
-        private void RemoveComponent(RecipeComponentViewModel recipe)
-        {
-            if (!_componentsDic.ContainsKey(recipe.Uid))
-                return;
 
-            Components.Remove(recipe);
-            _componentsDic.Remove(recipe.Uid);
+        /// <summary>
+        /// Checks if the resource is present in the recipe's inputs or outputs
+        /// </summary>
+        public bool HasResource(Guid resourceUid)
+        {
+            return HasResourceInInputs(resourceUid) || HasResourceInOutputs(resourceUid);
+        }
+
+        /// <summary>
+        /// Checks if the resource is present in the recipe's inputs
+        /// </summary>
+        public bool HasResourceInInputs(Guid resourceUid)
+        {
+            return _inputs.Any(c => c.LinkedResource?.Uid == resourceUid);
+        }
+
+        /// <summary>
+        /// Checks if the resource is present in the recipe's outputs
+        /// </summary>
+        public bool HasResourceInOutputs(Guid resourceUid)
+        {
+            return _outputs.Any(c => c.LinkedResource?.Uid == resourceUid);
+        }
+
+        /// <summary>
+        /// Checks if the resource is present in the recipe's components that can be used as default recipe
+        /// If recipe is reversible, checks both inputs and outputs; otherwise, only outputs
+        /// </summary>
+        public bool HasResourceInLinkedComponents(Guid resourceUid)
+        {
+            if (IsReversible)
+                return HasResource(resourceUid);
+            else
+                return HasResourceInOutputs(resourceUid);
+        }
+
+        private void AddComponent(RecipeComponentViewModel component)
+        {
+            if (component.IsOutput)
+            {
+                if (_outputsDic.ContainsKey(component.Uid))
+                    return;
+
+                Outputs.Add(component);
+                _outputsDic.Add(component.Uid, component);
+            }
+            else
+            {
+                if (_inputsDic.ContainsKey(component.Uid))
+                    return;
+
+                Inputs.Add(component);
+                _inputsDic.Add(component.Uid, component);
+            }
+        }
+
+        private void RemoveComponent(RecipeComponentViewModel component)
+        {
+            if (_inputsDic.ContainsKey(component.Uid))
+            {
+                Inputs.Remove(component);
+                _inputsDic.Remove(component.Uid);
+            }
+            else if (_outputsDic.ContainsKey(component.Uid))
+            {
+                Outputs.Remove(component);
+                _outputsDic.Remove(component.Uid);
+            }
         }
 
         private IconViewModel _icon;
@@ -115,7 +180,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         protected override Dictionary<string, Action<RecipeDto>> ConfigureUpdaters() => new()
         {
             { nameof(RecipeDto.Name), dto => Name = dto.Name },
-            { nameof(RecipeDto.CraftAmount), dto => CraftAmount = dto.CraftAmount },
+            { nameof(RecipeDto.IsReversible), dto => IsReversible = dto.IsReversible },
             { nameof(RecipeDto.Icon), dto => _ = UpdateIconFromDto(dto.Icon) },
         };
 
@@ -202,7 +267,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             UiItem.Dispose();
 
-            foreach(var component in Components)
+            foreach(var component in Inputs)
                 component.Dispose();
         }
 

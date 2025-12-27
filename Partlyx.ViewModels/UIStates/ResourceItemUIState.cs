@@ -40,18 +40,6 @@ namespace Partlyx.ViewModels
         public bool IsRenaming { get => _isRenaming; set => SetProperty(ref _isRenaming, value); }
         public string UnConfirmedName { get => _unConfirmedName; set => SetProperty(ref _unConfirmedName, value); }
 
-        public override async Task HandleDrop(ISelectedParts droppedParts)
-        {
-            var dropType = droppedParts.GetOnlyNotEmptyCollectionPartsTypeOrNull();
-            if (dropType == null) return;
-
-            else if (dropType == PartTypeEnumVM.Recipe)
-            {
-                var recipes = droppedParts.Recipes.ToList();
-                await _services.RecipeService.MoveRecipesAsync(AttachedResource, recipes);
-            }
-        }
-
         [RelayCommand]
         public async Task CommitNameChangeAsync()
         {

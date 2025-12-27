@@ -17,7 +17,6 @@ namespace Partlyx.Services.Dtos
             return new ResourceDto(
                 r.Uid,
                 r.Name,
-                r.Recipes.Select(rc => rc.ToDto()).ToList(),
                 r.DefaultRecipeUid,
                 r.GetIconInfo().ToDto()
                 );
@@ -27,10 +26,10 @@ namespace Partlyx.Services.Dtos
         {
             return new RecipeDto(
                 rc.Uid,
-                rc.ParentResource?.Uid,
                 rc.Name,
-                rc.CraftAmount,
-                rc.Components.Select(c => c.ToDto()).ToList(),
+                rc.IsReversible,
+                rc.Inputs.Select(c => c.ToDto()).ToList(),
+                rc.Outputs.Select(c => c.ToDto()).ToList(),
                 rc.GetIconInfo().ToDto()
                 );
         }
@@ -42,6 +41,7 @@ namespace Partlyx.Services.Dtos
                 c.ParentRecipe?.Uid,
                 c.ComponentResource.Uid,
                 c.Quantity,
+                c.IsOutput,
                 c.ComponentSelectedRecipeUid
                 );
         }

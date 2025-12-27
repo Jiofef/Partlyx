@@ -54,7 +54,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 rItem.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)
                 || rItem.Recipes.Any(rc =>
                     rc.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)
-                    || rc.Components.Any(c =>
+                    || rc.Inputs.Any(c =>
                         c.LinkedResource?.Value?.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) == true));
         }
     }

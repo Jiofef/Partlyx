@@ -35,6 +35,30 @@ namespace Partlyx.Services.Commands
         {
             await _setter(_savedValue);
         }
+
+        /// <summary>
+        /// Helper method to get current value from a service getter method.
+        /// </summary>
+        protected static async Task<T> GetCurrentValueAsync<TService, T>(
+            IServiceProvider sp, Guid entityId,
+            Func<TService, Guid, Task<T>> getter)
+            where TService : class
+        {
+            var service = sp.GetRequiredService<TService>();
+            return await getter(service, entityId);
+        }
+
+        /// <summary>
+        /// Creates a simple setter function for service methods.
+        /// </summary>
+        protected static Func<T, Task> CreateSetter<TService, T>(
+            IServiceProvider sp, Guid entityId,
+            Func<TService, Guid, T, Task> setter)
+            where TService : class
+        {
+            var service = sp.GetRequiredService<TService>();
+            return async (value) => await setter(service, entityId, value);
+        }
     }
 
     // Below is an example of using SetValueUndoableCommand to create a command.

@@ -13,7 +13,7 @@ namespace Partlyx.ViewModels.Graph
     public class RecipeGraphNodeViewModel : GraphTreeNodeViewModel, ITypedVMPartHolder<RecipeViewModel>
     {
         public RecipeGraphNodeViewModel(RecipeViewModel value) : base(value.Uid,
-                  new ObservableCollectionProjection<Guid, RecipeComponentViewModel>(value.Components!, (component => component.Uid)),
+                  new ObservableCollectionProjection<Guid, RecipeComponentViewModel>(value.Inputs!, (component => component.Uid)),
                   value) { }
 
         public PartTypeEnumVM? PartType => PartTypeEnumVM.Recipe;

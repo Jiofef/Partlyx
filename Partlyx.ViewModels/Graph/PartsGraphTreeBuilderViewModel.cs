@@ -70,7 +70,7 @@ namespace Partlyx.ViewModels.Graph
             if (rootNode.Value is RecipeViewModel recipe)
             {
                 parentResources.Add(recipe.LinkedParentResource!.Value!);
-                LoadChildComponentsFrom(recipe.Components, rootNode);
+                LoadChildComponentsFrom(recipe.Inputs, rootNode);
             }
             else if (rootNode.Value is RecipeComponentViewModel component && component.SelectedRecipeComponents != null)
             {

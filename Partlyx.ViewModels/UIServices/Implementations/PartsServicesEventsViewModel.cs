@@ -26,6 +26,6 @@ namespace Partlyx.ViewModels.UIServices.Implementations
     // -----
 
     public record ResourceDeletingStartedEvent(Guid ResourceUid) : IRoutedEvent { public object? ReceiverKey => ResourceUid; }
-    public record RecipeDeletingStartedEvent(Guid RecipeUid, Guid ParentResourceUid, HashSet<object> ReceiverKeys) : IRoutedMultiKeyEvent;
-    public record RecipeComponentDeletingStartedEvent(Guid ComponentUid, Guid ParentRecipeUid, Guid ParentResourceUid, HashSet<object> ReceiverKeys) : IRoutedMultiKeyEvent;
+    public record RecipeDeletingStartedEvent(Guid RecipeUid, HashSet<object> ReceiverKeys) : IRoutedMultiKeyEvent;
+    public record RecipeComponentDeletingStartedEvent(Guid ComponentUid, Guid ParentRecipeUid, HashSet<object> ReceiverKeys) : IRoutedMultiKeyEvent;
 }

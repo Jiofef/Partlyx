@@ -55,7 +55,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                     if (_settings.CreateResourceWithRecipeByDefault)
                     {
                         // Default recipe creating
-                        var defaultRecipeCreateCommand = _commands.Factory.Create<CreateRecipeCommand>(resourceUid, _loc["Recipe"]);
+                        var defaultRecipeCreateCommand = _commands.Factory.Create<CreateRecipeCommand>(_loc["Recipe"]);
                         await complexDispatcher.ExcecuteAsync(defaultRecipeCreateCommand);
                     }
                 });
@@ -115,7 +115,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             if (resource.LinkedDefaultRecipe?.Value == recipe)
                 return;
 
-            if (!resource.Recipes.Contains(recipe))
+            if (!recipe.HasResourceInLinkedComponents(resource.Uid))
                 return;
 
             await _commands.CreateAsyncEndExcecuteAsync<SetDefaultRecipeToResourceCommand>(resource.Uid, recipe.Uid);

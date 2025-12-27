@@ -8,7 +8,6 @@ namespace Partlyx.Core.Partlyx
         public Resource(string name = "Resource")
         {
             Name = name;
-            _recipes = new List<Recipe>();
         }
 
         protected Resource() { Uid = Guid.NewGuid(); Name = "Resource"; }
@@ -20,26 +19,20 @@ namespace Partlyx.Core.Partlyx
 
         public string Name { get; set; }
 
-        private readonly List<Recipe> _recipes = new();
-        public IReadOnlyList<Recipe> Recipes => _recipes;
-
         private Guid? _defaultRecipeUid;
         public Guid? DefaultRecipeUid { get => _defaultRecipeUid; set => _defaultRecipeUid = value; }
 
         private Recipe? _defaultRecipeCached;
 
         [NotMapped]
-        public Recipe? DefaultRecipe 
+        public Recipe? DefaultRecipe
         {
-            get => GetActualDefaultRecipe();
-            private set => DefaultRecipeUid = value?.Uid;
-        }
-        private Recipe? GetActualDefaultRecipe()
-        {
-            if (_defaultRecipeCached?.Uid != _defaultRecipeUid)
-                _defaultRecipeCached = _defaultRecipeUid != null ? GetRecipeByUid((Guid)_defaultRecipeUid) : null;
-
-            return _defaultRecipeCached;
+            get => _defaultRecipeCached;
+            set
+            {
+                _defaultRecipeCached = value;
+                _defaultRecipeUid = value?.Uid;
+            }
         }
 
         // Icon features
@@ -52,60 +45,11 @@ namespace Partlyx.Core.Partlyx
         }
         public IconInfo GetIconInfo() => new IconInfo(IconType, IconData);
 
-        // Secondary features
-        public Recipe CreateRecipe()
-        {
-            var r = Recipe.CreateForResource(this);
-
-            AddRecipeToList(r);
-
-            return r;
-        }
-
-        internal void AddRecipeToList(Recipe recipe)
-        {
-            _recipes.Add(recipe);
-        }
-
-        internal void RemoveRecipeFromList(Recipe recipe)
-        {
-            _recipes.Remove(recipe);
-        }
-
-        public bool HasRecipe(Recipe recipe) => _recipes.Contains(recipe);
-
-        public bool HasAnyRecipes()
-        {
-            return Recipes.Count > 0;
-        }
-
-        public void SetDefaultRecipe(Recipe? recipe)
-        {
-            if (recipe != null && !HasRecipe(recipe)) 
-                throw new ArgumentException($"Attempt to set the default recipe that is not in the resource. Name of the resource: {Name}");
-
-            DefaultRecipe = recipe;
-        }
-
-        public void DetachAllRecipes()
-        {
-            foreach (var recipe in Recipes)
-                recipe.Detach();
-        }
-
-        public Recipe? GetRecipeByUid(Guid uid)
-        {
-            var recipe = Recipes.FirstOrDefault(recipe => recipe.Uid == uid);
-            return recipe;
-        }
         public RecipeComponent? GetRecipeComponentByUid(Guid uid)
         {
-            var recipe = Recipes.FirstOrDefault(
-                rp => rp.Components.Any(c => c.Uid == uid));
-            var recipeComponent = recipe?.Components.FirstOrDefault(
-                c => c.Uid == uid);
-
-            return recipeComponent;
+            // Since recipes are not tied to resources, this method may need to be removed or changed
+            // For now, leave as stub
+            return null;
         }
 
         public Resource Clone()
@@ -116,16 +60,7 @@ namespace Partlyx.Core.Partlyx
             clone.IconType = IconType;
             clone.IconData = IconData;
 
-            foreach (var recipe in _recipes)
-            {
-                if (DefaultRecipe != recipe)
-                    recipe.CopyTo(clone);
-                else
-                {
-                    var newDefaultRecipe = recipe.CopyTo(clone);
-                    clone.SetDefaultRecipe(newDefaultRecipe);
-                }
-            }
+            clone.DefaultRecipe = DefaultRecipe;
 
             return clone;
         }

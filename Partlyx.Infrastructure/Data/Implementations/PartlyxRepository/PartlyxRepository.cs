@@ -17,6 +17,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
         }
 
 
+        // Resource CRUD
         public async Task<Guid> AddResourceAsync(Resource resource)
         {
             await using var db = _dbFactory.CreateDbContext();
@@ -30,9 +31,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
         {
             await using var db = _dbFactory.CreateDbContext();
 
-            var r = await db.Resources.Include(x => x.Recipes)
-            .ThenInclude(rc => rc.Components)
-            .ThenInclude(c => c.ComponentResource)
+            var r = await db.Resources
             .FirstOrDefaultAsync(x => x.Uid == uid);
 
             if (r == null) throw new Exception("Cannot duplicate a non existing resource with Uid: " + uid);
@@ -48,8 +47,6 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await using var db = _dbFactory.CreateDbContext();
 
             var r = await db.Resources
-                .Include(r => r.Recipes)
-                .ThenInclude(rc => rc.Components)
                 .FirstOrDefaultAsync(r => r.Uid == uid);
 
             if (r != null)
@@ -59,12 +56,47 @@ namespace Partlyx.Infrastructure.Data.Implementations
             }
         }
 
+        public async Task<int> GetResourcesCountAsync()
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            var count = db.Resources.Count();
+            return count;
+        }
+
+        // ---
+        // Recipe CRUD
+
+        public async Task<Guid> AddRecipeAsync(Recipe recipe)
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            db.Recipes.Add(recipe);
+            await db.SaveChangesAsync();
+            return recipe.Uid;
+        }
+
+        public async Task<Guid> DuplicateRecipeAsync(Guid uid)
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            var r = await db.Recipes.Include(rc => rc.Inputs).ThenInclude(c => c.ComponentResource)
+                .FirstOrDefaultAsync(x => x.Uid == uid);
+
+            if (r == null) throw new Exception("Cannot duplicate a non existing recipe with Uid: " + uid);
+
+            var duplicate = r.Clone();
+            db.Recipes.Add(duplicate);
+            await db.SaveChangesAsync();
+            return duplicate.Uid;
+        }
+
         public async Task DeleteRecipeAsync(Guid uid)
         {
             await using var db = _dbFactory.CreateDbContext();
 
             var r = await db.Recipes
-                .Include(rc => rc.Components)
+                .Include(rc => rc.Inputs)
                 .FirstOrDefaultAsync(r => r.Uid == uid);
 
             if (r != null)
@@ -73,6 +105,10 @@ namespace Partlyx.Infrastructure.Data.Implementations
                 await db.SaveChangesAsync();
             }
         }
+
+        // ---
+        // Component CRUD
+
         public async Task DeleteComponentAsync(Guid uid)
         {
             await using var db = _dbFactory.CreateDbContext();
@@ -87,14 +123,6 @@ namespace Partlyx.Infrastructure.Data.Implementations
             }
         }
 
-        public async Task<int> GetResourcesCountAsync()
-        {
-            await using var db = _dbFactory.CreateDbContext();
-
-            var count = db.Resources.Count();
-            return count;
-        }
-
         /// <summary>
         /// Important note. If you want to change the state of the received Resource or its descendants, use one of "ExecuteOn___Async" instead so that your changes are saved correctly.
         /// </summary>
@@ -103,9 +131,32 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await using var db = _dbFactory.CreateDbContext();
 
             var r = await db.Resources
-                .Include(x => x.Recipes)
-                .ThenInclude(rc => rc.Components)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Uid == uid);
+
+            return r;
+        }
+
+        public async Task<Recipe?> GetRecipeByUidAsync(Guid uid)
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            var r = await db.Recipes
+                .Include(rc => rc.Inputs)
                 .ThenInclude(c => c.ComponentResource)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Uid == uid);
+
+            return r;
+        }
+
+        public async Task<RecipeComponent?> GetRecipeComponentByUidAsync(Guid uid)
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            var r = await db.RecipeComponents
+                .Include(c => c.ComponentResource)
+                .Include(c => c.ParentRecipe)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Uid == uid);
 
@@ -129,9 +180,6 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await using var db = _dbFactory.CreateDbContext();
 
             var rl = await db.Resources
-                .Include(r => r.Recipes)
-                .ThenInclude(rc => rc.Components)
-                .ThenInclude(c => c.ComponentResource)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -143,8 +191,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await using var db = _dbFactory.CreateDbContext();
 
             var rl = await db.Recipes
-                .Include(rc => rc.ParentResource)
-                .Include(rc => rc.Components)
+                .Include(rc => rc.Inputs)
                 .ThenInclude(c => c.ComponentResource)
                 .AsNoTracking()
                 .ToListAsync();
@@ -159,7 +206,6 @@ namespace Partlyx.Infrastructure.Data.Implementations
             var rl = await db.RecipeComponents
                 .Include(c => c.ComponentResource)
                 .Include(c => c.ParentRecipe)
-                .ThenInclude(rc => rc!.ParentResource)
                 .AsNoTracking()
                 .ToListAsync();
 

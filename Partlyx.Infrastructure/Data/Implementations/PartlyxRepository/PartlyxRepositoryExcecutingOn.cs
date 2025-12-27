@@ -16,9 +16,6 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await using var db = _dbFactory.CreateDbContext();
 
             var r = await db.Resources
-                .Include(x => x.Recipes)
-                .ThenInclude(rc => rc.Components)
-                .ThenInclude(c => c.ComponentResource)
                 .FirstOrDefaultAsync(x => x.Uid == resourceUid);
 
             if (r == null) throw ResourceNotFound(resourceUid);
@@ -40,20 +37,15 @@ namespace Partlyx.Infrastructure.Data.Implementations
             });
         }
 
-        public async Task<TResult> ExecuteOnRecipeAsync<TResult>(Guid resourceUid, Guid recipeUid,
+        public async Task<TResult> ExecuteOnRecipeAsync<TResult>(Guid recipeUid,
                 Func<Recipe, Task<TResult>> action)
         {
             await using var db = _dbFactory.CreateDbContext();
 
-            var resource = await db.Resources
-                .Include(r => r.Recipes)
-                .ThenInclude(rc => rc.Components)
+            var recipe = await db.Recipes
+                .Include(rc => rc.Components)
                 .ThenInclude(c => c.ComponentResource)
-                .FirstOrDefaultAsync(r => r.Uid == resourceUid);
-
-            if (resource == null) throw ResourceNotFound(resourceUid);
-
-            var recipe = resource.GetRecipeByUid(recipeUid);
+                .FirstOrDefaultAsync(r => r.Uid == recipeUid);
 
             if (recipe == null) throw new InvalidOperationException("Recipe not found with Uid: " + recipeUid);
 
@@ -63,44 +55,38 @@ namespace Partlyx.Infrastructure.Data.Implementations
             return result;
         }
 
-        public Task ExecuteOnRecipeAsync(Guid resourceUid, Guid recipeUid,
+        public Task ExecuteOnRecipeAsync(Guid recipeUid,
                 Func<Recipe, Task> action)
         {
-            return ExecuteOnRecipeAsync(resourceUid, recipeUid, async r =>
+            return ExecuteOnRecipeAsync(recipeUid, async r =>
             {
                 await action(r);
                 return true; // Dummy value
             });
         }
 
-        public async Task<TResult> ExecuteOnComponentAsync<TResult>(Guid resourceUid, Guid componentUid,
+        public async Task<TResult> ExecuteOnComponentAsync<TResult>(Guid componentUid,
                 Func<RecipeComponent, Task<TResult>> action)
         {
             await using var db = _dbFactory.CreateDbContext();
 
-            var resource = await db.Resources
-                .Include(r => r.Recipes)
-                .ThenInclude(rc => rc.Components)
-                .ThenInclude(c => c.ComponentResource)
-                .FirstOrDefaultAsync(r => r.Uid == resourceUid);
+            var component = await db.RecipeComponents
+                .Include(c => c.ComponentResource)
+                .Include(c => c.ParentRecipe)
+                .FirstOrDefaultAsync(c => c.Uid == componentUid);
 
-            if (resource == null) throw ResourceNotFound(resourceUid);
+            if (component == null) throw new InvalidOperationException("Component not found with Uid: " + componentUid);
 
-            // Find a recipe that contains the component
-            var resourceComponent = resource.GetRecipeComponentByUid(componentUid);
-
-            if (resourceComponent == null) throw new InvalidOperationException("Component was not found in resource. Component's Uid: " + componentUid);
-
-            var result = await action(resourceComponent);
+            var result = await action(component);
 
             await db.SaveChangesAsync();
             return result;
         }
 
-        public Task ExecuteOnComponentAsync(Guid resourceUid, Guid componentUid,
+        public Task ExecuteOnComponentAsync(Guid componentUid,
                 Func<RecipeComponent, Task> action)
         {
-            return ExecuteOnComponentAsync(resourceUid, componentUid, async r =>
+            return ExecuteOnComponentAsync(componentUid, async r =>
             {
                 await action(r);
                 return true; // Dummy value

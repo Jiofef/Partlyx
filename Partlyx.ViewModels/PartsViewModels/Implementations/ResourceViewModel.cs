@@ -47,15 +47,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             if (dto.DefaultRecipeUid is Guid dRecipeUid)
                 _defaultRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(dRecipeUid);
 
-            RecipesDic = new(_recipesDic);
-
-            foreach (var recipe in dto.Recipes)
-            {
-                var vm = _partsFactory.GetOrCreateRecipeVM(recipe);
-                _recipes.Add(vm);
-                _recipesDic.Add(vm.Uid, vm);
-            }
-
             // For the most part, we don't really care when the icon will be loaded. Until then, the icon will be empty.
             _icon = new IconViewModel();
             _ = UpdateIconFromDto(dto.Icon);
@@ -73,30 +64,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         private string _name;
         public string Name { get => _name; set => SetProperty(ref _name, value); }
-
-        private ObservableCollection<RecipeViewModel> _recipes = new();
-        public ObservableCollection<RecipeViewModel> Recipes { get => _recipes; } // Updates locally when recipe is created/removed
-
-        private readonly Dictionary<Guid, RecipeViewModel> _recipesDic = new();
-        public ReadOnlyDictionary<Guid, RecipeViewModel> RecipesDic { get; }
-        public RecipeViewModel? GetChildOrNull(Guid uid) => _recipesDic.GetValueOrDefault(uid);
-
-        private void AddRecipe(RecipeViewModel recipe)
-        {
-            if (_recipesDic.ContainsKey(recipe.Uid))
-                return;
-
-            Recipes.Add(recipe);
-            _recipesDic.Add(recipe.Uid, recipe);
-        }
-        private void RemoveRecipe(RecipeViewModel recipe)
-        {
-            if (!_recipesDic.ContainsKey(recipe.Uid))
-                return;
-
-            Recipes.Remove(recipe);
-            _recipesDic.Remove(recipe.Uid);
-        }
 
         private GuidLinkedPart<RecipeViewModel>? _defaultRecipe;
 
@@ -125,21 +92,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 OnResourceUpdated(rue);
                 return;
             }
-            if (@event is RecipeCreatedEvent rce)
-            {
-                OnRecipeCreated(rce);
-                return;
-            }    
-            if (@event is RecipeDeletingStartedEvent rde)
-            {
-                OnRecipeDeletingStarted(rde);
-                return;
-            }
-            if (@event is RecipeMovedEvent rme)
-            {
-                OnRecipeMoved(rme);
-                return;
-            }
         }
 
         private void OnResourceUpdated(ResourceUpdatedEvent ev)
@@ -149,59 +101,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             Update(ev.Resource, ev.ChangedProperties);
         }
 
-        private void OnRecipeCreated(RecipeCreatedEvent ev)
-        {
-            if (Uid != ev.Recipe.ParentResourceUid) return;
-
-            var recipeVM = _partsFactory.GetOrCreateRecipeVM(ev.Recipe);
-            AddRecipe(recipeVM);
-
-            UiItem.IsExpanded = true;
-        }
-
-        private void OnRecipeDeletingStarted(RecipeDeletingStartedEvent ev)
-        {
-            if (Uid != ev.ParentResourceUid) return;
-
-            var recipeVM = Recipes.FirstOrDefault(r => r.Uid == ev.RecipeUid);
-            if (recipeVM != null)
-            {
-                RemoveRecipe(recipeVM);
-                recipeVM.Dispose();
-            }
-        }
-
-        private void OnRecipeMoved(RecipeMovedEvent ev)
-        {
-            if (Uid == ev.OldResourceUid)
-            {
-                var recipeVM = _recipesDic.GetValueOrDefault(ev.RecipeUid);
-                if (recipeVM != null)
-                    RemoveRecipe(recipeVM);
-            }
-            else if (Uid == ev.NewResourceUid)
-            {
-                var recipeVM = _store.Recipes.GetValueOrDefault(ev.RecipeUid);
-                if (recipeVM != null)
-                {
-                    AddRecipe(recipeVM);
-                    recipeVM.LinkedParentResource = _linkedPartsManager.CreateAndRegisterLinkedResourceVM(Uid);
-                }
-            }
-        }
-
-        /// <summary> Used when new DB is initialized and we need to connect created VM parts to each other </summary>
-        internal void InitAddChild(RecipeViewModel recipe)
-        {
-            AddRecipe(recipe);
-        }
-
         public void Dispose()
         {
             UiItem.Dispose();
-
-            foreach (var recipe in  Recipes)
-                recipe.Dispose();
         }
         public override void Update(ResourceDto dto, IReadOnlyList<string>? changedProperties = null)
         {

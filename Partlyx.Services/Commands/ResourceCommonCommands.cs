@@ -4,6 +4,7 @@ using Partlyx.Infrastructure.Data.Interfaces;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
+using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
 
 namespace Partlyx.Services.Commands.ResourceCommonCommands
@@ -11,27 +12,27 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
     public class CreateResourceCommand : IUndoableCommand
     {
         private readonly IResourceService _resourceService;
-        private readonly IPartlyxRepository _resourceRepository;
-        private readonly IEventBus _bus;
+        private readonly PartsCreatorService _partsCreator;
+        private readonly IPartlyxRepository _repo;
 
         public Guid ResourceUid { get; private set; }
 
         private Resource? _createdResource;
-        private string? _resourceName;
+        private readonly string? _resourceName;
 
-        public CreateResourceCommand(IResourceService rs, IPartlyxRepository rr, IEventBus bus, string? name = null)
+        public CreateResourceCommand(IResourceService rs, IEventBus bus, IPartlyxRepository repo, string? resourceName = null)
         {
             _resourceService = rs;
-            _resourceRepository = rr;
-            _bus = bus;
-            _resourceName = name;
+            _partsCreator = new PartsCreatorService(repo, bus);
+            _repo = repo;
+            _resourceName = resourceName;
         }
 
         public async Task ExecuteAsync()
         {
-            Guid uid = await _resourceService.CreateResourceAsync(_resourceName);
-            ResourceUid = uid;
-            _createdResource = await _resourceRepository.GetResourceByUidAsync(uid);
+            ResourceUid = await _resourceService.CreateResourceAsync(_resourceName);
+            // Get the created entity for potential redo
+            _createdResource = await _repo.GetResourceByUidAsync(ResourceUid);
         }
 
         public async Task UndoAsync()
@@ -42,49 +43,45 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
 
         public async Task RedoAsync()
         {
-            if (_createdResource == null) return;
-
-            await _resourceRepository.AddResourceAsync(_createdResource);
-
-            var @event = new ResourceCreatedEvent(_createdResource.ToDto(), _createdResource.Uid);
-            _bus.Publish(@event);
+            if (_createdResource != null)
+            {
+                // Use PartsCreatorService to recreate the exact same resource entity
+                ResourceUid = await _partsCreator.CreateResourceAsync(_createdResource);
+            }
         }
     }
 
     public class DeleteResourceCommand : IUndoableCommand
     {
         private readonly IResourceService _resourceService;
-        private readonly IPartlyxRepository _resourceRepository;
-        private readonly IEventBus _bus;
+        private readonly PartsCreatorService _partsCreator;
+        private readonly IPartlyxRepository _repo;
 
-        public Guid DeletedResourceUid { get; private set; }
+        public Guid DeletedResourceUid { get; }
 
         private Resource? _deletedResource;
 
-        public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IPartlyxRepository rr, IEventBus bus)
+        public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IEventBus bus, IPartlyxRepository repo)
         {
             DeletedResourceUid = resourceUid;
             _resourceService = rs;
-            _resourceRepository = rr;
-            _bus = bus;
+            _partsCreator = new PartsCreatorService(repo, bus);
+            _repo = repo;
         }
 
         public async Task ExecuteAsync()
         {
-            _deletedResource = await _resourceRepository.GetResourceByUidAsync(DeletedResourceUid);
+            _deletedResource = await _repo.GetResourceByUidAsync(DeletedResourceUid);
             await _resourceService.DeleteResourceAsync(DeletedResourceUid);
         }
 
         public async Task UndoAsync()
         {
-            if (_deletedResource == null) return;
-
-            await _resourceRepository.AddResourceAsync(_deletedResource);
-
-            var @event = new ResourceCreatedEvent(_deletedResource.ToDto(), _deletedResource.Uid);
-            _bus.Publish(@event);
-
-            _deletedResource = null;
+            if (_deletedResource != null)
+            {
+                await _partsCreator.CreateResourceAsync(_deletedResource);
+                _deletedResource = null;
+            }
         }
     }
 

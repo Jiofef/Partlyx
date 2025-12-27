@@ -44,9 +44,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private void SubscribeToResourceEvents()
         {
             Disposables.Add(_bus.Subscribe<ResourceUpdatedEvent>(OnResourceUpdated, true));
-            Disposables.Add(_bus.Subscribe<RecipeCreatedEvent>(OnRecipeCreated, true));
-            Disposables.Add(_bus.Subscribe<RecipeDeletingStartedEvent>(OnRecipeDeletingStarted, true));
-            Disposables.Add(_bus.Subscribe<RecipeMovedEvent>(OnRecipeMoved, true));
         }
         private void SubscribeToRecipeEvents()
         {
@@ -63,20 +60,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private void OnResourceUpdated(ResourceUpdatedEvent resourceUpdated)
         {
             SendToResource(resourceUpdated.Resource.Uid, resourceUpdated);
-        }
-        private void OnRecipeCreated(RecipeCreatedEvent recipeCreated)
-        {
-            if (recipeCreated.Recipe.ParentResourceUid != null)
-                SendToResource((Guid)recipeCreated.Recipe.ParentResourceUid!, recipeCreated);
-        }
-        private void OnRecipeDeletingStarted(RecipeDeletingStartedEvent recipeDeleted)
-        {
-            SendToResource(recipeDeleted.ParentResourceUid, recipeDeleted);
-        }
-        private void OnRecipeMoved(RecipeMovedEvent recipeMoved)
-        {
-            SendToResource(recipeMoved.OldResourceUid, recipeMoved);
-            SendToResource(recipeMoved.NewResourceUid, recipeMoved);
         }
         private void OnRecipeUpdated(RecipeUpdatedEvent recipeUpdated)
         {

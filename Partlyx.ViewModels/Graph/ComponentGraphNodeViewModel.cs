@@ -40,10 +40,6 @@ namespace Partlyx.ViewModels.Graph
             _quantityUpdateSubscription =
                 this.WhenAnyValue(@this => @this._component.Quantity)
                 .Subscribe((o) => OnCostChanged());
-
-            _craftAmountUpdateSubscription =
-                this.WhenAnyValue(@this => @this._component.LinkedParentRecipe.Value.CraftAmount)
-                .Subscribe((o) => OnCostChanged());
         }
 
         private void OnValueChanged()

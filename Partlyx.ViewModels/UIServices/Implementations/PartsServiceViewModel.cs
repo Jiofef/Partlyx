@@ -105,7 +105,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             }
             if (part is RecipeViewModel recipe1)
             {
-                foreach (var component in recipe1.Components)
+                foreach (var component in recipe1.Inputs)
                     await ComponentService.RemoveAsync(component);
             }
         }

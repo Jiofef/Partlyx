@@ -19,6 +19,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 {
     public partial class ItemPropertiesViewModel : ObservableObject, IDisposable
     {
+        private readonly IVMPartsStore _partsStore;
         private readonly PartsServiceViewModel _services;
         private readonly IDialogService _dialogService;
         private readonly ILocalizationService _loc;
@@ -33,11 +34,13 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public string FocusedPartTextAnnotation { get => _focusedPartTextAnnotation; set => SetProperty(ref _focusedPartTextAnnotation, value); }
 
 
-        public ItemPropertiesViewModel(PartsServiceViewModel services, IDialogService ds, IGlobalFocusedPart focusedPart, IEventBus bus, ILocalizationService loc, IServiceProvider serviceProvider)
+        public ItemPropertiesViewModel(PartsServiceViewModel services, IDialogService ds, IGlobalFocusedPart focusedPart, 
+            IEventBus bus, ILocalizationService loc, IServiceProvider serviceProvider, IVMPartsStore store)
         {
             _services = services;
             _dialogService = ds;
             _loc = loc;
+            _partsStore = store;
 
             _focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedPartChangedEvent>(ev => OnFocusedPartChanged());
 
@@ -136,10 +139,11 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             defaultRecipeProperty.SelectButtonPressedTask = new(
                 async (arg) =>
                 {
+                    var allTheRecipesList = _partsStore.Recipes.Values.ToList();
                     var dialogVM = new RecipesSelectionViewModel(_dialogService, new IsolatedSelectedParts())
                     { 
                         EnableMultiSelect = false, 
-                        Items = resource.Recipes, 
+                        Items = new ObservableCollection<RecipeViewModel>(allTheRecipesList), 
                         IsSelectionNecessaryToConfirm = true 
                     };
 
@@ -208,18 +212,18 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             iconProperty.Subscriptions.Add(iconUpdateSubscription);
             Properties.Add(iconProperty);
 
-            // Creating "Craft amount" property
-            var amountProperty = new SpinBoxItemPropertyViewModel() { Name = _loc["Product_amount"], Item = recipe};
-            amountProperty.Value = (decimal)recipe.CraftAmount;
-            amountProperty.SaveChangesTask = new(
+            // Creating "Is reversible" property
+            var isReversibleProperty = new CheckBoxItemPropertyViewModel() { Name = _loc["Is_reversible"], Item = recipe };
+            isReversibleProperty.IsChecked = recipe.IsReversible;
+            isReversibleProperty.SaveChangesTask = new(
                 async arg =>
                 {
-                    if (arg is not decimal amount) return;
-                    await _services.RecipeService.SetCraftableAmount(recipe, (double)amount);
+                    if (arg is not bool isReversible) return;
+                    await _services.RecipeService.SetIsReversible(recipe, isReversible);
                 });
-            var amountUpdateSubscription = recipe.WhenAnyValue(r => r.CraftAmount).Subscribe(args => amountProperty.Value = (decimal)recipe.CraftAmount);
-            amountProperty.Subscriptions.Add(amountUpdateSubscription);
-            Properties.Add(amountProperty);
+            var isReversibleUpdateSubscription = recipe.WhenAnyValue(r => r.IsReversible).Subscribe(args => isReversibleProperty.IsChecked = recipe.IsReversible);
+            isReversibleProperty.Subscriptions.Add(isReversibleUpdateSubscription);
+            Properties.Add(isReversibleProperty);
         }
 
         public void LoadComponentProperties(RecipeComponentViewModel component)
@@ -229,10 +233,11 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             selectedRecipeProperty.SelectButtonPressedTask = new(
                 async (arg) =>
                 {
+                    var allTheRecipesList = _partsStore.Recipes.Values.ToList();
                     var dialogVM = new RecipesSelectionViewModel(_dialogService, new IsolatedSelectedParts())
                     {
                         EnableMultiSelect = false,
-                        Items = component.LinkedResource?.Value?.Recipes,
+                        Items = new ObservableCollection<RecipeViewModel>(allTheRecipesList),
                         IsSelectionNecessaryToConfirm = true
                     };
 

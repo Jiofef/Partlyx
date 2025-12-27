@@ -19,11 +19,8 @@ namespace Partlyx.Infrastructure.Data.Implementations
 
         public class BatchIncludeOptions
         {
-            public bool IncludeResourcesRecipes { get; set; } = false;       // Resource -> Recipes
             public bool IncludeRecipesComponents { get; set; } = false;      // Recipe -> Components
-            public bool IncludeRecipeParentResource { get; set; } = false;   // Recipe -> ParentResource
             public bool IncludeComponentParentRecipe { get; set; } = false;  // Component -> ParentRecipe
-            public bool IncludeComponentParentResource { get; set; } = false;// Component -> ParentRecipe -> ParentResource
             public bool IncludeComponentChildResource { get; set; } = false; // Component -> ChildResource
         }
 
@@ -88,31 +85,19 @@ namespace Partlyx.Infrastructure.Data.Implementations
 
             await using var db = _dbFactory.CreateDbContext();
 
-            // Resources query + optional includes
-            IQueryable<Resource> resourcesQ = db.Resources;
-            if (options.IncludeResourcesRecipes)
-            {
-                if (options.IncludeRecipesComponents)
-                    resourcesQ = resourcesQ.Include(r => r.Recipes).ThenInclude(r => r.Components);
-                else
-                    resourcesQ = resourcesQ.Include(r => r.Recipes);
-            }
-            var resources = resUids.Length > 0 ? await resourcesQ.Where(r => resUids.Contains(r.Uid)).ToListAsync(ct) : new List<Resource>();
+            // Resources query
+            var resources = resUids.Length > 0 ? await db.Resources.Where(r => resUids.Contains(r.Uid)).ToListAsync(ct) : new List<Resource>();
 
             // Recipes query + optional includes
             IQueryable<Recipe> recipesQ = db.Recipes;
             if (options.IncludeRecipesComponents)
-                recipesQ = recipesQ.Include(r => r.Components);
-            if (options.IncludeRecipeParentResource)
-                recipesQ = recipesQ.Include(r => r.ParentResource);
+                recipesQ = recipesQ.Include(r => r.Inputs);
             var recipes = recUids.Length > 0 ? await recipesQ.Where(r => recUids.Contains(r.Uid)).ToListAsync(ct) : new List<Recipe>();
 
             // Components query + optional includes
             IQueryable<RecipeComponent> compsQ = db.RecipeComponents;
             if (options.IncludeComponentParentRecipe)
                 compsQ = compsQ.Include(c => c.ParentRecipe);
-            if (options.IncludeComponentParentResource)
-                compsQ = compsQ.Include(c => c.ParentRecipe).ThenInclude(r => r.ParentResource);
             if (options.IncludeComponentChildResource)
                 compsQ = compsQ.Include(c => c.ComponentResource);
             var components = compUids.Length > 0 ? await compsQ.Where(c => compUids.Contains(c.Uid)).ToListAsync(ct) : new List<RecipeComponent>();

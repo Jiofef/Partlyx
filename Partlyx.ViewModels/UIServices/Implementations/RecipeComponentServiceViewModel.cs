@@ -69,7 +69,6 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
         public async Task CreateComponentsFromAsync(RecipeViewModel parent, ICollection<ResourceAmountPairViewModel> resourceAmountPairs)
         {
-            var grandParentResUid = parent.LinkedParentResource!.Uid;
             var parentRecipeUid = parent!.Uid;
             foreach (var pair in resourceAmountPairs)
             {
@@ -77,7 +76,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 var componentQuantity = pair.Amount;
                 var componentResUid = resource.Uid;
 
-                var command = _commands.Factory.Create<CreateRecipeComponentCommand>(grandParentResUid, parentRecipeUid, componentResUid, componentQuantity);
+                var command = _commands.Factory.Create<CreateRecipeComponentCommand>(parentRecipeUid, componentResUid, componentQuantity);
 
                 // It must be executed on a single thread so that recipients respond to events immediately after they are sent
                 await Task.Run(async () =>
@@ -106,12 +105,10 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 if (component.LinkedParentRecipe?.Value == targetRecipe)
                     continue;
 
-                var previousGrandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Value!.Uid;
-                var newGrandParentUid = targetRecipe.LinkedParentResource!.Value!.Uid;
-                var previousParentUid = component.LinkedParentRecipe.Uid;
+                var previousParentUid = component.LinkedParentRecipe!.Uid;
                 var newParentUid = targetRecipe.Uid;
 
-                await _commands.CreateSyncAndExcecuteAsync<MoveRecipeComponentCommand>(previousGrandParentUid, newGrandParentUid, previousParentUid, newParentUid, component.Uid);
+                await _commands.CreateSyncAndExcecuteAsync<MoveRecipeComponentCommand>(previousParentUid, newParentUid, component.Uid);
             }
 
             var componentUids = components.Select(c => c.Uid).ToArray();
@@ -121,23 +118,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task RemoveAsync(RecipeComponentViewModel component)
         {
-            var grandParentUid = component.LinkedParentRecipe!.Value?.LinkedParentResource?.Uid;
             var parentUid = component.LinkedParentRecipe!.Uid;
 
-            if (grandParentUid == null)
-                return;
-
-            var grandParentUidNotNull = (Guid)grandParentUid;
-
-            bool exists = await _service.IsComponentExists(grandParentUidNotNull, component.Uid);
+            bool exists = await _service.IsComponentExists(component.Uid);
             
             if (exists)
             {
                 await Task.Run(async () =>
                 {
-                    _bus.Publish(new RecipeComponentDeletingStartedEvent(component.Uid, parentUid, grandParentUidNotNull, 
-                        new HashSet<object>() { component.Uid, parentUid, grandParentUidNotNull }));
-                    await Task.Run(async () => await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeComponentCommand>(grandParentUid!, parentUid, component.Uid));
+                    _bus.Publish(new RecipeComponentDeletingStartedEvent(component.Uid, parentUid, 
+                        new HashSet<object>() { component.Uid, parentUid }));
+                    await Task.Run(async () => await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeComponentCommand>(parentUid, component.Uid));
                 });
             }
         }
@@ -145,9 +136,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task<Guid> Duplicate(RecipeComponentViewModel component)
         {
-            var parentUid = component.LinkedParentRecipe!.Uid;
-            var grandParentUid = component.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
-            var command = await _commands.CreateSyncAndExcecuteAsync<DuplicateRecipeCommand>(grandParentUid, parentUid, component.Uid);
+            var command = await _commands.CreateSyncAndExcecuteAsync<DuplicateRecipeComponentCommand>(component.Uid);
 
             var componentUid = command.DuplicateUid;
             _bus.Publish(new RecipeComponentCreatingCompletedVMEvent(componentUid));
@@ -158,7 +147,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task MergeSameComponentsAsync(RecipeViewModel recipe)
         {
-            var components = recipe.Components;
+            var components = recipe.Inputs;
             var nonUniqueComponents = components.GetWithoutUniqueComponents();
             var mergedComponents = nonUniqueComponents.GetMerged();
 
@@ -187,9 +176,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             if (targetComponent.LinkedSelectedRecipe?.Value == valueRecipe)
                 return;
 
-            var grandParentUid = targetComponent.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
-
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentSelectedRecipe>(grandParentUid, targetComponent.Uid, valueRecipe?.Uid!);
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentSelectedRecipe>(targetComponent.Uid, valueRecipe?.Uid);
         }
 
         [RelayCommand]
@@ -216,9 +203,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             if (targetComponent.Quantity == value)
                 return;
 
-            var grandParentUid = targetComponent.LinkedParentRecipe!.Value!.LinkedParentResource!.Uid;
-            var uid = targetComponent.Uid;
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentQuantityCommand>(grandParentUid, uid, value);
+            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentQuantityCommand>(targetComponent.Uid, value);
         }
     }
 }
