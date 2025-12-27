@@ -4,6 +4,7 @@ using Partlyx.UI.Avalonia.Helpers;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -18,12 +19,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private Dictionary<Guid, ResourceViewModel> _resources { get; }
         private Dictionary<Guid, RecipeViewModel> _recipes { get; }
         private Dictionary<Guid, RecipeComponentViewModel> _components { get; }
-        private Dictionary<Guid, List<RecipeComponentViewModel>> _componentsWithResource { get; }
+        private Dictionary<Guid, ObservableCollection<RecipeComponentViewModel>> _componentsWithResource { get; }
 
         public IReadOnlyDictionary<Guid, ResourceViewModel> Resources => _resources;
         public IReadOnlyDictionary<Guid, RecipeViewModel> Recipes => _recipes;
         public IReadOnlyDictionary<Guid, RecipeComponentViewModel> Components => _components;
-        public IReadOnlyDictionary<Guid, List<RecipeComponentViewModel>> ComponentsWithResource => _componentsWithResource;
+        public IReadOnlyDictionary<Guid, ObservableCollection<RecipeComponentViewModel>> ComponentsWithResource => _componentsWithResource;
 
         public VMPartsStore(IEventBus bus)
         {
@@ -68,7 +69,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 if (resource != null)
                 {
                     if (!_componentsWithResource.ContainsKey(resource.Uid))
-                        _componentsWithResource.Add(resource.Uid, new List<RecipeComponentViewModel>());
+                        _componentsWithResource.Add(resource.Uid, new ObservableCollection<RecipeComponentViewModel>());
                     _componentsWithResource[resource.Uid].Add(component);
                 }
 
@@ -158,6 +159,10 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _recipes.ClearAndDispose();
             _components.ClearAndDispose();
 
+            foreach (var col in _componentsWithResource.Values)
+                col.Clear();
+            _componentsWithResource.Clear();
+
             // Notify awaiters that nothing will appear (store was cleared).
             CompleteAllPendingWithNull();
         }
@@ -166,6 +171,24 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             _fileClosedSubscription.Dispose();
             ClearStore();
+        }
+        
+        // Additional functions
+
+        public List<RecipeViewModel> GetSourceRecipesTo(ResourceViewModel resource)
+        {
+            var components = ComponentsWithResource[resource.Uid];
+            HashSet<RecipeViewModel?> allTheRecipes = components
+                .Select(c => c.LinkedParentRecipe?.Value)
+                .ToHashSet();
+
+            allTheRecipes.Remove(null);
+
+            var sourceRecipes = allTheRecipes
+                .Cast<RecipeViewModel>() // Casting to not nullable
+                .Where(r => r.HasResourceInLinkedComponents(resource.Uid))
+                .ToList();
+            return sourceRecipes;
         }
     }
 }

@@ -12,12 +12,15 @@ namespace Partlyx.Tests
             var segment = new Resource("Segment");
 
             var triangle = new Resource("Triangle");
-            triangle.CreateRecipe().CreateComponent(segment, 3);
+            var triangleRecipe = Recipe.Create();
+            triangleRecipe.CreateComponent(segment, 3);
+            triangle.DefaultRecipe = triangleRecipe;
 
             var square = new Resource("Square");
-            var squareRecipe = square.CreateRecipe();
+            var squareRecipe = Recipe.Create();
             squareRecipe.CreateComponent(triangle, 2);
             squareRecipe.CreateComponent(segment, -2);
+            square.DefaultRecipe = squareRecipe;
 
             // Act
             squareRecipe.MakeQuantified();
@@ -39,11 +42,11 @@ namespace Partlyx.Tests
             var segment = new Resource("Segment");
 
             var triangle = new Resource("Triangle");
-            var recipe = triangle.CreateRecipe();
+            var recipe = Recipe.Create();
             recipe.CreateComponent(segment, 3);
 
             // Act
-            var recipeClone = recipe.CloneDetached();
+            var recipeClone = recipe.Clone();
 
             // Assert
             Assert.Single(recipe.Components);

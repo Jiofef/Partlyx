@@ -45,6 +45,19 @@ namespace Partlyx.Core.Partlyx
         }
         public IconInfo GetIconInfo() => new IconInfo(IconType, IconData);
 
+        public void SetDefaultRecipe(Recipe recipe)
+        {
+            if (recipe == null) throw new ArgumentNullException(nameof(recipe));
+            bool hasResource = recipe.IsReversible
+                ? recipe.Components.Any(c => c.ComponentResource.Uid == this.Uid)
+                : recipe.Outputs.Any(c => c.ComponentResource.Uid == this.Uid);
+            if (!hasResource)
+            {
+                throw new ArgumentException("Recipe does not produce this resource");
+            }
+            DefaultRecipe = recipe;
+        }
+
         public RecipeComponent? GetRecipeComponentByUid(Guid uid)
         {
             // Since recipes are not tied to resources, this method may need to be removed or changed

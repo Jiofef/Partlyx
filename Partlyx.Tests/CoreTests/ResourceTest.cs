@@ -11,7 +11,8 @@ namespace Partlyx.Tests.CoreTests
             Resource testResource = new Resource() { Name = "TestResource" };
 
             Resource supportResource = new Resource() { Name = "SupportResource" };
-            Recipe recipe = supportResource.CreateRecipe();
+            Recipe recipe = Recipe.Create();
+            recipe.CreateComponent(supportResource, 1); // input, not output
 
             // Act & assert
             Assert.Throws<ArgumentException>(() => testResource.SetDefaultRecipe(recipe));
@@ -22,7 +23,8 @@ namespace Partlyx.Tests.CoreTests
         {
             // Arrange
             Resource testResource = new Resource() { Name = "TestResource" };
-            Recipe recipe = testResource.CreateRecipe();
+            Recipe recipe = Recipe.Create();
+            recipe.CreateOutput(testResource, 1); // valid output
 
             // Act
             testResource.SetDefaultRecipe(recipe);

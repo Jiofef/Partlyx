@@ -17,8 +17,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
     public partial class ResourceViewModel : UpdatableViewModel<ResourceDto>, IVMPart, IObservableFindableIconHolder, ITypedVMPartHolder<ResourceViewModel>
     {
         // Services
-        private readonly IVMPartsStore _store;
-        private readonly IVMPartsFactory _partsFactory;
         private readonly IResourceItemUiStateService _uiStateService;
         private readonly ICommandServices _commands;
         private readonly ILinkedPartsManager _linkedPartsManager;
@@ -26,7 +24,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IEventBus _bus;
         public PartsServiceViewModel Services { get; }
         private ResourceViewModel() { }
-        public ResourceViewModel(ResourceDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store, IVMPartsFactory partsFactory,
+        public ResourceViewModel(ResourceDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav,
             IResourceItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm, IconServiceViewModel iconService, IEventBus bus)
         {
             Uid = dto.Uid;
@@ -34,8 +32,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             // Services
             Services = service;
             GlobalNavigations = nav;
-            _store = store;
-            _partsFactory = partsFactory;
             _uiStateService = uiStateS;
             _commands = cs;
             _linkedPartsManager = lpm;
@@ -133,6 +129,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         // Compatibility
         /// <summary> Self </summary>
-        public ResourceViewModel? Part => this;
+        public ResourceViewModel Part => this;
     }
 }

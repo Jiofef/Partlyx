@@ -34,7 +34,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IVMPartsStore _partsStore;
         private readonly IImagesStoreViewModel _imagesStore;
 
-        public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IMainWindowController mwc, PanAndZoomControllerViewModel pazc, PartsGraphTreeBuilderViewModel graph, IVMPartsStore store, 
+        public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IMainWindowController mwc, PanAndZoomControllerViewModel pazc,
+            PartsGraphTreeBuilderViewModel graph, IVMPartsStore store, 
             IImagesStoreViewModel imagesStore, IEventBus bus, ITimerService timerService)
         {
             SelectedParts = selectedParts;

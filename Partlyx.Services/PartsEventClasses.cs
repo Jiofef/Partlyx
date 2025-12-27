@@ -3,6 +3,7 @@ using Partlyx.Services.Dtos;
 
 namespace Partlyx.Services.PartsEventClasses
 {
+    public record ChangedValuePair(object NewValue, object OldValue);
     // Resource events
     public record ResourceUpdatedEvent(ResourceDto Resource, IReadOnlyList<string>? ChangedProperties, object? ReceiverKey) : IRoutedEvent;
 
@@ -18,7 +19,7 @@ namespace Partlyx.Services.PartsEventClasses
     public record RecipeCreatedEvent(RecipeDto Recipe, object? ReceiverKey) : IRoutedEvent;
 
     // Recipe component events
-    public record RecipeComponentUpdatedEvent(RecipeComponentDto RecipeComponent, IReadOnlyList<string>? ChangedProperties, object? ReceiverKey) : IRoutedEvent;
+    public record RecipeComponentUpdatedEvent(RecipeComponentDto RecipeComponent, IReadOnlyDictionary<string, ChangedValuePair>? ChangedProperties, object? ReceiverKey) : IRoutedEvent;
 
     public record RecipeComponentDeletedEvent(Guid ParentRecipeUid, Guid RecipeComponentUid, object? ReceiverKey) : IRoutedEvent;
 
