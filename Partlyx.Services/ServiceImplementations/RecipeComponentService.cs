@@ -164,21 +164,30 @@ namespace Partlyx.Services.ServiceImplementations
 
         public async Task SetQuantityAsync(Guid componentUid, double quantity)
         {
+            double oldQuantity = 0;
             await _repo.ExecuteOnComponentAsync(componentUid, component =>
             {
+                oldQuantity = component.Quantity;
                 component.Quantity = quantity;
                 return Task.CompletedTask;
             });
 
             var component = await GetComponentAsync(componentUid);
             if (component != null)
-                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, new[] { "Quantity" }, component.Uid));
+            {
+                var changedProperties = new Dictionary<string, ChangedValuePair>
+                {
+                    { "Quantity", new ChangedValuePair(quantity, oldQuantity) }
+                };
+                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, changedProperties, component.Uid));
+            }
         }
 
         public async Task SetResourceSelectedRecipeAsync(Guid componentUid, Guid? recipeToSelectUid)
         {
             var batchOptions = new PartlyxRepository.BatchIncludeOptions() { IncludeComponentChildResource = true };
 
+            Guid? oldRecipeUid = null;
             if (recipeToSelectUid == null)
             {
                 await _repo.ExecuteWithBatchAsync(
@@ -186,6 +195,7 @@ namespace Partlyx.Services.ServiceImplementations
                 batch =>
                 {
                     var component = batch.Components[componentUid];
+                    oldRecipeUid = component.ComponentSelectedRecipeUid;
 
                     component.SetSelectedRecipe(null);
                     return Task.CompletedTask;
@@ -198,6 +208,7 @@ namespace Partlyx.Services.ServiceImplementations
                 batch =>
                 {
                     var component = batch.Components[componentUid];
+                    oldRecipeUid = component.ComponentSelectedRecipeUid;
                     var recipeToSelect = batch.Recipes[(Guid)recipeToSelectUid];
 
                     component.SetSelectedRecipe(recipeToSelect);
@@ -207,13 +218,22 @@ namespace Partlyx.Services.ServiceImplementations
 
             var component = await GetComponentAsync(componentUid);
             if (component != null)
-                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, new[] { "SelectedRecipeUid" }, component.Uid));
+            {
+                var changedProperties = new Dictionary<string, ChangedValuePair>
+                {
+                    { "SelectedRecipeUid", new ChangedValuePair(recipeToSelectUid ?? Guid.Empty, oldRecipeUid ?? Guid.Empty) }
+                };
+                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, changedProperties, component.Uid));
+            }
         }
 
         public async Task SetComponentResourceAsync(Guid componentUid, Guid resourceToSelectUid)
         {
+            Guid oldResourceUid = Guid.Empty;
             await _repo.ExecuteOnComponentAsync(componentUid, async component =>
             {
+                oldResourceUid = component.ComponentResource.Uid;
+
                 var newComponentResource = await _repo.GetResourceByUidAsync(resourceToSelectUid);
 
                 if (newComponentResource == null)
@@ -224,7 +244,13 @@ namespace Partlyx.Services.ServiceImplementations
 
             var component = await GetComponentAsync(componentUid);
             if (component != null)
-                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, new[] { "ComponentResource" }, component.Uid));
+            {
+                var changedProperties = new Dictionary<string, ChangedValuePair>
+                {
+                    { "ResourceUid", new ChangedValuePair(resourceToSelectUid, oldResourceUid) }
+                };
+                _eventBus.Publish(new RecipeComponentUpdatedEvent(component, changedProperties, component.Uid));
+            }
         }
     }
 }

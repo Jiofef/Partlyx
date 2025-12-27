@@ -59,6 +59,16 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 _outputsDic.Add(vm.Uid, vm);
             }
 
+            // Initialize resource counts
+            foreach (var component in _inputs)
+            {
+                UpdateResourceCount(_inputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+            }
+            foreach (var component in _outputs)
+            {
+                UpdateResourceCount(_outputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+            }
+
             // For the most part, we don't really care when the icon will be loaded. Until then, the icon will be empty.
             _icon = new IconViewModel();
             _ = UpdateIconFromDto(dto.Icon);
@@ -95,6 +105,12 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly Dictionary<Guid, RecipeComponentViewModel> _outputsDic = new();
         public ReadOnlyDictionary<Guid, RecipeComponentViewModel> OutputsDic { get; }
 
+        // Optimized resource counting
+        private readonly Dictionary<Guid, int> _inputsResourceCounts = new();
+        public HashSet<Guid> InputResources() => _inputsResourceCounts.Keys.ToHashSet();
+        private readonly Dictionary<Guid, int> _outputsResourceCounts = new();
+        public HashSet<Guid> OutputResources() => _outputsResourceCounts.Keys.ToHashSet();
+
         public RecipeComponentViewModel? GetChildOrNull(Guid uid)
         {
             return _inputsDic.GetValueOrDefault(uid) ?? _outputsDic.GetValueOrDefault(uid);
@@ -113,7 +129,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         /// </summary>
         public bool HasResourceInInputs(Guid resourceUid)
         {
-            return _inputs.Any(c => c.LinkedResource?.Uid == resourceUid);
+            return _inputsResourceCounts.ContainsKey(resourceUid);
         }
 
         /// <summary>
@@ -121,7 +137,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         /// </summary>
         public bool HasResourceInOutputs(Guid resourceUid)
         {
-            return _outputs.Any(c => c.LinkedResource?.Uid == resourceUid);
+            return _outputsResourceCounts.ContainsKey(resourceUid);
         }
 
         /// <summary>
@@ -145,6 +161,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                 Outputs.Add(component);
                 _outputsDic.Add(component.Uid, component);
+                UpdateResourceCount(_outputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
             }
             else
             {
@@ -153,6 +170,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                 Inputs.Add(component);
                 _inputsDic.Add(component.Uid, component);
+                UpdateResourceCount(_inputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
             }
         }
 
@@ -162,11 +180,31 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 Inputs.Remove(component);
                 _inputsDic.Remove(component.Uid);
+                UpdateResourceCount(_inputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, -1);
             }
             else if (_outputsDic.ContainsKey(component.Uid))
             {
                 Outputs.Remove(component);
                 _outputsDic.Remove(component.Uid);
+                UpdateResourceCount(_outputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, -1);
+            }
+        }
+
+        private void UpdateResourceCount(Dictionary<Guid, int> dict, Guid resourceUid, int delta)
+        {
+            if (resourceUid == Guid.Empty) return;
+
+            if (dict.TryGetValue(resourceUid, out int count))
+            {
+                count += delta;
+                if (count > 0)
+                    dict[resourceUid] = count;
+                else
+                    dict.Remove(resourceUid);
+            }
+            else if (delta > 0)
+            {
+                dict[resourceUid] = delta;
             }
         }
 
@@ -204,6 +242,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             if (@event is RecipeComponentMovedEvent rcme)
             {
                 OnComponentMoved(rcme);
+                return;
+            }
+            if (@event is RecipeComponentUpdatedEvent rcue)
+            {
+                OnComponentUpdated(rcue);
                 return;
             }
         }
@@ -257,6 +300,26 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             }
         }
 
+        private void OnComponentUpdated(RecipeComponentUpdatedEvent ev)
+        {
+            if (ev.ChangedProperties?.TryGetValue("ResourceUid", out var pair) == true)
+            {
+                var componentVM = GetChildOrNull(ev.RecipeComponent.Uid);
+                if (componentVM != null)
+                {
+                    var oldResourceUid = (Guid)pair.OldValue;
+                    var newResourceUid = (Guid)pair.NewValue;
+
+                    if (oldResourceUid != newResourceUid)
+                    {
+                        var dict = componentVM.IsOutput ? _outputsResourceCounts : _inputsResourceCounts;
+                        UpdateResourceCount(dict, oldResourceUid, -1);
+                        UpdateResourceCount(dict, newResourceUid, 1);
+                    }
+                }
+            }
+        }
+
         /// <summary> Used when new DB is initialized and we need to connect created VM parts to each other </summary>
         internal void InitAddChild(RecipeComponentViewModel component)
         {
@@ -291,6 +354,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         // Compatibility
         /// <summary> Self </summary>
-        public RecipeViewModel? Part => this;
+        public RecipeViewModel Part => this;
     }
 }

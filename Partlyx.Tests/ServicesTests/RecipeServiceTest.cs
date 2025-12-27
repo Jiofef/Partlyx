@@ -32,16 +32,11 @@ namespace Partlyx.Tests
         public async void CreateAndGetRecipeAsync_CreateEmptyRecipe_CheckItsExistence()
         {
             // Arrange
-            var resourceRepo = _provider.GetRequiredService<IPartlyxRepository>();
-            var resourceService = _provider.GetRequiredService<IResourceService>();
             var recipeService = _provider.GetRequiredService<IRecipeService>();
 
-            Guid resourceUid = await resourceService.CreateResourceAsync();
-
             // Act
-            Guid recipeUid = await recipeService.CreateRecipeAsync(resourceUid);
-            var resource = await resourceRepo.GetResourceByUidAsync(resourceUid);
-            var recipe = resource?.GetRecipeByUid(recipeUid);
+            Guid recipeUid = await recipeService.CreateRecipeAsync();
+            var recipe = await recipeService.GetRecipeAsync(recipeUid);
 
             // Assert
             Assert.NotNull(recipe);

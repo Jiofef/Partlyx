@@ -127,7 +127,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             if (Uid != ev.RecipeComponent.Uid) return;
 
-            Update(ev.RecipeComponent, ev.ChangedProperties);
+            Update(ev.RecipeComponent, ev.ChangedProperties?.Keys.ToList());
         }
 
         public void Dispose()
@@ -165,6 +165,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         // Compatibility
         /// <summary> Self </summary>
-        public RecipeComponentViewModel? Part => this;
+        public RecipeComponentViewModel Part => this;
     }
 }

@@ -160,6 +160,7 @@ namespace Partlyx.UI.Avalonia
 
             services.AddTransient<IVMPartsFactory, VMPartsFactory>();
             services.AddSingleton<IVMPartsStore, VMPartsStore>();
+            services.AddSingleton<VMComponentsGraphs>();
             services.AddSingleton<IPartsInitializeServiceViewModel, PartsInitializeServiceViewModel>();
             services.AddSingleton<IViewModelStorePartsEventRouter, ViewModelStorePartsEventRouter>();
             services.AddSingleton<IVMPartsStoreCleaner, VMPartsStoreCleaner>();
