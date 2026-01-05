@@ -64,6 +64,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 _outputsDic.Add(vm.Uid, vm);
             }
 
+<<<<<<< HEAD
             // Initialize DisplayChildren
             var inputsGroupHeader = new RecipeComponentInputGroup("Inputs", Inputs, this);
             var outputsGroupHeader = new RecipeComponentOutputGroup("Outputs", Outputs, this);
@@ -78,6 +79,16 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             foreach (var component in _outputs)
             {
                 UpdateResourceCount(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+=======
+            // Initialize resource counts
+            foreach (var component in _inputs)
+            {
+                UpdateResourceCount(_inputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+            }
+            foreach (var component in _outputs)
+            {
+                UpdateResourceCount(_outputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+>>>>>>> eb2daac3084ec0fb129d9cab08484a796b54789a
             }
 
             // For the most part, we don't really care when the icon will be loaded. Until then, the icon will be empty.
@@ -128,9 +139,15 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         // Optimized resource counting
         private readonly Dictionary<Guid, int> _inputsResourceCounts = new();
+<<<<<<< HEAD
         public HashSet<Guid> InputResources { get; } = new();
         private readonly Dictionary<Guid, int> _outputsResourceCounts = new();
         public HashSet<Guid> OutputResources { get; } = new();
+=======
+        public HashSet<Guid> InputResources() => _inputsResourceCounts.Keys.ToHashSet();
+        private readonly Dictionary<Guid, int> _outputsResourceCounts = new();
+        public HashSet<Guid> OutputResources() => _outputsResourceCounts.Keys.ToHashSet();
+>>>>>>> eb2daac3084ec0fb129d9cab08484a796b54789a
 
         public RecipeComponentViewModel? GetChildOrNull(Guid uid)
         {
@@ -182,7 +199,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                 Outputs.Add(component);
                 _outputsDic.Add(component.Uid, component);
+<<<<<<< HEAD
                 UpdateResourceCount(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+=======
+                UpdateResourceCount(_outputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+>>>>>>> eb2daac3084ec0fb129d9cab08484a796b54789a
             }
             else
             {
@@ -191,7 +212,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                 Inputs.Add(component);
                 _inputsDic.Add(component.Uid, component);
+<<<<<<< HEAD
                 UpdateResourceCount(RecipeComponentType.Input, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+=======
+                UpdateResourceCount(_inputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+>>>>>>> eb2daac3084ec0fb129d9cab08484a796b54789a
             }
         }
 
@@ -201,12 +226,17 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 Inputs.Remove(component);
                 _inputsDic.Remove(component.Uid);
+<<<<<<< HEAD
                 UpdateResourceCount(RecipeComponentType.Input, component.LinkedResource?.Uid ?? Guid.Empty, -1);
+=======
+                UpdateResourceCount(_inputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, -1);
+>>>>>>> eb2daac3084ec0fb129d9cab08484a796b54789a
             }
             else if (_outputsDic.ContainsKey(component.Uid))
             {
                 Outputs.Remove(component);
                 _outputsDic.Remove(component.Uid);
+<<<<<<< HEAD
                 UpdateResourceCount(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty, -1);
             }
         }
@@ -219,10 +249,21 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             HashSet<Guid> hashes = componentType == RecipeComponentType.Input ? InputResources : OutputResources;
 
             bool wasPresent = dict.ContainsKey(resourceUid);
+=======
+                UpdateResourceCount(_outputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, -1);
+            }
+        }
+
+        private void UpdateResourceCount(Dictionary<Guid, int> dict, Guid resourceUid, int delta)
+        {
+            if (resourceUid == Guid.Empty) return;
+
+>>>>>>> eb2daac3084ec0fb129d9cab08484a796b54789a
             if (dict.TryGetValue(resourceUid, out int count))
             {
                 count += delta;
                 if (count > 0)
+<<<<<<< HEAD
                 {
                     dict[resourceUid] = count;
                 }
@@ -231,10 +272,16 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                     dict.Remove(resourceUid);
                     hashes?.Remove(resourceUid);
                 }
+=======
+                    dict[resourceUid] = count;
+                else
+                    dict.Remove(resourceUid);
+>>>>>>> eb2daac3084ec0fb129d9cab08484a796b54789a
             }
             else if (delta > 0)
             {
                 dict[resourceUid] = delta;
+<<<<<<< HEAD
                 hashes?.Add(resourceUid);
             }
 
@@ -277,6 +324,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             foreach (var resourceUid in allResources)
             {
                 PublishResourceLinkChanged(resourceUid);
+=======
+>>>>>>> eb2daac3084ec0fb129d9cab08484a796b54789a
             }
         }
 
@@ -384,8 +433,14 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                     if (oldResourceUid != newResourceUid)
                     {
+<<<<<<< HEAD
                         UpdateResourceCount(componentVM.ComponentType, oldResourceUid, -1);
                         UpdateResourceCount(componentVM.ComponentType, newResourceUid, 1);
+=======
+                        var dict = componentVM.IsOutput ? _outputsResourceCounts : _inputsResourceCounts;
+                        UpdateResourceCount(dict, oldResourceUid, -1);
+                        UpdateResourceCount(dict, newResourceUid, 1);
+>>>>>>> eb2daac3084ec0fb129d9cab08484a796b54789a
                     }
                 }
             }

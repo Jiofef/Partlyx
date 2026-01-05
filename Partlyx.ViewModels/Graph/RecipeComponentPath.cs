@@ -51,6 +51,7 @@ namespace Partlyx.ViewModels.Graph
                 {
                     amount = -amount;
                 }
+<<<<<<< HEAD
                 
                 if (component.Resource != null)
                 {
@@ -62,6 +63,16 @@ namespace Partlyx.ViewModels.Graph
                     {
                         resourceAmounts[component.Resource] = amount;
                     }
+=======
+
+                if (resourceAmounts.ContainsKey(component.Resource))
+                {
+                    resourceAmounts[component.Resource] += amount;
+                }
+                else
+                {
+                    resourceAmounts[component.Resource] = amount;
+>>>>>>> eb2daac3084ec0fb129d9cab08484a796b54789a
                 }
             }
 
