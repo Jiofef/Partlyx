@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicData;
 using DynamicData.Binding;
+using Partlyx.Infrastructure.Data.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using ReactiveUI;
 using System;
@@ -14,7 +15,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
     {
         private readonly IGlobalResourcesVMContainer _resourcesContainer;
 
-        // DynamicData контейнер для ресурсов
+        // DynamicData container for resources
         private readonly SourceCache<ResourceViewModel, Guid> _resourcesCache = new(r => r.Uid);
 
         private readonly ReadOnlyObservableCollection<ResourceViewModel> _filteredResources;
@@ -52,9 +53,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             return rItem =>
                 rItem.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)
-                || rItem.Recipes.Any(rc =>
-                    rc.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)
-                    || rc.Inputs.Any(c =>
+                || (rItem.LinkedDefaultRecipe?.Value is RecipeViewModel rc && rc.Inputs.Any(c =>
                         c.LinkedResource?.Value?.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) == true));
         }
     }

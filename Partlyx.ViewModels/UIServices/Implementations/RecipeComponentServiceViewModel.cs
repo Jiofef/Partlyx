@@ -4,6 +4,7 @@ using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
+using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
@@ -35,8 +36,12 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             _settings = settings;
         }
 
-        [RelayCommand]
-        public async Task CreateComponentAsync(RecipeViewModel parent)
+        public async Task CreateInputAsync(RecipeViewModel parent)
+            => await CreateComponentAsync(parent, false);
+        public async Task CreateOutputAsync(RecipeViewModel parent)
+            => await CreateComponentAsync(parent, true);
+
+        public async Task CreateComponentAsync(RecipeViewModel parent, bool isOutput = false, bool executeInLastComplex = false)
         {
             var selected = await ShowComponentCreateMenuAsync();
 
@@ -44,30 +49,21 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 return;
 
             var selectedResources = selected.Resources.ToList();
-            await CreateComponentsFromAsync(parent, selectedResources);
+            await CreateComponentsFromAsync(parent, selectedResources, isOutput, executeInLastComplex);
         }
 
-        [RelayCommand]
-        public async Task CreateComponentsFromAsync(PartsTargetInteractionInfo<ResourceViewModel, RecipeViewModel> info)
+        public async Task CreateComponentsFromAsync(RecipeViewModel parent, ICollection<ResourceViewModel> resources, bool isOutput = false, bool executeInLastComplex = false)
         {
-            var parent = info.Target;
-            var resources = info.Parts;
-
-            await CreateComponentsFromAsync(parent, resources);
-        }
-
-        public async Task CreateComponentsFromAsync(RecipeViewModel parent, ICollection<ResourceViewModel> resources)
-        {
-            var componentQuantity = _settings.DefaultComponentQuantity;
+            var componentQuantity = isOutput ? _settings.DefaultRecipeOutputAmount : _settings.DefaultRecipeInputAmount;
 
             var resourceAmountPairs = resources
                 .Select(r => new ResourceAmountPairViewModel(r, componentQuantity))
                 .ToList();
 
-            await CreateComponentsFromAsync(parent, resourceAmountPairs);
+            await CreateComponentsFromAsync(parent, resourceAmountPairs, isOutput, executeInLastComplex);
         }
 
-        public async Task CreateComponentsFromAsync(RecipeViewModel parent, ICollection<ResourceAmountPairViewModel> resourceAmountPairs)
+        public async Task CreateComponentsFromAsync(RecipeViewModel parent, ICollection<ResourceAmountPairViewModel> resourceAmountPairs, bool isOutput = false, bool executeInLastComplex = false)
         {
             var parentRecipeUid = parent!.Uid;
             foreach (var pair in resourceAmountPairs)
@@ -76,29 +72,25 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 var componentQuantity = pair.Amount;
                 var componentResUid = resource.Uid;
 
-                var command = _commands.Factory.Create<CreateRecipeComponentCommand>(parentRecipeUid, componentResUid, componentQuantity);
+                var options = new RecipeComponentCreatingOptions(componentQuantity, true, isOutput);
+
+                var command = _commands.Factory.Create<CreateRecipeComponentCommand>(parentRecipeUid, componentResUid, options);
 
                 // It must be executed on a single thread so that recipients respond to events immediately after they are sent
                 await Task.Run(async () =>
                 {
-                    await _commands.Dispatcher.ExcecuteAsync(command);
+                    if (executeInLastComplex)
+                        await _commands.Dispatcher.ExcecuteInLastComplexAsync(command);
+                    else
+                        await _commands.Dispatcher.ExcecuteAsync(command);
 
-                    var componentUid = command.RecipeComponentUid;
+                        var componentUid = command.RecipeComponentUid;
                     _bus.Publish(new RecipeComponentCreatingCompletedVMEvent(componentUid));
                 });
             }
         }
 
-        [RelayCommand]
-        public async Task MoveComponentsAsync(PartsTargetInteractionInfo<RecipeComponentViewModel, RecipeViewModel> info)
-        {
-            var targetRecipe = info.Target;
-            var components = info.Parts;
-
-            await MoveComponentsAsync(targetRecipe, components);
-        }
-
-        public async Task MoveComponentsAsync(RecipeViewModel targetRecipe, List<RecipeComponentViewModel> components)
+        public async Task MoveComponentsAsync(RecipeViewModel targetRecipe, List<RecipeComponentViewModel> components, bool executeInLastComplex = false)
         {
             foreach (var component in components)
             {
@@ -108,15 +100,16 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 var previousParentUid = component.LinkedParentRecipe!.Uid;
                 var newParentUid = targetRecipe.Uid;
 
-                await _commands.CreateSyncAndExcecuteAsync<MoveRecipeComponentCommand>(previousParentUid, newParentUid, component.Uid);
+                await _commands.CreateAndExcecuteInLastComplexAsyncIf<MoveRecipeComponentCommand>(
+                    executeInLastComplex,
+                    previousParentUid, newParentUid, component.Uid);
             }
 
             var componentUids = components.Select(c => c.Uid).ToArray();
             _bus.Publish(new RecipeComponentsMovingCompletedVMEvent(componentUids));
         }
 
-        [RelayCommand]
-        public async Task RemoveAsync(RecipeComponentViewModel component)
+        public async Task RemoveAsync(RecipeComponentViewModel component, bool executeInLastComplex = false)
         {
             var parentUid = component.LinkedParentRecipe!.Uid;
 
@@ -128,15 +121,17 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 {
                     _bus.Publish(new RecipeComponentDeletingStartedEvent(component.Uid, parentUid, 
                         new HashSet<object>() { component.Uid, parentUid }));
-                    await Task.Run(async () => await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeComponentCommand>(parentUid, component.Uid));
+                    await Task.Run(async () => await _commands.CreateAndExcecuteInLastComplexAsyncIf<DeleteRecipeComponentCommand>(
+                        executeInLastComplex,
+                        component.Uid));
                 });
             }
         }
-
-        [RelayCommand]
-        public async Task<Guid> Duplicate(RecipeComponentViewModel component)
+        public async Task<Guid> Duplicate(RecipeComponentViewModel component, bool executeInLastComplex = false)
         {
-            var command = await _commands.CreateSyncAndExcecuteAsync<DuplicateRecipeComponentCommand>(component.Uid);
+            var command = await _commands.CreateAndExcecuteInLastComplexAsyncIf<DuplicateRecipeComponentCommand>(
+                executeInLastComplex,
+                component.Uid);
 
             var componentUid = command.DuplicateUid;
             _bus.Publish(new RecipeComponentCreatingCompletedVMEvent(componentUid));
@@ -144,50 +139,43 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             return componentUid;
         }
 
-        [RelayCommand]
-        public async Task MergeSameComponentsAsync(RecipeViewModel recipe)
+        public async Task MergeSameComponentsAsync(RecipeViewModel recipe, bool executeInLastComplex = false)
         {
-            var components = recipe.Inputs;
-            var nonUniqueComponents = components.GetWithoutUniqueComponents();
-            var mergedComponents = nonUniqueComponents.GetMerged();
+            // Merging inputs
+            var inputs = recipe.Inputs;
+            var nonUniqueInputs = inputs.GetWithoutUniqueComponents();
+            var mergedInputs = nonUniqueInputs.GetMerged();
 
             await Task.Run(async () =>
             {
-                foreach (var component in nonUniqueComponents)
+                foreach (var component in nonUniqueInputs)
                     await RemoveAsync(component);
 
-                await CreateComponentsFromAsync(recipe, mergedComponents);
+                await CreateComponentsFromAsync(recipe, mergedInputs, false, executeInLastComplex);
+            });
+
+            // Merging outputs
+            var outputs = recipe.Outputs;
+            var nonUniqueOutputs = outputs.GetWithoutUniqueComponents();
+            var mergedOutputs = nonUniqueOutputs.GetMerged();
+
+            await Task.Run(async () =>
+            {
+                foreach (var component in nonUniqueOutputs)
+                    await RemoveAsync(component);
+
+                await CreateComponentsFromAsync(recipe, mergedOutputs, true, executeInLastComplex);
             });
         }
 
-        [RelayCommand]
-        public async Task SetSelectedRecipe(PartSetValueInfo<RecipeComponentViewModel, RecipeViewModel?> info)
-        {
-            if (info == null || info.Part == null || info.Value == null) return;
-
-            var targetComponent = info.Part;
-            var valueRecipe = info.Value;
-
-            await SetSelectedRecipe(targetComponent, valueRecipe);
-        }
-
-        public async Task SetSelectedRecipe(RecipeComponentViewModel targetComponent, RecipeViewModel valueRecipe)
+        public async Task SetSelectedRecipe(RecipeComponentViewModel targetComponent, RecipeViewModel? valueRecipe, bool executeInLastComplex = false)
         {
             if (targetComponent.LinkedSelectedRecipe?.Value == valueRecipe)
                 return;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentSelectedRecipe>(targetComponent.Uid, valueRecipe?.Uid);
-        }
-
-        [RelayCommand]
-        public async Task SetQuantityAsync(PartSetValueInfo<RecipeComponentViewModel, double> info)
-        {
-            if (info == null || info.Part == null) return;
-
-            var targetComponent = info.Part;
-            var value = info.Value;
-
-            await SetQuantityAsync(targetComponent, value);
+            await _commands.CreateAndExcecuteInLastComplexAsyncIf<SetRecipeComponentSelectedRecipe>(
+                executeInLastComplex,
+                targetComponent.Uid, valueRecipe?.Uid!);
         }
 
         public async Task<ISelectedParts?> ShowComponentCreateMenuAsync()
@@ -198,12 +186,14 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 
             return selected;
         }
-        public async Task SetQuantityAsync(RecipeComponentViewModel targetComponent, double value)
+        public async Task SetQuantityAsync(RecipeComponentViewModel targetComponent, double value, bool executeInLastComplex = false)
         {
             if (targetComponent.Quantity == value)
                 return;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeComponentQuantityCommand>(targetComponent.Uid, value);
+            await _commands.CreateAndExcecuteInLastComplexAsyncIf<SetRecipeComponentQuantityCommand>(
+                executeInLastComplex,
+                targetComponent.Uid, value);
         }
     }
 }

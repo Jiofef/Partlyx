@@ -35,7 +35,9 @@ namespace Partlyx.Core.Partlyx
         public string Name { get; set; }
         public virtual List<RecipeComponent> Components { get; } = new List<RecipeComponent>();
 
+        [NotMapped]
         public IReadOnlyList<RecipeComponent> Inputs => Components.Where(c => !c.IsOutput).ToList();
+        [NotMapped]
         public IReadOnlyList<RecipeComponent> Outputs => Components.Where(c => c.IsOutput).ToList();
         public bool IsReversible { get; set; } = false;
 

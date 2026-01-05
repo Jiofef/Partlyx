@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using DynamicData;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using System.Linq;
 
 namespace Partlyx.UI.Avalonia.Behaviors
 {
@@ -33,20 +34,20 @@ namespace Partlyx.UI.Avalonia.Behaviors
 
             // Deleting objects that are not selected
             var items = control.SelectedItems;
-            foreach (var resource in selectedParts.Resources)
+            foreach (var resource in selectedParts.Resources.ToList())
             {
                 if (!items.Contains(resource))
-                    selectedParts.Resources.Remove(resource);
+                    selectedParts.RemoveResourceFromSelected(resource);
             }
-            foreach (var recipe in selectedParts.Recipes)
+            foreach (var recipe in selectedParts.Recipes.ToList())
             {
                 if (!items.Contains(recipe))
-                    selectedParts.Recipes.Remove(recipe);
+                    selectedParts.RemoveRecipeFromSelected(recipe);
             }
-            foreach (var component in selectedParts.Components)
+            foreach (var component in selectedParts.Components.ToList())
             {
                 if (!items.Contains(component))
-                    selectedParts.Components.Remove(component);
+                    selectedParts.RemoveComponentFromSelected(component);
             }
 
             // Adding new objects that are selected (if the object is added to selectedParts already, AddPartToSelected won't add it)
@@ -94,15 +95,15 @@ namespace Partlyx.UI.Avalonia.Behaviors
 
             if (part is ResourceViewModel resource)
             {
-                selectedParts.Resources.Remove(resource);
+                selectedParts.RemoveResourceFromSelected(resource);
             }
             else if (part is RecipeViewModel recipe)
             {
-                selectedParts.Recipes.Remove(recipe);
+                selectedParts.RemoveRecipeFromSelected(recipe);
             }
             else if (part is RecipeComponentViewModel component)
             {
-                selectedParts.Components.Remove(component);
+                selectedParts.RemoveComponentFromSelected(component);
             }
         }
         private void OnItemSelected(IVMPart part)

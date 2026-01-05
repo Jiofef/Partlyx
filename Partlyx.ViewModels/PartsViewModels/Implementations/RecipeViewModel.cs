@@ -10,6 +10,11 @@ using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIStates;
 using System.Collections.ObjectModel;
+using DynamicData;
+using DynamicData.Binding;
+using System.Reactive.Linq;
+using System.Reactive.Concurrency;
+using ReactiveUI;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
@@ -59,14 +64,20 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 _outputsDic.Add(vm.Uid, vm);
             }
 
+            // Initialize DisplayChildren
+            var inputsGroupHeader = new RecipeComponentInputGroup("Inputs", Inputs, this);
+            var outputsGroupHeader = new RecipeComponentOutputGroup("Outputs", Outputs, this);
+            _componentGroups = new() { inputsGroupHeader, outputsGroupHeader };
+            ComponentGroups = new(_componentGroups);
+
             // Initialize resource counts
             foreach (var component in _inputs)
             {
-                UpdateResourceCount(_inputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+                UpdateResourceCount(RecipeComponentType.Input, component.LinkedResource?.Uid ?? Guid.Empty, 1);
             }
             foreach (var component in _outputs)
             {
-                UpdateResourceCount(_outputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+                UpdateResourceCount(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty, 1);
             }
 
             // For the most part, we don't really care when the icon will be loaded. Until then, the icon will be empty.
@@ -91,7 +102,17 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public string Name { get => _name; set => SetProperty(ref _name, value); }
 
         private bool _isReversible;
-        public bool IsReversible { get => _isReversible; set => SetProperty(ref _isReversible, value); }
+        public bool IsReversible
+        {
+            get => _isReversible;
+            set
+            {
+                if (SetProperty(ref _isReversible, value))
+                {
+                    PublishAllResourceLinkChanges();
+                }
+            }
+        }
 
         private ObservableCollection<RecipeComponentViewModel> _inputs = new();
         public ObservableCollection<RecipeComponentViewModel> Inputs { get => _inputs; }
@@ -107,9 +128,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         // Optimized resource counting
         private readonly Dictionary<Guid, int> _inputsResourceCounts = new();
-        public HashSet<Guid> InputResources() => _inputsResourceCounts.Keys.ToHashSet();
+        public HashSet<Guid> InputResources { get; } = new();
         private readonly Dictionary<Guid, int> _outputsResourceCounts = new();
-        public HashSet<Guid> OutputResources() => _outputsResourceCounts.Keys.ToHashSet();
+        public HashSet<Guid> OutputResources { get; } = new();
 
         public RecipeComponentViewModel? GetChildOrNull(Guid uid)
         {
@@ -161,7 +182,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                 Outputs.Add(component);
                 _outputsDic.Add(component.Uid, component);
-                UpdateResourceCount(_outputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+                UpdateResourceCount(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty, 1);
             }
             else
             {
@@ -170,7 +191,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                 Inputs.Add(component);
                 _inputsDic.Add(component.Uid, component);
-                UpdateResourceCount(_inputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+                UpdateResourceCount(RecipeComponentType.Input, component.LinkedResource?.Uid ?? Guid.Empty, 1);
             }
         }
 
@@ -180,31 +201,82 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 Inputs.Remove(component);
                 _inputsDic.Remove(component.Uid);
-                UpdateResourceCount(_inputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, -1);
+                UpdateResourceCount(RecipeComponentType.Input, component.LinkedResource?.Uid ?? Guid.Empty, -1);
             }
             else if (_outputsDic.ContainsKey(component.Uid))
             {
                 Outputs.Remove(component);
                 _outputsDic.Remove(component.Uid);
-                UpdateResourceCount(_outputsResourceCounts, component.LinkedResource?.Uid ?? Guid.Empty, -1);
+                UpdateResourceCount(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty, -1);
             }
         }
 
-        private void UpdateResourceCount(Dictionary<Guid, int> dict, Guid resourceUid, int delta)
+        private void UpdateResourceCount(RecipeComponentType componentType, Guid resourceUid, int delta)
         {
             if (resourceUid == Guid.Empty) return;
 
+            Dictionary<Guid, int> dict = componentType == RecipeComponentType.Input ? _inputsResourceCounts : _outputsResourceCounts;
+            HashSet<Guid> hashes = componentType == RecipeComponentType.Input ? InputResources : OutputResources;
+
+            bool wasPresent = dict.ContainsKey(resourceUid);
             if (dict.TryGetValue(resourceUid, out int count))
             {
                 count += delta;
                 if (count > 0)
+                {
                     dict[resourceUid] = count;
+                }
                 else
+                {
                     dict.Remove(resourceUid);
+                    hashes?.Remove(resourceUid);
+                }
             }
             else if (delta > 0)
             {
                 dict[resourceUid] = delta;
+                hashes?.Add(resourceUid);
+            }
+
+            // Publish event if the presence changed
+            if (wasPresent != dict.ContainsKey(resourceUid))
+            {
+                PublishResourceLinkChanged(resourceUid);
+            }
+        }
+
+        private RecipeResourceLinkTypeEnum GetLinkTypeForResource(Guid resourceUid)
+        {
+            bool inInputs = InputResources.Contains(resourceUid);
+            bool inOutputs = OutputResources.Contains(resourceUid);
+
+            if (IsReversible)
+            {
+                if (inInputs && inOutputs) return RecipeResourceLinkTypeEnum.Both;
+                if (inInputs) return RecipeResourceLinkTypeEnum.Receiving;
+                if (inOutputs) return RecipeResourceLinkTypeEnum.Producing;
+                return RecipeResourceLinkTypeEnum.None;
+            }
+            else
+            {
+                return inOutputs ? RecipeResourceLinkTypeEnum.Producing : RecipeResourceLinkTypeEnum.None;
+            }
+        }
+
+        private void PublishResourceLinkChanged(Guid resourceUid)
+        {
+            var linkType = GetLinkTypeForResource(resourceUid);
+            _bus.Publish(new RecipeResourceLinkChangedEvent(this, resourceUid, linkType));
+        }
+
+        private void PublishAllResourceLinkChanges()
+        {
+            var allResources = new HashSet<Guid>(InputResources);
+            allResources.UnionWith(OutputResources);
+
+            foreach (var resourceUid in allResources)
+            {
+                PublishResourceLinkChanged(resourceUid);
             }
         }
 
@@ -312,9 +384,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                     if (oldResourceUid != newResourceUid)
                     {
-                        var dict = componentVM.IsOutput ? _outputsResourceCounts : _inputsResourceCounts;
-                        UpdateResourceCount(dict, oldResourceUid, -1);
-                        UpdateResourceCount(dict, newResourceUid, 1);
+                        UpdateResourceCount(componentVM.ComponentType, oldResourceUid, -1);
+                        UpdateResourceCount(componentVM.ComponentType, newResourceUid, 1);
                     }
                 }
             }
@@ -330,7 +401,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             UiItem.Dispose();
 
-            foreach(var component in Inputs)
+            foreach (var component in Inputs)
                 component.Dispose();
         }
 
@@ -347,8 +418,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
 
         // For UI
+        private readonly ObservableCollection<RecipeComponentGroup> _componentGroups;
+        public ReadOnlyObservableCollection<RecipeComponentGroup> ComponentGroups { get; }
+
         public RecipeItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
-        PartItemUIState IVMPart.UiItem => UiItem;
+        FocusableItemUIState IFocusable.UiItem => UiItem;
         public RecipeNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
         public PartsGlobalNavigations GlobalNavigations { get; }
 

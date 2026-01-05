@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Partlyx.Core.Contracts;
+using Partlyx.Core.Technical;
 using Partlyx.Infrastructure;
 using Partlyx.Infrastructure.Data;
 using Partlyx.Infrastructure.Data.ApplicationResources;
@@ -69,12 +70,15 @@ namespace Partlyx.UI.Avalonia
             LoadJsonSavesAsync();
             InitializeDatabaseAsync();
 
-            Dispatcher.UIThread.UnhandledException += (s, e) =>
+            if (DevStaticConfig.ENABLE_VISUAL_UNHANDLED_EXCEPTIONS)
             {
-                e.Handled = true;
+                Dispatcher.UIThread.UnhandledException += (s, e) =>
+                {
+                    e.Handled = true;
 
-                ShowError(e.Exception);
-            };
+                    ShowError(e.Exception);
+                };
+            }
 
             base.OnFrameworkInitializationCompleted();
 
@@ -131,6 +135,8 @@ namespace Partlyx.UI.Avalonia
             services.AddSingleton<MainViewModel>();
 
             services.AddTransient<PartsTreeViewModel>();
+            services.AddTransient<PartsTreeResourcesViewModel>();
+            services.AddTransient<PartsTreeRecipesViewModel>();
             services.AddTransient<PartsGraphViewModel>();
             services.AddTransient<ItemPropertiesViewModel>();
 
@@ -186,8 +192,8 @@ namespace Partlyx.UI.Avalonia
 
             services.AddTransient<IIsolatedSelectedParts, IsolatedSelectedParts>();
             services.AddSingleton<IGlobalSelectedParts, GlobalSelectedParts>();
-            services.AddTransient<IIsolatedFocusedPart, IsolatedFocusedPart>();
-            services.AddSingleton<IGlobalFocusedPart, GlobalFocusedPart>();
+            services.AddTransient<IIsolatedFocusedElementContainer, IsolatedFocusedPart>();
+            services.AddSingleton<IGlobalFocusedElementContainer, GlobalFocusedPart>();
             services.AddTransient<IIsolatedResourcesVMContainer, ResourcesVMContainer>();
             services.AddSingleton<IGlobalResourcesVMContainer, ResourcesVMContainer>();
             services.AddTransient<IIsolatedRecipesVMContainer, RecipesVMContainer>();
@@ -198,7 +204,9 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<IResourceItemUiStateService, ResourceItemUiStateService>();
             services.AddTransient<IRecipeItemUiStateService, RecipeItemUiStateService>();
             services.AddTransient<IRecipeComponentItemUiStateService, RecipeComponentItemUiStateService>();
+            services.AddTransient<IComponentPathUiStateService, ComponentPathUiStateService>();
             services.AddTransient<IResourceSearchService, ResourceSearchService>();
+            services.AddTransient<IRecipeSearchService, RecipeSearchService>();
 
             services.AddTransient<IconServiceViewModel>();
             services.AddTransient<ImageViewModel>();

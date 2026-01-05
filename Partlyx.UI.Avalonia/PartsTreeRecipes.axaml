@@ -1,0 +1,235 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels.Implementations"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             xmlns:dnd="using:Partlyx.UI.Avalonia.DragAndDrop"
+             x:Class="Partlyx.UI.Avalonia.PartsTreeRecipes"
+             xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
+             xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
+             xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:system="using:System"
+             x:CompileBindings="false"
+             x:DataType="vmo:PartsTreeRecipesViewModel"
+             d:DesignWidth="320"
+             d:DesignHeight="320">
+    <UserControl.DataTemplates>
+        <!-- Recipe item-->
+        <TreeDataTemplate DataType="vmp:RecipeViewModel" ItemsSource="{Binding ComponentGroups}">
+            <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2" Height="36">
+                <i:Interaction.Behaviors>
+					<dnd:ContextDragBehavior Context="{Binding $parent[UserControl].DataContext.LocalSelectedItems}"/>
+                    <dnd:ContextDropBehavior Handler="{StaticResource RecipeItemDropHandler}"/>
+                    <beh:DragHoverCommandBehavior Command="{Binding UiItem.ExpandCommand}" Enabled="{Binding !UiItem.IsExpanded}"/>
+                    <beh:TreeViewItemContainerSelectionSyncBehavior TargetPropertyName="UiItem.IsSelected"/>
+                </i:Interaction.Behaviors>
+
+                <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+                <Grid HorizontalAlignment="Stretch" ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto">
+                    <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 4, 2"/>
+                    <Panel VerticalAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Background="Transparent" Margin="4, 0">
+                        <i:Interaction.Behaviors>
+                            <beh:DoubleTappedBehavior Command="{Binding UiItem.StartRenamingCommand}"/>
+                       </i:Interaction.Behaviors>
+
+					    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" Classes="common" IsVisible="{Binding !UiItem.IsRenaming}"/>
+
+                        <TextBox VerticalAlignment="Center" Text="{Binding UiItem.UnConfirmedName, UpdateSourceTrigger=PropertyChanged}" IsVisible="{Binding UiItem.IsRenaming}" Classes="common">
+                            <TextBox.KeyBindings>
+						        <KeyBinding Gesture="Enter" Command="{Binding UiItem.CommitNameChangeCommand}"/>
+                                <KeyBinding Gesture="Escape" Command="{Binding UiItem.CancelNameChangeCommand}"/>
+                            </TextBox.KeyBindings>
+                            <i:Interaction.Behaviors>
+                                    <ia:EventTriggerBehavior EventName="LostFocus">
+                                        <ia:InvokeCommandAction Command="{Binding UiItem.CommitNameChangeCommand}"/>
+                                    </ia:EventTriggerBehavior>
+                                <beh:TextBoxFocusAndSelectBehavior IsActive="{Binding UiItem.IsRenaming}"/>
+                                <beh:FocusCountBehavior Count="{Binding $parent[UserControl].DataContext.HotkeysBlockElementsAmount, Mode=TwoWay}"/>
+                            </i:Interaction.Behaviors>
+                        </TextBox>
+                    </Panel>
+
+                    <ToggleButton Grid.Column="3" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
+                                    Command="{Binding UiItem.ToggleGlobalFocus}"
+                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}">
+                        <i:Interaction.Behaviors>
+                            <beh:DragHoverCommandBehavior Command="{Binding UiItem.FocusGlobalCommand}" DelayMs="0"/>
+                        </i:Interaction.Behaviors>
+                    </ToggleButton>
+                </Grid>
+            </Grid>
+        </TreeDataTemplate>
+
+        <!-- Recipe component item-->
+        <TreeDataTemplate DataType="vmp:RecipeComponentViewModel" ItemsSource="{x:Null}" >
+            <Grid HorizontalAlignment="Stretch" Margin="4,2,4,2">
+                <i:Interaction.Behaviors>
+					<dnd:ContextDragBehavior Context="{Binding $parent[UserControl].DataContext.LocalSelectedItems}"/>
+                    <dnd:ContextDropBehavior Handler="{StaticResource RecipeComponentItemDropHandler}"/>
+                    <beh:TreeViewItemContainerSelectionSyncBehavior TargetPropertyName="UiItem.IsSelected"/>
+                </i:Interaction.Behaviors>
+
+                <Border x:Name="HeaderArea" Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0"/>
+                <Grid RowDefinitions="Auto, Auto">
+                    <Grid HorizontalAlignment="Stretch" Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
+                        <local:IconControl Grid.Column="0" IconContent="{Binding Icon}" Width="24" Height="24" Margin="4, 2, 4, 2"/>
+                        <TextBlock Text="{Binding LinkedResource.Value.Name}" Grid.Column="1" VerticalAlignment="Center" Classes="common" Margin="4, 0"/>
+
+                    <ToggleButton Grid.Column="2" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
+                                    Command="{Binding UiItem.ToggleGlobalFocus}"
+                                    Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}">
+                        <i:Interaction.Behaviors>
+                            <beh:DragHoverCommandBehavior Command="{Binding UiItem.FocusGlobalCommand}" CommandParameter="{x:True}" DelayMs="0"/>
+                        </i:Interaction.Behaviors>
+                    </ToggleButton>
+
+                    </Grid>
+                    <NumericUpDown Value="{Binding Quantity, Mode=TwoWay}" Grid.Row="1" Height="32" HorizontalAlignment="Stretch">
+						<i:Interaction.Behaviors>
+							<ia:EventTrigger EventName="LostFocus">
+								<ia:InvokeCommandAction
+                                    Command="{Binding UiItem.SetQuantityCommand}"
+                                    CommandParameter="{Binding Quantity}"/>
+                            </ia:EventTrigger>
+                            <beh:NumericUpDownUnfocusOnEnterOrEscapeBehavior/>
+                        </i:Interaction.Behaviors>
+                    </NumericUpDown>
+                </Grid>
+            </Grid>
+        </TreeDataTemplate>
+
+        <!-- Group header-->
+        <TreeDataTemplate DataType="vmp:RecipeComponentInputGroup" ItemsSource="{Binding GroupCollection}">
+            <Grid ColumnDefinitions="*,auto" IsEnabled="True">
+				<TextBlock Text="{h:Loc Key= {Binding GroupName}}"
+                    FontWeight="Bold"
+                    Foreground="{StaticResource PxBlackBrush}"
+                    Margin="0,5,0,0"/>
+                <Button HorizontalAlignment="Stretch" Classes="darker-focus"
+                        Command="{Binding $parent[TreeView].DataContext.CreateInputCommand}" Grid.Column="1"
+                        CommandParameter="{Binding ParentRecipe}"
+                        Width="32"
+                        Height="32"
+                        IsEnabled="True">
+                    <Button.Content>
+                        <mdi:MaterialIcon Kind="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
+                    </Button.Content>
+                        <ToolTip.Tip>
+					    <StackPanel>
+						    <TextBlock Text="{h:Loc Create_an_input_for_this_recipe}"/>
+                            <Separator/>
+                            <TextBlock Text="(Ctrl + Shift + =)"/>
+                        </StackPanel>
+                    </ToolTip.Tip>
+                </Button>
+            </Grid>
+        </TreeDataTemplate>
+        <TreeDataTemplate DataType="vmp:RecipeComponentOutputGroup" ItemsSource="{Binding GroupCollection}">
+            <Grid ColumnDefinitions="*,auto" IsEnabled="True">
+				<TextBlock Text="{h:Loc Key= {Binding GroupName}}"
+                    FontWeight="Bold"
+                    Foreground="{StaticResource PxBlackBrush}"
+                    Margin="0,5,0,0"/>
+                <Button HorizontalAlignment="Stretch" Classes="darker-focus"
+                        Command="{Binding $parent[TreeView].DataContext.CreateOutputCommand}" Grid.Column="1"
+                        CommandParameter="{Binding ParentRecipe}"
+                        Width="32"
+                        Height="32"
+                        IsEnabled="True">
+                    <Button.Content>
+                        <mdi:MaterialIcon Kind="Plus" Width="15" Foreground="{StaticResource PxBlackBrush}"/>
+                    </Button.Content>
+                        <ToolTip.Tip>
+					    <StackPanel>
+						    <TextBlock Text="{h:Loc Create_an_output_for_this_recipe}"/>
+                            <Separator/>
+                            <TextBlock Text="(Ctrl + Shift + =)"/>
+                        </StackPanel>
+                    </ToolTip.Tip>
+                </Button>
+            </Grid>
+        </TreeDataTemplate>
+    </UserControl.DataTemplates>
+    <Grid Background="Transparent" HorizontalAlignment="Stretch" RowDefinitions="Auto,*,Auto"
+          Focusable="True">
+        <Grid.KeyBindings>
+			<KeyBinding Gesture="Ctrl+OemPlus" Command="{Binding CreateResourceCommand}"/>
+            <KeyBinding Gesture="Ctrl+Shift+OemPlus" Command="{Binding ParentTreeService.CreateChildForSelected}"/>
+        </Grid.KeyBindings>
+
+        <StackPanel Orientation="Vertical" Grid.Row="0">
+            <Grid Margin="8, 2, 4, 2" ColumnDefinitions="*,Auto">
+                <TextBox Classes="common"
+                     Watermark="{h:Loc Search___}" Grid.Row="0"
+                     Text="{Binding Search.SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Grid.Column="1" Classes="base" Width="32" Height="32" Command="{Binding ClearSearchCommand}"
+                        ToolTip.Tip="{h:Loc Clear_search_text}">
+                    <mdi:MaterialIcon Kind="Cancel" Width="16" Classes="common"/>
+                </Button>
+            </Grid>
+            <StackPanel Orientation="Horizontal" Margin="8, 2, 4, 2">
+                <Button Classes="base" Width="32" ToolTip.Tip="{h:Loc Expand_All}" Command="{Binding ExpandAllCommand}">
+                    <mdi:MaterialIcon Kind="ChevronDoubleDown" Width="16" Classes="common"/>
+                </Button>
+                <Button Classes="base" Width="32" ToolTip.Tip="{h:Loc Collapse_All}" Command="{Binding CollapseAllCommand}">
+                    <mdi:MaterialIcon Kind="ChevronDoubleUp" Width="16" Classes="common"/>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TreeView x:Name="TreeViewControl"
+                          ItemsSource="{Binding Search.FilteredRecipes}"
+                          Margin="0,0,10,0" BorderThickness="0" Background="{StaticResource PxBlue0Brush}"
+                          SelectionMode="Multiple"
+                          SelectedItems="{Binding LocalSelectedPartsCollection}">
+                    <TreeView.Template>
+                        <ControlTemplate TargetType="TreeView">
+                            <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <ItemsPresenter/>
+                            </Border>
+                        </ControlTemplate>
+                    </TreeView.Template>
+                    <TreeView.ItemContainerTheme>
+                        <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource MaterialTreeViewItem}">
+                        <Setter Property="IsExpanded">
+                            <Setter.Value>
+                            <Binding Path="DataContext.UiItem.IsExpanded"
+                                        RelativeSource="{RelativeSource Self}"
+                                        Mode="TwoWay"/>
+                            </Setter.Value>
+                        </Setter>
+                        </ControlTheme>
+                    </TreeView.ItemContainerTheme>
+                    <TreeView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
+                        </ItemsPanelTemplate>
+                    </TreeView.ItemsPanel>
+                </TreeView>
+            </ScrollViewer>
+        </Grid>
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+            <Button HorizontalAlignment="Stretch" Classes="base" Command="{Binding CreateRecipeCommand}" Grid.Column="0">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal" Margin="8">
+                        <TextBlock Text="{h:Loc Create_recipe}"/>
+                       <mdi:MaterialIcon Kind="Plus" Width="12" Margin="4, 0, 0, 0" Classes="common"/>
+                    </StackPanel>
+                </Button.Content>
+                <ToolTip.Tip>
+					<StackPanel>
+						<TextBlock Text="{h:Loc Create_recipe}"/>
+                        <Separator/>
+                        <TextBlock Text="(Ctrl + =)"/>
+                    </StackPanel>
+                </ToolTip.Tip>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

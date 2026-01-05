@@ -80,7 +80,9 @@ namespace Partlyx.Infrastructure.Data.Implementations
         {
             await using var db = _dbFactory.CreateDbContext();
 
-            var r = await db.Recipes.Include(rc => rc.Inputs).ThenInclude(c => c.ComponentResource)
+            var r = await db.Recipes
+                .Include(rc => rc.Components)
+                .ThenInclude(c => c.ComponentResource)
                 .FirstOrDefaultAsync(x => x.Uid == uid);
 
             if (r == null) throw new Exception("Cannot duplicate a non existing recipe with Uid: " + uid);
@@ -96,7 +98,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await using var db = _dbFactory.CreateDbContext();
 
             var r = await db.Recipes
-                .Include(rc => rc.Inputs)
+                .Include(rc => rc.Components)
                 .FirstOrDefaultAsync(r => r.Uid == uid);
 
             if (r != null)
@@ -142,7 +144,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await using var db = _dbFactory.CreateDbContext();
 
             var r = await db.Recipes
-                .Include(rc => rc.Inputs)
+                .Include(rc => rc.Components)
                 .ThenInclude(c => c.ComponentResource)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Uid == uid);
@@ -191,7 +193,7 @@ namespace Partlyx.Infrastructure.Data.Implementations
             await using var db = _dbFactory.CreateDbContext();
 
             var rl = await db.Recipes
-                .Include(rc => rc.Inputs)
+                .Include(rc => rc.Components)
                 .ThenInclude(c => c.ComponentResource)
                 .AsNoTracking()
                 .ToListAsync();

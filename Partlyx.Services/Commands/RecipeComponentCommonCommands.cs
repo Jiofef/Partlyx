@@ -19,13 +19,12 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
         private Guid _componentResourceUid;
 
         public Guid RecipeComponentUid { get; private set; }
+        public RecipeComponentCreatingOptions? CreatingOptions { get; }
 
         private RecipeComponent? _createdRecipeComponent;
-        private double? _quantity;
-        private bool _isOutput;
 
         public CreateRecipeComponentCommand(Guid parentRecipeUid, Guid componentResourceUid,
-            IRecipeComponentService rcs, IEventBus bus, IPartlyxRepository repo, double? quantity = null, bool isOutput = false)
+            IRecipeComponentService rcs, IEventBus bus, IPartlyxRepository repo, RecipeComponentCreatingOptions? opt = null)
         {
             _recipeComponentService = rcs;
             _partsCreator = new PartsCreatorService(repo, bus);
@@ -33,15 +32,15 @@ namespace Partlyx.Services.Commands.RecipeComponentCommonCommands
 
             _recipeUid = parentRecipeUid;
             _componentResourceUid = componentResourceUid;
-            _quantity = quantity;
-            _isOutput = isOutput;
+
+            CreatingOptions = opt;
         }
 
         public async Task ExecuteAsync()
         {
-            RecipeComponentUid = _isOutput
-                ? await _recipeComponentService.CreateOutputAsync(_recipeUid, _componentResourceUid, _quantity)
-                : await _recipeComponentService.CreateInputAsync(_recipeUid, _componentResourceUid, _quantity);
+            RecipeComponentUid = CreatingOptions?.IsOutput ?? false
+                ? await _recipeComponentService.CreateOutputAsync(_recipeUid, _componentResourceUid, CreatingOptions)
+                : await _recipeComponentService.CreateInputAsync(_recipeUid, _componentResourceUid, CreatingOptions);
 
             // Get the created entity for potential redo
             _createdRecipeComponent = await _repo.GetRecipeComponentByUidAsync(RecipeComponentUid);

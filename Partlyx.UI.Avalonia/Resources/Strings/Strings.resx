@@ -387,14 +387,14 @@
   <data name="help_Help" xml:space="preserve">
     <value>Help</value>
   </data>
-  <data name="Find_resource_in_tree" xml:space="preserve">
-    <value>Find resource in tree</value>
+  <data name="Find_resource" xml:space="preserve">
+    <value>Find resource</value>
   </data>
-  <data name="Find_recipe_in_tree" xml:space="preserve">
-    <value>Find recipe in tree</value>
+  <data name="Find_recipe" xml:space="preserve">
+    <value>Find recipe</value>
   </data>
-  <data name="Find_component_in_tree" xml:space="preserve">
-    <value>Find component in tree</value>
+  <data name="Find_component" xml:space="preserve">
+    <value>Find component</value>
   </data>
   <data name="Other" xml:space="preserve">
     <value>Other</value>
@@ -411,10 +411,10 @@
   <data name="Create_resource_with_recipe_by_default" xml:space="preserve">
     <value>Create resource with recipe by default</value>
   </data>
-  <data name="Default_recipe_craft_amount" xml:space="preserve">
+  <data name="Default_recipe_output_amount" xml:space="preserve">
     <value>Default recipe craft amount</value>
   </data>
-  <data name="Default_component_quantity" xml:space="preserve">
+  <data name="Default_recipe_input_amount" xml:space="preserve">
     <value>Default component quantity</value>
   </data>
   <data name="settings_Parts" xml:space="preserve">
@@ -449,5 +449,26 @@
   </data>
   <data name="Duplicate" xml:space="preserve">
     <value>Duplicate</value>
+  </data>
+  <data name="Create_a_recipe" xml:space="preserve">
+    <value>Create a recipe</value>
+  </data>
+  <data name="Create_recipe" xml:space="preserve">
+    <value>Create recipe</value>
+  </data>
+  <data name="Resources" xml:space="preserve">
+    <value>Resources</value>
+  </data>
+  <data name="Recipes" xml:space="preserve">
+    <value>Recipes</value>
+  </data>
+  <data name="Inputs" xml:space="preserve">
+    <value>Inputs</value>
+  </data>
+  <data name="Outputs" xml:space="preserve">
+    <value>Outputs</value>
+  </data>
+  <data name="Component_creating" xml:space="preserve">
+    <value>Component creating</value>
   </data>
 </root>

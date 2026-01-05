@@ -11,6 +11,9 @@ using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIStates;
 using System.Collections.ObjectModel;
+using Partlyx.ViewModels.PartsViewModels;
+using Partlyx.Core.Partlyx;
+using System.Runtime.CompilerServices;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
@@ -68,6 +71,14 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private IconViewModel _icon;
         public IconViewModel Icon { get => _icon; private set => SetProperty(ref _icon, value); }
 
+        // Recipe relationships
+        private readonly HashSet<RecipeViewModel> _producingRecipesSet = new();
+        public IReadOnlySet<RecipeViewModel> ProducingRecipesSet => _producingRecipesSet;
+        public ObservableCollection<RecipeViewModel> ProducingRecipes { get; } = new();
+        private readonly HashSet<RecipeViewModel> _receiverRecipesSet = new();
+        public IReadOnlySet<RecipeViewModel> ReceiverRecipesSet => _receiverRecipesSet;
+        public ObservableCollection<RecipeViewModel> ReceiverRecipes { get; } = new();
+
         // Info updating
         protected override Dictionary<string, Action<ResourceDto>> ConfigureUpdaters() => new()
         {
@@ -88,6 +99,11 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 OnResourceUpdated(rue);
                 return;
             }
+            if (@event is RecipeResourceLinkChangedEvent rrlce)
+            {
+                OnRecipeResourceLinkChanged(rrlce);
+                return;
+            }
         }
 
         private void OnResourceUpdated(ResourceUpdatedEvent ev)
@@ -95,6 +111,56 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             if (Uid != ev.Resource.Uid) return;
 
             Update(ev.Resource, ev.ChangedProperties);
+        }
+
+        private void OnRecipeResourceLinkChanged(RecipeResourceLinkChangedEvent ev)
+        {
+            if (ev.ResourceUid != Uid) return;
+
+            var recipe = ev.Recipe;
+
+            void EnsureRemoveProducingRecipe()
+            {
+                if (_producingRecipesSet.Remove(recipe))
+                    ProducingRecipes.Remove(recipe);
+            }
+            void EnsureAddProducingRecipe()
+            {
+                if (_producingRecipesSet.Add(recipe))
+                    ProducingRecipes.Add(recipe);
+            }
+            void EnsureRemoveReceiverRecipe()
+            {
+                if (_receiverRecipesSet.Remove(recipe))
+                    ReceiverRecipes.Remove(recipe);
+            }
+            void EnsureAddReceiverRecipe()
+            {
+                if (_receiverRecipesSet.Add(recipe))
+                    ReceiverRecipes.Add(recipe);
+            }
+
+            switch (ev.LinkType)
+            {
+                case RecipeResourceLinkTypeEnum.None:
+                    EnsureRemoveProducingRecipe();
+                    EnsureRemoveReceiverRecipe();
+                break;
+                case RecipeResourceLinkTypeEnum.Receiving:
+                    EnsureRemoveProducingRecipe();
+                    EnsureAddReceiverRecipe();
+                break;
+                case RecipeResourceLinkTypeEnum.Producing:
+                    EnsureAddProducingRecipe();
+                    EnsureRemoveReceiverRecipe();
+                break;
+                    case RecipeResourceLinkTypeEnum.Both:
+                    EnsureAddProducingRecipe();
+                    EnsureAddReceiverRecipe();
+                break;
+            }
+
+
         }
 
         public void Dispose()
@@ -118,13 +184,13 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             await Task.Run(async () =>
             {
-                await _commands.CreateAsyncEndExcecuteAsync<SetDefaultRecipeToResourceCommand>(Uid, recipeUid);
+                await _commands.CreateAndExcecuteAsync<SetDefaultRecipeToResourceCommand>(Uid, recipeUid);
             });
         }
 
         // For UI
         public ResourceItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
-        PartItemUIState IVMPart.UiItem => UiItem;
+        FocusableItemUIState IFocusable.UiItem => UiItem;
         public PartsGlobalNavigations GlobalNavigations { get; }
 
         // Compatibility

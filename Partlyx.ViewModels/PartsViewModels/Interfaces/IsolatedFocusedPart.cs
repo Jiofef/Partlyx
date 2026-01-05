@@ -2,5 +2,5 @@
 
 namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
-    public class IsolatedFocusedPart : FocusedPartAbstract, IIsolatedFocusedPart { }
+    public class IsolatedFocusedPart : FocusedElementContainerAbstract, IIsolatedFocusedElementContainer { }
 }

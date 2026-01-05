@@ -363,9 +363,11 @@
   <data name="About_Us" xml:space="preserve">
     <value>About us</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="info_text_About_Us" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="info_text_About_Us" xml:space="preserve">
+    <value>Partlyx
+Version: 1.0.0
+License: MIT
+Developed by Jiofef (Artyom Stepanov)</value>
   </data>
   <data name="help_HowToUsePartlyx" xml:space="preserve">
     <value>How to use Partlyx</value>
@@ -376,71 +378,14 @@
   <data name="help_Some_QOL_Features" xml:space="preserve">
     <value>Some Quality Of Life features</value>
   </data>
-  <data name="help_Parts_tree" xml:space="preserve">
-    <value>Parts tree</value>
-  </data>
-  <data name="help_Help" xml:space="preserve">
-    <value>Help</value>
-  </data>
-  <data name="Find_resource_in_tree" xml:space="preserve">
-    <value>Find resource in tree</value>
-  </data>
-  <data name="Find_recipe_in_tree" xml:space="preserve">
-    <value>Find recipe in tree</value>
-  </data>
-  <data name="Find_component_in_tree" xml:space="preserve">
-    <value>Find component in tree</value>
-  </data>
-  <data name="Other" xml:space="preserve">
-    <value>Other</value>
-  </data>
-  <data name="Other2" xml:space="preserve">
-    <value>Other</value>
-  </data>
-  <data name="icon_Empty" xml:space="preserve">
-    <value>Empty</value>
-  </data>
-  <data name="icon_Inherited" xml:space="preserve">
-    <value>Inherited</value>
-  </data>
-  <data name="Create_resource_with_recipe_by_default" xml:space="preserve">
-    <value>Create resource with recipe by default</value>
-  </data>
-  <data name="Default_recipe_craft_amount" xml:space="preserve">
-    <value>Default recipe craft amount</value>
-  </data>
-  <data name="Default_component_quantity" xml:space="preserve">
-    <value>Default component quantity</value>
-  </data>
-  <data name="settings_Parts" xml:space="preserve">
-    <value>Parts</value>
-  </data>
-  <data name="Rename" xml:space="preserve">
-    <value>Rename</value>
-  </data>
-  <data name="Open_branch" xml:space="preserve">
-    <value>Open branch</value>
-  </data>
-  <data name="info_text_About_Us" xml:space="preserve">
-    <value>Partlyx
-Version: 1.0.0
-License: MIT
-Developed by Jiofef (Artyom Stepanov)</value>
-  </data>
-  <data name="help_text_Parts_graph" xml:space="preserve">
-    <value>The Parts Graph is located in the center of the screen and displays recipes.
+  <data name="help_text_What_is_Partlyx" xml:space="preserve">
+    <value>Partlyx allows you to create schematics (recipes) of varying complexity, composed of components that can be any previously created resources.
 
-* If a resource is selected, its **Default recipe** is shown.
-* If a recipe is selected, that recipe is shown.
-* If a component is selected, its parent recipe is shown.
-
-The graph visualizes all parts from the tree as nodes and displays all required quantities, including component amounts and the amounts of resources produced by recipes.
-
-By default, the graph shows Default recipes for components, but you can change the displayed recipe for a specific component, for example by clicking its node in the graph.
-
-You can move the camera in the graph by holding the left mouse button and dragging. Zoom in and out using the mouse wheel.
-
-By right-clicking a component in the graph, you can select "Open Branch", which will expand the Default or selected recipe of that component in the graph</value>
+What does Partlyx do?
+* Allows you to describe entities as a dependency graph
+* Visualizes a multi-level structure
+* Calculates total cost / weight / value across the entire graph
+* Works with abstract resource types</value>
   </data>
   <data name="help_text_Some_QOL_Features" xml:space="preserve">
     <value>Some complex or time-consuming actions can be simplified
@@ -457,14 +402,50 @@ By right-clicking a component in the graph, you can select "Open Branch", which 
 
 * You can select multiple parts in the tree by holding Ctrl</value>
   </data>
-  <data name="help_text_What_is_Partlyx" xml:space="preserve">
-    <value>Partlyx allows you to create schematics (recipes) of varying complexity, composed of components that can be any previously created resources.
-
-What does Partlyx do?
-* Allows you to describe entities as a dependency graph
-* Visualizes a multi-level structure
-* Calculates total cost / weight / value across the entire graph
-* Works with abstract resource types</value>
+  <data name="help_Parts_tree" xml:space="preserve">
+    <value>Parts tree</value>
+  </data>
+  <data name="help_Help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="Find_resource" xml:space="preserve">
+    <value>Find resource</value>
+  </data>
+  <data name="Find_recipe" xml:space="preserve">
+    <value>Find recipe</value>
+  </data>
+  <data name="Find_component" xml:space="preserve">
+    <value>Find component</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="Other2" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="icon_Empty" xml:space="preserve">
+    <value>Empty</value>
+  </data>
+  <data name="icon_Inherited" xml:space="preserve">
+    <value>Inherited</value>
+  </data>
+  <data name="Create_resource_with_recipe_by_default" xml:space="preserve">
+    <value>Create resource with recipe by default</value>
+  </data>
+  <data name="Default_recipe_output_amount" xml:space="preserve">
+    <value>Default recipe craft amount</value>
+  </data>
+  <data name="Default_recipe_input_amount" xml:space="preserve">
+    <value>Default component quantity</value>
+  </data>
+  <data name="settings_Parts" xml:space="preserve">
+    <value>Parts</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Open_branch" xml:space="preserve">
+    <value>Open branch</value>
   </data>
   <data name="help_text_Parts_and_tree" xml:space="preserve">
     <value>Most actions are performed in the left panel — the Parts Tree
@@ -495,6 +476,21 @@ You can customize the appearance of resources and their recipes by changing thei
   <data name="help_Parts_graph" xml:space="preserve">
     <value>Parts graph</value>
   </data>
+  <data name="help_text_Parts_graph" xml:space="preserve">
+    <value>The Parts Graph is located in the center of the screen and displays recipes.
+
+* If a resource is selected, its **Default recipe** is shown.
+* If a recipe is selected, that recipe is shown.
+* If a component is selected, its parent recipe is shown.
+
+The graph visualizes all parts from the tree as nodes and displays all required quantities, including component amounts and the amounts of resources produced by recipes.
+
+By default, the graph shows Default recipes for components, but you can change the displayed recipe for a specific component, for example by clicking its node in the graph.
+
+You can move the camera in the graph by holding the left mouse button and dragging. Zoom in and out using the mouse wheel.
+
+By right-clicking a component in the graph, you can select "Open Branch", which will expand the Default or selected recipe of that component in the graph</value>
+  </data>
   <data name="help_Parts_and_tree" xml:space="preserve">
     <value>Parts and tree</value>
   </data>
@@ -509,5 +505,26 @@ You can customize the appearance of resources and their recipes by changing thei
   </data>
   <data name="Duplicate" xml:space="preserve">
     <value>Duplicate</value>
+  </data>
+  <data name="Create_a_recipe" xml:space="preserve">
+    <value>Create a recipe</value>
+  </data>
+  <data name="Create_recipe" xml:space="preserve">
+    <value>Create recipe</value>
+  </data>
+  <data name="Resources" xml:space="preserve">
+    <value>Resources</value>
+  </data>
+  <data name="Recipes" xml:space="preserve">
+    <value>Recipes</value>
+  </data>
+  <data name="Inputs" xml:space="preserve">
+    <value>Inputs</value>
+  </data>
+  <data name="Outputs" xml:space="preserve">
+    <value>Outputs</value>
+  </data>
+  <data name="Component_creating" xml:space="preserve">
+    <value>Component creating</value>
   </data>
 </root>

@@ -48,12 +48,10 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _partsStore = store;
             _imagesStore = imagesStore;
 
-            var focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedPartChangedEvent>(ev =>
+            var focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedElementChangedEvent>(ev =>
                 {
-                    _partsStore.TryGet(ev.FocusedPartUid, out var focused);
-                    _partsStore.TryGet(ev.PreviousSelectedPartUid, out var previous);
-                    var focusedRecipe = focused?.GetRelatedRecipe();
-                    var previousRecipe = previous?.GetRelatedRecipe();
+                    var focusedRecipe = ev.NewFocused?.GetRelatedRecipe();
+                    var previousRecipe = ev.PreviousFocused?.GetRelatedRecipe();
 
                     if (focusedRecipe != previousRecipe)
                         CenterizePanPosition();

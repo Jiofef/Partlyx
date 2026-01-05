@@ -77,10 +77,6 @@ namespace Partlyx.Tests.Utils
             services.AddTransient<IPartsService, PartsService>();
 
             services.AddTransient<IIconInfoProvider, IconInfoProvider>();
-            services.AddTransient<IResourceFigureIconService, ResourceFigureIconService>();
-            services.AddTransient<IResourceImageIconService, ResourceImageIconService>();
-            services.AddTransient<IRecipeFigureIconService, RecipeFigureIconService>();
-            services.AddTransient<IRecipeImageIconService, RecipeImageIconService>();
 
             services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
             services.AddTransient<ICommandFactory, DICommandFactory>();
@@ -136,8 +132,8 @@ namespace Partlyx.Tests.Utils
 
             services.AddTransient<IIsolatedSelectedParts, IsolatedSelectedParts>();
             services.AddSingleton<IGlobalSelectedParts, GlobalSelectedParts>();
-            services.AddTransient<IIsolatedFocusedPart, IsolatedFocusedPart>();
-            services.AddSingleton<IGlobalFocusedPart, GlobalFocusedPart>();
+            services.AddTransient<IIsolatedFocusedElementContainer, IsolatedFocusedPart>();
+            services.AddSingleton<IGlobalFocusedElementContainer, GlobalFocusedPart>();
             services.AddTransient<IIsolatedResourcesVMContainer, ResourcesVMContainer>();
             services.AddSingleton<IGlobalResourcesVMContainer, ResourcesVMContainer>();
             services.AddTransient<IIsolatedRecipesVMContainer, RecipesVMContainer>();
@@ -163,7 +159,6 @@ namespace Partlyx.Tests.Utils
             services.AddTransient<CreateRecipeCommand>();
             services.AddTransient<DeleteRecipeCommand>();
             services.AddTransient<DuplicateRecipeCommand>();
-            services.AddTransient<SetRecipeCraftAmountCommand>();
 
             // Recipe component commands
             services.AddTransient<CreateRecipeComponentCommand>();

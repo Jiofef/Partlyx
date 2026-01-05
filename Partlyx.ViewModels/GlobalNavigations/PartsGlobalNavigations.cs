@@ -1,5 +1,4 @@
-﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
-using Partlyx.ViewModels.PartsViewModels.Interfaces;
+﻿using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +9,11 @@ namespace Partlyx.ViewModels.GlobalNavigations
 {
     public class PartsGlobalNavigations
     {
-        public IGlobalFocusedPart FocusedPart { get; }
+        public IGlobalFocusedElementContainer FocusedElementContainer { get; }
         public IGlobalSelectedParts SelectedParts { get; }
-        public PartsGlobalNavigations(IGlobalFocusedPart focusedPart, IGlobalSelectedParts selectedParts) 
+        public PartsGlobalNavigations(IGlobalFocusedElementContainer focusedPart, IGlobalSelectedParts selectedParts) 
         {
-            FocusedPart = focusedPart;
+            FocusedElementContainer = focusedPart;
             SelectedParts = selectedParts;
         }
     }

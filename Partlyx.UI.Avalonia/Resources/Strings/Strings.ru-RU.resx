@@ -363,9 +363,11 @@
   <data name="About_Us" xml:space="preserve">
     <value>О нас</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="info_text_About_Us" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
+  <data name="info_text_About_Us" xml:space="preserve">
+    <value>Partlyx
+Версия: 1.0.0
+Лицензия: MIT
+Разработал Jiofef (Артём Степанов)</value>
   </data>
   <data name="help_HowToUsePartlyx" xml:space="preserve">
     <value>Как использовать Partlyx</value>
@@ -376,20 +378,44 @@
   <data name="help_Some_QOL_Features" xml:space="preserve">
     <value>Некоторые фичи для удобства</value>
   </data>
+  <data name="help_text_What_is_Partlyx" xml:space="preserve">
+    <value>Partlyx позволяет вам создавать схемы (рецепты) разной сложности, состоящие из компонентов, коими могут быть любые ранее созданные ресурсы.
+
+Что делает Partlyx?
+* Позволяет описывать сущности как граф зависимостей
+* Визуализирует многоуровневую структуру
+* Считает суммарную стоимость/вес/цену по всему графу
+* Работает с абстрактными типами ресурсов</value>
+  </data>
+  <data name="help_text_Some_QOL_Features" xml:space="preserve">
+    <value>Некоторые сложные или долгие действия могут быть упрощены
+
+* Вы можете схватить любой элемент в дереве мышкой и выполнять некоторые действия, если отпустить (бросить) схваченный элемент над другим подходящим элементом интерфейса
+** Вы можете бросить схваченный рецепт над свойством "Стандартный рецепт" у ресурса, и, если рецепт подходящий, он выставится в свойстве
+** Вы можете бросить схваченный рецепт над свойством "Выбранный рецепт" у компонента, и, если рецепт подходящий, он выставится в свойстве
+** Вы можете бросить схваченный ресурс над рецептом, и тогда ресурс добавится в рецепт, как компонент. Это же можно сделать и если бросить схваченный ресурс над узлом рецепта в графе (самый верхний узел)
+** Если вы схватили элемент, наведение на элементы дерева в течении короткого времени раскрывают список их дочерних элементов
+** Если вы схватили элемент, наведение на кнопку фокуса (глазик) элементов автоматически активирует её
+
+* В приложении есть горячие клавиши. Они отображаются, если навестись на соответствующее действие (кнопку или пункт в меню) мышкой и немного подождать.
+** Кроме этого, есть некоторые действия, для которых предусмотрены клавиши, но нет прямых кнопок в интерфейсе. Например, камеру в графе можно перемещать с помощью стрелок "Вверх, вниз, влево, вправо". Зажатый Shift ускоряет передвижение, а Ctrl замедляет.
+
+* Вы можете выделять несколько элементов в дереве, если зажат Ctrl</value>
+  </data>
   <data name="help_Parts_tree" xml:space="preserve">
     <value>Дерево элементов</value>
   </data>
   <data name="help_Help" xml:space="preserve">
     <value>Справка</value>
   </data>
-  <data name="Find_resource_in_tree" xml:space="preserve">
-    <value>Найти ресурс в дереве</value>
+  <data name="Find_resource" xml:space="preserve">
+    <value>Найти ресурс</value>
   </data>
-  <data name="Find_recipe_in_tree" xml:space="preserve">
-    <value>Найти рецепт в дереве</value>
+  <data name="Find_recipe" xml:space="preserve">
+    <value>Найти рецепт</value>
   </data>
-  <data name="Find_component_in_tree" xml:space="preserve">
-    <value>Найти компонент в дереве</value>
+  <data name="Find_component" xml:space="preserve">
+    <value>Найти компонент</value>
   </data>
   <data name="Other" xml:space="preserve">
     <value>Другое</value>
@@ -406,10 +432,10 @@
   <data name="Create_resource_with_recipe_by_default" xml:space="preserve">
     <value>Создавать ресурс с рецептом по умолчанию</value>
   </data>
-  <data name="Default_recipe_craft_amount" xml:space="preserve">
+  <data name="Default_recipe_output_amount" xml:space="preserve">
     <value>Количество ресурса из создаваемого рецепта по умолчанию</value>
   </data>
-  <data name="Default_component_quantity" xml:space="preserve">
+  <data name="Default_recipe_input_amount" xml:space="preserve">
     <value>Количество создаваемого компонента по умолчанию</value>
   </data>
   <data name="settings_Parts" xml:space="preserve">
@@ -420,24 +446,6 @@
   </data>
   <data name="Open_branch" xml:space="preserve">
     <value>Открыть ветку</value>
-  </data>
-  <data name="info_text_About_Us" xml:space="preserve">
-    <value>Partlyx
-Версия: 1.0.0
-Лицензия: MIT
-Разработал Jiofef (Артём Степанов)</value>
-  </data>
-  <data name="help_text_What_is_Partlyx" xml:space="preserve">
-    <value>Partlyx позволяет вам создавать схемы (рецепты) разной сложности, состоящие из компонентов, коими могут быть любые ранее созданные ресурсы.
-
-Что делает Partlyx?
-* Позволяет описывать сущности как граф зависимостей
-* Визуализирует многоуровневую структуру
-* Считает суммарную стоимость/вес/цену по всему графу
-* Работает с абстрактными типами ресурсов</value>
-  </data>
-  <data name="help_Parts_graph" xml:space="preserve">
-    <value>Граф элементов</value>
   </data>
   <data name="help_text_Parts_and_tree" xml:space="preserve">
     <value>Большинство действий производятся в окне слева - дереве элементов.
@@ -462,6 +470,9 @@
 
 Вы можете изменять внешний вид ресурсов и их рецептов, путём изменения их иконки. Это делается в свойствах ресурса или рецепта. Доступны иконки из множества предустановленных, для них можно выбирать цвет. Вы можете загружать свои изображения и использовать их в качестве иконок</value>
   </data>
+  <data name="help_Parts_graph" xml:space="preserve">
+    <value>Граф элементов</value>
+  </data>
   <data name="help_text_Parts_graph" xml:space="preserve">
     <value>Граф находится в центре экрана и отображает рецепты
 * Если выбран ресурс, показывает его стандартный рецепт
@@ -474,21 +485,6 @@
 Вы можете перемещать камеру в графе, зажав ЛКМ и двигая мышью. Отдалять и приближать камеру можно с помощью колёсика мыши
 
 Щёлкнув правой кнопкой мыши по компоненту в графе, вы можете выбрать опцию "Открыть ветку", что раскроет стандартный или выбранный рецепт этого компонента в графе</value>
-  </data>
-  <data name="help_text_Some_QOL_Features" xml:space="preserve">
-    <value>Некоторые сложные или долгие действия могут быть упрощены
-
-* Вы можете схватить любой элемент в дереве мышкой и выполнять некоторые действия, если отпустить (бросить) схваченный элемент над другим подходящим элементом интерфейса
-** Вы можете бросить схваченный рецепт над свойством "Стандартный рецепт" у ресурса, и, если рецепт подходящий, он выставится в свойстве
-** Вы можете бросить схваченный рецепт над свойством "Выбранный рецепт" у компонента, и, если рецепт подходящий, он выставится в свойстве
-** Вы можете бросить схваченный ресурс над рецептом, и тогда ресурс добавится в рецепт, как компонент. Это же можно сделать и если бросить схваченный ресурс над узлом рецепта в графе (самый верхний узел)
-** Если вы схватили элемент, наведение на элементы дерева в течении короткого времени раскрывают список их дочерних элементов
-** Если вы схватили элемент, наведение на кнопку фокуса (глазик) элементов автоматически активирует её
-
-* В приложении есть горячие клавиши. Они отображаются, если навестись на соответствующее действие (кнопку или пункт в меню) мышкой и немного подождать.
-** Кроме этого, есть некоторые действия, для которых предусмотрены клавиши, но нет прямых кнопок в интерфейсе. Например, камеру в графе можно перемещать с помощью стрелок "Вверх, вниз, влево, вправо". Зажатый Shift ускоряет передвижение, а Ctrl замедляет.
-
-* Вы можете выделять несколько элементов в дереве, если зажат Ctrl</value>
   </data>
   <data name="help_Parts_and_tree" xml:space="preserve">
     <value>Элементы и дерево</value>
@@ -504,5 +500,26 @@
   </data>
   <data name="Duplicate" xml:space="preserve">
     <value>Дублировать</value>
+  </data>
+  <data name="Create_a_recipe" xml:space="preserve">
+    <value>Создать рецепт</value>
+  </data>
+  <data name="Create_recipe" xml:space="preserve">
+    <value>Создать рецепт</value>
+  </data>
+  <data name="Resources" xml:space="preserve">
+    <value>Ресурсы</value>
+  </data>
+  <data name="Recipes" xml:space="preserve">
+    <value>Рецепты</value>
+  </data>
+  <data name="Inputs" xml:space="preserve">
+    <value>Входы</value>
+  </data>
+  <data name="Outputs" xml:space="preserve">
+    <value>Выходы</value>
+  </data>
+  <data name="Component_creating" xml:space="preserve">
+    <value>Создание компонентов</value>
   </data>
 </root>

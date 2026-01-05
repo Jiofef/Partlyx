@@ -19,7 +19,7 @@
              x:Class="Partlyx.UI.Avalonia.DialogsXAML.ComponentCreate">
     
     <Grid Background="{StaticResource PxBlue0Brush}" RowDefinitions="Auto,*" Margin="4">
-        <TextBlock Text="{h:Loc Component_Creating}" TextAlignment="Center" Classes="common" Background="{StaticResource PxWhiteBrush}"/>
+        <TextBlock Text="{h:Loc Component_creating}" TextAlignment="Center" Classes="common" Background="{StaticResource PxWhiteBrush}"/>
         <Grid Background="{StaticResource PxBlue0Brush}" Grid.Row="1">
             <Grid Margin="4" RowDefinitions="Auto,*,Auto">
                 <TextBox Classes="common" Watermark="{h:Loc Search___}" Background="{StaticResource PxWhiteBrush}" Grid.Row="0"/>
@@ -27,7 +27,7 @@
                                 Margin="0,0,10,0" Classes="common"
                                 BorderThickness="0" Background="{StaticResource PxBlue0Brush}"
                                 Grid.Row="1"
-                                beh:ListViewSelectionBehavior.BindableSelectedItems="{Binding SelectedParts.Resources}">
+                                SelectedItems="{Binding SelectedPartsCollection}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <VirtualizingStackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>

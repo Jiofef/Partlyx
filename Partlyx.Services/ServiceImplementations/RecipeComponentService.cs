@@ -19,18 +19,20 @@ namespace Partlyx.Services.ServiceImplementations
             _eventBus = bus;
         }
 
-        public async Task<Guid> CreateInputAsync(Guid parentRecipeUid, Guid componentResourceUid, double? quantity = null)
+        public async Task<Guid> CreateInputAsync(Guid parentRecipeUid, Guid componentResourceUid, RecipeComponentCreatingOptions? opt = null)
         {
-            return await CreateComponentAsync(parentRecipeUid, componentResourceUid, quantity, false);
+            return await CreateComponentAsync(parentRecipeUid, componentResourceUid, opt);
         }
 
-        public async Task<Guid> CreateOutputAsync(Guid parentRecipeUid, Guid componentResourceUid, double? quantity = null)
+        public async Task<Guid> CreateOutputAsync(Guid parentRecipeUid, Guid componentResourceUid, RecipeComponentCreatingOptions? opt = null)
         {
-            return await CreateComponentAsync(parentRecipeUid, componentResourceUid, quantity, true);
+            return await CreateComponentAsync(parentRecipeUid, componentResourceUid, opt);
         }
 
-        private async Task<Guid> CreateComponentAsync(Guid parentRecipeUid, Guid componentResourceUid, double? quantity, bool isOutput)
+        private async Task<Guid> CreateComponentAsync(Guid parentRecipeUid, Guid componentResourceUid, RecipeComponentCreatingOptions? opt = null)
         {
+            if (opt == null)
+                opt = new(); // Default options
             var batchOptions = new PartlyxRepository.BatchIncludeOptions() { IncludeComponentChildResource = true };
             var result = await _repo.ExecuteWithBatchAsync(
                 [componentResourceUid], [parentRecipeUid], [], batchOptions,
@@ -39,8 +41,8 @@ namespace Partlyx.Services.ServiceImplementations
                 var recipe = batch.Recipes[parentRecipeUid];
                 var resource = batch.Resources[componentResourceUid];
 
-                double componentQuantity = quantity ?? 1;
-                var component = isOutput ? recipe.CreateOutput(resource, componentQuantity) : recipe.CreateInput(resource, componentQuantity);
+                double componentQuantity = opt.Quantity;
+                var component = opt.IsOutput ? recipe.CreateOutput(resource, componentQuantity) : recipe.CreateInput(resource, componentQuantity);
 
                 return Task.FromResult(component.Uid);
             });
@@ -52,30 +54,7 @@ namespace Partlyx.Services.ServiceImplementations
             return result;
         }
 
-        public async Task<Guid> CreateComponentAsync(Guid grandParentResourceUid, Guid parentRecipeUid, Guid componentResourceUid, double? quantity = null)
-        {
-            var batchOptions = new PartlyxRepository.BatchIncludeOptions() { };
-            var result = await _repo.ExecuteWithBatchAsync(
-                [componentResourceUid], [parentRecipeUid], [], batchOptions,
-                batch =>
-            {
-                var recipe = batch.Recipes[parentRecipeUid];
-                var resource = batch.Resources[componentResourceUid];
-
-                double componentQuantity = quantity ?? 1;
-                var component = recipe.CreateComponent(resource, componentQuantity);
-
-                return Task.FromResult(component.Uid);
-            });
-
-            var component = await GetComponentAsync(result);
-            if (component != null)
-                _eventBus.Publish(new RecipeComponentCreatedEvent(component, component.Uid));
-
-            return result;
-        }
-
-        public async Task<Guid> DuplicateComponentAsync(Guid grandParentResourceUid, Guid componentUid)
+        public async Task<Guid> DuplicateComponentAsync(Guid componentUid)
         {
             var result = await _repo.ExecuteOnComponentAsync(componentUid, component =>
             {
@@ -103,21 +82,6 @@ namespace Partlyx.Services.ServiceImplementations
 
             _eventBus.Publish(new RecipeComponentDeletedEvent(componentParentRecipeGuid, componentUid,
                 new HashSet<object>() { componentParentRecipeGuid, componentUid }));
-        }
-
-        public async Task<Guid> DuplicateComponentAsync(Guid componentUid)
-        {
-            var result = await _repo.ExecuteOnComponentAsync(componentUid, component =>
-            {
-                var duplicate = component.CopyTo(component.ParentRecipe!);
-                return Task.FromResult(duplicate.Uid);
-            });
-
-            var component = await GetComponentAsync(result);
-            if (component != null)
-                _eventBus.Publish(new RecipeComponentCreatedEvent(component, component.ParentRecipeUid));
-
-            return result;
         }
 
         public async Task MoveComponentAsync(Guid parentRecipeUid, Guid newParentRecipeUid, Guid componentUid)
@@ -253,4 +217,6 @@ namespace Partlyx.Services.ServiceImplementations
             }
         }
     }
+
+    public record RecipeComponentCreatingOptions(double Quantity = 1, bool EnableRecipeIconAutoChanging = true, bool IsOutput = false);
 }

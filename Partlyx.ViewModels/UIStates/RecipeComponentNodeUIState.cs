@@ -12,14 +12,16 @@ namespace Partlyx.ViewModels.UIStates
     public partial class RecipeComponentNodeUIState : ObservableObject, IDisposable
     {
         private readonly PartsServiceViewModel _services;
+        private readonly VMComponentsGraphs _graphs;
 
         private readonly RecipeComponentViewModel _componentVM;
 
         private readonly List<IDisposable> _subscriptions = new();
 
-        public RecipeComponentNodeUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm)
+        public RecipeComponentNodeUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm, VMComponentsGraphs graphs)
         {
             _services = svm;
+            _graphs = graphs;
 
             _componentVM = vm;
 
@@ -52,31 +54,35 @@ namespace Partlyx.ViewModels.UIStates
         [RelayCommand]
         public async Task SetNextSelectedRecipe()
         {
-            if (_componentVM.LinkedResource?.Value?.Recipes == null || _componentVM.LinkedResource.Value.Recipes.Count > 0)
+            var resource = _componentVM.Resource;
+
+            if (resource == null)
                 return;
 
-            ResourceViewModel resource = _componentVM.LinkedResource!.Value!;
             var selectedRecipe = _componentVM.LinkedSelectedRecipe?.Value;
 
             if (selectedRecipe == null)
             {
-                var firstRecipe = resource.Recipes.First();
-                var args = new PartSetValueInfo<RecipeComponentViewModel, RecipeViewModel?>(_componentVM, firstRecipe);
-                await _services.ComponentService.SetSelectedRecipe(args);
+                var firstRecipe = resource.ProducingRecipes.FirstOrDefault();
+                
+                if (firstRecipe == null)
+                    return;
+
+                await _services.ComponentService.SetSelectedRecipe(_componentVM, firstRecipe, true);
             }
             else 
             {
-                var selectedRecipeIndex = resource.Recipes.IndexOf(selectedRecipe);
-                if (selectedRecipeIndex + 1 == resource.Recipes.Count)
+                var selectedRecipeIndex = resource.ProducingRecipes.IndexOf(selectedRecipe);
+                if (selectedRecipeIndex + 1 == resource.ProducingRecipes.Count)
                 {
                     var args = new PartSetValueInfo<RecipeComponentViewModel, RecipeViewModel?>(_componentVM, null);
-                    await _services.ComponentService.SetSelectedRecipe(args);
+                    await _services.ComponentService.SetSelectedRecipe(_componentVM, null, true);
                 }
                 else
                 {
-                    var nextRecipe = resource.Recipes[selectedRecipeIndex + 1];
+                    var nextRecipe = resource.ProducingRecipes[selectedRecipeIndex + 1];
                     var args = new PartSetValueInfo<RecipeComponentViewModel, RecipeViewModel?>(_componentVM, nextRecipe);
-                    await _services.ComponentService.SetSelectedRecipe(args);
+                    await _services.ComponentService.SetSelectedRecipe(_componentVM, nextRecipe, true);
                 }
             }
         }

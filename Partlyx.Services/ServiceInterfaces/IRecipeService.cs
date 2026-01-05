@@ -1,10 +1,11 @@
 ﻿using Partlyx.Services.Dtos;
+using Partlyx.Services.ServiceImplementations;
 
 namespace Partlyx.Services.ServiceInterfaces
 {
     public interface IRecipeService
     {
-        Task<Guid> CreateRecipeAsync(string? recipeName = null, Guid? inheritedIconResourceUid = null);
+        Task<Guid> CreateRecipeAsync(RecipeCreatingOptions? opt = null);
         Task DeleteRecipeAsync(Guid recipeUid);
         Task<Guid> DuplicateRecipeAsync(Guid recipeUid);
         Task<List<RecipeDto>> GetAllTheRecipesAsync();

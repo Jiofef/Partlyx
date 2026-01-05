@@ -2,6 +2,7 @@
 using Partlyx.Core.Contracts;
 using Partlyx.Core.Help;
 using Partlyx.Core.OtherSaves;
+using Partlyx.Core.Technical;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
@@ -87,7 +88,6 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _jsonSavesService = jss;
         }
 
-        private const bool DISABLE_DB_DELETE_ON_EXIT = true; // During development, it is inconvenient to reopen the file every time you restart. However, don't forget to disable this when releasing the application.
         
         public async Task OnInitializeFinished()
         {
@@ -113,7 +113,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             if (isExitConfirmed)
             {
-                if (!DISABLE_DB_DELETE_ON_EXIT)
+                if (!DevStaticConfig.DISABLE_DB_DELETE_ON_EXIT)
                     await _fileService.DeleteWorkingDBAsync();
             }
 

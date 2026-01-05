@@ -16,6 +16,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IVMPartsStore _store;
 
         private readonly IDisposable _resourcesBulkLoadedSubscription;
+        private readonly IDisposable _recipesBulkLoadedSubscription;
 
         private readonly IDisposable _partsInitializationStartedSubscription;
 
@@ -34,6 +35,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _store = vmps;
 
             _resourcesBulkLoadedSubscription = bus.Subscribe<ResourcesBulkLoadedEvent>(OnResourceBulkLoaded, true);
+            _recipesBulkLoadedSubscription = bus.Subscribe<RecipesBulkLoadedEvent>(OnRecipeBulkLoaded, true);
 
             _partsInitializationStartedSubscription = bus.Subscribe<PartsInitializationStartedEvent>(OnInitializationStarted, true);
         }
@@ -45,16 +47,25 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         }
 
         private void OnResourceBulkLoaded(ResourcesBulkLoadedEvent ev)
-        {
-            // Resources and recipes VMs are creating their children by themselves from dto in constructor
-            foreach (var dto in ev.Bulk)
+        {            foreach (var dto in ev.Bulk)
                 _factory.GetOrCreateResourceVM(dto);
 
             IsResourcesLoaded = true;
+
+            if (_isEverythingLoaded)
+                OnLoadFinished();
+        }
+
+        private void OnRecipeBulkLoaded(RecipesBulkLoadedEvent ev)
+        {
+            // Recipes VMs are creating their children by themselves from dto in constructor
+            foreach (var dto in ev.Bulk)
+                _factory.GetOrCreateRecipeVM(dto);
+
             IsRecipesLoaded = true;
             IsRecipeComponentsLoaded = true;
 
-            if (_isEverythingLoaded || true)
+            if (_isEverythingLoaded)
                 OnLoadFinished();
         }
 
@@ -67,6 +78,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public void Dispose()
         {
             _resourcesBulkLoadedSubscription.Dispose();
+            _recipesBulkLoadedSubscription.Dispose();
 
             _partsInitializationStartedSubscription.Dispose();
         }

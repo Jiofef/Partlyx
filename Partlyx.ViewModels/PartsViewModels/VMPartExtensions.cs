@@ -23,5 +23,16 @@ namespace Partlyx.ViewModels.PartsViewModels
             else
                 return null;
         }
+
+        public static RecipeViewModel? GetRelatedRecipe(this IFocusable focusable)
+        {
+            if (focusable == null) return null;
+
+            if (focusable is IVMPart part)
+                return GetRelatedRecipe(part);
+            else
+                // For other focusable types like paths, implement later
+                return null;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Partlyx.Infrastructure.Events;
+﻿using Partlyx.Core.Partlyx;
+using Partlyx.Infrastructure.Events;
 using Partlyx.Services.Commands;
 using Partlyx.Services.Dtos;
 using Partlyx.Services.PartsEventClasses;
@@ -66,6 +67,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
 
             _quantity = dto.Quantity;
+            _isOutput = dto.IsOutput;
             if (dto.SelectedRecipeUid is Guid selectedUid)
                 LinkedSelectedRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(selectedUid);
         }
@@ -77,16 +79,24 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         private GuidLinkedPart<RecipeViewModel>? _parentRecipe;
         public GuidLinkedPart<RecipeViewModel>? LinkedParentRecipe { get => _parentRecipe; set => SetProperty(ref _parentRecipe, value); }
+        public RecipeViewModel ParentRecipe => LinkedParentRecipe?.Value!;
 
         private GuidLinkedPart<ResourceViewModel>? _resource;
         public GuidLinkedPart<ResourceViewModel>? LinkedResource { get => _resource; private set => SetProperty(ref _resource, value); }
-        public ResourceViewModel Resource => LinkedResource!.Value!;
+        public ResourceViewModel? Resource => LinkedResource?.Value;
 
         private double _quantity;
         public double Quantity { get => _quantity; set => SetProperty(ref _quantity, value); }
 
         private bool _isOutput;
-        public bool IsOutput { get => _isOutput; set => SetProperty(ref _isOutput, value); }
+        public bool IsOutput { get => _isOutput;
+            set
+            {
+                if (SetProperty(ref _isOutput, value))
+                    OnPropertyChanged(nameof(ComponentType));
+            }
+        }
+        public RecipeComponentType ComponentType => IsOutput ? RecipeComponentType.Output : RecipeComponentType.Input;
 
         private GuidLinkedPart<RecipeViewModel>? _selectedRecipe;
         public GuidLinkedPart<RecipeViewModel>? LinkedSelectedRecipe { get => _selectedRecipe; private set => SetProperty(ref _selectedRecipe, value); }
@@ -153,7 +163,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         // For UI
         public RecipeComponentItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
-        PartItemUIState IVMPart.UiItem => UiItem;
+        FocusableItemUIState IFocusable.UiItem => UiItem;
         public RecipeComponentNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
         public PartsGlobalNavigations GlobalNavigations { get; }
         private void UpdateSelectedComponents()

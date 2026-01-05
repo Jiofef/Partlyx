@@ -23,9 +23,6 @@ namespace Partlyx.Infrastructure.Migrations
                         .HasColumnType("BLOB")
                         .HasColumnName("Uid");
 
-                    b.Property<double>("CraftAmount")
-                        .HasColumnType("REAL");
-
                     b.Property<string>("IconData")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -33,16 +30,16 @@ namespace Partlyx.Infrastructure.Migrations
                     b.Property<int>("IconType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsReversible")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("ResourceUid")
-                        .HasColumnType("BLOB");
-
                     b.HasKey("Uid");
-
-                    b.HasIndex("ResourceUid");
 
                     b.ToTable("Recipes", (string)null);
                 });
@@ -58,6 +55,11 @@ namespace Partlyx.Infrastructure.Migrations
 
                     b.Property<Guid?>("ComponentSelectedRecipeUid")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsOutput")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
 
                     b.Property<double>("Quantity")
                         .HasColumnType("REAL");
@@ -133,16 +135,6 @@ namespace Partlyx.Infrastructure.Migrations
                     b.ToTable("Images", (string)null);
                 });
 
-            modelBuilder.Entity("Partlyx.Core.Partlyx.Recipe", b =>
-                {
-                    b.HasOne("Partlyx.Core.Partlyx.Resource", "ParentResource")
-                        .WithMany("Recipes")
-                        .HasForeignKey("ResourceUid")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("ParentResource");
-                });
-
             modelBuilder.Entity("Partlyx.Core.Partlyx.RecipeComponent", b =>
                 {
                     b.HasOne("Partlyx.Core.Partlyx.Resource", "ComponentResource")
@@ -164,11 +156,6 @@ namespace Partlyx.Infrastructure.Migrations
             modelBuilder.Entity("Partlyx.Core.Partlyx.Recipe", b =>
                 {
                     b.Navigation("Components");
-                });
-
-            modelBuilder.Entity("Partlyx.Core.Partlyx.Resource", b =>
-                {
-                    b.Navigation("Recipes");
                 });
 #pragma warning restore 612, 618
         }

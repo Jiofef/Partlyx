@@ -41,10 +41,8 @@ namespace Partlyx.ViewModels
         private string _columnText = "";
         public string ColumnText { get => _columnText; private set => SetProperty(ref _columnText, value); }
 
-        private string _secondaryColumnTextPart1 = "";
-        public string SecondaryColumnTextPart1 { get => _secondaryColumnTextPart1; private set => SetProperty(ref _secondaryColumnTextPart1, value); }
-        private string _secondaryColumnTextPart2 = "";
-        public string SecondaryColumnTextPart2 { get => _secondaryColumnTextPart2; private set => SetProperty(ref _secondaryColumnTextPart2, value); }
+        private string _secondaryColumnText = "";
+        public string SecondaryColumnText { get => _secondaryColumnText; private set => SetProperty(ref _secondaryColumnText, value); }
 
         private void UpdateColumnText()
         {
@@ -64,13 +62,11 @@ namespace Partlyx.ViewModels
 
             if (name == null)
             {
-                SecondaryColumnTextPart1 = "Null";
-                SecondaryColumnTextPart2 = "";
+                SecondaryColumnText = "Null";
             }
             else
             {
-                SecondaryColumnTextPart1 = name;
-                SecondaryColumnTextPart2 = $" x{_recipeVM.CraftAmount}";
+                SecondaryColumnText = name;
             }
         }
 

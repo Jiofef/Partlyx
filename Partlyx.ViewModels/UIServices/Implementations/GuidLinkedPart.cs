@@ -25,13 +25,8 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             get => _value; 
             set 
             { 
-                bool isValueChanging = !EqualityComparer<TPart>.Default.Equals(_value, value);
-
-                if (isValueChanging)
-                {
-                    SetProperty(ref _value, value);
+                if (SetProperty(ref _value, value))
                     ValueChanged?.Invoke();
-                }
             } 
         }
 

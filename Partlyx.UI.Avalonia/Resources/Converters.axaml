@@ -7,4 +7,5 @@
     <conv:SystemColorToAvaloniaMediaColorConverter x:Key="SysColorToAvaloniaColorConv"/>
     <conv:ByteArrayToBitmapConverter x:Key="ByteArrayToBitmapConv"/>
     <conv:StringToMaterialIconKindConverter x:Key="StringToMaterialIconKindConv"/>
+    <conv:ObjectToEnumerableConverter x:Key="ObjectToEnumerableConv"/>
 </ResourceDictionary>

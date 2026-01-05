@@ -169,6 +169,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Component creating.
+        /// </summary>
+        public static string Component_creating {
+            get {
+                return ResourceManager.GetString("Component_creating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Component {0}.
         /// </summary>
         public static string Component_N {
@@ -196,6 +205,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Create a recipe.
+        /// </summary>
+        public static string Create_a_recipe {
+            get {
+                return ResourceManager.GetString("Create_a_recipe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Create a recipe for this resource.
         /// </summary>
         public static string Create_a_recipe_for_this_resource {
@@ -210,6 +228,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Create_quantified_copy {
             get {
                 return ResourceManager.GetString("Create_quantified_copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Create recipe.
+        /// </summary>
+        public static string Create_recipe {
+            get {
+                return ResourceManager.GetString("Create_recipe", resourceCulture);
             }
         }
         
@@ -232,15 +259,6 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Default component quantity.
-        /// </summary>
-        public static string Default_component_quantity {
-            get {
-                return ResourceManager.GetString("Default_component_quantity", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Default recipe.
         /// </summary>
         public static string Default_recipe {
@@ -250,11 +268,20 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Default component quantity.
+        /// </summary>
+        public static string Default_recipe_input_amount {
+            get {
+                return ResourceManager.GetString("Default_recipe_input_amount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Default recipe craft amount.
         /// </summary>
-        public static string Default_recipe_craft_amount {
+        public static string Default_recipe_output_amount {
             get {
-                return ResourceManager.GetString("Default_recipe_craft_amount", resourceCulture);
+                return ResourceManager.GetString("Default_recipe_output_amount", resourceCulture);
             }
         }
         
@@ -367,11 +394,11 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Find component in tree.
+        ///   Ищет локализованную строку, похожую на Find component.
         /// </summary>
-        public static string Find_component_in_tree {
+        public static string Find_component {
             get {
-                return ResourceManager.GetString("Find_component_in_tree", resourceCulture);
+                return ResourceManager.GetString("Find_component", resourceCulture);
             }
         }
         
@@ -385,20 +412,20 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Find recipe in tree.
+        ///   Ищет локализованную строку, похожую на Find recipe.
         /// </summary>
-        public static string Find_recipe_in_tree {
+        public static string Find_recipe {
             get {
-                return ResourceManager.GetString("Find_recipe_in_tree", resourceCulture);
+                return ResourceManager.GetString("Find_recipe", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Find resource in tree.
+        ///   Ищет локализованную строку, похожую на Find resource.
         /// </summary>
-        public static string Find_resource_in_tree {
+        public static string Find_resource {
             get {
-                return ResourceManager.GetString("Find_resource_in_tree", resourceCulture);
+                return ResourceManager.GetString("Find_resource", resourceCulture);
             }
         }
         
@@ -574,6 +601,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Inputs.
+        /// </summary>
+        public static string Inputs {
+            get {
+                return ResourceManager.GetString("Inputs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Invalid file error.
         /// </summary>
         public static string Invalid_file_error {
@@ -700,6 +736,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Outputs.
+        /// </summary>
+        public static string Outputs {
+            get {
+                return ResourceManager.GetString("Outputs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Open Project (.partree).
         /// </summary>
         public static string partree_Open_Project {
@@ -817,6 +862,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Recipes.
+        /// </summary>
+        public static string Recipes {
+            get {
+                return ResourceManager.GetString("Recipes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Redo.
         /// </summary>
         public static string Redo {
@@ -858,6 +912,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string resource_properties_annotation {
             get {
                 return ResourceManager.GetString("resource_properties_annotation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Resources.
+        /// </summary>
+        public static string Resources {
+            get {
+                return ResourceManager.GetString("Resources", resourceCulture);
             }
         }
         

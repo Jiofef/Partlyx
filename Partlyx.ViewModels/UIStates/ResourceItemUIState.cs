@@ -20,7 +20,10 @@ namespace Partlyx.ViewModels
         public ResourceViewModel AttachedResource { get; }
         public override IVMPart AttachedPart { get => AttachedResource; }
 
-        public ResourceItemUIState(ResourceViewModel vm, PartsServiceViewModel svm, IEventBus bus, IGlobalFocusedPart gfc)
+        public override IFocusedElementContainer GlobalFocusedContainer => AttachedResource.GlobalNavigations.FocusedElementContainer;
+        public override IFocusable AttachedFocusable => AttachedResource;
+
+        public ResourceItemUIState(ResourceViewModel vm, PartsServiceViewModel svm, IEventBus bus, IGlobalFocusedElementContainer gfc)
         {
             _bus = bus;
             _services = svm;
@@ -45,8 +48,7 @@ namespace Partlyx.ViewModels
         {
             if (!IsRenaming) return;
 
-            var args = new PartSetValueInfo<ResourceViewModel, string>(AttachedResource, UnConfirmedName);
-            await _services.ResourceService.RenameResource(args);
+            await _services.ResourceService.RenameResource(AttachedResource, UnConfirmedName);
 
             IsRenaming = false;
         }
@@ -66,18 +68,12 @@ namespace Partlyx.ViewModels
         public void ExpandBranch()
         {
             IsExpanded = true;
-
-            foreach (var child in AttachedResource.Recipes)
-                child.UiItem.ExpandBranch();
         }
 
         [RelayCommand]
         public void CollapseBranch()
         {
             IsExpanded = false;
-
-            foreach (var child in AttachedResource.Recipes)
-                child.UiItem.CollapseBranch();
         }
 
         [RelayCommand]

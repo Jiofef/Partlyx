@@ -17,11 +17,11 @@ namespace Partlyx.UI.Avalonia.Behaviors
             set => SetValue(SelectedPartsContainerProperty!, value);
         }
 
-        public static readonly StyledProperty<IFocusedPart?> FocusedPartContainerProperty =
-            AvaloniaProperty.Register<TreeViewPartSingleSelectionBehavior, IFocusedPart?>(
+        public static readonly StyledProperty<IFocusedElementContainer?> FocusedPartContainerProperty =
+            AvaloniaProperty.Register<TreeViewPartSingleSelectionBehavior, IFocusedElementContainer?>(
                 nameof(FocusedPartContainer));
 
-        public IFocusedPart? FocusedPartContainer
+        public IFocusedElementContainer? FocusedPartContainer
         {
             get => GetValue(FocusedPartContainerProperty);
             set => SetValue(FocusedPartContainerProperty!, value);
@@ -128,7 +128,7 @@ namespace Partlyx.UI.Avalonia.Behaviors
             if (FocusSelectedPart)
             {
                 var focusedPart = FocusedPartContainer;
-                focusedPart?.FocusPart(part);
+                focusedPart?.Focus(part);
             }
         }
     }

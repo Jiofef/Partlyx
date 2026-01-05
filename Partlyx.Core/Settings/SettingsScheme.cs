@@ -24,9 +24,9 @@ namespace Partlyx.Core.Settings
                         new SchematicOption(Key: SettingKeys.Language, Name: "Language", DefaultValueJson: Serialize(CultureInfo.CurrentCulture.Name), TypeName: TypeNames.Language),
                         ]),
                     new SchematicOptionsGroup("settings_Parts").WithOptions([
-                        new SchematicOption(Key: SettingKeys.CreateResourceWithRecipeByDefault, Name: "Create_resource_with_recipe_by_default", DefaultValueJson: Serialize(true), TypeName: TypeNames.Bool),
-                        new SchematicOption(Key: SettingKeys.DefaultRecipeCraftAmount, Name: "Default_recipe_craft_amount", DefaultValueJson: Serialize(1.0), TypeName: TypeNames.Double),
-                        new SchematicOption(Key: SettingKeys.DefaultComponentQuantity, Name: "Default_component_quantity", DefaultValueJson: Serialize(1.0), TypeName: TypeNames.Double),
+                        new SchematicOption(Key: SettingKeys.CreateResourceWithRecipeByDefault, Name: "Create_resource_with_recipe_by_default", DefaultValueJson: Serialize(false), TypeName: TypeNames.Bool),
+                        new SchematicOption(Key: SettingKeys.DefaultRecipeOutputAmount, Name: "Default_recipe_craft_amount", DefaultValueJson: Serialize(1.0), TypeName: TypeNames.Double),
+                        new SchematicOption(Key: SettingKeys.DefaultRecipeInputAmount, Name: "Default_component_quantity", DefaultValueJson: Serialize(1.0), TypeName: TypeNames.Double),
                         ]),
                 ]);
 

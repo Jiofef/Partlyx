@@ -111,12 +111,12 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
         }
     }
 
-    public class SetDefaultRecipeToResourceCommand : SetValueUndoableCommand<Guid>
+    public class SetDefaultRecipeToResourceCommand : SetValueUndoableCommand<Guid?>
     {
-        private SetDefaultRecipeToResourceCommand(Guid recipeUid, Guid previousRecipeUid, Func<Guid, Task> setter)
+        private SetDefaultRecipeToResourceCommand(Guid? recipeUid, Guid? previousRecipeUid, Func<Guid?, Task> setter)
             : base(recipeUid, previousRecipeUid, setter) { }
 
-        public static async Task<SetDefaultRecipeToResourceCommand?> CreateAsync(IServiceProvider serviceProvider, Guid resourceUid, Guid recipeUid)
+        public static async Task<SetDefaultRecipeToResourceCommand?> CreateAsync(IServiceProvider serviceProvider, Guid resourceUid, Guid? recipeUid)
         {
             var resourceService = serviceProvider.GetRequiredService<IResourceService>();
 
@@ -124,10 +124,7 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
             if (res == null)
                 throw new ArgumentNullException("Resource doesn't exist with Uid: " + resourceUid);
 
-            if (res.DefaultRecipeUid == null)
-                throw new Exception($"Trying to set a null default recipe Uid. Resource's uid: {res.Uid}");
-
-            var previousRecipeUid = (Guid)res.DefaultRecipeUid;
+            var previousRecipeUid = res.DefaultRecipeUid;
 
             return new SetDefaultRecipeToResourceCommand(recipeUid, previousRecipeUid, async (uid) =>
             {

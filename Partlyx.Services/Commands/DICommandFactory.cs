@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Partlyx.Services.Commands
@@ -11,7 +10,9 @@ namespace Partlyx.Services.Commands
     public class DICommandFactory : ICommandFactory
     {
         private readonly IServiceProvider _serviceProvider;
-        public DICommandFactory(IServiceProvider serviceProvider) => _serviceProvider = serviceProvider;
+
+        public DICommandFactory(IServiceProvider serviceProvider)
+            => _serviceProvider = serviceProvider;
 
         T ICommandFactory.Create<T>(params object[] args)
         {
@@ -20,84 +21,102 @@ namespace Partlyx.Services.Commands
 
         async Task<T> ICommandFactory.CreateAsync<T>(params object[] args)
         {
-            var t = typeof(T);
+            var creator = CreateAsyncCache<T>.Creator;
 
-            // Trying to find static CreateAsync
-            var staticCreate = t.GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .FirstOrDefault(m => string.Equals(m.Name, "CreateAsync", StringComparison.OrdinalIgnoreCase)
-                                     && (typeof(Task).IsAssignableFrom(m.ReturnType) || typeof(ValueTask).IsAssignableFrom(m.ReturnType)));
+            if (creator != null)
+                return await creator(_serviceProvider, args).ConfigureAwait(false);
 
-            if (staticCreate != null)
-            {
-                // 1) Preparing args
-                var parameters = staticCreate.GetParameters();
-                object[] callArgs;
-                if (parameters.Length > 0 && parameters[0].ParameterType == typeof(IServiceProvider))
-                {
-                    callArgs = new object[parameters.Length];
-                    callArgs[0] = _serviceProvider;
-                    // Filling the remaining arguments with arguments from args
-                    for (int i = 1; i < parameters.Length; i++)
-                    {
-                        if (i - 1 < args.Length) callArgs[i] = args[i - 1];
-                        else callArgs[i] = GetDefault(parameters[i].ParameterType);
-                    }
-                }
-                else
-                {
-                    // Same as above, but without adding _serviceProvider
-                    callArgs = new object[parameters.Length];
-                    for (int i = 0; i < parameters.Length; i++)
-                    {
-                        if (i < args.Length) callArgs[i] = args[i];
-                        else callArgs[i] = GetDefault(parameters[i].ParameterType);
-                    }
-                }
-
-                var result = staticCreate.Invoke(null, callArgs);
-                return await AwaitTaskResultAs<T>(result);
-            }
-
-            // 2) If command doesn't have CreateAsync method, we create an instance synchronously with ActivatirUtilities
+            // fallback: sync create
             var instance = ((ICommandFactory)this).Create<T>(args);
 
-            // 3) Calling InitializeAsync, if command supports async init
             if (instance is IAsyncInitializable asyncInit)
-            {
-                await asyncInit.InitializeAsync(args);
-            }
+                await asyncInit.InitializeAsync(args).ConfigureAwait(false);
 
             return instance;
         }
 
-        private static async Task<T> AwaitTaskResultAs<T>(object? taskObj) where T : class
+        // ================= CACHE =================
+
+        private static class CreateAsyncCache<T> where T : class
         {
-            if (taskObj == null) return null!;
+            public static readonly Func<IServiceProvider, object[], Task<T>>? Creator
+                = BuildCreator();
 
-            // Task<T>
-            var taskType = taskObj.GetType();
-            if (typeof(Task).IsAssignableFrom(taskType))
+            private static Func<IServiceProvider, object[], Task<T>>? BuildCreator()
             {
-                var awaiter = (Task)taskObj;
-                await awaiter.ConfigureAwait(false);
+                var type = typeof(T);
 
-                // Return result, if it is Task<TResult>
-                if (taskType.IsGenericType)
+                var method = type.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .FirstOrDefault(m =>
+                        m.Name == "CreateAsync" &&
+                        (typeof(Task<T>).IsAssignableFrom(m.ReturnType) ||
+                         (m.ReturnType.IsGenericType &&
+                          m.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>)))
+                    );
+
+                if (method == null)
+                    return null;
+
+                return async (sp, args) =>
                 {
-                    var resultProp = taskType.GetProperty("Result", BindingFlags.Public | BindingFlags.Instance);
-                    if (resultProp != null)
-                    {
-                        return (T)resultProp.GetValue(taskObj)!;
-                    }
-                }
-
-                return null!;
+                    var callArgs = BuildArguments(method, sp, args);
+                    var result = method.Invoke(null, callArgs);
+                    return await AwaitAs<T>(result).ConfigureAwait(false);
+                };
             }
-
-            // Throw an exception if it is ValueTask<T>
-            throw new InvalidOperationException("CreateAsync returned non-Task object");
         }
 
-        private static object? GetDefault(Type t) => t.IsValueType ? Activator.CreateInstance(t) : null;
+        // ================= HELPERS =================
+
+        private static object?[] BuildArguments(MethodInfo method, IServiceProvider sp, object[] args)
+        {
+            var parameters = method.GetParameters();
+            var callArgs = new object?[parameters.Length];
+
+            int offset = 0;
+
+            if (parameters.Length > 0 && parameters[0].ParameterType == typeof(IServiceProvider))
+            {
+                callArgs[0] = sp;
+                offset = 1;
+            }
+
+            for (int i = offset; i < parameters.Length; i++)
+            {
+                int src = i - offset;
+                callArgs[i] = src < args.Length
+                    ? args[src]
+                    : GetDefault(parameters[i].ParameterType);
+            }
+
+            return callArgs;
+        }
+
+        private static async Task<T> AwaitAs<T>(object? obj) where T : class
+        {
+            if (obj == null)
+                throw new InvalidOperationException("CreateAsync returned null");
+
+            if (obj is Task<T> taskT)
+                return await taskT.ConfigureAwait(false);
+
+            if (obj is Task task)
+            {
+                await task.ConfigureAwait(false);
+                throw new InvalidOperationException("CreateAsync returned Task without result");
+            }
+
+            var type = obj.GetType();
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTask<>))
+            {
+                var asTask = type.GetMethod("AsTask")!;
+                return await (Task<T>)asTask.Invoke(obj, null)!;
+            }
+
+            throw new InvalidOperationException("Unsupported CreateAsync return type");
+        }
+
+        private static object? GetDefault(Type t)
+            => t.IsValueType ? Activator.CreateInstance(t) : null;
     }
 }

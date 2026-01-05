@@ -8,11 +8,11 @@ namespace Partlyx.ViewModels.UIServices.Implementations
 {
     public partial class PartsServiceViewModel
     {
-        private readonly IGlobalFocusedPart _focusedPart;
+        private readonly IGlobalFocusedElementContainer _focusedPart;
         private readonly IGlobalSelectedParts _selectedparts;
         private readonly IVMPartsStore _store;
         public PartsServiceViewModel(ResourceServiceViewModel resService, RecipeServiceViewModel recService, RecipeComponentServiceViewModel comService,
-            IGlobalFocusedPart focusedPart, IGlobalSelectedParts selectedParts, IVMPartsStore store) 
+            IGlobalFocusedElementContainer focusedPart, IGlobalSelectedParts selectedParts, IVMPartsStore store) 
         {
             ResourceService = resService;
             RecipeService = recService;
@@ -30,7 +30,7 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public void TryRenamingFocused()
         {
-            var focused = _focusedPart.FocusedPart;
+            var focused = _focusedPart.Focused;
             if (focused == null) return;
 
             if (focused is ResourceViewModel resource)
@@ -98,11 +98,6 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         [RelayCommand]
         public async Task RemoveChildrenFrom(IVMPart part)
         {
-            if (part is ResourceViewModel resource)
-            {
-                foreach (var recipe in resource.Recipes)
-                    await RecipeService.RemoveAsync(recipe);
-            }
             if (part is RecipeViewModel recipe1)
             {
                 foreach (var component in recipe1.Inputs)

@@ -17,22 +17,23 @@ namespace Partlyx.Services.Commands.RecipeCommonCommands
 
 
         public Guid RecipeUid { get; private set; }
+        public RecipeCreatingOptions? CreatingOptions { get; }
 
         private Recipe? _createdRecipe;
-        private string? _recipeName;
 
 
-        public CreateRecipeCommand(IRecipeService rs, IEventBus bus, IPartlyxRepository repo, string? recipeName = null)
+        public CreateRecipeCommand(IRecipeService rs, IEventBus bus, IPartlyxRepository repo, RecipeCreatingOptions? opt = null)
         {
             _recipeService = rs;
             _partsCreator = new PartsCreatorService(repo, bus);
+            _repo = repo;
 
-            _recipeName = recipeName;
+            CreatingOptions = opt;
         }
 
         public async Task ExecuteAsync()
         {
-            RecipeUid = await _recipeService.CreateRecipeAsync(_recipeName);
+            RecipeUid = await _recipeService.CreateRecipeAsync(CreatingOptions);
             // Get the created entity for potential redo
             _createdRecipe = await _repo.GetRecipeByUidAsync(RecipeUid);
         }

@@ -27,14 +27,14 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         private readonly IDisposable _focusedPartChangedSubscription;
 
-        public IGlobalFocusedPart FocusedPart { get; }
+        public IGlobalFocusedElementContainer FocusedContainer { get; }
         public ObservableCollection<ItemPropertyViewModel> Properties { get; } = new();
 
         private string _focusedPartTextAnnotation = "";
         public string FocusedPartTextAnnotation { get => _focusedPartTextAnnotation; set => SetProperty(ref _focusedPartTextAnnotation, value); }
 
 
-        public ItemPropertiesViewModel(PartsServiceViewModel services, IDialogService ds, IGlobalFocusedPart focusedPart, 
+        public ItemPropertiesViewModel(PartsServiceViewModel services, IDialogService ds, IGlobalFocusedElementContainer focusedPart, 
             IEventBus bus, ILocalizationService loc, IServiceProvider serviceProvider, IVMPartsStore store)
         {
             _services = services;
@@ -42,9 +42,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _loc = loc;
             _partsStore = store;
 
-            _focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedPartChangedEvent>(ev => OnFocusedPartChanged());
+            _focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedElementChangedEvent>(ev => OnFocusedPartChanged());
 
-            FocusedPart = focusedPart;
+            FocusedContainer = focusedPart;
             _serviceProvider = serviceProvider;
         }
 
@@ -54,8 +54,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             FocusedPartTextAnnotation = "";
 
-            var focusedPart = FocusedPart.FocusedPart;
-            if (focusedPart == null) return;
+            var focused = FocusedContainer.Focused;
+            if (focused is not IVMPart focusedPart) return;
 
             switch (focusedPart.PartType)
             {
@@ -152,8 +152,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     if (result is not ISelectedParts selected) return;
                     var recipe = selected.GetSingleRecipeOrNull()!;
 
-                    var args = new PartSetValueInfo<ResourceViewModel, RecipeViewModel>(resource, recipe);
-                    await _services.ResourceService.SetDefaultRecipe(args);
+                    await _services.ResourceService.SetDefaultRecipe(resource, recipe);
                 });
             defaultRecipeProperty.SaveChangesTask = new(
                 async (arg) =>
@@ -175,8 +174,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 async (arg) =>
                 {
                     if (arg is not string name) return;
-                    var args = new PartSetValueInfo<RecipeViewModel, string>(recipe, name);
-                    await _services.RecipeService.RenameRecipe(args);
+                    await _services.RecipeService.RenameRecipe(recipe, name);
                 });
             nameProperty.CancelChangesTask = new(
                 (args) => { nameProperty.Text = recipe.Name; return Task.CompletedTask; });

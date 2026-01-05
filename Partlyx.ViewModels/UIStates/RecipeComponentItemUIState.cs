@@ -20,7 +20,10 @@ namespace Partlyx.ViewModels.UIStates
         public RecipeComponentViewModel AttachedComponent { get; }
         public override IVMPart AttachedPart { get => AttachedComponent; }
 
-        public RecipeComponentItemUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm, IEventBus bus, IGlobalFocusedPart gfc)
+        public override IFocusedElementContainer GlobalFocusedContainer => AttachedComponent.GlobalNavigations.FocusedElementContainer;
+        public override IFocusable AttachedFocusable => AttachedComponent;
+
+        public RecipeComponentItemUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm, IEventBus bus, IGlobalFocusedElementContainer gfc)
         {
             _bus = bus;
             _services = svm;
@@ -53,8 +56,7 @@ namespace Partlyx.ViewModels.UIStates
         [RelayCommand]
         public async Task SetQuantityAsync(double value)
         {
-            var args = new PartSetValueInfo<RecipeComponentViewModel, double>(AttachedComponent, value);
-            await _services.ComponentService.SetQuantityAsync(args);
+            await _services.ComponentService.SetQuantityAsync(AttachedComponent, value);
         }
     }
 }

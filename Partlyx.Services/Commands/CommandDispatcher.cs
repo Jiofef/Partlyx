@@ -35,25 +35,25 @@ namespace Partlyx.Services.Commands
                 if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
 
                 maxHistoryLength = value;
-                if (_commandsHistory.Count > maxHistoryLength)
+                if (_undoableCommandsHistory.Count > maxHistoryLength)
                     TrimHistoryToMax();
             }
         }
 
-        private readonly LinkedList<IUndoableCommand> _commandsHistory = new();
+        private readonly LinkedList<IUndoableCommand> _undoableCommandsHistory = new();
         private readonly LinkedList<IUndoableCommand> _canceledCommandsHistory = new();
 
         private void TrimHistoryToMax()
         {
             if (maxHistoryLength == 0)
             {
-                _commandsHistory.Clear();
+                _undoableCommandsHistory.Clear();
                 return;
             }
 
-            while (_commandsHistory.Count > maxHistoryLength)
+            while (_undoableCommandsHistory.Count > maxHistoryLength)
             {
-                _commandsHistory.RemoveFirst();
+                _undoableCommandsHistory.RemoveFirst();
             }
         }
 
@@ -71,17 +71,35 @@ namespace Partlyx.Services.Commands
             OnCommandExcecuted(complex);
         }
 
+        public async Task ExcecuteInLastComplexAsync(IUndoableCommand command)
+        {
+            await command.ExecuteAsync();
+
+            var last = _undoableCommandsHistory.Last();
+            if (last == null)
+                OnCommandExcecuted(command);
+            else if (last is ComplexUndoableCommand complex)
+                complex.AddToComplex(command);
+            else
+            {
+                // Replacing the old single command with a new complex one
+                var newComplex = new ComplexUndoableCommand(last, command);
+                _undoableCommandsHistory.RemoveLast();
+                OnCommandExcecuted(newComplex);
+            }
+        }
+
         public async Task UndoAsync()
         {
-            if (_commandsHistory.Count == 0) return;
+            if (_undoableCommandsHistory.Count == 0) return;
 
-            IUndoableCommand cancelledCommand = _commandsHistory.Last!.Value;
-            _commandsHistory.RemoveLast();
+            IUndoableCommand cancelledCommand = _undoableCommandsHistory.Last!.Value;
+            _undoableCommandsHistory.RemoveLast();
 
             await cancelledCommand.UndoAsync();
             _canceledCommandsHistory.AddLast(cancelledCommand);
 
-            var previousCommand = _commandsHistory.Count > 0 ? _commandsHistory.Last.Value : null;
+            var previousCommand = _undoableCommandsHistory.Count > 0 ? _undoableCommandsHistory.Last.Value : null;
             _bus.Publish(new CommandUndoedEvent(cancelledCommand, previousCommand));
         }
         public async Task RedoAsync()
@@ -93,10 +111,10 @@ namespace Partlyx.Services.Commands
 
             await command.RedoAsync();
 
-            _commandsHistory.AddLast(command);
+            _undoableCommandsHistory.AddLast(command);
 
-            if (_commandsHistory.Count > MaxHistoryLength)
-                _commandsHistory.RemoveFirst();
+            if (_undoableCommandsHistory.Count > MaxHistoryLength)
+                _undoableCommandsHistory.RemoveFirst();
 
             _bus.Publish(new CommandRedoedEvent(command));
         }
@@ -106,17 +124,17 @@ namespace Partlyx.Services.Commands
             _bus.Publish(new CommandExcecutedEvent(command));
             if (command is IUndoableCommand uCommand)
             {
-                _commandsHistory.AddLast(uCommand);
+                _undoableCommandsHistory.AddLast(uCommand);
 
-                if (_commandsHistory.Count > MaxHistoryLength)
-                    _commandsHistory.RemoveFirst();
+                if (_undoableCommandsHistory.Count > MaxHistoryLength)
+                    _undoableCommandsHistory.RemoveFirst();
             }
             _canceledCommandsHistory.Clear();
         }
 
         private void ClearHistory()
         {
-            _commandsHistory.Clear();
+            _undoableCommandsHistory.Clear();
             _canceledCommandsHistory.Clear();
         }
 

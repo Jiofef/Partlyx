@@ -8,6 +8,7 @@ namespace Partlyx.Services.Commands
 
         Task ExcecuteAsync(ICommand command);
         Task ExcecuteComplexAsync(Func<ICommandDispatcherComplexHelper, Task> complex);
+        Task ExcecuteInLastComplexAsync(IUndoableCommand command);
         Task RedoAsync();
         Task UndoAsync();
     }

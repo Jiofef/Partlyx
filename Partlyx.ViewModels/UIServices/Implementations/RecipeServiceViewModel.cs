@@ -6,6 +6,7 @@ using Partlyx.Services.Commands;
 using Partlyx.Services.Commands.RecipeCommonCommands;
 using Partlyx.Services.Commands.RecipeComponentCommonCommands;
 using Partlyx.Services.Commands.ResourceCommonCommands;
+using Partlyx.Services.ServiceImplementations;
 using Partlyx.Services.ServiceInterfaces;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels;
@@ -24,9 +25,9 @@ namespace Partlyx.ViewModels.UIServices.Implementations
         private readonly ApplicationSettingsProviderViewModel _settings;
 
         private readonly IGlobalSelectedParts _selectedParts;
-        private readonly IGlobalFocusedPart _focusedPart;
+        private readonly IGlobalFocusedElementContainer _focusedPart;
 
-        public RecipeServiceViewModel(ICommandServices cs, ILocalizationService loc, IGlobalSelectedParts gsp, IGlobalFocusedPart gfp, IEventBus bus, IRecipeService service,
+        public RecipeServiceViewModel(ICommandServices cs, ILocalizationService loc, IGlobalSelectedParts gsp, IGlobalFocusedElementContainer gfp, IEventBus bus, IRecipeService service,
             ApplicationSettingsProviderViewModel settings)
         {
             _commands = cs;
@@ -38,48 +39,51 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             _selectedParts = gsp;
             _focusedPart = gfp;
         }
-
-        [RelayCommand]
-        public async Task<Guid> CreateRecipeAsync()
+        public async Task<Guid> CreateRecipeAsync(ResourceViewModel? parentResource = null, bool executeInLastComplex = false)
         {
-            int recipesCount = (await _service.GetAllTheRecipesAsync()).Count;
-            var recipeName = recipesCount == 0
-                            ? _loc["Recipe"]
-                            : _loc.Get("Recipe_N", recipesCount + 1);
+            string recipeName = _loc["Recipe"];
 
-            var command = _commands.Factory.Create<CreateRecipeCommand>(recipeName);
+            var parentResourceDto = parentResource?.ToDto();
+            if (parentResourceDto != null)
+                recipeName = parentResourceDto.Name;
 
+            RecipeCreatingOptions options = new(recipeName, true, parentResourceDto);
+
+            var createRecipeCommand = _commands.Factory.Create<CreateRecipeCommand>(options);
             // It must be executed on a single thread so that recipients respond to events immediately after they are sent
             await Task.Run(async () =>
             {
-                await _commands.Dispatcher.ExcecuteAsync(command);
+                if (executeInLastComplex)
+                    await _commands.Dispatcher.ExcecuteInLastComplexAsync(createRecipeCommand);
+                else
+                    await _commands.Dispatcher.ExcecuteAsync(createRecipeCommand);
+
+                // If we create a recipe for a resource, we want it to be immediately present in its components as an output
+                if (parentResourceDto != null)
+                {
+                    var parentRecipeUid = createRecipeCommand.RecipeUid;
+                    var componentAmount = _settings.DefaultRecipeOutputAmount;
+                    var componentCreatingOptions = new RecipeComponentCreatingOptions(componentAmount, true, true);
+                    await _commands.CreateAndExcecuteInLastComplexAsync<CreateRecipeComponentCommand>(parentRecipeUid, componentCreatingOptions);
+                }
             });
 
 
-            var recipeUid = command.RecipeUid;
+            var recipeUid = createRecipeCommand.RecipeUid;
             _bus.Publish(new RecipeCreatingCompletedVMEvent(recipeUid));
 
             return recipeUid;
         }
-
-        [RelayCommand]
-        public async Task RenameRecipe(PartSetValueInfo<RecipeViewModel, string> info)
-        {
-            var targetRecipe = info.Part;
-            string newName = info.Value;
-
-            await RenameRecipe(targetRecipe, newName);
-        }
-        public async Task RenameRecipe(RecipeViewModel targetRecipe, string newName)
+        public async Task RenameRecipe(RecipeViewModel targetRecipe, string newName, bool executeInLastComplex = false)
         {
             if (targetRecipe.Name == newName)
                 return;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeNameCommand>(targetRecipe.Uid, newName);
+            await _commands.CreateAndExcecuteInLastComplexAsyncIf<SetRecipeNameCommand>(
+                executeInLastComplex,
+                targetRecipe.Uid, newName);
         }
-
-        [RelayCommand]
-        public async Task RemoveAsync(RecipeViewModel recipe)
+        public async Task RemoveAsync(RecipeViewModel recipe, bool executeInLastComplex = false)
         {
             bool exists = await _service.IsRecipeExists(recipe.Uid);
 
@@ -87,56 +91,42 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             {
                 _bus.Publish(new RecipeDeletingStartedEvent(recipe.Uid,
                     new HashSet<object>() { recipe.Uid }));
-                await _commands.CreateSyncAndExcecuteAsync<DeleteRecipeCommand>(recipe.Uid);
+                await _commands.CreateAndExcecuteInLastComplexAsyncIf<DeleteRecipeCommand>(
+                    executeInLastComplex,
+                    recipe.Uid);
             }
         }
 
-        public async Task<Guid> Duplicate(RecipeViewModel recipe)
+        public async Task<Guid> Duplicate(RecipeViewModel recipe, bool executeInLastComplex = false)
         {
-            var command = await _commands.CreateSyncAndExcecuteAsync<DuplicateRecipeCommand>(recipe.Uid);
+            var command = await _commands.CreateAndExcecuteInLastComplexAsyncIf<DuplicateRecipeCommand>(
+                executeInLastComplex,
+                recipe.Uid);
 
             var recipeUid = command.DuplicateUid;
             _bus.Publish(new RecipeCreatingCompletedVMEvent(recipeUid));
 
             return recipeUid;
         }
-
-        [RelayCommand]
-        public async Task SetIcon(PartSetValueInfo<RecipeViewModel, IconViewModel> info)
-        {
-            if (info == null || info.Part == null || info.Value == null) return;
-
-            var targetRecipe = info.Part;
-            var valueIcon = info.Value;
-
-            await SetIcon(targetRecipe, valueIcon);
-        }
-        public async Task SetIcon(RecipeViewModel targetRecipe, IconViewModel newIcon)
+        public async Task SetIcon(RecipeViewModel targetRecipe, IconViewModel newIcon, bool executeInLastComplex = false)
         {
             var oldIcon = targetRecipe.Icon;
 
             if (oldIcon.IsIdentical(newIcon))
                 return;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeIconCommand>(targetRecipe.Uid, newIcon.ToDto());
+            await _commands.CreateAndExcecuteInLastComplexAsyncIf<SetRecipeIconCommand>(
+                executeInLastComplex,
+                targetRecipe.Uid, newIcon.ToDto());
         }
-
-        [RelayCommand]
-        public async Task SetIsReversible(PartSetValueInfo<RecipeViewModel, bool> info)
-        {
-            if (info == null || info.Part == null) return;
-
-            var targetRecipe = info.Part;
-            var value = info.Value;
-
-            await SetIsReversible(targetRecipe, value);
-        }
-        public async Task SetIsReversible(RecipeViewModel targetRecipe, bool isReversible)
+        public async Task SetIsReversible(RecipeViewModel targetRecipe, bool isReversible, bool executeInLastComplex = false)
         {
             if (targetRecipe.IsReversible == isReversible)
                 return;
 
-            await _commands.CreateAsyncEndExcecuteAsync<SetRecipeIsReversibleCommand>(targetRecipe.Uid, isReversible);
+            await _commands.CreateAndExcecuteInLastComplexAsyncIf<SetRecipeIsReversibleCommand>(
+                executeInLastComplex,
+                targetRecipe.Uid, isReversible);
         }
     }
 }

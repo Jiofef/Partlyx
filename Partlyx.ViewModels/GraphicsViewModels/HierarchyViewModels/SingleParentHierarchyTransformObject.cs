@@ -1,10 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
-using Partlyx.ViewModels.Graph;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
 {
-    public class HierarchyTransformObject : ObservableHierarchyObject, ISizePositionObject
+    public class SingleParentHierarchyTransformObject : ObservableSingleParentHierarchyObject, ISizePositionObject
     {
         private float _width, _height;
         public float Width { get => _width; protected set => SetProperty(ref _width, value); }
@@ -14,18 +12,18 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
 
         public float X
         {
-            get => Parent is HierarchyTransformObject parent ? parent.X + XLocal : XLocal;
+            get => Parent is SingleParentHierarchyTransformObject parent ? parent.X + XLocal : XLocal;
             set
             {
-                XLocal = Parent is HierarchyTransformObject parent ? parent.X + value : value;
+                XLocal = Parent is SingleParentHierarchyTransformObject parent ? parent.X + value : value;
             }
         }
         public float Y
         {
-            get => Parent is HierarchyTransformObject parent ? parent.Y + YLocal : YLocal;
+            get => Parent is SingleParentHierarchyTransformObject parent ? parent.Y + YLocal : YLocal;
             set
             {
-                YLocal = Parent is HierarchyTransformObject parent ? parent.Y + value : value;
+                YLocal = Parent is SingleParentHierarchyTransformObject parent ? parent.Y + value : value;
             }
         }
 
@@ -44,16 +42,16 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
         public float YLocalCentered { get => Y + Height / 2; set => YLocal = value - Height / 2; }
 
         // If you're going to set all the local positions and update tree at one time
-        protected void SetXLocalSilent(float value) => _xLocal = value;
-        protected void SetYLocalSilent(float value) => _yLocal = value;
-        protected void SetXLocalCenteredSilent(float value) => _xLocal = value - Width / 2;
-        protected void SetYLocalCenteredSilent(float value) => _yLocal = value - Height / 2;
+        public void SetXLocalSilent(float value) => _xLocal = value;
+        public void SetYLocalSilent(float value) => _yLocal = value;
+        public void SetXLocalCenteredSilent(float value) => _xLocal = value - Width / 2;
+        public void SetYLocalCenteredSilent(float value) => _yLocal = value - Height / 2;
 
-        protected void UpdateGlobalPositionOfTree()
+        public void UpdateGlobalPositionOfTree()
         {
             // Root finding
-            HierarchyTransformObject root = this;
-            while (root.Parent is HierarchyTransformObject parent)
+            SingleParentHierarchyTransformObject root = this;
+            while (root.Parent is SingleParentHierarchyTransformObject parent)
             {
                 root = parent;
             }
@@ -81,7 +79,7 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
         }
         private void NotifyChildrenPositionXChange()
         {
-            foreach (HierarchyTransformObject child in Children)
+            foreach (SingleParentHierarchyTransformObject child in Children)
             {
                 child.NotifyPositionXChanged();
                 child.NotifyChildrenPositionXChange();
@@ -89,7 +87,7 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
         }
         private void NotifyChildrenPositionYChange()
         {
-            foreach (HierarchyTransformObject child in Children)
+            foreach (SingleParentHierarchyTransformObject child in Children)
             {
                 child.NotifyPositionYChanged();
                 child.NotifyChildrenPositionYChange();

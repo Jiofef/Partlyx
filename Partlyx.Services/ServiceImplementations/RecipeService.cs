@@ -22,16 +22,37 @@ namespace Partlyx.Services.ServiceImplementations
             _creator = new PartsCreatorService(repo, bus);
         }
 
-        public async Task<Guid> CreateRecipeAsync(string? recipeName = null, Guid? inheritedIconResourceUid = null)
+        public async Task<Guid> CreateRecipeAsync(RecipeCreatingOptions? opt = null)
         {
-            var recipe = Recipe.Create(recipeName ?? "Recipe");
+            if (opt == null)
+                opt = new(); // Default options
 
-            if (inheritedIconResourceUid.HasValue)
+            bool isReferenceResourceProvided = opt.ReferenceResource != null;
+
+            // Name
+            string recipeName = "Recipe";
+
+            if (!opt.OverrideReferenceResourceName && opt.ReferenceResource?.Name != null)
+                recipeName = opt.ReferenceResource.Name;
+            else if (opt.RecipeName != null) // When overriding the resource name or resource isn't provided
+                recipeName = opt.RecipeName;
+
+            recipeName = await _repo.GetUniqueRecipeNameAsync(recipeName);
+
+            var recipe = Recipe.Create(recipeName);
+
+            // Icon
+            IIcon icon;
+            if (isReferenceResourceProvided)
             {
-                var icon = new InheritedIcon(inheritedIconResourceUid.Value, InheritedIcon.InheritedIconParentTypeEnum.Resource);
-                var iconInfo = icon.GetInfo();
-                recipe.UpdateIconInfo(iconInfo);
+                icon = new InheritedIcon(opt.ReferenceResource!.Uid, InheritedIcon.InheritedIconParentTypeEnum.Resource);
             }
+            else
+            {
+                icon = new NullIcon();
+            }
+                var iconInfo = icon.GetInfo();
+            recipe.UpdateIconInfo(iconInfo);
 
             return await _creator.CreateRecipeAsync(recipe);
         }
@@ -122,4 +143,6 @@ namespace Partlyx.Services.ServiceImplementations
                 _eventBus.Publish(new RecipeUpdatedEvent(recipe, new[] { "IsReversible" }, recipe.Uid));
         }
     }
+
+    public record RecipeCreatingOptions(string? RecipeName = null, bool OverrideReferenceResourceName = false, ResourceDto? ReferenceResource = null);
 }

@@ -3,15 +3,9 @@ using DynamicData;
 using DynamicData.Binding;
 using Partlyx.UI.Avalonia.Helpers;
 using ReactiveUI;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
 {
@@ -52,14 +46,7 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
 
         private void UpdateSum()
         {
-            double newSum = BaseValue;
-
-            foreach (var child in SumObjectChildren)
-            {
-                newSum += child.Sum;
-            }
-
-            Sum = newSum;
+            Sum = BaseValue + SumObjectChildren.Sum(c => c.Sum);
         }
 
         public void Dispose()

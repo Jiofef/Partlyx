@@ -30,8 +30,8 @@ namespace Partlyx.ViewModels.Settings
             {
                 { SettingKeys.Language, new((arg) => { Language = (LanguageInfo)arg!; }) },
                 { SettingKeys.CreateResourceWithRecipeByDefault, new(arg => { CreateResourceWithRecipeByDefault = (bool)arg!; }) },
-                { SettingKeys.DefaultRecipeCraftAmount, new(arg => { DefaultRecipeCraftAmount = (double)arg!; }) },
-                { SettingKeys.DefaultComponentQuantity, new(arg => { DefaultComponentQuantity = (double)arg!; }) },
+                { SettingKeys.DefaultRecipeOutputAmount, new(arg => { DefaultRecipeOutputAmount = (double)arg!; }) },
+                { SettingKeys.DefaultRecipeInputAmount, new(arg => { DefaultRecipeInputAmount = (double)arg!; }) },
             };
         }
 
@@ -55,10 +55,10 @@ namespace Partlyx.ViewModels.Settings
         private bool _createResourceWithRecipeByDefault;
 
         public bool CreateResourceWithRecipeByDefault { get => _createResourceWithRecipeByDefault; set => SetProperty(ref _createResourceWithRecipeByDefault, value); }
-        private double _defaultRecipeCraftAmount;
-        public double DefaultRecipeCraftAmount { get => _defaultRecipeCraftAmount; set => SetProperty(ref _defaultRecipeCraftAmount, value); }
-        private double _defaultComponentQuantity;
-        public double DefaultComponentQuantity { get => _defaultComponentQuantity; set => SetProperty(ref _defaultComponentQuantity, value); }
+        private double _defaultRecipeOutputAmount;
+        public double DefaultRecipeOutputAmount { get => _defaultRecipeOutputAmount; set => SetProperty(ref _defaultRecipeOutputAmount, value); }
+        private double _defaultRecipeInputAmount;
+        public double DefaultRecipeInputAmount { get => _defaultRecipeInputAmount; set => SetProperty(ref _defaultRecipeInputAmount, value); }
 
         public void Dispose()
             => _disposables?.Dispose();

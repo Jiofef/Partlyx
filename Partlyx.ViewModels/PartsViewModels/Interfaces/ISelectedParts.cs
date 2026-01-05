@@ -5,9 +5,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
     public interface ISelectedParts
     {
-        ObservableCollection<ResourceViewModel> Resources { get; }
-        ObservableCollection<RecipeViewModel> Recipes { get; }
-        ObservableCollection<RecipeComponentViewModel> Components { get; }
+        ReadOnlyObservableCollection<ResourceViewModel> Resources { get; }
+        ReadOnlyObservableCollection<RecipeViewModel> Recipes { get; }
+        ReadOnlyObservableCollection<RecipeComponentViewModel> Components { get; }
         bool IsSingleResourceSelected { get; }
         bool IsSingleRecipeSelected { get; }
         bool IsSingleComponentSelected { get; }
@@ -30,6 +30,10 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
         void ClearSelectedRecipes();
         void ClearSelectedResources();
         void ClearSelection();
+
+        void RemoveResourceFromSelected(ResourceViewModel resource);
+        void RemoveRecipeFromSelected(RecipeViewModel recipe);
+        void RemoveComponentFromSelected(RecipeComponentViewModel component);
         RecipeComponentViewModel? GetSingleComponentOrNull();
         RecipeViewModel? GetSingleRecipeOrNull();
         ResourceViewModel? GetSingleResourceOrNull();

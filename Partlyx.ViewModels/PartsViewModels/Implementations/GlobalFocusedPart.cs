@@ -4,7 +4,7 @@ using Partlyx.ViewModels.PartsViewModels.Interfaces;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    public class GlobalFocusedPart : FocusedPartAbstract, IGlobalFocusedPart, IDisposable
+    public class GlobalFocusedPart : FocusedElementContainerAbstract, IGlobalFocusedElementContainer, IDisposable
     {
         private readonly IEventBus _bus;
         private readonly List<IDisposable> _subscriptions = new();
@@ -12,35 +12,30 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             _bus = bus;
 
-            var fileClosedSubscription = bus.Subscribe<FileClosedUIEvent>((ev) => FocusPart(null));
+            var fileClosedSubscription = bus.Subscribe<FileClosedUIEvent>((ev) => Focus(null));
             _subscriptions.Add(fileClosedSubscription);
         }
 
-        protected override void OnPartFocused(IVMPart? part, IVMPart? previousPart, bool isValueChanged)
+        protected override void OnElementFocused(IFocusable? element, IFocusable? previousElement, bool isValueChanged)
         {
-            base.OnPartFocused(part, previousPart, isValueChanged);
+            base.OnElementFocused(element, previousElement, isValueChanged);
 
             if (!isValueChanged) return;
 
-            if (part != null)
+
+            if (element != null)
             {
-                var @event = new GlobalPartFocusedEvent(
-                    (PartTypeEnumVM)SelectedPartType!, FocusedPart!.Uid,
-                    previousPart?.PartType, previousPart?.Uid
-                    );
+                var @event = new GlobalElementFocusedEvent(element, previousElement);
                 _bus.Publish(@event);
             }
             else
             {
-                var @event = new GlobalPartUnfocusedEvent();
+                var @event = new GlobalElementUnfocusedEvent();
                 _bus.Publish(@event);
             }
 
-            var @changedEvent = new GlobalFocusedPartChangedEvent(
-                SelectedPartType, FocusedPart?.Uid,
-                previousPart?.PartType, previousPart?.Uid
-                );
-            _bus.Publish(changedEvent);
+            var @changedEvent = new GlobalFocusedElementChangedEvent(element, previousElement);
+            _bus.Publish(@changedEvent);
         }
 
         public void Dispose()

@@ -18,7 +18,9 @@ namespace Partlyx.ViewModels
         private readonly PartsServiceViewModel _services;
         public RecipeViewModel AttachedRecipe { get; }
         public override IVMPart AttachedPart { get => AttachedRecipe; }
-        public RecipeItemUIState(RecipeViewModel vm, IEventBus bus, PartsServiceViewModel cvm, IGlobalFocusedPart gfc) 
+        public override IFocusedElementContainer GlobalFocusedContainer => AttachedRecipe.GlobalNavigations.FocusedElementContainer;
+        public override IFocusable AttachedFocusable => AttachedRecipe;
+        public RecipeItemUIState(RecipeViewModel vm, IEventBus bus, PartsServiceViewModel cvm, IGlobalFocusedElementContainer gfc) 
         {
             _bus = bus;
             _services = cvm;
@@ -58,8 +60,7 @@ namespace Partlyx.ViewModels
         {
             if (!IsRenaming) return;
 
-            var args = new PartSetValueInfo<RecipeViewModel, string>(AttachedRecipe, UnConfirmedName);
-            await _services.RecipeService.RenameRecipe(args);
+            await _services.RecipeService.RenameRecipe(AttachedRecipe, UnConfirmedName);
 
             IsRenaming = false;
         }

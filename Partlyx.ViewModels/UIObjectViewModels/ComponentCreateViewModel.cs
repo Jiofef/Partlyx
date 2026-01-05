@@ -8,11 +8,12 @@ using System.Collections.ObjectModel;
 
 namespace Partlyx.ViewModels.UIObjectViewModels
 {
-    public partial class ComponentCreateViewModel
+    public partial class ComponentCreateViewModel : PartlyxObservable
     {
         private readonly IDialogService _dialogService;
 
         public IIsolatedSelectedParts SelectedParts { get; }
+        public ObservableCollection<object> SelectedPartsCollection { get; } = new();
         public IResourceSearchService Search { get; }
         public string DialogIdentifier { get; set; } = IDialogService.DefaultDialogIdentifier;
 
@@ -22,6 +23,9 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             SelectedParts = isl;
             Search = rss;
+
+            var selectionObserver = new SelectedPartsObserveHelper(isl, SelectedPartsCollection);
+            Disposables.Add(selectionObserver);
         }
 
         [RelayCommand]

@@ -1,5 +1,6 @@
 ﻿using Partlyx.Services.Dtos;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
 
 namespace Partlyx.ViewModels
 {
@@ -33,5 +34,30 @@ namespace Partlyx.ViewModels
                     return new NullIconDto();
             }
         }
+
+        public static ResourceDto ToDto(this ResourceViewModel resourceVM)
+            => new ResourceDto(
+                resourceVM.Uid,
+                resourceVM.Name,
+                resourceVM.LinkedDefaultRecipe?.Uid,
+                resourceVM.Icon.ToDto());
+
+        public static RecipeDto ToDto(this RecipeViewModel recipeVM)
+            => new RecipeDto(
+                recipeVM.Uid,
+                recipeVM.Name,
+                recipeVM.IsReversible,
+                recipeVM.Inputs.Select(c => c.ToDto()).ToList(),
+                recipeVM.Outputs.Select(c => c.ToDto()).ToList(),
+                recipeVM.Icon.ToDto());
+
+        public static RecipeComponentDto ToDto(this RecipeComponentViewModel componentVM)
+            => new RecipeComponentDto(
+                componentVM.Uid,
+                componentVM.LinkedParentRecipe?.Uid,
+                componentVM.Resource.Uid,
+                componentVM.Quantity,
+                componentVM.IsOutput,
+                componentVM.LinkedSelectedRecipe?.Uid);
     }
 }

@@ -4,11 +4,11 @@ using Partlyx.ViewModels.UIStates;
 
 namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
-    public interface IVMPart : IDisposable, IIconHolderViewModel, IUidObjectViewModel
+    public interface IVMPart : IDisposable, IIconHolderViewModel, IUidObjectViewModel, IFocusable
     {
         PartTypeEnumVM PartType { get; }
-        PartItemUIState UiItem { get; }
         PartsGlobalNavigations GlobalNavigations { get; }
+        FocusableElementTypeEnum IFocusable.FocusableType { get => FocusableElementTypeEnum.RecipeHolder; }
     }
     public enum PartTypeEnumVM { Resource, Recipe, Component }
 }

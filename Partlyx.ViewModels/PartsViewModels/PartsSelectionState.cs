@@ -8,7 +8,7 @@ namespace Partlyx.ViewModels.PartsViewModels
 {
     public sealed partial class PartsSelectionState : ObservableObject, IDisposable
     {
-        private readonly ObservableCollection<IVMPart> _parts;
+        private readonly ICollection<object> _parts;
         private bool _hasAnything;
         private bool _hasResource;
         private bool _hasRecipe;
@@ -22,14 +22,12 @@ namespace Partlyx.ViewModels.PartsViewModels
         private int _resourceCount;
         private int _recipeCount;
         private int _componentCount;
-        private int _partsCount;
-
-        public PartsSelectionState(ObservableCollection<IVMPart> parts)
+        public PartsSelectionState(INotifyCollectionChanged parts)
         {
-            _parts = parts;
+            _parts = (ICollection<object>)parts;
 
             RecalculateCounts();
-            _parts.CollectionChanged += Parts_CollectionChanged;
+            parts.CollectionChanged += Parts_CollectionChanged;
         }
 
         //  Public properties
@@ -152,10 +150,10 @@ namespace Partlyx.ViewModels.PartsViewModels
 
             FlagsUpdated?.Invoke();
         }
-        public Action FlagsUpdated = delegate { };
+        public event Action FlagsUpdated = delegate { };
         public void Dispose()
         {
-            _parts.CollectionChanged -= Parts_CollectionChanged;
+            ((INotifyCollectionChanged)_parts).CollectionChanged -= Parts_CollectionChanged;
         }
     }
 }

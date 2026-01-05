@@ -51,14 +51,17 @@ namespace Partlyx.ViewModels.Graph
                 {
                     amount = -amount;
                 }
-
-                if (resourceAmounts.ContainsKey(component.Resource))
+                
+                if (component.Resource != null)
                 {
-                    resourceAmounts[component.Resource] += amount;
-                }
-                else
-                {
-                    resourceAmounts[component.Resource] = amount;
+                    if (resourceAmounts.ContainsKey(component.Resource))
+                    {
+                        resourceAmounts[component.Resource] += amount;
+                    }
+                    else
+                    {
+                        resourceAmounts[component.Resource] = amount;
+                    }
                 }
             }
 

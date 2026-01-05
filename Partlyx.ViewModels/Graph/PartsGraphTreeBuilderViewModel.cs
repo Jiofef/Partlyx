@@ -19,15 +19,47 @@ using Partlyx.Services.ServiceImplementations;
 
 namespace Partlyx.ViewModels.Graph
 {
+    public enum GraphType { RecipeGraph, PathGraph }
+
     public class PartsGraphTreeBuilderViewModel : GraphTreeBuilderViewModel
     {
         private List<IDisposable> _subscriptions = new();
 
         private IVMPartsStore _store;
+        private readonly GraphLayoutEngine _layoutEngine = new();
+
+        // Graph display options
+        private bool _showIntermediateRecipesForRecipeGraph = false;
+        public bool ShowIntermediateRecipesForRecipeGraph
+        {
+            get => _showIntermediateRecipesForRecipeGraph;
+            set
+            {
+                if (_showIntermediateRecipesForRecipeGraph != value)
+                {
+                    _showIntermediateRecipesForRecipeGraph = value;
+                    UpdateGraph();
+                }
+            }
+        }
+
+        private bool _showRecipesBetweenComponentsForPathGraph = true;
+        public bool ShowRecipesBetweenComponentsForPathGraph
+        {
+            get => _showRecipesBetweenComponentsForPathGraph;
+            set
+            {
+                if (_showRecipesBetweenComponentsForPathGraph != value)
+                {
+                    _showRecipesBetweenComponentsForPathGraph = value;
+                    UpdateGraph();
+                }
+            }
+        }
 
         public RelayCommand? OnGraphBuilded { get; set; }
 
-        public PartsGraphTreeBuilderViewModel(IGlobalFocusedPart focusedPart, IEventBus bus, IRoutedEventBus routedBus, IVMPartsStore store)
+        public PartsGraphTreeBuilderViewModel(IGlobalFocusedElementContainer focusedPart, IEventBus bus, IRoutedEventBus routedBus, IVMPartsStore store)
         {
             _store = store;
 
@@ -35,13 +67,11 @@ namespace Partlyx.ViewModels.Graph
 
             _updateGraphTrottledInvoker = new(TimeSpan.FromMilliseconds(200));
 
-            var focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedPartChangedEvent>(
+            var focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedElementChangedEvent>(
                 (ev) =>
                     {
-                        _store.TryGet(ev.FocusedPartUid, out var focused);
-                        _store.TryGet(ev.PreviousSelectedPartUid, out var previous);
-                        var focusedRecipe = focused?.GetRelatedRecipe();
-                        var previousRecipe = previous?.GetRelatedRecipe();
+                        var focusedRecipe = ev.NewFocused?.GetRelatedRecipe();
+                        var previousRecipe = ev.PreviousFocused?.GetRelatedRecipe();
 
                         if (focusedRecipe != previousRecipe)
                             UpdateGraph();
@@ -57,7 +87,7 @@ namespace Partlyx.ViewModels.Graph
             _subscriptions.Add(routedBus.Subscribe<RecipeComponentUpdatedViewModelEvent>("SelectedRecipeUid", ev => UpdateGraph()));
         }
 
-        public IGlobalFocusedPart FocusedPart { get; }
+        public IGlobalFocusedElementContainer FocusedPart { get; }
 
         public ObservableCollection<ComponentGraphNodeViewModel> ComponentLeafs { get; } = new();
 
@@ -105,26 +135,6 @@ namespace Partlyx.ViewModels.Graph
                     parentResources.Remove(componentResource);
                 }
             }
-
-            rootNode.BuildChildren();
-        }
-
-        private List<GraphTreeNodeViewModel> FindNodesByPartUid(Guid uid)
-        {
-            List<GraphTreeNodeViewModel> nodes = new();
-
-            nodes = Nodes.Where(
-                n =>
-                {
-                    var nodePartUid = (n.Value as IVMPart)?.Uid;
-                    if (nodePartUid == null)
-                        return false;
-                    else
-                        return nodePartUid.Equals(uid);
-                })
-                .ToList();
-
-            return nodes;
         }
 
         private ThrottledInvoker _updateGraphTrottledInvoker;
@@ -132,27 +142,171 @@ namespace Partlyx.ViewModels.Graph
         {
             _updateGraphTrottledInvoker.InvokeAsync(UpdateGraphPrivate);
         }
+        public static GraphType GetGraphType(IFocusable? focusable)
+        {
+            if (focusable == null) return GraphType.RecipeGraph;
+
+            return focusable.FocusableType switch
+            {
+                FocusableElementTypeEnum.RecipeHolder => GraphType.RecipeGraph,
+                FocusableElementTypeEnum.ComponentPathHolder => GraphType.PathGraph,
+                _ => GraphType.RecipeGraph
+            };
+        }
+
         private Task UpdateGraphPrivate()
         {
             DestroyTree();
 
-            // Getting the part to build the tree from it
-            var selectedRecipe = FocusedPart.FocusedPart?.GetRelatedRecipe();
-            if (selectedRecipe == null) return Task.CompletedTask;
+            var focused = FocusedPart.Focused;
+            var graphType = GetGraphType(focused);
 
-            // Creating the root node
-            var mainNode = new RecipeGraphNodeViewModel(selectedRecipe);
-            mainNode.XCentered = RootNodeDefaultPosition.X;
-            mainNode.YCentered = RootNodeDefaultPosition.Y;
-            AddNode(mainNode);
-            RootNode = mainNode;
+            if (graphType == GraphType.RecipeGraph)
+            {
+                return BuildRecipeGraph(focused?.GetRelatedRecipe());
+            }
+            else // PathGraph
+            {
+                return BuildPathGraph(focused as RecipeComponentPath);
+            }
+        }
 
-            // Building the tree
-            RebuildBranch(mainNode);
+        private Task BuildRecipeGraph(RecipeViewModel? recipe)
+        {
+            if (recipe == null) return Task.CompletedTask;
 
-            Edges = mainNode.GetBranchLinesMultiCollection();
-            BuildEdgesFor(mainNode);
+            // Creating the recipe node
+            var recipeNode = new RecipeGraphNodeViewModel(recipe);
+            recipeNode.XCentered = RootNodeDefaultPosition.X;
+            recipeNode.YCentered = RootNodeDefaultPosition.Y;
+            AddNode(recipeNode);
+            RootNode = recipeNode;
 
+            // Create nodes for outputs and inputs
+            var outputNodes = new List<GraphTreeNodeViewModel>();
+            var inputNodes = new List<GraphTreeNodeViewModel>();
+
+            foreach (var output in recipe.Outputs)
+            {
+                var node = new ComponentGraphNodeViewModel(output);
+                outputNodes.Add(node);
+                AddNode(node);
+                recipeNode.AddChild(node); // Outputs as children for now, but will be positioned above
+            }
+
+            foreach (var input in recipe.Inputs)
+            {
+                var node = new ComponentGraphNodeViewModel(input);
+                inputNodes.Add(node);
+                AddNode(node);
+                recipeNode.AddChild(node); // Inputs as children
+
+                // Build further branches for inputs
+                if (input.SelectedRecipeComponents != null && input.SelectedRecipeComponents.Count > 0)
+                {
+                    RebuildBranch(node);
+                }
+                else
+                {
+                    ComponentLeafs.Add(node);
+                }
+            }
+
+            // Apply special layout for recipe graph
+            _layoutEngine.LayoutAsRecipeGraph(recipeNode, outputNodes, inputNodes);
+
+            Edges = recipeNode.GetBranchLinesMultiCollection();
+            BuildEdgesFor(recipeNode);
+
+            if (OnGraphBuilded != null)
+            {
+                OnGraphBuilded.Execute(null);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private Task BuildPathGraph(RecipeComponentPath? path)
+        {
+            if (path == null || path.Nodes.Count == 0) return Task.CompletedTask;
+
+            // Collect all components and their parent recipes
+            var components = new HashSet<RecipeComponentViewModel>();
+            var recipes = new HashSet<RecipeViewModel>();
+
+            foreach (var component in path.Nodes)
+            {
+                components.Add(component);
+                if (component.LinkedParentRecipe?.Value is RecipeViewModel recipe)
+                {
+                    recipes.Add(recipe);
+                }
+            }
+
+            // Create nodes
+            var componentNodes = new Dictionary<RecipeComponentViewModel, ComponentGraphNodeViewModel>();
+            var recipeNodes = new Dictionary<RecipeViewModel, RecipeGraphNodeViewModel>();
+
+            foreach (var component in components)
+            {
+                var node = new ComponentGraphNodeViewModel(component);
+                componentNodes[component] = node;
+                AddNode(node);
+            }
+
+            foreach (var recipe in recipes)
+            {
+                var node = new RecipeGraphNodeViewModel(recipe);
+                recipeNodes[recipe] = node;
+                AddNode(node);
+            }
+
+            // Create connections
+            foreach (var component in components)
+            {
+                if (component.LinkedParentRecipe?.Value is RecipeViewModel recipe && recipeNodes.TryGetValue(recipe, out var recipeNode) && componentNodes.TryGetValue(component, out var componentNode))
+                {
+                    // Connect component to its recipe
+                    recipeNode.AddChild(componentNode);
+                }
+            }
+
+            // If showing recipes between components, add recipe -> next component connections
+            if (ShowRecipesBetweenComponentsForPathGraph)
+            {
+                var componentList = path.Nodes.ToList();
+                for (int i = 0; i < componentList.Count - 1; i++)
+                {
+                    var currentComponent = componentList[i];
+                    var nextComponent = componentList[i + 1];
+
+                    if (currentComponent.LinkedParentRecipe?.Value is RecipeViewModel recipe &&
+                        recipeNodes.TryGetValue(recipe, out var recipeNode) &&
+                        componentNodes.TryGetValue(nextComponent, out var nextComponentNode))
+                    {
+                        // If next component is in recipe's outputs or inputs
+                        if (recipe.Inputs.Contains(nextComponent) || recipe.Outputs.Contains(nextComponent))
+                        {
+                            recipeNode.AddChild(nextComponentNode);
+                        }
+                    }
+                }
+            }
+
+            // Set root and layout
+            var firstComponent = path.Nodes.First.Value;
+            if (componentNodes.TryGetValue(firstComponent, out var rootNode))
+            {
+                RootNode = rootNode;
+                rootNode.XCentered = RootNodeDefaultPosition.X;
+                rootNode.YCentered = RootNodeDefaultPosition.Y;
+
+                // Apply layout
+                _layoutEngine.LayoutAsTree(rootNode);
+
+                Edges = rootNode.GetBranchLinesMultiCollection();
+                BuildEdgesFor(rootNode);
+            }
 
             if (OnGraphBuilded != null)
             {
@@ -165,78 +319,5 @@ namespace Partlyx.ViewModels.Graph
         {
             ComponentLeafs.ClearAndDispose();
         }
-
-        #region Unfinished optimization code
-        //private void OnComponentAdded(RecipeComponentVMAddedToStoreEvent ev)
-        //{
-        //    var component = _store.RecipeComponents[ev.ComponentUid];
-        //    if (component == null) return;
-
-        //    AddComponent(component);
-        //}
-
-        //private void AddComponent(RecipeComponentViewModel component)
-        //{
-        //    var parentUid = component.LinkedParentRecipe?.Uid;
-        //    if (parentUid == null) return;
-
-        //    var componentParentNodes = FindNodesByPartUid((Guid)parentUid);
-
-        //    foreach (var parentNode in componentParentNodes)
-        //    {
-        //        var componentNode = new ComponentGraphNodeViewModel(component);
-        //        parentNode.AddChild(componentNode);
-
-        //        AddNode(componentNode);
-
-        //        var collections = componentNode.GetBranchLinesCollections();
-        //        Edges.AddCollections(collections);
-        //    }
-
-        //    UpdateTreePositions();
-        //}
-
-        //private void OnComponentRemoved(RecipeComponentVMRemovedFromStoreEvent ev)
-        //{
-        //    var component = _store.RecipeComponents[ev.ComponentUid];
-        //    if (component == null) return;
-
-        //    RemoveComponentFromTree(component);
-        //}
-
-        //private void RemoveComponentFromTree(RecipeComponentViewModel component)
-        //{
-        //    var parentUid = component.LinkedParentRecipe?.Uid;
-        //    if (parentUid == null) return;
-
-        //    var componentParentNodes = FindNodesByPartUid((Guid)parentUid);
-
-        //    foreach (var parentNode in componentParentNodes)
-        //    {
-        //        var componentNode = new ComponentGraphNodeViewModel(component);
-        //        parentNode.RemoveChild(componentNode);
-
-        //        RemoveNode(componentNode);
-
-        //        var collections = componentNode.GetBranchLinesCollections();
-        //        Edges.RemoveCollections(collections);
-        //    }
-
-        //    UpdateTreePositions();
-        //}
-
-        //private void OnComponentMoved(RecipeComponentMovedEvent ev)
-        //{
-        //    var component = _store.RecipeComponents[ev.ComponentUid];
-        //    if (component == null) return;
-
-        //    var previousComponentParentNodes = FindNodesByPartUid(ev.OldRecipeUid);
-        //}
-
-        //private GraphTreeNodeViewModel? GetComponentParentNode()
-        //{
-        //    var parentRecipeUid = component.LinkedParentRecipe?.Uid;
-        //}
-        #endregion
     }
 }

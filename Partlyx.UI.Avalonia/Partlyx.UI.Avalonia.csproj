@@ -37,6 +37,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="PartsTreeRecipes.axaml.cs">
+      <DependentUpon>PartsTreeRecipes.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="PartsTreeResources.axaml.cs">
+      <DependentUpon>PartsTreeResources.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Resources\Strings\Strings.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

@@ -127,18 +127,18 @@ namespace Partlyx.UI.Avalonia.Behaviors
         {
             if (parts == null) return;
 
-            parts.Resources.CollectionChanged += Resources_CollectionChanged;
-            parts.Recipes.CollectionChanged += Recipes_CollectionChanged;
-            parts.Components.CollectionChanged += Components_CollectionChanged;
+            ((INotifyCollectionChanged)parts.Resources).CollectionChanged += Resources_CollectionChanged;
+            ((INotifyCollectionChanged)parts.Recipes).CollectionChanged += Recipes_CollectionChanged;
+            ((INotifyCollectionChanged)parts.Components).CollectionChanged += Components_CollectionChanged;
         }
 
         private void UnhookSelectedPartsCollections(ISelectedParts? parts)
         {
             if (parts == null) return;
 
-            try { parts.Resources.CollectionChanged -= Resources_CollectionChanged; } catch { }
-            try { parts.Recipes.CollectionChanged -= Recipes_CollectionChanged; } catch { }
-            try { parts.Components.CollectionChanged -= Components_CollectionChanged; } catch { }
+            try { ((INotifyCollectionChanged)parts.Resources).CollectionChanged -= Resources_CollectionChanged; } catch { }
+            try { ((INotifyCollectionChanged)parts.Recipes).CollectionChanged -= Recipes_CollectionChanged; } catch { }
+            try { ((INotifyCollectionChanged)parts.Components).CollectionChanged -= Components_CollectionChanged; } catch { }
         }
 
         #endregion
@@ -299,18 +299,15 @@ namespace Partlyx.UI.Avalonia.Behaviors
                         {
                             if (removed is ResourceViewModel resource)
                             {
-                                if (SelectedParts.Resources.Contains(resource))
-                                    SelectedParts.Resources.Remove(resource);
+                                SelectedParts.RemoveResourceFromSelected(resource);
                             }
                             else if (removed is RecipeViewModel recipe)
                             {
-                                if (SelectedParts.Recipes.Contains(recipe))
-                                    SelectedParts.Recipes.Remove(recipe);
+                                SelectedParts.RemoveRecipeFromSelected(recipe);
                             }
                             else if (removed is RecipeComponentViewModel component)
                             {
-                                if (SelectedParts.Components.Contains(component))
-                                    SelectedParts.Components.Remove(component);
+                                SelectedParts.RemoveComponentFromSelected(component);
                             }
                         }
                     }

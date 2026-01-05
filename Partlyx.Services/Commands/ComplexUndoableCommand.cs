@@ -23,6 +23,11 @@ namespace Partlyx.Services.Commands
             }
         }
 
+        public void AddToComplex(IUndoableCommand command)
+        {
+            _commands.Add(command);
+        }
+
         public async Task UndoAsync()
         {
             // We undo the command backwards to ensure that the large operation is correctly canceled

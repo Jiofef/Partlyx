@@ -69,6 +69,7 @@ namespace Partlyx.Core.Partlyx
 
         // Secondary features
         public bool IsOutput { get; set; } = false;
+        public RecipeComponentType ComponentType => IsOutput ? RecipeComponentType.Output : RecipeComponentType.Input;
 
         private Guid? _componentSelectedRecipeUid;
         public Guid? ComponentSelectedRecipeUid

@@ -88,19 +88,33 @@ namespace Partlyx.Services.ServiceImplementations
             return resourcesUids;
         }
 
-        public async Task SetDefaultRecipeAsync(Guid resourceUid, Guid recipeUid)
+        public async Task SetDefaultRecipeAsync(Guid resourceUid, Guid? recipeUid)
         {
             var batchOptions = new PartlyxRepository.BatchIncludeOptions() { };
 
-            await _repo.ExecuteWithBatchAsync([resourceUid], [recipeUid], [], batchOptions,
-                batch =>
+            if (recipeUid is Guid recipeUidNotNull)
             {
-                var resource = batch.Resources[resourceUid];
-                var recipe = batch.Recipes[recipeUid];
-                resource.DefaultRecipe = recipe;
+                await _repo.ExecuteWithBatchAsync([resourceUid], [recipeUidNotNull], [], batchOptions,
+                batch =>
+                {
+                    var resource = batch.Resources[resourceUid];
+                    var recipe = batch.Recipes[recipeUidNotNull];
+                    resource.DefaultRecipe = recipe;
 
-                return Task.CompletedTask;
-            });
+                    return Task.CompletedTask;
+                });
+            }
+            else
+            {
+                await _repo.ExecuteWithBatchAsync([resourceUid], [], [], batchOptions,
+                batch =>
+                {
+                    var resource = batch.Resources[resourceUid];
+                    resource.DefaultRecipe = null;
+
+                    return Task.CompletedTask;
+                });
+            }
 
             var resource = await GetResourceAsync(resourceUid);
             if (resource != null)

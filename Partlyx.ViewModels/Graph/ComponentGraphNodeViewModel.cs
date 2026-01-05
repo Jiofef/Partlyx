@@ -68,24 +68,50 @@ namespace Partlyx.ViewModels.Graph
 
         private void UpdateCost()
         {
-            if (_component != null)
+            if (_component == null)
             {
-                if (Parent is RecipeGraphNodeViewModel || _component.LinkedParentRecipe?.Value?.CraftAmount == null)
-                    _localCost = _component.Quantity;
-                else
-                    _localCost = _component.Quantity / _component.LinkedParentRecipe.Value.CraftAmount;
+                Cost = 1;
+                UpdateColumnText();
+                return;
             }
-            else
-                _localCost = 1;
 
-            var parentComponent = TryFindParent<ComponentGraphNodeViewModel>();
-            if (parentComponent != null)
+            double totalProduced = 0;
+
+            foreach (var parent in Parents)
             {
-                Cost = _localCost * parentComponent.Cost;
-            }
-            else
-                Cost = _localCost;
+                if (parent is RecipeGraphNodeViewModel recipeNode && recipeNode.Value is RecipeViewModel recipe)
+                {
+                    // Find this component in recipe outputs
+                    var outputComponent = recipe.Outputs.FirstOrDefault(c => c.Resource == _component.Resource);
+                    if (outputComponent != null)
+                    {
+                        // Calculate recipe scale based on input components that are also parents
+                        double recipeScale = 0;
+                        foreach (var input in recipe.Inputs)
+                        {
+                            var inputParent = Parents.FirstOrDefault(p =>
+                                p is ComponentGraphNodeViewModel compNode &&
+                                compNode._component?.Resource == input.Resource);
+                            if (inputParent is ComponentGraphNodeViewModel compNode && compNode._component != null)
+                            {
+                                recipeScale += compNode.Cost / compNode._component.Quantity * input.Quantity;
+                            }
+                        }
 
+                        if (recipeScale > 0)
+                        {
+                            totalProduced += recipeScale / recipe.Inputs.Sum(i => i.Quantity) * outputComponent.Quantity;
+                        }
+                    }
+                }
+                else if (parent is ComponentGraphNodeViewModel parentComponent && parentComponent._component != null)
+                {
+                    // Direct component transformation
+                    totalProduced += parentComponent.Cost / parentComponent._component.Quantity * _component.Quantity;
+                }
+            }
+
+            Cost = totalProduced > 0 ? totalProduced : _component.Quantity;
             UpdateColumnText();
         }
         private void OnCostChanged()

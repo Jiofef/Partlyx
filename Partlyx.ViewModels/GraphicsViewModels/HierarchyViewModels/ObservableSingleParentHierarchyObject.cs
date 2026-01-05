@@ -4,20 +4,20 @@ using System.Collections.ObjectModel;
 
 namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
 {
-    public class ObservableHierarchyObject : ObservableObject
+    public class ObservableSingleParentHierarchyObject : ObservableObject
     {
-        public ObservableHierarchyObject()
+        public ObservableSingleParentHierarchyObject()
         {
             Children = new(_children);
         }
 
-        protected ObservableCollection<ObservableHierarchyObject> _children = new();
-        public ReadOnlyObservableCollection<ObservableHierarchyObject> Children { get; }
+        protected ObservableCollection<ObservableSingleParentHierarchyObject> _children = new();
+        public ReadOnlyObservableCollection<ObservableSingleParentHierarchyObject> Children { get; }
 
-        private ObservableHierarchyObject? _parent;
-        public ObservableHierarchyObject? Parent { get => _parent; private set => SetProperty(ref _parent, value); }
+        private ObservableSingleParentHierarchyObject? _parent;
+        public ObservableSingleParentHierarchyObject? Parent { get => _parent; private set => SetProperty(ref _parent, value); }
 
-        public void Reparent(ObservableHierarchyObject newParent)
+        public void Reparent(ObservableSingleParentHierarchyObject newParent)
         {
             if (Parent != null)
             {
@@ -25,24 +25,24 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
             }
             newParent.AddChild(this);
         }
-        public ObservableHierarchyObject GetRoot()
+        public ObservableSingleParentHierarchyObject GetRoot()
         {
             var root = this;
 
-            while (root.Parent is ObservableHierarchyObject parent)
+            while (root.Parent is ObservableSingleParentHierarchyObject parent)
             {
                 root = parent;
             }
 
             return root;
         }
-        public void AddChild(ObservableHierarchyObject child)
+        public void AddChild(ObservableSingleParentHierarchyObject child)
         {
             if (_children.Contains(child)) return;
             _children.Add(child);
             child.Parent = this;
         }
-        public void RemoveChild(ObservableHierarchyObject child)
+        public void RemoveChild(ObservableSingleParentHierarchyObject child)
         {
             if (_children.Remove(child))
                 child.Parent = null;
@@ -53,12 +53,12 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
         }
 
         /// <summary> Performs the action for all hierarchy elements from top to bottom, starting with this </summary>
-        protected void ExcecuteWithAllTheChildren(Action<ObservableHierarchyObject> action)
+        protected void ExcecuteWithAllTheChildren(Action<ObservableSingleParentHierarchyObject> action)
         {
             ExcecuteRecursion(this);
-            void ExcecuteRecursion(ObservableHierarchyObject hObject)
+            void ExcecuteRecursion(ObservableSingleParentHierarchyObject hObject)
             {
-                foreach (ObservableHierarchyObject child in hObject.Children)
+                foreach (ObservableSingleParentHierarchyObject child in hObject.Children)
                 {
                     action(child);
                     ExcecuteRecursion(child);
@@ -66,7 +66,7 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
             }
         }
 
-        public TParent? TryFindParent<TParent>() where TParent : ObservableHierarchyObject
+        public TParent? TryFindParent<TParent>() where TParent : ObservableSingleParentHierarchyObject
         {
             var current = this;
 

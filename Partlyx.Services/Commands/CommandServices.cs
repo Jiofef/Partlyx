@@ -19,17 +19,26 @@ namespace Partlyx.Services.Commands
         public ICommandDispatcher Dispatcher { get; }
         public ICommandFactory Factory { get; }
 
-        public async Task<TCommand> CreateSyncAndExcecuteAsync<TCommand>(params object[] args) where TCommand : ICommand
+        public async Task<TCommand> CreateAndExcecuteAsync<TCommand>(params object[] args) where TCommand : class, ICommand
         {
-            TCommand command = Factory.Create<TCommand>(args);
+            TCommand command = await Factory.CreateAsync<TCommand>(args);
             await Dispatcher.ExcecuteAsync(command);
             return command;
         }
 
-        public async Task<TCommand> CreateAsyncEndExcecuteAsync<TCommand>(params object[] args) where TCommand : class, ICommand, IAsyncInitializable
+        public async Task<TCommand> CreateAndExcecuteInLastComplexAsync<TCommand>(params object[] args) where TCommand : class, IUndoableCommand
         {
             TCommand command = await Factory.CreateAsync<TCommand>(args);
-            await Dispatcher.ExcecuteAsync(command);
+            await Dispatcher.ExcecuteInLastComplexAsync(command);
+            return command;
+        }
+        public async Task<TCommand> CreateAndExcecuteInLastComplexAsyncIf<TCommand>(bool executeInComplex, params object[] args) where TCommand : class, IUndoableCommand
+        {
+            TCommand command = await Factory.CreateAsync<TCommand>(args);
+            if (executeInComplex)
+                await Dispatcher.ExcecuteInLastComplexAsync(command);
+            else
+                await Dispatcher.ExcecuteAsync(command);
             return command;
         }
     }

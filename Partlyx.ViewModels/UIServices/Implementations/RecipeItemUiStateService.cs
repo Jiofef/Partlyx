@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Partlyx.ViewModels.Graph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIStates;
@@ -37,6 +38,27 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             {
                 state = (RecipeNodeUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeNodeUIState), vm);
                 _nodeStates.Add(vm.Uid, state);
+            }
+            return state;
+        }
+    }
+
+    public class ComponentPathUiStateService : IComponentPathUiStateService
+    {
+        private IServiceProvider _provider { get; }
+        public ComponentPathUiStateService(IServiceProvider provider)
+        {
+            _provider = provider;
+        }
+        private readonly Dictionary<Guid, RecipeComponentPathItemUIState> _itemStates = new();
+
+        public RecipeComponentPathItemUIState GetOrCreateItemUi(RecipeComponentPathItem vm)
+        {
+            var state = _itemStates.GetValueOrDefault(vm.Uid);
+            if (state == null)
+            {
+                state = (RecipeComponentPathItemUIState)ActivatorUtilities.CreateInstance(_provider, typeof(RecipeComponentPathItemUIState), vm);
+                _itemStates.Add(vm.Uid, state);
             }
             return state;
         }

@@ -6,7 +6,7 @@ using UJL.CSharp.Collections;
 
 namespace Partlyx.ViewModels.Graph
 {
-    public class GraphTreeNodeViewModel : HierarchyTransformObject, ISizePositionObject
+    public class GraphTreeNodeViewModel : MultiParentHierarchyTransformObject, ISizePositionObject
     {
         private const float StandardNodeDistanceX = 24;
         private const float StandardNodeDistanceY = 48;
@@ -73,9 +73,6 @@ namespace Partlyx.ViewModels.Graph
         /// <summary> Call it when your tree is ready </summary>
         public virtual void BuildChildren()
         {
-            BuildBranchAndGetItsWidth();
-            UpdateGlobalPositionOfTree();
-
             BuildingRecursion(this);
             void BuildingRecursion(GraphTreeNodeViewModel node)
             {
@@ -88,47 +85,5 @@ namespace Partlyx.ViewModels.Graph
         }
 
         protected virtual void Build() { }
-
-        // This method works almost without errors, but requires rework and removal of workarounds (for example adding Width to branchOffset)
-        private float BuildBranchAndGetItsWidth()
-        {
-            if (Children.Count == 0)
-                return this.Width;
-
-            // Finding branch width
-            float branchWidth = 0;
-            float[] childrenBranchWidths = new float[Children.Count];
-
-            for (int i = 0; i < Children.Count; i++)
-            {
-                var child = (GraphTreeNodeViewModel)Children[i];
-                float childBranchWidth = child.BuildBranchAndGetItsWidth();
-                childrenBranchWidths[i] = childBranchWidth;
-                branchWidth += childBranchWidth;
-
-                if (i < Children.Count - 1)
-                    branchWidth += child.Children.Count == 0 ? SingleChildrenDistanceX : BranchesDistanceX;
-            }
-
-            // Setting children positions
-            float branchOffset = -branchWidth / 2;
-
-            float nextChildOffsetX = branchOffset;
-            for (int i = 0; i < Children.Count; i++)
-            {
-                float currentBranchWidth = childrenBranchWidths[i];
-                var child = (GraphTreeNodeViewModel)Children[i];
-                child.SetYLocalSilent(Height + SingleChildrenDistanceY);
-                child.SetXLocalSilent(nextChildOffsetX + currentBranchWidth / 2);
-
-                float dist = child.Children.Count == 0 ? SingleChildrenDistanceX : BranchesDistanceX;
-                nextChildOffsetX += currentBranchWidth + dist;
-            }
-
-            if (Children.Count == 1)
-                ((GraphTreeNodeViewModel)Children[0]).SetXLocalSilent(0);
-
-            return branchWidth;
-        }
     }
 }
