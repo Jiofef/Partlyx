@@ -124,11 +124,29 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Available conversions:.
+        /// </summary>
+        public static string Available_conversions {
+            get {
+                return ResourceManager.GetString("Available_conversions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Built in icons.
         /// </summary>
         public static string BuiltIn_Icons {
             get {
                 return ResourceManager.GetString("BuiltIn_Icons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Calculate using:.
+        /// </summary>
+        public static string Calculate_using_ {
+            get {
+                return ResourceManager.GetString("Calculate_using_", resourceCulture);
             }
         }
         
@@ -192,6 +210,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Component_N {
             get {
                 return ResourceManager.GetString("Component_N", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Converter.
+        /// </summary>
+        public static string Converter {
+            get {
+                return ResourceManager.GetString("Converter", resourceCulture);
             }
         }
         
@@ -610,6 +637,24 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Input amount.
+        /// </summary>
+        public static string Input_amount {
+            get {
+                return ResourceManager.GetString("Input_amount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Input resource.
+        /// </summary>
+        public static string Input_resource {
+            get {
+                return ResourceManager.GetString("Input_resource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Inputs.
         /// </summary>
         public static string Inputs {
@@ -718,6 +763,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Options.
+        /// </summary>
+        public static string Options {
+            get {
+                return ResourceManager.GetString("Options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Other.
         /// </summary>
         public static string Other {
@@ -732,6 +786,24 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Other2 {
             get {
                 return ResourceManager.GetString("Other2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Output amount.
+        /// </summary>
+        public static string Output_amount {
+            get {
+                return ResourceManager.GetString("Output_amount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Output resource.
+        /// </summary>
+        public static string Output_resource {
+            get {
+                return ResourceManager.GetString("Output_resource", resourceCulture);
             }
         }
         

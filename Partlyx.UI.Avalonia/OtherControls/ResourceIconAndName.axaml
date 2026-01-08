@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels.Implementations"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:Partlyx.UI.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Partlyx.UI.Avalonia.ResourceIconAndName"
+             x:Name="Root">
+  	    <StackPanel VerticalAlignment="Center">
+            <Grid HorizontalAlignment="Stretch" ColumnDefinitions="Auto,*">
+                <local:IconControl Grid.Column="0" IconContent="{Binding #Root.Resource.Icon}" Width="24" Height="24" Margin="4, 2, 4, 2"/>
+				<TextBlock Grid.Column="1" VerticalAlignment="Center" Text="{Binding #Root.Resource.Name}" Classes="common"/>
+            </Grid>
+        </StackPanel>
+</UserControl>

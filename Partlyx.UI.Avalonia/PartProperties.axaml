@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="320" d:DesignHeight="320"
              x:Class="Partlyx.UI.Avalonia.PartProperties"
              xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
              xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
@@ -89,7 +89,8 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="{Binding DisplayableName}" Grid.Column="0" VerticalAlignment="Center" Classes="common" Margin="4"/>
-                    <NumericUpDown x:Name="SpinBox" Value="{Binding Value, Mode=TwoWay}" Grid.Column="1" VerticalAlignment="Center" Margin="4">
+                    <NumericUpDown x:Name="SpinBox" Value="{Binding Value, Mode=TwoWay}" Grid.Column="1"
+                                   Background="Transparent" VerticalAlignment="Center" Margin="4">
                         <i:Interaction.Behaviors>
                             <ia:EventTrigger EventName="LostFocus">
                                 <ia:InvokeCommandAction
@@ -103,27 +104,16 @@
             </Grid>
         </DataTemplate>
     </UserControl.DataTemplates>
-    <Grid Background="{StaticResource PxBlue0Brush}" HorizontalAlignment="Stretch">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <StackPanel Orientation="Vertical" Grid.Row="0">
-            <Grid Height="48">
-                <Rectangle Fill="{StaticResource PxBlue0Brush}" RadiusX="8" RadiusY="8" StrokeThickness="4" Stroke="{StaticResource PxBlue1Brush}"/>
-                <TextBlock Text="{h:Loc Properties}" Foreground="{StaticResource PxBlackBrush}" FontSize="32" TextAlignment="Center" FontStyle="Italic" DockPanel.Dock="Top"/>
-            </Grid>
-            <TextBlock Grid.Row="0" Text="{Binding FocusedPartTextAnnotation}" Margin="8, 4, 8, 4" HorizontalAlignment="Center" Foreground="{StaticResource PxBlackBrush}" Classes="common"/>
-            <ListBox x:Name="PropertiesListView" ItemsSource="{Binding Properties}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <ContentControl>
-                            <ContentPresenter Content="{Binding}"/>
-                        </ContentControl>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </StackPanel>
-    </Grid>
+    <StackPanel Orientation="Vertical" Grid.Row="0">
+        <TextBlock Grid.Row="0" Text="{Binding FocusedPartTextAnnotation}" Margin="8, 4, 8, 4" HorizontalAlignment="Center" Foreground="{StaticResource PxBlackBrush}" Classes="common"/>
+        <ListBox x:Name="PropertiesListView" ItemsSource="{Binding Properties}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl>
+                        <ContentPresenter Content="{Binding}"/>
+                    </ContentControl>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </StackPanel>
 </UserControl>

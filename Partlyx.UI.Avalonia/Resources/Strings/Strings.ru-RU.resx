@@ -522,4 +522,28 @@
   <data name="Component_creating" xml:space="preserve">
     <value>Создание компонентов</value>
   </data>
+  <data name="Converter" xml:space="preserve">
+    <value>Преобразователь</value>
+  </data>
+  <data name="Input_resource" xml:space="preserve">
+    <value>Входящий ресурс</value>
+  </data>
+  <data name="Output_resource" xml:space="preserve">
+    <value>Выходящий ресурс</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Опции</value>
+  </data>
+  <data name="Available_conversions" xml:space="preserve">
+    <value>Доступные преобразования:</value>
+  </data>
+  <data name="Input_amount" xml:space="preserve">
+    <value>Количество входного</value>
+  </data>
+  <data name="Output_amount" xml:space="preserve">
+    <value>Количество выходящего</value>
+  </data>
+  <data name="Calculate_using_" xml:space="preserve">
+    <value>Расчёт через:</value>
+  </data>
 </root>

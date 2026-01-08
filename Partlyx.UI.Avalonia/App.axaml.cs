@@ -137,8 +137,12 @@ namespace Partlyx.UI.Avalonia
             services.AddTransient<PartsTreeViewModel>();
             services.AddTransient<PartsTreeResourcesViewModel>();
             services.AddTransient<PartsTreeRecipesViewModel>();
-            services.AddTransient<PartsGraphViewModel>();
+
+            services.AddTransient<AdditionalMenusViewModel>();
             services.AddTransient<ItemPropertiesViewModel>();
+            services.AddTransient<ResourceConverterViewModel>();
+            
+            services.AddTransient<PartsGraphViewModel>();
 
             services.AddTransient<MenuPanelViewModel>();
             services.AddTransient<MenuPanelFileViewModel>();

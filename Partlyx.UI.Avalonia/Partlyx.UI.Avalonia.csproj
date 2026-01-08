@@ -37,6 +37,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="LeftMenu.axaml.cs">
+      <DependentUpon>LeftMenu.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="RightMenu.axaml.cs">
+      <DependentUpon>RightMenu.axaml</DependentUpon>
+    </Compile>
     <Compile Update="PartsTreeRecipes.axaml.cs">
       <DependentUpon>PartsTreeRecipes.axaml</DependentUpon>
     </Compile>

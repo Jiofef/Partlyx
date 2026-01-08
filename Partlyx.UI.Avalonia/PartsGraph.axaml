@@ -33,7 +33,7 @@
 
     <UserControl.DataTemplates>
 		<!-- Override image icon template -->
-        <DataTemplate DataType="vmoi:ImageViewModel"> 
+        <DataTemplate x:DataType="vmoi:ImageViewModel"> 
             <Image Source="{Binding ToDraw, Converter={StaticResource ByteArrayToBitmapConv}}"/>
         </DataTemplate>
     </UserControl.DataTemplates>
@@ -58,7 +58,7 @@
                                MaxZoom="{Binding PanAndZoomController.MaxZoom}">
                 <Grid>
 					<!-- edges behind -->
-                    <ItemsControl ItemsSource="{Binding Graph.Edges}" ClipToBounds="False">
+                    <ItemsControl ItemsSource="{Binding GraphBuilder.Edges}" ClipToBounds="False">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <Canvas x:Name="PART_Canvas"/>
@@ -71,7 +71,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     <!-- nodes on top -->
-                    <ItemsControl ItemsSource="{Binding Graph.Nodes}" ClipToBounds="False">
+                    <ItemsControl ItemsSource="{Binding GraphBuilder.Nodes}" ClipToBounds="False">
                         <ItemsControl.ItemsPanel>
 						    <ItemsPanelTemplate>
 							    <Canvas x:Name="PART_Canvas"/>
@@ -86,7 +86,7 @@
                           </ItemsControl.ItemContainerTheme>
 
                         <ItemsControl.DataTemplates>
-                            <DataTemplate DataType="graphvm:RecipeGraphNodeViewModel">
+                            <DataTemplate x:DataType="graphvm:RecipeGraphNodeViewModel">
                                 <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
                                         Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}"
                             BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2" VerticalContentAlignment="Stretch">

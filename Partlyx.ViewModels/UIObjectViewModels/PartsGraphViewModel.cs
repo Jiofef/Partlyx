@@ -27,7 +27,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public DynamicPanPositionController PanVelocityController { get; }
 
         // Core
-        public PartsGraphBuilderViewModel Graph { get; }
+        public PartsGraphBuilderViewModel GraphBuilder { get; }
         public ComponentSumController SumController { get; }
         private readonly ComponentSumControllerBinder _componentSumBinder;
 
@@ -41,7 +41,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             SelectedParts = selectedParts;
             MainWindowController = mwc;
             PanAndZoomController = pazc;
-            Graph = graph;
+            GraphBuilder = graph;
 
             PanVelocityController = new DynamicPanPositionController(PanAndZoomController, timerService);
 
@@ -61,13 +61,13 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             SumController = new();
             _componentSumBinder = new ComponentSumControllerBinder(graph.ComponentLeafs, SumController);
 
-            Graph.OnGraphBuilded = new(async () => 
+            GraphBuilder.OnGraphBuilded = new(async () => 
             {
                 // We find all the unique images among the displayed nodes, and send a request to download the full version of the image instead of the compressed one.
 
                 List<Guid> nodeImagesUids = new();
                 HashSet<Guid> nodeImagesUidsHashed = new();
-                foreach (var node in Graph.Nodes)
+                foreach (var node in GraphBuilder.Nodes)
                 {
                     if (node.Value is not IVMPart part) continue;
                     if (part.Icon?.Content is not ImageViewModel image) continue;
@@ -93,7 +93,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         [RelayCommand]
         public void CenterizePanPosition()
         {
-            var graphCenter = Graph.Graph.BoundingBox.Center;
+            var graphCenter = GraphBuilder.Graph.BoundingBox.Center;
             PanAndZoomController.CenterizePanPosition(new System.Drawing.Point((int)graphCenter.X, -(int)graphCenter.Y));
         }
 

@@ -126,6 +126,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly Dictionary<Guid, RecipeComponentViewModel> _outputsDic = new();
         public ReadOnlyDictionary<Guid, RecipeComponentViewModel> OutputsDic { get; }
 
+        public ObservableCollection<RecipeComponentViewModel> GetComponents(bool isOutput)
+            => isOutput ? Outputs : Inputs;
+
         // Optimized resource counting
         private readonly Dictionary<Guid, int> _inputsResourceCounts = new();
         public HashSet<Guid> InputResources { get; } = new();

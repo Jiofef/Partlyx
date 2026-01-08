@@ -1,0 +1,138 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:i="using:Avalonia.Xaml.Interactivity"
+             xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+             xmlns:dnd="using:Avalonia.Xaml.Interactions.DragAndDrop"
+             xmlns:graph="using:Partlyx.ViewModels.Graph"
+             xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
+             xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
+             xmlns:localo="using:Partlyx.UI.Avalonia.OtherControls"
+             xmlns:local="using:Partlyx.UI.Avalonia"
+             xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
+             mc:Ignorable="d" d:DesignWidth="320" d:DesignHeight="640"
+             x:Class="Partlyx.UI.Avalonia.ResourcesConverter"
+             x:DataType="vmo:ResourceConverterViewModel"
+             x:CompileBindings="False">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+		<StackPanel HorizontalAlignment="Stretch" Spacing="4">
+            <StackPanel HorizontalAlignment="Stretch" Margin="8" Spacing="4">
+                <!-- Input resource -->
+                <TextBlock Text="{h:Loc Input_resource}" Classes="common" FontSize="20"/>
+                <Grid>
+                    <Border Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <local:ResourceIconAndName Resource="{Binding InputResource}" VerticalAlignment="Stretch"/>
+                        <Button Content="{h:Loc Select}"
+                                HorizontalAlignment="Stretch"  Classes="darker-focus"
+                                Command="{Binding SelectInput}" Grid.Column="1"
+                                Height="32"/>
+                    </Grid>				
+                </Grid>
+                <Border Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="4"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        IsVisible="{Binding IsCalculatingFromInput}">
+				    <Grid ColumnDefinitions="*, Auto">
+                        <NumericUpDown HorizontalAlignment="Stretch" Value="{Binding InputAmount}"
+                                       Background="{StaticResource PxWhiteBrush}"/>
+                        <TextBlock Text="X" Grid.Column="1" VerticalAlignment="Center" MinWidth="32" TextAlignment="Center" FontSize="16" Classes="common"/>
+                    </Grid>
+                </Border>
+
+                <!-- Output resource -->
+                <TextBlock Text="{h:Loc Output_resource}" Classes="common" FontSize="20"/>
+                <Grid>
+                    <Border Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" 
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <local:ResourceIconAndName Resource="{Binding OutputResource}" VerticalAlignment="Stretch"/>
+                        <Button Content="{h:Loc Select}"
+                                HorizontalAlignment="Stretch" Classes="darker-focus"
+                                Command="{Binding SelectOutputCommand}" Grid.Column="1"
+                                Height="32"/>
+                    </Grid>				
+                </Grid>
+                <Border Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="4"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        IsVisible="{Binding IsCalculatingFromOutput}">				
+                    <Grid ColumnDefinitions="*, Auto">
+                        <NumericUpDown HorizontalAlignment="Stretch" Value="{Binding OutputAmount}"
+                                       Background="{StaticResource PxWhiteBrush}"/>
+                        <TextBlock Text="X" Grid.Column="1" Classes="common" VerticalAlignment="Center" TextAlignment="Center" FontSize="16" MinWidth="24"/>
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <Separator Background="{StaticResource PxBlue1Brush}" Classes="common"
+                       HorizontalAlignment="Stretch" Height="3" Margin="8"/>
+
+            <!-- Options -->
+            <StackPanel Spacing="4" Margin="8">
+			    <Expander Header="{h:Loc Options}" 
+                          VerticalAlignment="Top"
+                          FontFamily="Cascadia Code">
+                    <StackPanel Spacing="4" Margin="8">
+                        <StackPanel Orientation="Horizontal" IsVisible="False"> <!-- To do -->
+						    <ToggleButton/>
+                        </StackPanel>
+
+                        <TextBlock Text="{h:Loc Calculate_using_}" Classes="common" FontSize="20"/>
+						<RadioButton IsChecked="{Binding IsCalculatingFromInput}" GroupName="CalculateUsingGroup" Content="{h:Loc Input_amount}" FontFamily="Cascadia Code"/>
+						<RadioButton IsChecked="{Binding IsCalculatingFromOutput}" GroupName="CalculateUsingGroup" Content="{h:Loc Output_amount}" FontFamily="Cascadia Code"/>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+
+            <Separator Background="{StaticResource PxBlue1Brush}" Classes="common"
+                       HorizontalAlignment="Stretch" Height="3" Margin="8"/>
+
+            <!-- Available conversions -->
+            <StackPanel Spacing="4" Margin="8">
+                <TextBlock Text="{h:Loc Available_conversions}" Classes="common" FontSize="20"/>
+                <StackPanel.DataTemplates>
+
+                </StackPanel.DataTemplates>
+                <ListBox ItemsSource="{Binding AvailableConversions}">
+				    <ListBox.ItemTemplate>
+					    <!-- Path item template -->
+                        <DataTemplate DataType="graph:RecipeComponentPathItem">
+				            <Border Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" 
+                                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                <StackPanel>
+                                    <TextBlock Text="{h:Loc Complexity_steps}" Classes="common"/>
+				                        <StackPanel>
+				                            <!-- Inputs should be here -->		
+                                        </StackPanel>
+                                        <mdi:MaterialIcon Kind="ArrowDown" HorizontalAlignment="Center"/>
+            	                        <StackPanel>
+				                            <!-- Outputs should be here -->		
+                                        </StackPanel>
+
+                                        <!-- Recipes order -->
+                                        <Expander Header="{h:Loc Recipes_order}" IsVisible="False">
+                                            <!-- !To do! -->
+                                        </Expander>
+
+                                        <StackPanel Orientation="Horizontal">
+						                    <Button Content="{h:Loc Make_a_recipe}" Classes="darker-focus"/>
+                                            <ToggleButton Grid.Column="2" Classes="with_icon" Margin="4" Width="24" Height="24" ToolTip.Tip="{h:Loc Open_in_editor}"
+                                                      IsHitTestVisible="True"
+                                                      Command="{Binding UiItem.ToggleGlobalFocus}"
+                                                        Tag="Eye" IsChecked="{Binding UiItem.HasGlobalFocus}">
+                                            <i:Interaction.Behaviors>
+                                                <beh:DragHoverCommandBehavior Command="{Binding UiItem.FocusGlobalCommand}" DelayMs="0"/>
+                                            </i:Interaction.Behaviors>
+                                        </ToggleButton>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

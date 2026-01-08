@@ -3,11 +3,9 @@ using Partlyx.ViewModels.UIStates;
 
 namespace Partlyx.ViewModels
 {
-    public interface IFocusable
+    public interface IFocusable : IUidObjectViewModel
     {
         FocusableElementTypeEnum FocusableType { get; }
         FocusableItemUIState UiItem { get; }
-
-        Guid Uid { get; }
     }
 }

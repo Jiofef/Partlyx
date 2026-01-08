@@ -1,8 +1,10 @@
-﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
+﻿using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,8 +14,6 @@ namespace Partlyx.ViewModels.PartsViewModels
     {
         public static RecipeViewModel? GetRelatedRecipe(this IVMPart part)
         {
-            if (part == null) return null;
-
             if (part is ResourceViewModel resource)
                 return resource.LinkedDefaultRecipe?.Value;
             else if (part is RecipeViewModel recipe)
@@ -26,13 +26,18 @@ namespace Partlyx.ViewModels.PartsViewModels
 
         public static RecipeViewModel? GetRelatedRecipe(this IFocusable focusable)
         {
-            if (focusable == null) return null;
-
             if (focusable is IVMPart part)
                 return GetRelatedRecipe(part);
-            else
-                // For other focusable types like paths, implement later
-                return null;
+            
+            return null;
+        }
+
+        public static RecipeComponentPath? GetRelatedRecipeComponentPath(this IFocusable focusable)
+        {
+            if (focusable is RecipeComponentPathItem pathItem)
+                return pathItem.Path;
+
+            return null;
         }
     }
 }

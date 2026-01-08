@@ -7,9 +7,9 @@ using System.Diagnostics;
 
 namespace Partlyx.UI.Avalonia;
 
-public partial class PartsTree : UserControl
+public partial class LeftMenu : UserControl
 {
-    public PartsTree()
+    public LeftMenu()
     {
         InitializeComponent();
     }

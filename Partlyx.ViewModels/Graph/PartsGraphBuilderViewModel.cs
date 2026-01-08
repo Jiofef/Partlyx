@@ -3,6 +3,7 @@ using DynamicData;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.ViewModels.GraphicsViewModels;
+using Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -18,7 +19,7 @@ namespace Partlyx.ViewModels.Graph
 
         public ObservableCollection<ComponentGraphNodeViewModel> ComponentLeafs { get; } = new();
         public RelayCommand? OnGraphBuilded { get; set; }
-        public IGlobalFocusedElementContainer FocusedPart { get; }
+        public IGlobalFocusedElementContainer FocusedElement { get; }
 
         public PartsGraphBuilderViewModel(
             IGlobalFocusedElementContainer focusedPart,
@@ -27,7 +28,7 @@ namespace Partlyx.ViewModels.Graph
             IVMPartsStore store)
         {
             _store = store;
-            FocusedPart = focusedPart;
+            FocusedElement = focusedPart;
             _throttled = new ThrottledInvoker(TimeSpan.FromMilliseconds(200));
 
             bus.Subscribe<GlobalFocusedElementChangedEvent>(_ => UpdateGraph());
@@ -38,32 +39,103 @@ namespace Partlyx.ViewModels.Graph
 
         public void UpdateGraph() => _throttled.InvokeAsync(BuildAsync);
 
-        private async Task BuildAsync()
+        private async Task<bool> BuildAsync()
         {
             DestroyTree();
             ComponentLeafs.Clear();
 
-            var recipe = FocusedPart.Focused?.GetRelatedRecipe();
-            if (recipe == null)
-                return;
+            var focused = FocusedElement.Focused;
+            if (focused == null)
+                return false;
 
-            var root = new RecipeGraphNodeViewModel(recipe);
-            AddNode(root);
-            RootNode = root;
+            switch (focused.FocusableType)
+            {
+                case FocusableElementTypeEnum.RecipeHolder:
+                    var recipe = focused.GetRelatedRecipe();
+                    if (recipe == null)
+                        return false;
 
-            BuildRecursively(root, recipe, new HashSet<Guid> { recipe.Uid });
+                    var recipeRoot = recipe.ToNode();
+                    AddNode(recipeRoot);
+                    RootNode = recipeRoot;
 
-            BuildEdges();
+                    BuildRecipeNodesRecursively(recipeRoot, recipe, new HashSet<Guid> { recipe.Uid });
 
-            BuildLayout();
+                    BuildEdges();
+
+                    BuildLayout();
+                    break;
+                case FocusableElementTypeEnum.ComponentPathHolder:
+                    var path = focused.GetRelatedRecipeComponentPath();
+                    if (path == null || path.Nodes.Count == 0)
+                        return false;
+
+                    var steps = path.Nodes;
+
+                    // Creating the root component node
+                    var current = steps.First!;
+                    var pathRoot = current.Value.ToNode();
+                    AddNode(pathRoot);
+
+                    // Creating the root component recipe node
+                    var rootRecipe = current.Value.ParentRecipe;
+                    if (rootRecipe == null)
+                        return false;
+
+                    // Creating the root component node siblings
+                    var rootSiblings = current.Value.GetSiblings();
+                    var previousLayerComponentNodes = new List<ComponentGraphNodeViewModel>() { pathRoot };
+                    foreach (var sibling in rootSiblings)
+                    {
+                        var siblingNode = sibling.ToNode();
+                        previousLayerComponentNodes.Add(siblingNode); 
+                        AddNode(siblingNode);
+                    }
+
+                    // Building all the layers
+                    var currentRecipe = rootRecipe;
+                    var currentRecipeNode = rootRecipe.ToNode();
+                    AddNode(currentRecipeNode);
+                    while (current.Next != null)
+                    {
+                        // Binding parent component nodes to recipe
+                        current = current.Next;
+                        previousLayerComponentNodes.AddChildToAll(currentRecipeNode);
+
+                        // Creating child components
+                        var siblings = current.Value.GetWithSiblings();
+                        var nextLayerComponentNodes = new List<ComponentGraphNodeViewModel>() { pathRoot };
+                        foreach (var sibling in siblings)
+                        {
+                            var siblingNode = sibling.ToNode(currentRecipeNode);
+                            nextLayerComponentNodes.Add(siblingNode);
+                            AddNode(siblingNode);
+                        }
+
+                        // Binding the recipe to its child components
+                        currentRecipeNode.AddChildren(nextLayerComponentNodes);
+
+                        // Getting the next recipe and creating the node for it
+                        currentRecipe = current.Value.ParentRecipe;
+                        if (currentRecipe == null)
+                            return false;
+
+                        currentRecipeNode = currentRecipe.ToNode();
+
+                        // Sending our children components collection to the next iteration
+                        previousLayerComponentNodes = nextLayerComponentNodes;
+                    }
+
+                    break;
+                default:
+                    return false;
+            }
 
             OnGraphBuilded?.Execute(null);
+            return true;
         }
 
-        /// <summary>
-        /// Builds DAG structure only. No positioning logic allowed here.
-        /// </summary>
-        private void BuildRecursively(
+        private void BuildRecipeNodesRecursively(
             GraphNodeViewModel recipeNode,
             RecipeViewModel recipe,
             HashSet<Guid> path)
@@ -71,7 +143,7 @@ namespace Partlyx.ViewModels.Graph
             // Inputs → components → producer recipes
             foreach (var input in recipe.Inputs ?? Enumerable.Empty<RecipeComponentViewModel>())
             {
-                var component = new ComponentGraphNodeViewModel(input);
+                var component = input.ToNode();
                 AddNode(component);
                 recipeNode.AddChild(component);
 
@@ -87,7 +159,7 @@ namespace Partlyx.ViewModels.Graph
                     continue;
                 }
 
-                var nextRecipeNode = new RecipeGraphNodeViewModel(nextRecipe);
+                var nextRecipeNode = nextRecipe.ToNode();
                 AddNode(nextRecipeNode);
                 component.AddChild(nextRecipeNode);
 
@@ -95,14 +167,14 @@ namespace Partlyx.ViewModels.Graph
                 if (!path.Contains(nextRecipe.Uid))
                 {
                     var nextPath = new HashSet<Guid>(path) { nextRecipe.Uid };
-                    BuildRecursively(nextRecipeNode, nextRecipe, nextPath);
+                    BuildRecipeNodesRecursively(nextRecipeNode, nextRecipe, nextPath);
                 }
             }
 
             // Outputs (side products)
             foreach (var output in recipe.Outputs ?? Enumerable.Empty<RecipeComponentViewModel>())
             {
-                var component = new ComponentGraphNodeViewModel(output);
+                var component = output.ToNode();
                 AddNode(component);
                 component.AddChild(recipeNode);
                 ComponentLeafs.Add(component);

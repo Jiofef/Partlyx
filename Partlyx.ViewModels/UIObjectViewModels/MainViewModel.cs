@@ -27,7 +27,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         public PartsGraphViewModel PartsGraph { get; }
 
-        public ItemPropertiesViewModel ItemProperties { get; }
+        public AdditionalMenusViewModel AdditionalMenus { get; }
 
         public MenuPanelViewModel MenuPanel { get; }
 
@@ -49,6 +49,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public MainViewModel(
             PartsTreeViewModel partsTree,
             PartsGraphViewModel partsGraph,
+            AdditionalMenusViewModel additionalMenus,
             ItemPropertiesViewModel itemProperties,
             MenuPanelViewModel menuPanel,
             IMainWindowController windowController,
@@ -69,7 +70,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         {
             PartsTree = partsTree;
             PartsGraph = partsGraph;
-            ItemProperties = itemProperties;
+            AdditionalMenus = additionalMenus;
             MenuPanel = menuPanel;
             SelectedParts = selectedParts;
             WindowController = windowController;

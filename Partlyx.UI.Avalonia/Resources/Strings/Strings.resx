@@ -471,4 +471,28 @@
   <data name="Component_creating" xml:space="preserve">
     <value>Component creating</value>
   </data>
+  <data name="Converter" xml:space="preserve">
+    <value>Converter</value>
+  </data>
+  <data name="Input_resource" xml:space="preserve">
+    <value>Input resource</value>
+  </data>
+  <data name="Output_resource" xml:space="preserve">
+    <value>Output resource</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="Available_conversions" xml:space="preserve">
+    <value>Available conversions:</value>
+  </data>
+  <data name="Input_amount" xml:space="preserve">
+    <value>Input amount</value>
+  </data>
+  <data name="Output_amount" xml:space="preserve">
+    <value>Output amount</value>
+  </data>
+  <data name="Calculate_using_" xml:space="preserve">
+    <value>Calculate using:</value>
+  </data>
 </root>
