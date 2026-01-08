@@ -32,8 +32,8 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             _bus.Subscribe<RecipeComponentVMAddedToStoreEvent>((ev) => NotifyAdded(ev.ComponentUid, _store.Components[ev.ComponentUid], _linkedComponentsDic));
 
             _bus.Subscribe<ResourceVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.ResourceUid, _linkedResourcesDic));
-            _bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.RecipeUid, _linkedResourcesDic));
-            _bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.ComponentUid, _linkedResourcesDic));
+            _bus.Subscribe<RecipeVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.RecipeUid, _linkedRecipesDic));
+            _bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>((ev) => NotifyRemoved(ev.ComponentUid, _linkedComponentsDic));
         }
 
         private List<WeakReference<GuidLinkedPart<ResourceViewModel>>> _linkedResourcesDisorderedList = new();

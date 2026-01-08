@@ -207,8 +207,8 @@
   <data name="Selected_recipe" xml:space="preserve">
     <value>Selected recipe</value>
   </data>
-  <data name="Needed_amount" xml:space="preserve">
-    <value>Needed amount</value>
+  <data name="Amount" xml:space="preserve">
+    <value>Amount</value>
   </data>
   <data name="Default_recipe" xml:space="preserve">
     <value>Default recipe</value>

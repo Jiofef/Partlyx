@@ -61,10 +61,13 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 // If we create a recipe for a resource, we want it to be immediately present in its components as an output
                 if (parentResourceDto != null)
                 {
-                    var parentRecipeUid = createRecipeCommand.RecipeUid;
+                    var newRecipeUid = createRecipeCommand.RecipeUid;
                     var componentAmount = _settings.DefaultRecipeOutputAmount;
                     var componentCreatingOptions = new RecipeComponentCreatingOptions(componentAmount, true, true);
-                    await _commands.CreateAndExcecuteInLastComplexAsync<CreateRecipeComponentCommand>(parentRecipeUid, componentCreatingOptions);
+                    await _commands.CreateAndExcecuteInLastComplexAsync<CreateRecipeComponentCommand>(newRecipeUid, parentResourceDto.Uid, componentCreatingOptions);
+
+                    // Also we want to set the recipe as default to the resource, if there was not any recipes before
+                    await _commands.CreateAndExcecuteInLastComplexAsync<SetDefaultRecipeToResourceCommand>(parentResourceDto.Uid, newRecipeUid);
                 }
             });
 

@@ -92,7 +92,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public void RemoveRecipe(Guid uid)
         {
-            if (_recipes.ContainsKey(uid))
+            if (_recipes.TryGetValue(uid, out var recipe))
             {
                 _recipes[uid].Dispose();
                 _recipes.Remove(uid);

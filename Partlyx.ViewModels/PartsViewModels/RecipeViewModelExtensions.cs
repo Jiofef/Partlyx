@@ -19,7 +19,7 @@ namespace Partlyx.ViewModels.PartsViewModels
 
             recipe.TraverseSafe((component, isCycling) =>
             {
-                if (isCycling || component.SelectedRecipeComponents.IsNullOrEmpty())
+                if (isCycling || (component.CurrentRecipe?.Inputs).IsNullOrEmpty())
                     fundamentComponents.Add(component);
             });
 
@@ -81,10 +81,10 @@ namespace Partlyx.ViewModels.PartsViewModels
 
                     action(component, isComponentRecursive);
 
-                    if (component.SelectedRecipeComponents != null && component.SelectedRecipeComponents.Count > 0 && !isComponentRecursive)
+                    if (component.CurrentRecipe != null && component.CurrentRecipe.Inputs.Count > 0 && !isComponentRecursive)
                     {
                         parentResources.Add(componentResource);
-                        Iterate(component.SelectedRecipeComponents);
+                        Iterate(component.CurrentRecipe.Inputs);
                     }
 
                     parentResources.Remove(componentResource);

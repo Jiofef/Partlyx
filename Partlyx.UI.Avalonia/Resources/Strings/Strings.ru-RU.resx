@@ -207,8 +207,8 @@
   <data name="Selected_recipe" xml:space="preserve">
     <value>Выбранный рецепт</value>
   </data>
-  <data name="Needed_amount" xml:space="preserve">
-    <value>Необходимое количество</value>
+  <data name="Amount" xml:space="preserve">
+    <value>Количество</value>
   </data>
   <data name="Default_recipe" xml:space="preserve">
     <value>Стандартный рецепт</value>

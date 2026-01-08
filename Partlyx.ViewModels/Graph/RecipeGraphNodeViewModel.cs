@@ -10,11 +10,10 @@ using UJL.CSharp.Collections;
 
 namespace Partlyx.ViewModels.Graph
 {
-    public class RecipeGraphNodeViewModel : GraphTreeNodeViewModel, ITypedVMPartHolder<RecipeViewModel>
+    public class RecipeGraphNodeViewModel : GraphNodeViewModel, ITypedVMPartHolder<RecipeViewModel>
     {
-        public RecipeGraphNodeViewModel(RecipeViewModel value) : base(value.Uid,
-                  new ObservableCollectionProjection<Guid, RecipeComponentViewModel>(value.Inputs!, (component => component.Uid)),
-                  value) { }
+        public RecipeGraphNodeViewModel(RecipeViewModel value, GraphNodeViewModel? mainRelative = null)
+            : base(mainRelative, value) { }
 
         public PartTypeEnumVM? PartType => PartTypeEnumVM.Recipe;
 

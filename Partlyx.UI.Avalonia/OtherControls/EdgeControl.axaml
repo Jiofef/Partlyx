@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vmpg="using:Partlyx.ViewModels.Graph"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Partlyx.UI.Avalonia.OtherControls.EdgeControl"
+             x:DataType="vmpg:EdgeViewModel">
+  <Path Data="{Binding Geometry, Converter={StaticResource PartlyxToAvaloniaGeometryConv}}"
+          Stroke="{DynamicResource PxBlackBrush}"
+          StrokeThickness="2"
+          Fill="{DynamicResource PxBlackBrush}"/>
+</UserControl>

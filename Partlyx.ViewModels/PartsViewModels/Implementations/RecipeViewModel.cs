@@ -401,8 +401,19 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             UiItem.Dispose();
 
-            foreach (var component in Inputs)
+            // We call ToList to avoid an error due to collection changes during the loop.
+            foreach (var component in Inputs.ToList())
+            {
                 component.Dispose();
+                RemoveComponent(component);
+                _store.RemoveRecipeComponent(component.Uid);
+            }
+            foreach (var component in Outputs.ToList())
+            {
+                component.Dispose();
+                RemoveComponent(component);
+                _store.RemoveRecipeComponent(component.Uid);
+            }
         }
 
         public override void Update(RecipeDto dto, IReadOnlyList<string>? changedProperties = null)

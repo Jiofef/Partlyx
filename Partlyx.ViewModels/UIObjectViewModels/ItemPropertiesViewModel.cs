@@ -257,7 +257,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             Properties.Add(selectedRecipeProperty);
 
             // Creating "Quantity" property
-            var quantityProperty = new SpinBoxItemPropertyViewModel() { Name = _loc["Needed_amount"], Item = component };
+            var quantityProperty = new SpinBoxItemPropertyViewModel() { Name = _loc["Amount"], Item = component };
             quantityProperty.Value = (decimal)component.Quantity;
             quantityProperty.SaveChangesTask = new(
                 async arg =>

@@ -27,7 +27,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         public DynamicPanPositionController PanVelocityController { get; }
 
         // Core
-        public PartsGraphTreeBuilderViewModel Graph { get; }
+        public PartsGraphBuilderViewModel Graph { get; }
         public ComponentSumController SumController { get; }
         private readonly ComponentSumControllerBinder _componentSumBinder;
 
@@ -35,7 +35,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         private readonly IImagesStoreViewModel _imagesStore;
 
         public PartsGraphViewModel(IGlobalSelectedParts selectedParts, IMainWindowController mwc, PanAndZoomControllerViewModel pazc,
-            PartsGraphTreeBuilderViewModel graph, IVMPartsStore store, 
+            PartsGraphBuilderViewModel graph, IVMPartsStore store, 
             IImagesStoreViewModel imagesStore, IEventBus bus, ITimerService timerService)
         {
             SelectedParts = selectedParts;
@@ -93,7 +93,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         [RelayCommand]
         public void CenterizePanPosition()
         {
-            PanAndZoomController.CenterizePanPosition(Graph.RootNodeDefaultPosition);
+            var graphCenter = Graph.Graph.BoundingBox.Center;
+            PanAndZoomController.CenterizePanPosition(new System.Drawing.Point((int)graphCenter.X, -(int)graphCenter.Y));
         }
 
         [RelayCommand]

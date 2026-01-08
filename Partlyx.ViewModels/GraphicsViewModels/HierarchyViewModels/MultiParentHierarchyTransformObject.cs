@@ -10,54 +10,34 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
 
         public Vector2 GetSize() => new Vector2(Width, Height);
 
-        // Cached global positions to avoid expensive calculations
-        private float _cachedX;
-        private float _cachedY;
-        private bool _isPositionCacheValid = false;
+        // Primary global positions
+        private float _xGlobal, _yGlobal;
 
         public float X
         {
-            get
-            {
-                if (!_isPositionCacheValid)
-                    UpdatePositionCache();
-                return _cachedX;
-            }
+            get => _xGlobal;
             set
             {
-                if (Parents.Count == 0)
+                if (_xGlobal != value)
                 {
-                    XLocal = value;
+                    _xGlobal = value;
+                    NotifyPositionXChanged();
+                    NotifyChildrenPositionXChange();
                 }
-                else
-                {
-                    float parentsAvgX = GetParentsAverageX();
-                    XLocal = value - parentsAvgX;
-                }
-                InvalidatePositionCache();
             }
         }
 
         public float Y
         {
-            get
-            {
-                if (!_isPositionCacheValid)
-                    UpdatePositionCache();
-                return _cachedY;
-            }
+            get => _yGlobal;
             set
             {
-                if (Parents.Count == 0)
+                if (_yGlobal != value)
                 {
-                    YLocal = value;
+                    _yGlobal = value;
+                    NotifyPositionYChanged();
+                    NotifyChildrenPositionYChange();
                 }
-                else
-                {
-                    float parentsAvgY = GetParentsAverageY();
-                    YLocal = value - parentsAvgY;
-                }
-                InvalidatePositionCache();
             }
         }
 
@@ -68,76 +48,14 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
 
         public Vector2 GetPositionCentered() => new Vector2(XCentered, YCentered);
 
-        private float _xLocal, _yLocal;
-        public float XLocal
-        {
-            get => _xLocal;
-            set
-            {
-                if (_xLocal != value)
-                {
-                    _xLocal = value;
-                    InvalidatePositionCache();
-                    NotifyPositionXChanged();
-                    NotifyChildrenPositionXChange();
-                }
-            }
-        }
+        public float XLocal => Parents.Count == 0 ? X : X - GetParentsAverageX();
 
-        public float YLocal
-        {
-            get => _yLocal;
-            set
-            {
-                if (_yLocal != value)
-                {
-                    _yLocal = value;
-                    InvalidatePositionCache();
-                    NotifyPositionYChanged();
-                    NotifyChildrenPositionYChange();
-                }
-            }
-        }
+        public float YLocal => Parents.Count == 0 ? Y : Y - GetParentsAverageY();
 
-        public float XLocalCentered { get => X + Width / 2; set => XLocal = value - Width / 2; }
-        public float YLocalCentered { get => Y + Height / 2; set => YLocal = value - Height / 2; }
+        public float XLocalCentered { get => XLocal + Width / 2; }
+        public float YLocalCentered { get => YLocal + Height / 2; }
 
-        // If you're going to set all the local positions and update tree at one time
-        public void SetXLocalSilent(float value) => _xLocal = value;
-        public void SetYLocalSilent(float value) => _yLocal = value;
-        public void SetXLocalCenteredSilent(float value) => _xLocal = value - Width / 2;
-        public void SetYLocalCenteredSilent(float value) => _yLocal = value - Height / 2;
 
-        private void UpdatePositionCache()
-        {
-            if (Parents.Count == 0)
-            {
-                _cachedX = XLocal;
-                _cachedY = YLocal;
-            }
-            else
-            {
-                _cachedX = GetParentsAverageX() + XLocal;
-                _cachedY = GetParentsAverageY() + YLocal;
-            }
-            _isPositionCacheValid = true;
-        }
-
-        private void InvalidatePositionCache()
-        {
-            if (_isPositionCacheValid)
-            {
-                _isPositionCacheValid = false;
-                // Invalidate cache for all descendants
-                foreach (var child in GetAllTheDescendants())
-                {
-                    if (child is MultiParentHierarchyTransformObject mphto)
-                    {
-                        mphto._isPositionCacheValid = false;
-                    }
-                }
-            }
-        }
 
         private float GetParentsAverageX()
         {
@@ -153,16 +71,6 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
 
         public void UpdateGlobalPositionOfTree()
         {
-            // Invalidate all position caches in the hierarchy
-            var allObjects = GetAllTheAncestors().Concat(GetAllTheDescendants()).Distinct();
-            foreach (var obj in allObjects)
-            {
-                if (obj is MultiParentHierarchyTransformObject mphto)
-                {
-                    mphto._isPositionCacheValid = false;
-                }
-            }
-
             // Find all roots and update them
             var roots = GetRoots();
             foreach (var root in roots)

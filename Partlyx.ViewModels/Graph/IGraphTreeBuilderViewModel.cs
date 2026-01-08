@@ -7,9 +7,10 @@ namespace Partlyx.ViewModels.Graph
 {
     public interface IGraphTreeBuilderViewModel
     {
-        ObservableMultiCollection<FromToLineViewModel> Edges { get; }
-        ObservableCollection<GraphTreeNodeViewModel> Nodes { get; }
-        GraphTreeNodeViewModel? RootNode { get; }
+        ObservableCollection<EdgeViewModel> Edges { get; }
+        ReadOnlyObservableCollection<GraphNodeViewModel> Nodes { get; }
+        GraphNodeViewModel? RootNode { get; }
         Point RootNodeDefaultPosition { get; }
+        ReadOnlyDictionary<Guid, GraphNodeViewModel> NodesDictionary { get; }
     }
 }

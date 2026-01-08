@@ -28,6 +28,8 @@ namespace Partlyx.Services.ServiceImplementations
             if (name != null)
                 resource.Name = name;
 
+            resource.Name = await _repo.GetUniqueResourceNameAsync(resource.Name);
+
             var icon = new FigureIcon();
             var iconInfo = icon.GetInfo();
             resource.UpdateIconInfo(iconInfo);

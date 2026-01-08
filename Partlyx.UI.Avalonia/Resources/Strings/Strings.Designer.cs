@@ -70,6 +70,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Amount.
+        /// </summary>
+        public static string Amount {
+            get {
+                return ResourceManager.GetString("Amount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на An error occured during loading an image Image wasnt loaded.
         /// </summary>
         public static string An_error_occured_during_loading_an_image_Image_wasnt_loaded {
@@ -669,15 +678,6 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Name {
             get {
                 return ResourceManager.GetString("Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Needed amount.
-        /// </summary>
-        public static string Needed_amount {
-            get {
-                return ResourceManager.GetString("Needed_amount", resourceCulture);
             }
         }
         

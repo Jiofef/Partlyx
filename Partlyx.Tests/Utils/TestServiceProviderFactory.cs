@@ -116,8 +116,8 @@ namespace Partlyx.Tests.Utils
             services.AddSingleton<IMainWindowController, MainWindowController>();
             services.AddTransient<MainWindowNameController>();
 
-            services.AddTransient<IGraphTreeBuilderViewModel, GraphTreeBuilderViewModel>();
-            services.AddTransient<PartsGraphTreeBuilderViewModel>();
+            services.AddTransient<IGraphTreeBuilderViewModel, MSAGLGraphBuilderViewModel>();
+            services.AddTransient<PartsGraphBuilderViewModel>();
 
             services.AddTransient<ResourceViewModel>();
             services.AddTransient<RecipeViewModel>();

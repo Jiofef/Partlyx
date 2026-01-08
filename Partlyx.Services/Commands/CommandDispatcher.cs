@@ -75,7 +75,7 @@ namespace Partlyx.Services.Commands
         {
             await command.ExecuteAsync();
 
-            var last = _undoableCommandsHistory.Last();
+            var last = _undoableCommandsHistory.LastOrDefault();
             if (last == null)
                 OnCommandExcecuted(command);
             else if (last is ComplexUndoableCommand complex)

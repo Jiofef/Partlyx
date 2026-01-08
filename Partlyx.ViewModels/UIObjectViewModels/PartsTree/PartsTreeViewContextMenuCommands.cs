@@ -158,7 +158,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         [RelayCommand]
         public async Task MergeComponentsForRecipeAsync()
         {
-            foreach (var recipe in _currentSelected.OfType<RecipeViewModel>())
+            foreach (var recipe in _currentSelected.OfType<RecipeViewModel>().ToList())
             {
                 await _service.ComponentService.MergeSameComponentsAsync(recipe);
             }

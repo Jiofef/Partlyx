@@ -8,4 +8,5 @@
     <conv:ByteArrayToBitmapConverter x:Key="ByteArrayToBitmapConv"/>
     <conv:StringToMaterialIconKindConverter x:Key="StringToMaterialIconKindConv"/>
     <conv:ObjectToEnumerableConverter x:Key="ObjectToEnumerableConv"/>
+    <conv:PartlyxToAvaloniaGeometryConverter x:Key="PartlyxToAvaloniaGeometryConv"/>
 </ResourceDictionary>

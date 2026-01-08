@@ -5,11 +5,10 @@ using UJL.CSharp.Collections;
 
 namespace Partlyx.ViewModels.Graph
 {
-    public class ComponentGraphNodeViewModel : GraphTreeNodeViewModel, IDisposable, ITypedVMPartHolder<RecipeComponentViewModel>
+    public class ComponentGraphNodeViewModel : GraphNodeViewModel, IDisposable, ITypedVMPartHolder<RecipeComponentViewModel>
     {
         private readonly IDisposable _resourceNameUpdateSubscription;
         private readonly IDisposable _quantityUpdateSubscription;
-        private readonly IDisposable _craftAmountUpdateSubscription;
         private readonly IDisposable _valueUpdateSubscription;
 
         private string _columnTextPart1 = "";
@@ -17,12 +16,8 @@ namespace Partlyx.ViewModels.Graph
         public string ColumnTextPart1 { get => _columnTextPart1; private set => SetProperty(ref _columnTextPart1, value); }
         public string ColumnTextPart2 { get => _columnTextPart2; private set => SetProperty(ref _columnTextPart2, value); }
 
-        public ComponentGraphNodeViewModel(RecipeComponentViewModel value)
-            : base(value.Uid,
-              (value.SelectedRecipeComponents != null
-              ? new ObservableCollectionProjection<Guid, RecipeComponentViewModel>(value.SelectedRecipeComponents, (component => component.Uid))
-              : null),
-              value)
+        public ComponentGraphNodeViewModel(RecipeComponentViewModel value, GraphNodeViewModel? mainRelative = null)
+            : base(mainRelative, value)
         {
             if (Value is RecipeComponentViewModel component)
             {
@@ -58,13 +53,6 @@ namespace Partlyx.ViewModels.Graph
         public PartTypeEnumVM? PartType => PartTypeEnumVM.Component;
         private RecipeComponentViewModel? _component = null;
         public RecipeComponentViewModel? Part { get => _component; private set => SetProperty(ref _component, value); }
-
-        protected override void Build()
-        {
-            base.Build();
-
-            UpdateCost();
-        }
 
         private void UpdateCost()
         {
@@ -149,7 +137,6 @@ namespace Partlyx.ViewModels.Graph
         {
             _resourceNameUpdateSubscription.Dispose();
             _quantityUpdateSubscription.Dispose();
-            _craftAmountUpdateSubscription.Dispose();
             _valueUpdateSubscription.Dispose();
         }
     }

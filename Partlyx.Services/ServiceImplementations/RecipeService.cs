@@ -51,7 +51,7 @@ namespace Partlyx.Services.ServiceImplementations
             {
                 icon = new NullIcon();
             }
-                var iconInfo = icon.GetInfo();
+            var iconInfo = icon.GetInfo();
             recipe.UpdateIconInfo(iconInfo);
 
             return await _creator.CreateRecipeAsync(recipe);

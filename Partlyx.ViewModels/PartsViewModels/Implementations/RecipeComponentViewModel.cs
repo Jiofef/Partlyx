@@ -101,9 +101,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private GuidLinkedPart<RecipeViewModel>? _selectedRecipe;
         public GuidLinkedPart<RecipeViewModel>? LinkedSelectedRecipe { get => _selectedRecipe; private set => SetProperty(ref _selectedRecipe, value); }
 
-        private ObservableCollection<RecipeComponentViewModel>? _selectedRecipeComponents;
+        private RecipeViewModel? _currentRecipe;
 
-        public ObservableCollection<RecipeComponentViewModel>? SelectedRecipeComponents { get => _selectedRecipeComponents; private set => SetProperty(ref _selectedRecipeComponents, value); }
+        public RecipeViewModel? CurrentRecipe { get => _currentRecipe; private set => SetProperty(ref _currentRecipe, value); }
 
         public IconViewModel Icon { get => LinkedResource?.Value?.Icon!; }
 
@@ -168,9 +168,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public PartsGlobalNavigations GlobalNavigations { get; }
         private void UpdateSelectedComponents()
         {
-            SelectedRecipeComponents =
-                LinkedSelectedRecipe?.Value?.Inputs ??
-                LinkedResource?.Value?.LinkedDefaultRecipe?.Value?.Inputs;
+            CurrentRecipe =
+                LinkedSelectedRecipe?.Value ??
+                LinkedResource?.Value?.LinkedDefaultRecipe?.Value;
         }
 
         // Compatibility
