@@ -19,13 +19,13 @@
              d:DesignHeight="320">
 
     <UserControl.KeyBindings>
-        <KeyBinding Gesture="F2" Command="{Binding ActivateHotkeyCommand}"
+        <KeyBinding Gesture="F2" Command="{Binding ActivateHotkeyCommand}" 
                     CommandParameter="{Binding Service.TryRenamingSingleSelectedCommand}"/>
         <KeyBinding Gesture="Enter" Command="{Binding ActivateHotkeyCommand}"
                     CommandParameter="{Binding Service.TryRenamingSingleSelectedCommand}"/>
-        <KeyBinding Gesture="F" Command="{Binding ActivateHotkeyCommand}"
+        <KeyBinding Gesture="Ctrl+F" Command="{Binding ActivateHotkeyCommand}"
                     CommandParameter="{Binding Service.TryToggleSingleSelectedFocusCommand}"/>
-        <KeyBinding Gesture="Q" Command="{Binding ActivateHotkeyCommand}"
+        <KeyBinding Gesture="Ctrl+Q" Command="{Binding ActivateHotkeyCommand}"
                     CommandParameter="{Binding ContextMenuCommands.CreateQuantifiedRecipeCommand}"/>
         <KeyBinding Gesture="Ctrl+M" Command="{Binding ActivateHotkeyCommand}"
                     CommandParameter="{Binding ContextMenuCommands.MergeComponentsForRecipeCommand}"/>
@@ -45,11 +45,11 @@
                 IsVisible="{Binding ContextMenuCommands.AllowCreateRecipe}"/>
             <MenuItem Header="{h:Loc Create_a_component_for_this_recipe}" Command="{Binding ContextMenuCommands.CreateComponentCommand}"  Classes="common" InputGesture="Ctrl+Shift+OemPlus" 
                 IsVisible="{Binding ContextMenuCommands.AllowCreateComponent}"/>
-            <MenuItem Header="{h:Loc Create_quantified_copy}" Command="{Binding ContextMenuCommands.CreateQuantifiedRecipeCommand}"  Classes="common" InputGesture="Q" 
+            <MenuItem Header="{h:Loc Create_quantified_copy}" Command="{Binding ContextMenuCommands.CreateQuantifiedRecipeCommand}"  Classes="common" InputGesture="Ctrl+Q" 
                 IsVisible="{Binding ContextMenuCommands.AllowQuantifyRecipe}"/>
             <MenuItem Header="{h:Loc Merge_same_components}" Command="{Binding ContextMenuCommands.MergeComponentsForRecipeCommand}"  Classes="common" InputGesture="Ctrl+M"
                 IsVisible="{Binding ContextMenuCommands.AllowMergeRecipe}"/>
-            <MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding ContextMenuCommands.ToggleFocusCommand}"  Classes="common" InputGesture="F" 
+            <MenuItem Header="{h:Loc Toggle_focus}" Command="{Binding ContextMenuCommands.ToggleFocusCommand}"  Classes="common" InputGesture="Ctrl+F" 
                 IsVisible="{Binding ContextMenuCommands.AllowToggleFocus}"/>
             <MenuItem Header="{h:Loc Expand_branch}" Command="{Binding ContextMenuCommands.ExpandBranchCommand}" Classes="common"
                 IsVisible="{Binding ContextMenuCommands.AllowExpandBranch}"/>
@@ -61,7 +61,7 @@
                 IsVisible="{Binding ContextMenuCommands.AllowFindRecipe}"/>
             <MenuItem Header="{h:Loc Find_component}" Command="{Binding ContextMenuCommands.FindComponentCommand}" Classes="common"
                 IsVisible="{Binding ContextMenuCommands.AllowFindComponent}"/>
-            <MenuItem Header="{h:Loc Duplicate}" Command="{Binding ContextMenuCommands.DuplicateCommand}" Classes="common" InputGesture="D"
+            <MenuItem Header="{h:Loc Duplicate}" Command="{Binding ContextMenuCommands.DuplicateCommand}" Classes="common" InputGesture="Ctrl+D"
                 IsVisible="{Binding ContextMenuCommands.AllowDuplicate}"/>
             <MenuItem Header="{h:Loc Delete}" Command="{Binding ContextMenuCommands.DeleteCommand}" CommandParameter="{Binding}" Classes="common" InputGesture = "Delete"
                 IsVisible="{Binding ContextMenuCommands.AllowDelete}"/>

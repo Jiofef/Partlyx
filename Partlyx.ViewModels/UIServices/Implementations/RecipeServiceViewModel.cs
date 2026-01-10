@@ -39,13 +39,14 @@ namespace Partlyx.ViewModels.UIServices.Implementations
             _selectedParts = gsp;
             _focusedPart = gfp;
         }
-        public async Task<Guid> CreateRecipeAsync(ResourceViewModel? parentResource = null, bool executeInLastComplex = false)
+        public async Task<Guid> CreateRecipeAsync(ResourceViewModel? parentResource = null, bool createParentResourceOutput = true, bool executeInLastComplex = false)
         {
             string recipeName = _loc["Recipe"];
 
             var parentResourceDto = parentResource?.ToDto();
             if (parentResourceDto != null)
                 recipeName = parentResourceDto.Name;
+            int producingRecipesForParentResource = parentResource?.ProducingRecipes.Count ?? 0;
 
             RecipeCreatingOptions options = new(recipeName, true, parentResourceDto);
 
@@ -58,8 +59,8 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                 else
                     await _commands.Dispatcher.ExcecuteAsync(createRecipeCommand);
 
-                // If we create a recipe for a resource, we want it to be immediately present in its components as an output
-                if (parentResourceDto != null)
+                // If we create a recipe for a resource, we might want it to be immediately present in its components as an output
+                if (parentResourceDto != null && createParentResourceOutput)
                 {
                     var newRecipeUid = createRecipeCommand.RecipeUid;
                     var componentAmount = _settings.DefaultRecipeOutputAmount;
@@ -67,7 +68,8 @@ namespace Partlyx.ViewModels.UIServices.Implementations
                     await _commands.CreateAndExcecuteInLastComplexAsync<CreateRecipeComponentCommand>(newRecipeUid, parentResourceDto.Uid, componentCreatingOptions);
 
                     // Also we want to set the recipe as default to the resource, if there was not any recipes before
-                    await _commands.CreateAndExcecuteInLastComplexAsync<SetDefaultRecipeToResourceCommand>(parentResourceDto.Uid, newRecipeUid);
+                    if (producingRecipesForParentResource == 0)
+                        await _commands.CreateAndExcecuteInLastComplexAsync<SetDefaultRecipeToResourceCommand>(parentResourceDto.Uid, newRecipeUid);
                 }
             });
 

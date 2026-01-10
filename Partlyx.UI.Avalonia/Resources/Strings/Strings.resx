@@ -495,4 +495,10 @@
   <data name="Calculate_using_" xml:space="preserve">
     <value>Calculate using:</value>
   </data>
+  <data name="Complexity_steps_v" xml:space="preserve">
+    <value>Complexity steps: {0}</value>
+  </data>
+  <data name="Make_a_recipe" xml:space="preserve">
+    <value>Make a recipe</value>
+  </data>
 </root>

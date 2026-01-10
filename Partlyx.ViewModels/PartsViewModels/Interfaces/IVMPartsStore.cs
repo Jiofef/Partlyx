@@ -1,4 +1,5 @@
 ﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
+using System.Collections.ObjectModel;
 
 namespace Partlyx.ViewModels.PartsViewModels.Interfaces
 {
@@ -7,6 +8,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
         IReadOnlyDictionary<Guid, ResourceViewModel> Resources { get; }
         IReadOnlyDictionary<Guid, RecipeViewModel> Recipes { get; }
         IReadOnlyDictionary<Guid, RecipeComponentViewModel> Components { get; }
+        IReadOnlyDictionary<Guid, ObservableCollection<RecipeComponentViewModel>> ComponentsWithResource { get; }
 
         void Register(ResourceViewModel resource);
         void Register(RecipeViewModel recipe);

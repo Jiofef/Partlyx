@@ -1,4 +1,6 @@
+using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
+using ReactiveUI;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,6 +11,9 @@ namespace Partlyx.ViewModels.Graph
         public RecipeComponentPath(LinkedList<RecipeComponentViewModel> nodes) : base(nodes)
         {
         }
+
+        public int GetComponentsAmount() => Nodes.Count;
+        public int GetRecipesAmount() => Nodes.Count / 2;
 
         public static RecipeComponentPath FromList(List<RecipeComponentViewModel> path)
         {
@@ -34,38 +39,100 @@ namespace Partlyx.ViewModels.Graph
 
         public Dictionary<ResourceViewModel, double> Quantify(double inputAmount)
         {
-            var multipliers = CalculateMultipliers();
-            var resourceAmounts = new Dictionary<ResourceViewModel, double>();
+            var totals = new Dictionary<ResourceViewModel, double>();
 
-            double scaleFactor = inputAmount / (GetFirst()?.Value.Quantity ?? 1.0);
+            // This tracks the amount of the current resource moving through the path
+            double currentFlow = inputAmount;
 
-            foreach (var kvp in multipliers)
+            // We iterate through the path nodes in pairs (Recipe Input -> Recipe Output)
+            var currentNode = Nodes.First;
+
+            while (currentNode != null && currentNode.Next != null)
             {
-                var component = kvp.Key;
-                double multiplier = kvp.Value * scaleFactor;
+                var pathInputComp = currentNode.Value;      // e.g., 1 Oak
+                var pathOutputComp = currentNode.Next.Value; // e.g., 4 Planks
+                var recipe = pathInputComp.ParentRecipe;
 
-                double amount = multiplier * component.Quantity;
+                if (recipe == null) break;
 
-                // For inputs, it's cost (negative), for outputs - production (positive)
-                if (!component.IsOutput)
+                // 1. Determine how many times this specific recipe is executed
+                // based on the amount of resource arriving at this step.
+                double crafts = recipe.GetCraftsCount(pathInputComp.Uid, currentFlow, false);
+
+                // 2. Add ALL inputs/outputs of this recipe to the global summary
+                // This captures side-products and auxiliary requirements
+                foreach (var inComp in recipe.Inputs)
                 {
-                    amount = -amount;
+                    if (inComp.Resource != null)
+                        AddDelta(totals, inComp.Resource, -inComp.Quantity * crafts);
                 }
-                
-                if (component.Resource != null)
+                foreach (var outComp in recipe.Outputs)
                 {
-                    if (resourceAmounts.ContainsKey(component.Resource))
-                    {
-                        resourceAmounts[component.Resource] += amount;
-                    }
-                    else
-                    {
-                        resourceAmounts[component.Resource] = amount;
-                    }
+                    if (outComp.Resource != null)
+                        AddDelta(totals, outComp.Resource, outComp.Quantity * crafts);
                 }
+
+                // 3. Update currentFlow for the NEXT step in the path.
+                // The flow for the next recipe is the scaled amount of our current output.
+                // e.g., if we produced 4 planks, currentFlow becomes 4 for the next step.
+                currentFlow = pathOutputComp.Quantity * crafts;
+
+                // Move to the next "link" (the next pair in the chain)
+                currentNode = currentNode.Next.Next;
             }
 
-            return resourceAmounts;
+            // Cleanup small values
+            const double epsilon = 1e-10;
+            foreach (var key in totals.Keys.ToList())
+                if (Math.Abs(totals[key]) < epsilon) totals.Remove(key);
+
+            return totals;
+        }
+
+        public Dictionary<ResourceViewModel, double> QuantifyFromOutputAmount(double targetOutputAmount)
+        {
+            // To find out how much input is needed, we traverse the path backwards
+            double neededFlow = targetOutputAmount;
+            var currentNode = Nodes.Last;
+
+            while (currentNode != null && currentNode.Previous != null)
+            {
+                var pathOutputComp = currentNode.Value;
+                var pathInputComp = currentNode.Previous.Value;
+                var recipe = pathOutputComp.ParentRecipe;
+
+                if (recipe != null)
+                {
+                    // Backwards: How many crafts to get 'neededFlow' of this output?
+                    double crafts = recipe.GetCraftsCount(pathOutputComp.Uid, neededFlow, true);
+                    // How much input did that require?
+                    neededFlow = pathInputComp.Quantity * crafts;
+                }
+
+                currentNode = currentNode.Previous.Previous;
+            }
+
+            // Now that we know the initial input required, run the forward calculation
+            return Quantify(neededFlow);
+        }
+
+        private void AddDelta(Dictionary<ResourceViewModel, double> dict, ResourceViewModel res, double delta)
+        {
+            if (dict.ContainsKey(res)) dict[res] += delta;
+            else dict[res] = delta;
+        }
+
+        public IEnumerable<ResourceAmountPairViewModel> QuantifyToValuePairs(double inputAmount)
+        {
+            var quantified = Quantify(inputAmount);
+            return quantified.Select(kvp => new ResourceAmountPairViewModel(kvp.Key, kvp.Value));
+        }
+
+        public IEnumerable<ResourceAmountPairViewModel> QuantifyFromOutputAmountToValuePairs(double outputAmount)
+        {
+            var quantified = QuantifyFromOutputAmount(outputAmount);
+            return quantified.Select(kvp => new ResourceAmountPairViewModel(kvp.Key, kvp.Value));
         }
     }
+    public enum ComponentPathAmountMode { Input, Output}
 }

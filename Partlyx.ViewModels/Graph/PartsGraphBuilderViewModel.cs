@@ -126,6 +126,9 @@ namespace Partlyx.ViewModels.Graph
                         previousLayerComponentNodes = nextLayerComponentNodes;
                     }
 
+                    BuildEdges();
+
+                    BuildLayout();
                     break;
                 default:
                     return false;

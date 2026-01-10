@@ -1,8 +1,9 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 
 namespace Partlyx.ViewModels.Graph
 {
-    public abstract class Path<T>
+    public abstract class Path<T> : ObservableObject
     {
         protected LinkedList<T> _nodes;
 

@@ -16,29 +16,13 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
         public float X
         {
             get => _xGlobal;
-            set
-            {
-                if (_xGlobal != value)
-                {
-                    _xGlobal = value;
-                    NotifyPositionXChanged();
-                    NotifyChildrenPositionXChange();
-                }
-            }
+            set => SetProperty(ref _xGlobal, value);
         }
 
         public float Y
         {
             get => _yGlobal;
-            set
-            {
-                if (_yGlobal != value)
-                {
-                    _yGlobal = value;
-                    NotifyPositionYChanged();
-                    NotifyChildrenPositionYChange();
-                }
-            }
+            set => SetProperty(ref _yGlobal, value);
         }
 
         public Vector2 GetPosition() => new Vector2(X, Y);
@@ -67,56 +51,6 @@ namespace Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels
         {
             if (Parents.Count == 0) return 0;
             return Parents.Average(p => (p as MultiParentHierarchyTransformObject)?.Y ?? 0);
-        }
-
-        public void UpdateGlobalPositionOfTree()
-        {
-            // Find all roots and update them
-            var roots = GetRoots();
-            foreach (var root in roots)
-            {
-                if (root is MultiParentHierarchyTransformObject mphto)
-                {
-                    mphto.NotifyPositionXChanged();
-                    mphto.NotifyPositionYChanged();
-                    mphto.NotifyChildrenPositionXChange();
-                    mphto.NotifyChildrenPositionYChange();
-                }
-            }
-        }
-
-        private void NotifyPositionXChanged()
-        {
-            OnPropertyChanged(nameof(X));
-            OnPropertyChanged(nameof(ISizePositionObject.XCentered));
-            OnPropertyChanged(nameof(XLocal));
-            OnPropertyChanged(nameof(XLocalCentered));
-        }
-
-        private void NotifyPositionYChanged()
-        {
-            OnPropertyChanged(nameof(Y));
-            OnPropertyChanged(nameof(ISizePositionObject.YCentered));
-            OnPropertyChanged(nameof(YLocal));
-            OnPropertyChanged(nameof(YLocalCentered));
-        }
-
-        private void NotifyChildrenPositionXChange()
-        {
-            foreach (MultiParentHierarchyTransformObject child in Children)
-            {
-                child.NotifyPositionXChanged();
-                child.NotifyChildrenPositionXChange();
-            }
-        }
-
-        private void NotifyChildrenPositionYChange()
-        {
-            foreach (MultiParentHierarchyTransformObject child in Children)
-            {
-                child.NotifyPositionYChanged();
-                child.NotifyChildrenPositionYChange();
-            }
         }
     }
 }

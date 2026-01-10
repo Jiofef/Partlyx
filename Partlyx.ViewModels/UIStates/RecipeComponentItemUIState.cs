@@ -23,6 +23,9 @@ namespace Partlyx.ViewModels.UIStates
         public override IFocusedElementContainer GlobalFocusedContainer => AttachedComponent.GlobalNavigations.FocusedElementContainer;
         public override IFocusable AttachedFocusable => AttachedComponent;
 
+        private double _visualQuantity;
+        public double VisualQuantity { get => _visualQuantity; set => SetProperty(ref _visualQuantity, value); }
+
         public RecipeComponentItemUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm, IEventBus bus, IGlobalFocusedElementContainer gfc)
         {
             _bus = bus;

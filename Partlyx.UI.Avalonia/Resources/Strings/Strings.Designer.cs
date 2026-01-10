@@ -187,6 +187,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Complexity steps: {0}.
+        /// </summary>
+        public static string Complexity_steps_v {
+            get {
+                return ResourceManager.GetString("Complexity_steps_v", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Component.
         /// </summary>
         public static string Component {
@@ -696,6 +705,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Load_image {
             get {
                 return ResourceManager.GetString("Load_image", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Make a recipe.
+        /// </summary>
+        public static string Make_a_recipe {
+            get {
+                return ResourceManager.GetString("Make_a_recipe", resourceCulture);
             }
         }
         

@@ -168,12 +168,12 @@
                     </ToggleButton>
 
                     </Grid>
-                    <NumericUpDown Value="{Binding Quantity, Mode=TwoWay}" Grid.Row="1" Height="32" HorizontalAlignment="Stretch">
+                    <NumericUpDown Value="{Binding UiItem.VisualQuantity, Mode=TwoWay}" Grid.Row="1" Height="32" Background="Transparent" HorizontalAlignment="Stretch">
 						<i:Interaction.Behaviors>
 							<ia:EventTrigger EventName="LostFocus">
 								<ia:InvokeCommandAction
                                     Command="{Binding UiItem.SetQuantityCommand}"
-                                    CommandParameter="{Binding Quantity}"/>
+                                    CommandParameter="{Binding UiItem.VisualQuantity}"/>
                             </ia:EventTrigger>
                             <beh:NumericUpDownUnfocusOnEnterOrEscapeBehavior/>
                         </i:Interaction.Behaviors>

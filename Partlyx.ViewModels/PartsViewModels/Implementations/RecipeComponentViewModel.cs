@@ -9,6 +9,7 @@ using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIStates;
+using Partlyx.ViewModels.PartsViewModels;
 using ReactiveUI;
 using System.Collections.ObjectModel;
 
@@ -67,6 +68,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
 
             _quantity = dto.Quantity;
+            UiItem.VisualQuantity = dto.Quantity;
             _isOutput = dto.IsOutput;
             if (dto.SelectedRecipeUid is Guid selectedUid)
                 LinkedSelectedRecipe = _linkedPartsManager.CreateAndRegisterLinkedRecipeVM(selectedUid);
@@ -86,7 +88,31 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public ResourceViewModel? Resource => LinkedResource?.Value;
 
         private double _quantity;
-        public double Quantity { get => _quantity; set => SetProperty(ref _quantity, value); }
+        public double Quantity
+        {
+            get => _quantity;
+            set
+            {
+                double oldValue = _quantity;
+                if (SetProperty(ref _quantity, value))
+                {
+                    UiItem.VisualQuantity = value;
+                    PublishQuantityChangedEvent(oldValue, value);
+                }
+            }
+        }
+
+        private void PublishQuantityChangedEvent(double oldValue, double newValue)
+        {
+            var resourceUid = LinkedResource?.Uid ?? Guid.Empty;
+            _bus.Publish(new RecipeComponentQuantityChangedEvent(
+                Uid,
+                resourceUid,
+                ComponentType,
+                oldValue,
+                newValue,
+                Uid));
+        }
 
         private bool _isOutput;
         public bool IsOutput { get => _isOutput;

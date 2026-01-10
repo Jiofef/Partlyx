@@ -546,4 +546,10 @@
   <data name="Calculate_using_" xml:space="preserve">
     <value>Расчёт через:</value>
   </data>
+  <data name="Complexity_steps_v" xml:space="preserve">
+    <value>Количество шагов: {0}</value>
+  </data>
+  <data name="Make_a_recipe" xml:space="preserve">
+    <value>Сделать рецептом</value>
+  </data>
 </root>

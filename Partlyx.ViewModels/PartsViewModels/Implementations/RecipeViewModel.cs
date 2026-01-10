@@ -9,6 +9,7 @@ using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIStates;
+using Partlyx.ViewModels.PartsViewModels;
 using System.Collections.ObjectModel;
 using DynamicData;
 using DynamicData.Binding;
@@ -28,6 +29,10 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IconServiceViewModel _iconService;
         private readonly IEventBus _bus;
         public PartsServiceViewModel Services { get; }
+
+        // Aggregators
+        private readonly ResourceQuantityAggregator _quantityAggregator;
+        private readonly ResourceLinksManager _linksManager;
 
         public RecipeViewModel(RecipeDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store,
             IVMPartsFactory partsFactory, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm, IconServiceViewModel iconService, IEventBus bus)
@@ -70,21 +75,19 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             _componentGroups = new() { inputsGroupHeader, outputsGroupHeader };
             ComponentGroups = new(_componentGroups);
 
-            // Initialize resource counts
-            foreach (var component in _inputs)
-            {
-                UpdateResourceCount(RecipeComponentType.Input, component.LinkedResource?.Uid ?? Guid.Empty, 1);
-            }
-            foreach (var component in _outputs)
-            {
-                UpdateResourceCount(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty, 1);
-            }
+            // Initialize aggregators
+            _quantityAggregator = new ResourceQuantityAggregator(this);
+            _quantityAggregator.InitializeFromComponents(_inputs, _outputs);
+
+            _linksManager = new ResourceLinksManager(this, _bus);
+            _linksManager.InitializeFromComponents(_inputs, _outputs);
+            _linksManager.PublishAllResourceLinkChanges();
 
             // For the most part, we don't really care when the icon will be loaded. Until then, the icon will be empty.
             _icon = new IconViewModel();
-            _ = UpdateIconFromDto(dto.Icon);
+            _ = UpdateIconFromDtoAsync(dto.Icon);
         }
-        private async Task UpdateIconFromDto(IconDto dto)
+        private async Task UpdateIconFromDtoAsync(IconDto dto)
         {
             Icon?.Dispose();
             Icon = await _iconService.CreateFromDtoAsync(dto);
@@ -129,52 +132,41 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public ObservableCollection<RecipeComponentViewModel> GetComponents(bool isOutput)
             => isOutput ? Outputs : Inputs;
 
-        // Optimized resource counting
-        private readonly Dictionary<Guid, int> _inputsResourceCounts = new();
-        public HashSet<Guid> InputResources { get; } = new();
-        private readonly Dictionary<Guid, int> _outputsResourceCounts = new();
-        public HashSet<Guid> OutputResources { get; } = new();
+        // Resource quantity sums - delegated to aggregator
+        public ReadOnlyDictionary<Guid, double> InputResourceQuantities => _quantityAggregator.InputQuantities;
+        public ReadOnlyDictionary<Guid, double> OutputResourceQuantities => _quantityAggregator.OutputQuantities;
+
+        // Resource links - delegated to manager
+        public HashSet<Guid> InputResources => _linksManager.InputResources;
+        public HashSet<Guid> OutputResources => _linksManager.OutputResources;
 
         public RecipeComponentViewModel? GetChildOrNull(Guid uid)
-        {
-            return _inputsDic.GetValueOrDefault(uid) ?? _outputsDic.GetValueOrDefault(uid);
-        }
+            => _inputsDic.GetValueOrDefault(uid) ?? _outputsDic.GetValueOrDefault(uid);
 
         /// <summary>
         /// Checks if the resource is present in the recipe's inputs or outputs
         /// </summary>
-        public bool HasResource(Guid resourceUid)
-        {
-            return HasResourceInInputs(resourceUid) || HasResourceInOutputs(resourceUid);
-        }
+        public bool HasResource(Guid resourceUid) 
+            => HasResourceInInputs(resourceUid) || HasResourceInOutputs(resourceUid);
 
         /// <summary>
         /// Checks if the resource is present in the recipe's inputs
         /// </summary>
-        public bool HasResourceInInputs(Guid resourceUid)
-        {
-            return _inputsResourceCounts.ContainsKey(resourceUid);
-        }
+        public bool HasResourceInInputs(Guid resourceUid) 
+            => _linksManager.HasResourceInInputs(resourceUid);
 
         /// <summary>
         /// Checks if the resource is present in the recipe's outputs
         /// </summary>
-        public bool HasResourceInOutputs(Guid resourceUid)
-        {
-            return _outputsResourceCounts.ContainsKey(resourceUid);
-        }
+        public bool HasResourceInOutputs(Guid resourceUid) 
+            => _linksManager.HasResourceInOutputs(resourceUid);
 
         /// <summary>
         /// Checks if the resource is present in the recipe's components that can be used as default recipe
         /// If recipe is reversible, checks both inputs and outputs; otherwise, only outputs
         /// </summary>
         public bool HasResourceInLinkedComponents(Guid resourceUid)
-        {
-            if (IsReversible)
-                return HasResource(resourceUid);
-            else
-                return HasResourceInOutputs(resourceUid);
-        }
+            => IsReversible ? HasResource(resourceUid) : HasResourceInOutputs(resourceUid);
 
         private void AddComponent(RecipeComponentViewModel component)
         {
@@ -185,7 +177,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                 Outputs.Add(component);
                 _outputsDic.Add(component.Uid, component);
-                UpdateResourceCount(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+                _linksManager.AddComponent(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty);
+                _quantityAggregator.AddComponent(component);
             }
             else
             {
@@ -194,7 +187,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                 Inputs.Add(component);
                 _inputsDic.Add(component.Uid, component);
-                UpdateResourceCount(RecipeComponentType.Input, component.LinkedResource?.Uid ?? Guid.Empty, 1);
+                _linksManager.AddComponent(RecipeComponentType.Input, component.LinkedResource?.Uid ?? Guid.Empty);
+                _quantityAggregator.AddComponent(component);
             }
         }
 
@@ -204,83 +198,21 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 Inputs.Remove(component);
                 _inputsDic.Remove(component.Uid);
-                UpdateResourceCount(RecipeComponentType.Input, component.LinkedResource?.Uid ?? Guid.Empty, -1);
+                _linksManager.RemoveComponent(RecipeComponentType.Input, component.LinkedResource?.Uid ?? Guid.Empty);
+                _quantityAggregator.RemoveComponent(component);
             }
             else if (_outputsDic.ContainsKey(component.Uid))
             {
                 Outputs.Remove(component);
                 _outputsDic.Remove(component.Uid);
-                UpdateResourceCount(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty, -1);
+                _linksManager.RemoveComponent(RecipeComponentType.Output, component.LinkedResource?.Uid ?? Guid.Empty);
+                _quantityAggregator.RemoveComponent(component);
             }
-        }
-
-        private void UpdateResourceCount(RecipeComponentType componentType, Guid resourceUid, int delta)
-        {
-            if (resourceUid == Guid.Empty) return;
-
-            Dictionary<Guid, int> dict = componentType == RecipeComponentType.Input ? _inputsResourceCounts : _outputsResourceCounts;
-            HashSet<Guid> hashes = componentType == RecipeComponentType.Input ? InputResources : OutputResources;
-
-            bool wasPresent = dict.ContainsKey(resourceUid);
-            if (dict.TryGetValue(resourceUid, out int count))
-            {
-                count += delta;
-                if (count > 0)
-                {
-                    dict[resourceUid] = count;
-                }
-                else
-                {
-                    dict.Remove(resourceUid);
-                    hashes?.Remove(resourceUid);
-                }
-            }
-            else if (delta > 0)
-            {
-                dict[resourceUid] = delta;
-                hashes?.Add(resourceUid);
-            }
-
-            // Publish event if the presence changed
-            if (wasPresent != dict.ContainsKey(resourceUid))
-            {
-                PublishResourceLinkChanged(resourceUid);
-            }
-        }
-
-        private RecipeResourceLinkTypeEnum GetLinkTypeForResource(Guid resourceUid)
-        {
-            bool inInputs = InputResources.Contains(resourceUid);
-            bool inOutputs = OutputResources.Contains(resourceUid);
-
-            if (IsReversible)
-            {
-                if (inInputs && inOutputs) return RecipeResourceLinkTypeEnum.Both;
-                if (inInputs) return RecipeResourceLinkTypeEnum.Receiving;
-                if (inOutputs) return RecipeResourceLinkTypeEnum.Producing;
-                return RecipeResourceLinkTypeEnum.None;
-            }
-            else
-            {
-                return inOutputs ? RecipeResourceLinkTypeEnum.Producing : RecipeResourceLinkTypeEnum.None;
-            }
-        }
-
-        private void PublishResourceLinkChanged(Guid resourceUid)
-        {
-            var linkType = GetLinkTypeForResource(resourceUid);
-            _bus.Publish(new RecipeResourceLinkChangedEvent(this, resourceUid, linkType));
         }
 
         private void PublishAllResourceLinkChanges()
         {
-            var allResources = new HashSet<Guid>(InputResources);
-            allResources.UnionWith(OutputResources);
-
-            foreach (var resourceUid in allResources)
-            {
-                PublishResourceLinkChanged(resourceUid);
-            }
+            _linksManager.PublishAllResourceLinkChanges();
         }
 
         private IconViewModel _icon;
@@ -294,36 +226,40 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             { nameof(RecipeDto.Name), dto => Name = dto.Name },
             { nameof(RecipeDto.IsReversible), dto => IsReversible = dto.IsReversible },
-            { nameof(RecipeDto.Icon), dto => _ = UpdateIconFromDto(dto.Icon) },
+            { nameof(RecipeDto.Icon), dto => _ = UpdateIconFromDtoAsync(dto.Icon) },
         };
 
         public void HandleEvent(object @event)
         {
-            if (@event is RecipeUpdatedEvent rue)
+            switch (@event)
             {
-                OnRecipeUpdated(rue);
-                return;
+                case RecipeUpdatedEvent rue:
+                    OnRecipeUpdated(rue);
+                    break;
+                case RecipeComponentCreatedEvent rcce:
+                    OnComponentCreated(rcce);
+                    break;
+                case RecipeComponentDeletingStartedEvent rcde:
+                    OnComponentDeletingStarted(rcde);
+                    break;
+                case RecipeComponentMovedEvent rcme:
+                    OnComponentMoved(rcme);
+                    break;
+                case RecipeComponentUpdatedEvent rcue:
+                    OnComponentUpdated(rcue);
+                    break;
+                case RecipeComponentQuantityChangedEvent rcqc:
+                    OnComponentQuantityChanged(rcqc);
+                    break;
             }
-            if (@event is RecipeComponentCreatedEvent rcce)
-            {
-                OnComponentCreated(rcce);
-                return;
-            }
-            if (@event is RecipeComponentDeletingStartedEvent rcde)
-            {
-                OnComponentDeletingStarted(rcde);
-                return;
-            }
-            if (@event is RecipeComponentMovedEvent rcme)
-            {
-                OnComponentMoved(rcme);
-                return;
-            }
-            if (@event is RecipeComponentUpdatedEvent rcue)
-            {
-                OnComponentUpdated(rcue);
-                return;
-            }
+        }
+
+        private void OnComponentQuantityChanged(RecipeComponentQuantityChangedEvent ev)
+        {
+            // Only process events for components that belong to this recipe
+            if (GetChildOrNull(ev.ComponentUid) == null) return;
+
+            _quantityAggregator.UpdateComponentQuantity(ev.ComponentType, ev.ResourceUid, ev.OldQuantity, ev.NewQuantity);
         }
         private void OnRecipeUpdated(RecipeUpdatedEvent ev)
         {
@@ -360,9 +296,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             {
                 var componentVM = GetChildOrNull(ev.ComponentUid);
                 if (componentVM != null)
-                {
                     RemoveComponent(componentVM);
-                }
             }
             else if (Uid == ev.NewRecipeUid)
             {
@@ -387,18 +321,15 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
                     if (oldResourceUid != newResourceUid)
                     {
-                        UpdateResourceCount(componentVM.ComponentType, oldResourceUid, -1);
-                        UpdateResourceCount(componentVM.ComponentType, newResourceUid, 1);
+                        _linksManager.RemoveComponent(componentVM.ComponentType, oldResourceUid);
+                        _linksManager.AddComponent(componentVM.ComponentType, newResourceUid);
                     }
                 }
             }
         }
 
         /// <summary> Used when new DB is initialized and we need to connect created VM parts to each other </summary>
-        internal void InitAddChild(RecipeComponentViewModel component)
-        {
-            AddComponent(component);
-        }
+        internal void InitAddChild(RecipeComponentViewModel component) => AddComponent(component);
 
         public void Dispose()
         {

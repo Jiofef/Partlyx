@@ -142,15 +142,15 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         [RelayCommand]
         public void ExpandAll()
         {
-            var ev = new SetAllTheResourceItemsExpandedEvent(true);
-            _bus.Publish(ev);
+            _bus.Publish(new SetAllTheResourceItemsExpandedEvent(true));
+            _bus.Publish(new SetAllTheRecipeItemsExpandedEvent(true));
         }
 
         [RelayCommand]
         public void CollapseAll()
         {
-            var ev = new SetAllTheResourceItemsExpandedEvent(false);
-            _bus.Publish(ev);
+            _bus.Publish(new SetAllTheRecipeItemsExpandedEvent(false));
+            _bus.Publish(new SetAllTheResourceItemsExpandedEvent(false));
         }
 
         [RelayCommand(CanExecute = nameof(AllowHotkeys))]

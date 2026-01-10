@@ -159,8 +159,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                     EnsureAddReceiverRecipe();
                 break;
             }
-
-
         }
 
         public void Dispose()

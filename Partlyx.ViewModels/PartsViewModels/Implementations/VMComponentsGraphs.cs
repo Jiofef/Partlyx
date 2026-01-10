@@ -2,14 +2,15 @@ using Partlyx.Infrastructure.Events;
 using Partlyx.Services.ServiceImplementations;
 using Partlyx.ViewModels.Graph;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.UIServices.Implementations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
-    // Class events
     public record ComponentGraphsUpdatedEvent();
+
     public class VMComponentsGraphs : IDisposable
     {
         private readonly IEventBus _bus;
@@ -19,166 +20,171 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public class RecipeComponentGraph
         {
             public HashSet<RecipeComponentViewModel> Components { get; } = new();
-            public HashSet<ResourceViewModel> Resources { get; } = new();
-            public Dictionary<RecipeComponentViewModel, HashSet<RecipeComponentViewModel>> AdjacencyList { get; } = new();
+            public HashSet<Guid> ResourceUids { get; } = new();
+            public Dictionary<RecipeComponentViewModel, HashSet<RecipeComponentViewModel>> Adjacency { get; } = new();
         }
 
-        private Dictionary<Guid, RecipeComponentGraph> _graphsByResourceUid = new();
-        private Dictionary<Guid, RecipeComponentGraph> _componentToGraph = new();
-        private List<RecipeComponentGraph> _allGraphs = new();
-        private readonly Dictionary<(int, int), List<RecipeComponentPath>> _pathCache = new();
+        private readonly List<RecipeComponentGraph> _allGraphs = new();
+        private readonly Dictionary<Guid, RecipeComponentGraph> _resourceToGraph = new();
+        private readonly Dictionary<Guid, RecipeComponentGraph> _componentToGraph = new();
 
         private readonly ThrottledInvoker _updateInvoker = new(TimeSpan.FromMilliseconds(100));
+
         public VMComponentsGraphs(IEventBus bus, IVMPartsStore store)
         {
             _bus = bus;
             _store = store;
 
-            // Subscribe to events
-            _subscriptions.Add(_bus.Subscribe<RecipeComponentVMAddedToStoreEvent>(ev => _updateInvoker.InvokeAsync(BuildGraphs)));
-            _subscriptions.Add(_bus.Subscribe<RecipeComponentVMRemovedFromStoreEvent>(ev => _updateInvoker.InvokeAsync(BuildGraphs)));
-            _subscriptions.Add(_bus.Subscribe<RecipeVMAddedToStoreEvent>(ev => _updateInvoker.InvokeAsync(BuildGraphs)));
-            _subscriptions.Add(_bus.Subscribe<RecipeVMRemovedFromStoreEvent>(ev => _updateInvoker.InvokeAsync(BuildGraphs)));
-            _subscriptions.Add(_bus.Subscribe<ResourceVMAddedToStoreEvent>(ev => _updateInvoker.InvokeAsync(BuildGraphs)));
-            _subscriptions.Add(_bus.Subscribe<ResourceVMRemovedFromStoreEvent>((ev) => RebuildGraphs()));
+            _subscriptions.Add(_bus.Subscribe<RecipeUpdatedViewModelEvent>(_ => _updateInvoker.InvokeAsync(Rebuild)));
+            _subscriptions.Add(_bus.Subscribe<RecipeComponentUpdatedViewModelEvent>(_ => _updateInvoker.InvokeAsync(Rebuild)));
+            _subscriptions.Add(_bus.Subscribe<PartsVMInitializationFinishedEvent>(_ => _updateInvoker.InvokeAsync(Rebuild)));
 
-            BuildGraphs();
+            Rebuild();
         }
 
-        public RecipeComponentGraph? GetGraphForResource(Guid resourceUid)
+        private void Rebuild()
         {
-            _graphsByResourceUid.TryGetValue(resourceUid, out var graph);
-            return graph;
-        }
-
-        private void BuildGraphs()
-        {
-            _graphsByResourceUid.Clear();
-            _componentToGraph.Clear();
             _allGraphs.Clear();
-            _pathCache.Clear();
+            _resourceToGraph.Clear();
+            _componentToGraph.Clear();
 
-            // Index all components by their Resource UID for O(1) lookups
-            var componentsByResource = _store.Components.Values
-                .GroupBy(c => c.Resource.Uid)
-                .ToDictionary(g => g.Key, g => g.ToList());
+            var allComponents = _store.Components.Values.ToList();
 
-            var unvisited = new HashSet<RecipeComponentViewModel>(_store.Components.Values);
-
-            while (unvisited.Count > 0)
+            // 1. CLUSTERING: Group everything that touches the same resource or recipe
+            foreach (var comp in allComponents)
             {
-                var start = unvisited.First();
-                var graph = new RecipeComponentGraph();
+                if (_componentToGraph.ContainsKey(comp.Uid)) continue;
 
-                TraverseAndCollect(start, graph, unvisited, componentsByResource);
+                var currentGraph = new RecipeComponentGraph();
+                _allGraphs.Add(currentGraph);
 
-                _allGraphs.Add(graph);
-                foreach (var comp in graph.Components)
-                {
-                    _componentToGraph[comp.Uid] = graph;
-                    _graphsByResourceUid[comp.Resource.Uid] = graph;
-                    UpdateAdjacency(comp, graph, componentsByResource);
-                }
+                FloodFill(comp, currentGraph);
+            }
+
+            // 2. ADJACENCY: Define directional flow within each merged graph
+            foreach (var graph in _allGraphs)
+            {
+                BuildAdjacency(graph);
             }
 
             _bus.Publish(new ComponentGraphsUpdatedEvent());
         }
 
-
-
-        public RecipeComponentPath? FindShortestPath(RecipeComponentViewModel from, RecipeComponentViewModel to)
+        private void FloodFill(RecipeComponentViewModel start, RecipeComponentGraph graph)
         {
-            var graph = GetGraphForResource(from.Resource.Uid);
-            if (graph == null || !graph.Components.Contains(to)) return null;
+            var stack = new Stack<RecipeComponentViewModel>();
+            stack.Push(start);
 
-            // BFS to find shortest path
-            var queue = new Queue<List<RecipeComponentViewModel>>();
-            var visited = new HashSet<RecipeComponentViewModel>();
-            queue.Enqueue(new List<RecipeComponentViewModel> { from });
-            visited.Add(from);
-
-            while (queue.Count > 0)
+            while (stack.Count > 0)
             {
-                var path = queue.Dequeue();
-                var current = path.Last();
+                var current = stack.Pop();
+                if (!graph.Components.Add(current)) continue;
 
-                if (current == to)
+                _componentToGraph[current.Uid] = graph;
+
+                // Connect by Resource
+                if (current.Resource != null)
                 {
-                    return RecipeComponentPath.FromList(path);
+                    graph.ResourceUids.Add(current.Resource.Uid);
+                    _resourceToGraph[current.Resource.Uid] = graph;
+
+                    if (_store.ComponentsWithResource.TryGetValue(current.Resource.Uid, out var siblings))
+                    {
+                        foreach (var sibling in siblings) stack.Push(sibling);
+                    }
                 }
 
-                // Get neighbors
-                var neighbors = GetNeighbors(current, graph);
-                foreach (var neighbor in neighbors)
+                // Connect by Recipe
+                var recipe = current.ParentRecipe;
+                if (recipe != null)
                 {
-                    if (!visited.Contains(neighbor))
+                    foreach (var rc in recipe.Inputs.Concat(recipe.Outputs)) stack.Push(rc);
+                }
+            }
+        }
+
+        private void BuildAdjacency(RecipeComponentGraph graph)
+        {
+            foreach (var comp in graph.Components)
+            {
+                if (!graph.Adjacency.TryGetValue(comp, out var neighbors))
+                {
+                    neighbors = new HashSet<RecipeComponentViewModel>();
+                    graph.Adjacency[comp] = neighbors;
+                }
+
+                var recipe = comp.ParentRecipe;
+                if (recipe == null) continue;
+
+                bool isInput = recipe.Inputs.Any(i => i.Uid == comp.Uid);
+                bool isOutput = recipe.Outputs.Any(o => o.Uid == comp.Uid);
+
+                // RULE A: Internal Transformation (In -> Out)
+                if (isInput)
+                {
+                    foreach (var output in recipe.Outputs) neighbors.Add(output);
+                }
+
+                // RULE B: Reversible Transformation (Out -> In)
+                if (isOutput && recipe.IsReversible)
+                {
+                    foreach (var input in recipe.Inputs) neighbors.Add(input);
+                }
+
+                // RULE C: Resource Bridge (Output A -> Input B)
+                if (isOutput && comp.Resource != null)
+                {
+                    if (_store.ComponentsWithResource.TryGetValue(comp.Resource.Uid, out var siblings))
                     {
-                        visited.Add(neighbor);
-                        var newPath = new List<RecipeComponentViewModel>(path) { neighbor };
-                        queue.Enqueue(newPath);
+                        foreach (var sibling in siblings)
+                        {
+                            if (sibling.Uid == comp.Uid) continue;
+                            if (sibling.ParentRecipe?.Inputs.Any(i => i.Uid == sibling.Uid) == true)
+                                neighbors.Add(sibling);
+                        }
                     }
                 }
             }
-
-            return null;
         }
 
-        public List<RecipeComponentPath> FindPathsBetweenSets(HashSet<RecipeComponentViewModel> startSet, HashSet<RecipeComponentViewModel> endSet, int maxPaths = 5)
+        public List<RecipeComponentPath> FindPathsBetweenResources(ResourceViewModel startRes, ResourceViewModel endRes)
         {
-            if (startSet.Count == 0 || endSet.Count == 0) return new();
+            if (!_resourceToGraph.TryGetValue(startRes.Uid, out var graph) ||
+                !_resourceToGraph.TryGetValue(endRes.Uid, out var endGraph) ||
+                graph != endGraph)
+                return new List<RecipeComponentPath>();
 
-            // Generate cache key
-            int startKey = GetSetHashCode(startSet);
-            int endKey = GetSetHashCode(endSet);
-            var cacheKey = (startKey, endKey);
-
-            if (_pathCache.TryGetValue(cacheKey, out var cachedPaths))
-                return cachedPaths;
-
-            var results = PerformMultiSourceBFS(startSet, endSet, maxPaths);
-
-            _pathCache[cacheKey] = results;
-            return results;
-        }
-
-        private List<RecipeComponentPath> PerformMultiSourceBFS(HashSet<RecipeComponentViewModel> startSet, HashSet<RecipeComponentViewModel> endSet, int maxPaths)
-        {
             var results = new List<RecipeComponentPath>();
-            var firstComp = startSet.First();
+            var startNodes = _store.ComponentsWithResource[startRes.Uid]
+                .Where(c => c.ParentRecipe?.Inputs.Any(i => i.Uid == c.Uid) == true);
 
-            if (!_componentToGraph.TryGetValue(firstComp.Uid, out var graph)) return results;
+            var targetUids = _store.ComponentsWithResource[endRes.Uid]
+                .Where(c => c.ParentRecipe?.Outputs.Any(o => o.Uid == c.Uid) == true)
+                .Select(c => c.Uid).ToHashSet();
 
-            // Queue: (Current node, Path to it)
-            var queue = new Queue<(RecipeComponentViewModel Node, List<RecipeComponentViewModel> Path)>();
-            var visited = new HashSet<RecipeComponentViewModel>();
-
-            // Multi-source: initialize with all start nodes
-            foreach (var startNode in startSet)
+            foreach (var startNode in startNodes)
             {
+                var queue = new Queue<(RecipeComponentViewModel Node, List<RecipeComponentViewModel> Path)>();
                 queue.Enqueue((startNode, new List<RecipeComponentViewModel> { startNode }));
-                visited.Add(startNode);
-            }
 
-            while (queue.Count > 0 && results.Count < maxPaths)
-            {
-                var (current, path) = queue.Dequeue();
-
-                if (endSet.Contains(current))
+                while (queue.Count > 0)
                 {
-                    results.Add(RecipeComponentPath.FromList(path));
-                    if (results.Count >= maxPaths) break;
-                    // Continue to find other paths
-                }
+                    var (current, path) = queue.Dequeue();
 
-                if (graph.AdjacencyList.TryGetValue(current, out var neighbors))
-                {
-                    foreach (var neighbor in neighbors)
+                    if (targetUids.Contains(current.Uid) && path.Count % 2 == 0)
                     {
-                        if (!visited.Contains(neighbor))
+                        results.Add(RecipeComponentPath.FromList(path));
+                        continue;
+                    }
+
+                    if (path.Count > 20) continue;
+
+                    if (graph.Adjacency.TryGetValue(current, out var neighbors))
+                    {
+                        foreach (var next in neighbors)
                         {
-                            visited.Add(neighbor);
-                            var newPath = new List<RecipeComponentViewModel>(path) { neighbor };
-                            queue.Enqueue((neighbor, newPath));
+                            if (path.Any(p => p.Uid == next.Uid)) continue;
+                            queue.Enqueue((next, new List<RecipeComponentViewModel>(path) { next }));
                         }
                     }
                 }
@@ -186,123 +192,6 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             return results;
         }
 
-        private int GetSetHashCode(HashSet<RecipeComponentViewModel> set)
-        {
-            // Combined hash for set (order-independent)
-            int hash = 0;
-            foreach (var item in set) hash ^= item.Uid.GetHashCode();
-            return hash;
-        }
-
-        private IEnumerable<RecipeComponentViewModel> GetNeighbors(RecipeComponentViewModel component, RecipeComponentGraph graph)
-        {
-            // Use AdjacencyList for direct neighbors
-            if (graph.AdjacencyList.TryGetValue(component, out var neighbors))
-            {
-                return neighbors;
-            }
-
-            return Enumerable.Empty<RecipeComponentViewModel>();
-        }
-
-        private void TraverseAndCollect(
-            RecipeComponentViewModel node, 
-            RecipeComponentGraph graph, 
-            HashSet<RecipeComponentViewModel> unvisited,
-            Dictionary<Guid, List<RecipeComponentViewModel>> componentsByResource)
-        {
-            var stack = new Stack<RecipeComponentViewModel>();
-            stack.Push(node);
-
-            while (stack.Count > 0)
-            {
-                var current = stack.Pop();
-                if (!unvisited.Contains(current)) continue;
-
-                unvisited.Remove(current);
-                graph.Components.Add(current);
-
-                var related = GetStructuralConnections(current, componentsByResource);
-                foreach (var r in related)
-                {
-                    if (unvisited.Contains(r)) 
-                        stack.Push(r);
-                }
-            }
-        }
-
-        private IEnumerable<RecipeComponentViewModel> GetStructuralConnections(
-            RecipeComponentViewModel comp, 
-            Dictionary<Guid, List<RecipeComponentViewModel>> componentsByResource)
-        {
-            var list = new List<RecipeComponentViewModel>();
-
-            // Recipe connections
-            if (comp.LinkedParentRecipe?.Value is RecipeViewModel r)
-            {
-                list.AddRange(r.Inputs);
-                list.AddRange(r.Outputs);
-            }
-
-            // Resource identity connections using the pre-built index
-            if (componentsByResource.TryGetValue(comp.Resource.Uid, out var siblings))
-            {
-                list.AddRange(siblings);
-            }
-
-            return list;
-        }
-
-        private void UpdateAdjacency(
-            RecipeComponentViewModel comp, 
-            RecipeComponentGraph graph,
-            Dictionary<Guid, List<RecipeComponentViewModel>> componentsByResource)
-        {
-            if (!graph.AdjacencyList.TryGetValue(comp, out var neighbors))
-            {
-                neighbors = new HashSet<RecipeComponentViewModel>();
-                graph.AdjacencyList[comp] = neighbors;
-            }
-
-            // Directional recipe logic
-            if (comp.LinkedParentRecipe?.Value is RecipeViewModel recipe)
-            {
-                if (recipe.Inputs.Contains(comp))
-                {
-                    foreach (var output in recipe.Outputs) 
-                        neighbors.Add(output);
-                }
-                else if (recipe.IsReversible)
-                {
-                    foreach (var input in recipe.Inputs) 
-                        neighbors.Add(input);
-                }
-            }
-
-            // Connect same-resource components within the current graph boundary
-            if (componentsByResource.TryGetValue(comp.Resource.Uid, out var allSiblings))
-            {
-                foreach (var sibling in allSiblings)
-                {
-                    if (sibling != comp && graph.Components.Contains(sibling))
-                    {
-                        neighbors.Add(sibling);
-                    }
-                }
-            }
-        }
-
-        private void RebuildGraphs()
-        {
-            BuildGraphs();
-        }
-
-        public void Dispose()
-        {
-            foreach (var sub in _subscriptions)
-            {
-                sub.Dispose();
-            }
-        }
+        public void Dispose() => _subscriptions.ForEach(s => s.Dispose());
     }
 }
