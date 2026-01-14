@@ -1,4 +1,5 @@
-﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
+﻿using Partlyx.ViewModels.Graph.PartsGraph;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
 
 namespace Partlyx.ViewModels.Graph
 {

@@ -68,7 +68,21 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
         public GuidLinkedPart<RecipeViewModel>? LinkedDefaultRecipe { get => _defaultRecipe; set => SetProperty(ref _defaultRecipe, value); }
 
+        private bool _isDefaultRecipeValid;
+        public bool IsDefaultRecipeValid { get => _isDefaultRecipeValid; private set => SetProperty(ref _isDefaultRecipeValid, value); }
+        private void UpdateIsDefaultRecipeValid()
+        {
+            if (LinkedDefaultRecipe?.Value == null)
+            {
+                IsDefaultRecipeValid = false;
+                return;
+            }
+
+            IsDefaultRecipeValid = ProducingRecipesSet.Contains(LinkedDefaultRecipe.Value);
+        }
+
         private IconViewModel _icon;
+
         public IconViewModel Icon { get => _icon; private set => SetProperty(ref _icon, value); }
 
         // Recipe relationships
@@ -145,18 +159,22 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                 case RecipeResourceLinkTypeEnum.None:
                     EnsureRemoveProducingRecipe();
                     EnsureRemoveReceiverRecipe();
+                    UpdateIsDefaultRecipeValid();
                 break;
                 case RecipeResourceLinkTypeEnum.Receiving:
                     EnsureRemoveProducingRecipe();
                     EnsureAddReceiverRecipe();
+                    UpdateIsDefaultRecipeValid();
                 break;
                 case RecipeResourceLinkTypeEnum.Producing:
                     EnsureAddProducingRecipe();
                     EnsureRemoveReceiverRecipe();
+                    UpdateIsDefaultRecipeValid();
                 break;
-                    case RecipeResourceLinkTypeEnum.Both:
+                case RecipeResourceLinkTypeEnum.Both:
                     EnsureAddProducingRecipe();
                     EnsureAddReceiverRecipe();
+                    UpdateIsDefaultRecipeValid();
                 break;
             }
         }

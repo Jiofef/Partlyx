@@ -18,8 +18,9 @@ namespace Partlyx.Core.Help
             ([
                 new InfoSectionsGroup("help_HowToUsePartlyx").WithSections([
                                 howToUsePartlyxSection,
-                                new InfoSection(Key: "help_Parts_and_tree", ContentKey:"help_text_Parts_and_tree"),
+                                new InfoSection(Key: "help_Resources_and_recipes", ContentKey:"help_text_Resources_and_recipes"),
                                 new InfoSection(Key: "help_Parts_graph", ContentKey:"help_text_Parts_graph"),
+                                new InfoSection(Key: "help_Resources_converter", ContentKey: "help_text_Resources_converter"),
                                 new InfoSection(Key: "help_Some_QOL_Features", ContentKey:"help_text_Some_QOL_Features"),
                                 ]),
             ]);

@@ -27,8 +27,9 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public PartsServiceViewModel Services { get; }
 
         // Events
-        private readonly IDisposable _childComponentsDefaultRecipeUpdateSubscription;
-        private readonly IDisposable _childComponentsSelectedRecipeUpdateSubscription;
+        private readonly IDisposable _currentRecipeDefaultRecipeUpdateSubscription;
+        private readonly IDisposable _currentRecipeDefaultRecipeValidSubscription;
+        private readonly IDisposable _currentRecipeSelectedRecipeUpdateSubscription;
         private readonly IDisposable _iconUpdatedSubscription;
 
         public RecipeComponentViewModel(RecipeComponentDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store,
@@ -53,14 +54,18 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
 
             // SelectedRecipeComponents is a helper property for fast switching from one component to its child components in the tree.
             // His calculation requires two property chains to be taken into account, and this is carried out in two compact subscriptions
-            _childComponentsDefaultRecipeUpdateSubscription = this
+            _currentRecipeDefaultRecipeUpdateSubscription = this
                 .WhenAnyValue(x => x.LinkedResource!.Value!.LinkedDefaultRecipe!.Value)
-                .Subscribe(v => UpdateSelectedComponents());
+                .Subscribe(v => UpdateCurrentRecipe());
 
-            _childComponentsSelectedRecipeUpdateSubscription = this
+            _currentRecipeDefaultRecipeValidSubscription = this
+                .WhenAnyValue(x => x.LinkedResource!.Value!.IsDefaultRecipeValid)
+                .Subscribe(v => UpdateCurrentRecipe());
+
+            _currentRecipeSelectedRecipeUpdateSubscription = this
                 .WhenAnyValue(x => x.LinkedSelectedRecipe!.Value)
-                .Subscribe(v => UpdateSelectedComponents());
-            UpdateSelectedComponents();
+                .Subscribe(v => UpdateCurrentRecipe());
+            UpdateCurrentRecipe();
 
             _iconUpdatedSubscription = this
                 .WhenAnyValue(x => x.LinkedResource!.Value!.Icon)
@@ -170,8 +175,8 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             UiItem.Dispose();
 
-            _childComponentsDefaultRecipeUpdateSubscription.Dispose();
-            _childComponentsSelectedRecipeUpdateSubscription.Dispose();
+            _currentRecipeDefaultRecipeUpdateSubscription.Dispose();
+            _currentRecipeSelectedRecipeUpdateSubscription.Dispose();
             _iconUpdatedSubscription.Dispose();
         }
 
@@ -192,11 +197,17 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         FocusableItemUIState IFocusable.UiItem => UiItem;
         public RecipeComponentNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
         public PartsGlobalNavigations GlobalNavigations { get; }
-        private void UpdateSelectedComponents()
+        private void UpdateCurrentRecipe()
         {
-            CurrentRecipe =
-                LinkedSelectedRecipe?.Value ??
-                LinkedResource?.Value?.LinkedDefaultRecipe?.Value;
+            bool hasValidSelectedRecipe = LinkedSelectedRecipe?.Value != null;
+            bool hasValidDefaultRecipe = LinkedResource?.Value?.LinkedDefaultRecipe?.Value != null && LinkedResource.Value.IsDefaultRecipeValid;
+
+            if (hasValidSelectedRecipe)
+                CurrentRecipe = LinkedSelectedRecipe?.Value;
+            else if (hasValidDefaultRecipe)
+                CurrentRecipe = LinkedResource?.Value?.LinkedDefaultRecipe?.Value;
+            else
+                CurrentRecipe = null;
         }
 
         // Compatibility

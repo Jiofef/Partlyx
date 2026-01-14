@@ -279,9 +279,6 @@
   <data name="partree_Save_Project" xml:space="preserve">
     <value>Save Project (.partree)</value>
   </data>
-  <data name="Total_resources_amount" xml:space="preserve">
-    <value>Total recipe's resources amount</value>
-  </data>
   <data name="Open_in_editor" xml:space="preserve">
     <value>Open in editor</value>
   </data>
@@ -381,8 +378,8 @@
   <data name="help_text_Some_QOL_Features" xml:space="preserve">
     <value>Some QOL features text</value>
   </data>
-  <data name="help_Parts_tree" xml:space="preserve">
-    <value>Parts tree</value>
+  <data name="help_Resources_and_recipes" xml:space="preserve">
+    <value>Resources and recipes</value>
   </data>
   <data name="help_Help" xml:space="preserve">
     <value>Help</value>
@@ -426,17 +423,14 @@
   <data name="Open_branch" xml:space="preserve">
     <value>Open branch</value>
   </data>
-  <data name="help_text_Parts_and_tree" xml:space="preserve">
-    <value>Parts and tree text</value>
+  <data name="help_text_Resources_and_recipes" xml:space="preserve">
+    <value>Resources and recipes text</value>
   </data>
   <data name="help_Parts_graph" xml:space="preserve">
     <value>Parts graph</value>
   </data>
   <data name="help_text_Parts_graph" xml:space="preserve">
     <value>Parts graph text</value>
-  </data>
-  <data name="help_Parts_and_tree" xml:space="preserve">
-    <value>Parts and tree</value>
   </data>
   <data name="Merge_same_components" xml:space="preserve">
     <value>Merge same components</value>
@@ -500,5 +494,26 @@
   </data>
   <data name="Make_a_recipe" xml:space="preserve">
     <value>Make a recipe</value>
+  </data>
+  <data name="Is_reversible" xml:space="preserve">
+    <value>Is reversible</value>
+  </data>
+  <data name="Swap_places" xml:space="preserve">
+    <value>Swap places</value>
+  </data>
+  <data name="Clear_choice" xml:space="preserve">
+    <value>Clear choice</value>
+  </data>
+  <data name="Total_inputs" xml:space="preserve">
+    <value>Total inputs:</value>
+  </data>
+  <data name="Total_outputs" xml:space="preserve">
+    <value>Total outputs:</value>
+  </data>
+  <data name="help_Resources_converter" xml:space="preserve">
+    <value>Resources converter</value>
+  </data>
+  <data name="help_text_Resources_converter" xml:space="preserve">
+    <value>Resources converter text</value>
   </data>
 </root>

@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 
-namespace Partlyx.ViewModels.Graph
+namespace Partlyx.ViewModels.Graph.PartsGraph
 {
     public abstract class Path<T> : ObservableObject
     {
@@ -12,7 +12,7 @@ namespace Partlyx.ViewModels.Graph
             _nodes = nodes;
         }
 
-        public LinkedList<T> Nodes => _nodes;
+        public LinkedList<T> Steps => _nodes;
 
         public int Length => _nodes.Count;
 

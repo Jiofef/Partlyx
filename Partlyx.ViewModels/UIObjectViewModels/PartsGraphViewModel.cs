@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Partlyx.Infrastructure.Data.CommonFileEvents;
 using Partlyx.Infrastructure.Events;
-using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.Graph.PartsGraph;
 using Partlyx.ViewModels.GraphicsViewModels;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels;
@@ -48,23 +48,15 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _partsStore = store;
             _imagesStore = imagesStore;
 
-            var focusedPartChangedSubscription = bus.Subscribe<GlobalFocusedElementChangedEvent>(ev =>
-                {
-                    var focusedRecipe = ev.NewFocused?.GetRelatedRecipe();
-                    var previousRecipe = ev.PreviousFocused?.GetRelatedRecipe();
-
-                    if (focusedRecipe != previousRecipe)
-                        CenterizePanPosition();
-                });
-            _subscriptions.Add(focusedPartChangedSubscription);
-
             SumController = new();
             _componentSumBinder = new ComponentSumControllerBinder(graph.ComponentLeafs, SumController);
 
-            GraphBuilder.OnGraphBuilded = new(async () => 
+            GraphBuilder.OnGraphBuilded += (oldManager, newManager) => 
             {
-                // We find all the unique images among the displayed nodes, and send a request to download the full version of the image instead of the compressed one.
+                if (oldManager != newManager)
+                    CenterizePanPosition();
 
+                // We find all the unique images among the displayed nodes, and send a request to download the full version of the image instead of the compressed one.
                 List<Guid> nodeImagesUids = new();
                 HashSet<Guid> nodeImagesUidsHashed = new();
                 foreach (var node in GraphBuilder.Nodes)
@@ -79,8 +71,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
                 if (nodeImagesUids.Count <= 0) return;
 
-                await imagesStore.LoadFullImages(nodeImagesUids.ToArray());
-            });
+                Task.Run(async () => await imagesStore.LoadFullImages(nodeImagesUids.ToArray()));
+            };
         }
 
         public void Dispose()

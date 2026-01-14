@@ -160,6 +160,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Clear choice.
+        /// </summary>
+        public static string Clear_choice {
+            get {
+                return ResourceManager.GetString("Clear_choice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Clear search text.
         /// </summary>
         public static string Clear_search_text {
@@ -511,15 +520,6 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Parts and tree.
-        /// </summary>
-        public static string help_Parts_and_tree {
-            get {
-                return ResourceManager.GetString("help_Parts_and_tree", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Parts graph.
         /// </summary>
         public static string help_Parts_graph {
@@ -529,11 +529,20 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Parts tree.
+        ///   Ищет локализованную строку, похожую на Resources and recipes.
         /// </summary>
-        public static string help_Parts_tree {
+        public static string help_Resources_and_recipes {
             get {
-                return ResourceManager.GetString("help_Parts_tree", resourceCulture);
+                return ResourceManager.GetString("help_Resources_and_recipes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Resources converter.
+        /// </summary>
+        public static string help_Resources_converter {
+            get {
+                return ResourceManager.GetString("help_Resources_converter", resourceCulture);
             }
         }
         
@@ -547,20 +556,29 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Parts and tree text.
-        /// </summary>
-        public static string help_text_Parts_and_tree {
-            get {
-                return ResourceManager.GetString("help_text_Parts_and_tree", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Parts graph text.
         /// </summary>
         public static string help_text_Parts_graph {
             get {
                 return ResourceManager.GetString("help_text_Parts_graph", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Resources and recipes text.
+        /// </summary>
+        public static string help_text_Resources_and_recipes {
+            get {
+                return ResourceManager.GetString("help_text_Resources_and_recipes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Resources converter text.
+        /// </summary>
+        public static string help_text_Resources_converter {
+            get {
+                return ResourceManager.GetString("help_text_Resources_converter", resourceCulture);
             }
         }
         
@@ -687,6 +705,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Invalid_image_error {
             get {
                 return ResourceManager.GetString("Invalid_image_error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Is reversible.
+        /// </summary>
+        public static string Is_reversible {
+            get {
+                return ResourceManager.GetString("Is_reversible", resourceCulture);
             }
         }
         
@@ -1132,6 +1159,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Swap places.
+        /// </summary>
+        public static string Swap_places {
+            get {
+                return ResourceManager.GetString("Swap_places", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на The button that does the weird thing.
         /// </summary>
         public static string The_button_that_does_the_weird_thing {
@@ -1159,11 +1195,20 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Total recipe&apos;s resources amount.
+        ///   Ищет локализованную строку, похожую на Total inputs:.
         /// </summary>
-        public static string Total_resources_amount {
+        public static string Total_inputs {
             get {
-                return ResourceManager.GetString("Total_resources_amount", resourceCulture);
+                return ResourceManager.GetString("Total_inputs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Total outputs:.
+        /// </summary>
+        public static string Total_outputs {
+            get {
+                return ResourceManager.GetString("Total_outputs", resourceCulture);
             }
         }
         

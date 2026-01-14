@@ -21,6 +21,7 @@ using Partlyx.UI.Avalonia.Resources;
 using Partlyx.UI.Avalonia.VMImplementations;
 using Partlyx.ViewModels.GlobalNavigations;
 using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.Graph.PartsGraph;
 using Partlyx.ViewModels.GraphicsViewModels.IconViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;

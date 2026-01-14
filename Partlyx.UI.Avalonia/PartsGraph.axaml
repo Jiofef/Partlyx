@@ -11,7 +11,7 @@
              xmlns:beh="using:Partlyx.UI.Avalonia.Behaviors"
              xmlns:dnd="using:Partlyx.UI.Avalonia.DragAndDrop"
              xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
-             xmlns:graphvm="clr-namespace:Partlyx.ViewModels.Graph;assembly=Partlyx.ViewModels"
+             xmlns:graphvm="clr-namespace:Partlyx.ViewModels.Graph.PartsGraph;assembly=Partlyx.ViewModels"
              xmlns:local="clr-namespace:Partlyx.UI.Avalonia"
              xmlns:localo="clr-namespace:Partlyx.UI.Avalonia.OtherControls"
              xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
@@ -89,7 +89,7 @@
                             <DataTemplate x:DataType="graphvm:RecipeGraphNodeViewModel">
                                 <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
                                         Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}"
-                            BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2" VerticalContentAlignment="Stretch">
+                            BorderBrush="{StaticResource PxGrayBrush}" BorderThickness="2" VerticalContentAlignment="Stretch" CornerRadius="32">
                                     <i:Interaction.Behaviors>
                                         <dnd:ContextDropBehavior Handler="{StaticResource RecipeItemDropHandler}"/>
                                     </i:Interaction.Behaviors>
@@ -97,13 +97,8 @@
                                         <local:IconControl Grid.Row="0" IconContent="{Binding Value.Icon}"/>
                                         <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
                                             <localo:FitTextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.ColumnText}"/>
-                                            <Grid ColumnDefinitions="*,*" HorizontalAlignment="Center">
-                                                <localo:FitTextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding Value.UiNode.SecondaryColumnTextPart1}"/>
-                                                <localo:FitTextBlock Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Value.UiNode.SecondaryColumnTextPart2}"/>
-                                            </Grid>                                        
                                         </StackPanel>
                                     </Grid>
-
                                     <Button.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="{h:Loc Find_recipe_in_tree}" Command="{Binding Value.UiNode.FindInTreeCommand}" Classes="common"/>
@@ -112,7 +107,7 @@
                                     </Button.ContextMenu>
                                 </Button>
                             </DataTemplate>
-                            <DataTemplate DataType="graphvm:ComponentGraphNodeViewModel">
+                            <DataTemplate x:DataType="graphvm:ComponentGraphNodeViewModel">
                                 <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
                                 BorderBrush="{StaticResource PxBlue0Brush}" BorderThickness="2"
                                     Command="{Binding Value.UiNode.SetNextSelectedRecipeCommand }" VerticalContentAlignment="Stretch"
@@ -120,11 +115,8 @@
                                     <Grid VerticalAlignment="Stretch" RowDefinitions="*,Auto">
                                         <local:IconControl Grid.Row="0" IconContent="{Binding Value.Icon}"/>
                                         <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
-                                            <localo:FitTextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" Text="{Binding Value.UiNode.BottomColumnText}"/>
-                                            <Grid ColumnDefinitions="*,*" HorizontalAlignment="Center">
-                                                <localo:FitTextBlock Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding ColumnTextPart1}"/>
-                                                <localo:FitTextBlock Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding ColumnTextPart2}"/>
-                                            </Grid>
+                                            <localo:FitTextBlock Grid.Row="0" HorizontalAlignment="Center" Text="{Binding ColumnText1}"/>
+                                            <localo:FitTextBlock Grid.Row="1" HorizontalAlignment="Center" Text="{Binding ColumnText2}"/>
                                         </StackPanel>
                                     </Grid>
 
@@ -165,42 +157,61 @@
 
         <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{StaticResource PxBlue1Brush}"/>
 
-        <Grid Grid.Row="2" VerticalAlignment="Stretch"  Background="{StaticResource PxBlue0Brush}">
+        <Grid Grid.Row="2" VerticalAlignment="Stretch" Background="{StaticResource PxBlue0Brush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MinWidth="32"/>
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="*" MinWidth="32"/>
+            </Grid.ColumnDefinitions>
+            <Grid.DataTemplates>
+				<DataTemplate x:DataType="graphvm:ComponentNodeSumCompilation">
+                    <Button Background="{StaticResource PxWhiteBrush}" Height="128" Width="128" Padding="2"
+                    Margin="8, 0, 8, 0"
+                    BorderBrush="{StaticResource PxBlue1Brush}" BorderThickness="4"
+                    VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" RowDefinitions="*,Auto">
+                            <local:IconControl Grid.Row="0" IconContent="{Binding ComponentsResource.Icon}"/>
+                            <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
+                                <localo:FitTextBlock HorizontalAlignment="Center" Text="{Binding ColumnText}"/>
+                                <localo:FitTextBlock HorizontalAlignment="Center" Text="{Binding BottomColumnText}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding ComponentsResource.UiItem.FindInTreeCommand}" Classes="common"/>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </DataTemplate>
+            </Grid.DataTemplates>
+
             <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
-                <localo:FitTextBlock Text="{h:Loc Total_resources_amount}" Classes="common" HorizontalAlignment="Center"/>
+                <TextBlock Text="{h:Loc Total_inputs}" Classes="common" HorizontalAlignment="Center"/>
                 
                 <ScrollViewer VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch">
-                    <ItemsControl ItemsSource="{Binding SumController.Compilations}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="{x:Type graphvm:ComponentNodeSumCompilation}">
-                                <Button Background="{StaticResource PxWhiteBrush}" Height="128" Width="128" Padding="2"
-                                Margin="8, 0, 8, 0"
-                                BorderBrush="{StaticResource PxBlue1Brush}" BorderThickness="4"
-                                VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" RowDefinitions="*,Auto">
-                                        <local:IconControl Grid.Row="0" IconContent="{Binding ComponentsResource.Icon}"/>
-                                        <StackPanel VerticalAlignment="Bottom" Orientation="Vertical" Grid.Row="1">
-                                            <localo:FitTextBlock HorizontalAlignment="Center" Text="{Binding ColumnText}"/>
-                                            <localo:FitTextBlock HorizontalAlignment="Center" Text="{Binding BottomColumnText}"/>
-                                        </StackPanel>
-                                    </Grid>
-
-                                    <Button.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="{h:Loc Find_in_tree}" Command="{Binding ComponentsResource.UiItem.FindInTreeCommand}" Classes="common"/>
-                                        </ContextMenu>
-                                    </Button.ContextMenu>
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-
+                    <ItemsControl ItemsSource="{Binding SumController.PositiveCompilations}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-
-                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
+
+            <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{StaticResource PxBlue1Brush}"/>
+            
+            <StackPanel Orientation="Vertical" Grid.Column="2" VerticalAlignment="Stretch">
+                <TextBlock Text="{h:Loc Total_outputs}" Classes="common" HorizontalAlignment="Center"/>
+                
+                <ScrollViewer VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch">
+                    <ItemsControl ItemsSource="{Binding SumController.NegativeCompilations}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                            </ItemsPanelTemplate>
+                           </ItemsControl.ItemsPanel>
                     </ItemsControl>
                 </ScrollViewer>
             </StackPanel>

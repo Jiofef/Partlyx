@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.Graph.PartsGraph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIStates;

@@ -3,7 +3,7 @@ using Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using ReactiveUI;
 
-namespace Partlyx.ViewModels.Graph
+namespace Partlyx.ViewModels.Graph.PartsGraph
 {
     public class ComponentNodeSumCompilation : SumHierarchyObject
     {
@@ -44,7 +44,7 @@ namespace Partlyx.ViewModels.Graph
 
         private void UpdateBottomColumnText()
         {
-            string newText = $"X{Sum}";
+            string newText = $"X{Math.Abs(Sum)}";
             BottomColumnText = newText;
         }
 

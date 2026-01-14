@@ -12,7 +12,6 @@ namespace Partlyx.ViewModels.UIStates
     public partial class RecipeComponentNodeUIState : ObservableObject, IDisposable
     {
         private readonly PartsServiceViewModel _services;
-        private readonly VMComponentsGraphs _graphs;
 
         private readonly RecipeComponentViewModel _componentVM;
 
@@ -21,34 +20,8 @@ namespace Partlyx.ViewModels.UIStates
         public RecipeComponentNodeUIState(RecipeComponentViewModel vm, PartsServiceViewModel svm, VMComponentsGraphs graphs)
         {
             _services = svm;
-            _graphs = graphs;
 
             _componentVM = vm;
-
-            var selectedRecipeUpdateSubscription = _componentVM
-                .WhenAnyValue(c => c.LinkedSelectedRecipe!.Value!.Name)
-                .Subscribe(n => UpdateBottomColumnText());
-            _subscriptions.Add(selectedRecipeUpdateSubscription);
-
-            UpdateBottomColumnText();
-        }
-
-        private string _bottomColumnText = "";
-        public string BottomColumnText { get => _bottomColumnText; set => SetProperty(ref _bottomColumnText, value); }
-
-        private void UpdateBottomColumnText()
-        {
-            string? selectedRecipeName = _componentVM.LinkedSelectedRecipe?.Value?.Name;
-
-            if (selectedRecipeName == null)
-            {
-                BottomColumnText = "";
-                return;
-            }
-            else
-            {
-                BottomColumnText = selectedRecipeName;
-            }
         }
 
         [RelayCommand]

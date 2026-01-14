@@ -36,6 +36,13 @@ namespace Partlyx.Services.ServiceImplementations
                 return Task.CompletedTask;
             });
 
+        public void Invoke(Action action)
+            => InvokeAsync(() =>
+            {
+                action();
+                return Task.CompletedTask;
+            });
+
         private async Task RunAsync(Func<Task> action)
         {
             TimeSpan wait;

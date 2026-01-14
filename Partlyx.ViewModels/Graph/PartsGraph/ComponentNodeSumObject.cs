@@ -3,11 +3,11 @@ using Partlyx.ViewModels.PartsViewModels.Implementations;
 using ReactiveUI;
 using System.Reactive.Linq;
 
-namespace Partlyx.ViewModels.Graph
+namespace Partlyx.ViewModels.Graph.PartsGraph
 {
     public class ComponentNodeSumObject : SumHierarchyObject, IDisposable
     {
-        private readonly IDisposable _costChangedSubscription;
+        private readonly IDisposable _logicSubscription;
         private readonly IDisposable _componentChangedSubscription;
         private readonly IDisposable _componentResourceChangedSubscription;
 
@@ -23,24 +23,26 @@ namespace Partlyx.ViewModels.Graph
         {
             ComponentNode = componentNode;
 
-            _costChangedSubscription = ComponentNode
-                .WhenAnyValue(x => x.Cost)
-                .Subscribe(_ => BaseValue = ComponentNode.Cost);
-
+            // Subscribe to Value to update Component reference
             _componentChangedSubscription = ComponentNode
                 .WhenAnyValue(n => n.Value)
                 .Subscribe(_ => Component = ComponentNode.Value as RecipeComponentViewModel);
 
+            // Subscribe to LinkedResource change
             _componentResourceChangedSubscription = this
-                .WhenAnyValue(c => c.Component.LinkedResource.Value)
+                .WhenAnyValue(c => c.Component!.LinkedResource!.Value)
                 .Subscribe(_ => ComponentResource = Component?.LinkedResource?.Value);
+
+            // Combined subscription for Cost and IsOutput to update BaseValue
+            _logicSubscription = this
+                .WhenAnyValue(x => x.ComponentNode.Cost)
+                .Subscribe(cost => BaseValue = cost);
         }
 
         new public void Dispose()
         {
             base.Dispose();
-
-            _costChangedSubscription.Dispose();
+            _logicSubscription.Dispose();
             _componentChangedSubscription.Dispose();
             _componentResourceChangedSubscription.Dispose();
         }

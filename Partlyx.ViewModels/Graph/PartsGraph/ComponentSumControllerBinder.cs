@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace Partlyx.ViewModels.Graph
+namespace Partlyx.ViewModels.Graph.PartsGraph
 {
     public class ComponentSumControllerBinder : IDisposable
     {

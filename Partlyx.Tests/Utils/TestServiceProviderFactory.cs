@@ -15,6 +15,7 @@ using Partlyx.Services.ServiceInterfaces;
 using Partlyx.Tests.Mocks;
 using Partlyx.ViewModels.GlobalNavigations;
 using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.Graph.PartsGraph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.Settings;

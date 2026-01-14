@@ -16,7 +16,7 @@
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
              x:DataType="vmo:ItemPropertiesViewModel">
     <UserControl.DataTemplates>
-        <DataTemplate DataType="vmprop:TextBoxItemPropertyViewModel">
+        <DataTemplate x:DataType="vmprop:TextBoxItemPropertyViewModel">
             <Grid Margin="4,2,4,2" Height="36" HorizontalAlignment="Stretch">
                 <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
                 <Grid ColumnDefinitions="Auto, *">
@@ -50,7 +50,7 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate DataType="vmprop:RecipeItemPropertyViewModel">
+        <DataTemplate x:DataType="vmprop:RecipeItemPropertyViewModel">
             <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
                 <i:Interaction.Behaviors>
 					<localdnd:PartlyxContextDropBehavior DropHandler="{Binding DropHandler}"/>
@@ -65,7 +65,7 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate DataType="vmprop:IconItemPropertyViewModel">
+        <DataTemplate x:DataType="vmprop:IconItemPropertyViewModel">
             <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
                 <i:Interaction.Behaviors>
 					<localdnd:PartlyxContextDropBehavior DropHandler="{Binding DropHandler}"/>
@@ -79,7 +79,7 @@
             </Grid>
         </DataTemplate>
 
-        <DataTemplate DataType="vmprop:SpinBoxItemPropertyViewModel">
+        <DataTemplate x:DataType="vmprop:SpinBoxItemPropertyViewModel">
             <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
                 <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
                 <Grid>
@@ -100,6 +100,22 @@
                             <beh:NumericUpDownUnfocusOnEnterOrEscapeBehavior/>
                         </i:Interaction.Behaviors>
                     </NumericUpDown>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:DataType="vmprop:CheckBoxItemPropertyViewModel">
+            <Grid Height="36" HorizontalAlignment="Stretch" Margin="4">
+                <Rectangle RadiusX="8" RadiusY="8" Fill="{StaticResource PxWhiteBrush}" HorizontalAlignment="Stretch"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding DisplayableName}" Grid.Column="0" VerticalAlignment="Center" Classes="common" Margin="4"/>
+                    <CheckBox x:Name="CheckBox" Command="{Binding SaveChangesCommand}" CommandParameter="{Binding IsChecked}" IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                              Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="4"/>
                 </Grid>
             </Grid>
         </DataTemplate>

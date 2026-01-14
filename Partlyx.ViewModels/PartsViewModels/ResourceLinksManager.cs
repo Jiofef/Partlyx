@@ -122,14 +122,15 @@ namespace Partlyx.ViewModels.PartsViewModels
 
             if (_recipe.IsReversible)
             {
-                if (inInputs && inOutputs) return RecipeResourceLinkTypeEnum.Both;
-                if (inInputs) return RecipeResourceLinkTypeEnum.Receiving;
-                if (inOutputs) return RecipeResourceLinkTypeEnum.Producing;
+                if (inInputs || inOutputs) return RecipeResourceLinkTypeEnum.Both;
                 return RecipeResourceLinkTypeEnum.None;
             }
             else
             {
-                return inOutputs ? RecipeResourceLinkTypeEnum.Producing : RecipeResourceLinkTypeEnum.None;
+                if (inInputs && inOutputs) return RecipeResourceLinkTypeEnum.Both;
+                if (inInputs) return RecipeResourceLinkTypeEnum.Receiving;
+                if (inOutputs) return RecipeResourceLinkTypeEnum.Producing;
+                return RecipeResourceLinkTypeEnum.None;
             }
         }
 

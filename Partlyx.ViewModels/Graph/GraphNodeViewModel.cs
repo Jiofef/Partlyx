@@ -5,6 +5,8 @@ namespace Partlyx.ViewModels.Graph
 {
     public class GraphNodeViewModel : MultiParentHierarchyTransformObject, ISizePositionObject
     {
+        public virtual GraphNodeShapeEnum NodeShape => GraphNodeShapeEnum.Rectangle;
+
         public const float StandardNodeDistanceX = 24;
         public const float StandardNodeDistanceY = 48;
         public const float StandardBranchDistanceX = StandardNodeDistanceX * 2.5f;
@@ -39,5 +41,7 @@ namespace Partlyx.ViewModels.Graph
         private float _branchesDistanceX;
         public float BranchesDistanceX { get => _branchesDistanceX; protected set => SetProperty(ref _branchesDistanceX, value); }
     }
+
+    public enum GraphNodeShapeEnum { Rectangle, Circle }
 }
 

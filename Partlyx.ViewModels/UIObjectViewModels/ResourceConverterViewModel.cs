@@ -3,10 +3,13 @@ using DynamicData;
 using Partlyx.Infrastructure.Events;
 using Partlyx.Services.PartsEventClasses;
 using Partlyx.Services.ServiceImplementations;
-using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.DragAndDrop.Implementations;
+using Partlyx.ViewModels.Graph.PartsGraph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
+using ReactiveUI;
 using System.Collections.ObjectModel;
 
 namespace Partlyx.ViewModels.UIObjectViewModels
@@ -36,15 +39,43 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 if (ev.ChangedProperties?.ContainsKey(nameof(RecipeComponentViewModel.Quantity)) ?? false)
                     UpdatePathAmounts();
             }));
+            Disposables.Add(bus.Subscribe<RecipeUpdatedViewModelEvent>(ev =>
+            {
+                if (ev.ChangedProperties?.Contains(nameof(RecipeViewModel.IsReversible)) ?? false)
+                    UpdateResults();
+            }));
             Disposables.Add(bus.Subscribe<ComponentGraphsUpdatedEvent>(_ => UpdateResults()));
+
+            Disposables.Add(InputResourceDropHandler.WhenAnyValue(d => d.Part).Subscribe(_ => InputResource = InputResourceDropHandler.Part));
+            Disposables.Add(OutputResourceDropHandler.WhenAnyValue(d => d.Part).Subscribe(_ => OutputResource = OutputResourceDropHandler.Part));
         }
         // <-- Converting data -->
         private ResourceViewModel? _inputResource;
-        public ResourceViewModel? InputResource { get => _inputResource; set { SetProperty(ref _inputResource, value); UpdateResults(); } }
+        public ResourceViewModel? InputResource { get => _inputResource; 
+            set 
+            {
+                if (SetProperty(ref _inputResource, value)) 
+                {
+                    InputResourceDropHandler.Part = value;
+                    UpdateResults(); 
+                }
+            }
+        }
+        public SinglePartContainerDropHandlerViewModel<ResourceViewModel> InputResourceDropHandler { get; } = new();
 
         private ResourceViewModel? _outputResource;
-        public ResourceViewModel? OutputResource { get => _outputResource; set { SetProperty(ref _outputResource, value); UpdateResults(); } }
+        public ResourceViewModel? OutputResource { get => _outputResource; 
+            set 
+            {
+                if (SetProperty(ref _outputResource, value))
+                {
+                    OutputResourceDropHandler.Part = value;
+                    UpdateResults(); 
+                }
+            }
+        }
 
+        public SinglePartContainerDropHandlerViewModel<ResourceViewModel> OutputResourceDropHandler { get; } = new();
         private double _inputAmount = 1.0;
         public double InputAmount { get => _inputAmount; set { SetProperty(ref _inputAmount, value); UpdatePathAmounts(); } }
         private double _outputAmount = 1.0;
@@ -67,7 +98,29 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             if (!selected.IsCancelled)
                 OutputResource = selected.Resource;
         }
+        [RelayCommand]
+        public async Task SwapPlaces()
+        {
+            var output = OutputResource;
 
+            SetBoth(output, InputResource);
+        }
+        [RelayCommand]
+        public async Task ClearChoice()
+        {
+            SetBoth(null, null);
+        }
+
+        public void SetBoth(ResourceViewModel? input, ResourceViewModel? output)
+        {
+            if (SetProperty(ref _inputResource, input, nameof(InputResource)) |
+                SetProperty(ref _outputResource, output, nameof(OutputResource)))
+            {
+                InputResourceDropHandler.Part = input;
+                OutputResourceDropHandler.Part = output;
+                UpdateResults();
+            }
+        }
         private async Task<(ResourceViewModel? Resource, bool IsCancelled)> SelectResource()
         {
             var allTheResourcesList = _store.Resources.Values.ToList();
@@ -88,9 +141,20 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
         // <-- Converting options -->
         private bool _isCalculatingFromInput = true;
-        public bool IsCalculatingFromInput { get => _isCalculatingFromInput; set { SetProperty(ref _isCalculatingFromInput, value); UpdatePathAmounts(); } }
+        public bool IsCalculatingFromInput { get => _isCalculatingFromInput; set 
+            { 
+                if (SetProperty(ref _isCalculatingFromInput, value) && _isCalculatingFromInput != _isCalculatingFromOutput)
+                    UpdatePathAmounts(); 
+            }
+        }
         private bool _isCalculatingFromOutput = false;
-        public bool IsCalculatingFromOutput { get => _isCalculatingFromOutput; set { SetProperty(ref _isCalculatingFromOutput, value); UpdatePathAmounts(); } }
+        public bool IsCalculatingFromOutput { get => _isCalculatingFromOutput; 
+            set 
+            { 
+                if (SetProperty(ref _isCalculatingFromOutput, value) && _isCalculatingFromInput != _isCalculatingFromOutput)
+                    UpdatePathAmounts(); 
+            } 
+        }
         // <-- Converting results -->
         public ObservableCollection<RecipeComponentPathItem> AvailableConversions { get; set; } = new();
 
@@ -107,6 +171,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             AvailableConversions.AddRange(pathItems);
 
             UpdatePathAmounts();
+
+            ClearUselessConversions();
         }
         private void UpdatePathAmounts()
         {
@@ -117,6 +183,18 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             var paths = AvailableConversions.Select(pi => pi.Path);
             var ev = new OnComponentPathAmountsUpdatedEvent(paths.ToHashSet());
             _bus.Publish(ev);
+        }
+        /// <summary>
+        /// "Useless" means conversions with empty outputs
+        /// </summary>
+        private void ClearUselessConversions()
+        {
+            for(int i = AvailableConversions.Count - 1; i >= 0; i++)
+            {
+                var conversion = AvailableConversions[i];
+                if (!conversion.SavedOutputSums.Any())
+                    AvailableConversions.RemoveAt(i);
+            }
         }
         private void ClearResults()
         {

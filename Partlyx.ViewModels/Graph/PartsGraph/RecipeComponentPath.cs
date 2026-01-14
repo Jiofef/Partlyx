@@ -1,10 +1,11 @@
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using ReactiveUI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Partlyx.ViewModels.Graph
+namespace Partlyx.ViewModels.Graph.PartsGraph
 {
     public class RecipeComponentPath : Path<RecipeComponentViewModel>
     {
@@ -12,8 +13,8 @@ namespace Partlyx.ViewModels.Graph
         {
         }
 
-        public int GetComponentsAmount() => Nodes.Count;
-        public int GetRecipesAmount() => Nodes.Count / 2;
+        public int GetComponentsAmount() => Steps.Count;
+        public int GetRecipesAmount() => Steps.Count / 2;
 
         public static RecipeComponentPath FromList(List<RecipeComponentViewModel> path)
         {
@@ -40,44 +41,44 @@ namespace Partlyx.ViewModels.Graph
         public Dictionary<ResourceViewModel, double> Quantify(double inputAmount)
         {
             var totals = new Dictionary<ResourceViewModel, double>();
-
-            // This tracks the amount of the current resource moving through the path
             double currentFlow = inputAmount;
-
-            // We iterate through the path nodes in pairs (Recipe Input -> Recipe Output)
-            var currentNode = Nodes.First;
+            var currentNode = Steps.First;
 
             while (currentNode != null && currentNode.Next != null)
             {
-                var pathInputComp = currentNode.Value;      // e.g., 1 Oak
-                var pathOutputComp = currentNode.Next.Value; // e.g., 4 Planks
+                var pathInputComp = currentNode.Value;
+                var pathOutputComp = currentNode.Next.Value;
                 var recipe = pathInputComp.ParentRecipe;
 
                 if (recipe == null) break;
 
-                // 1. Determine how many times this specific recipe is executed
-                // based on the amount of resource arriving at this step.
-                double crafts = recipe.GetCraftsCount(pathInputComp.Uid, currentFlow, false);
+                // FIX: Detect if we are moving backwards through the recipe
+                // A step is "reverse" if the first component of the pair is actually an Output in the recipe definition
+                bool isReverseStep = recipe.Outputs.Any(o => o.Uid == pathInputComp.Uid);
 
-                // 2. Add ALL inputs/outputs of this recipe to the global summary
-                // This captures side-products and auxiliary requirements
+                // 1. Calculate crafts count based on the direction
+                // If forward: calculate from input amount (false). If reverse: calculate from output amount (true).
+                double crafts = recipe.GetCraftsCount(pathInputComp.Uid, currentFlow, isReverseStep);
+
+                // 2. Add all components to summary with direction-aware signs
+                // In forward: consume Inputs (-), produce Outputs (+)
+                // In reverse: produce Inputs (+), consume Outputs (-)
+                double directionMultiplier = isReverseStep ? -1.0 : 1.0;
+
                 foreach (var inComp in recipe.Inputs)
                 {
                     if (inComp.Resource != null)
-                        AddDelta(totals, inComp.Resource, -inComp.Quantity * crafts);
+                        AddDelta(totals, inComp.Resource, -inComp.Quantity * crafts * directionMultiplier);
                 }
                 foreach (var outComp in recipe.Outputs)
                 {
                     if (outComp.Resource != null)
-                        AddDelta(totals, outComp.Resource, outComp.Quantity * crafts);
+                        AddDelta(totals, outComp.Resource, outComp.Quantity * crafts * directionMultiplier);
                 }
 
-                // 3. Update currentFlow for the NEXT step in the path.
-                // The flow for the next recipe is the scaled amount of our current output.
-                // e.g., if we produced 4 planks, currentFlow becomes 4 for the next step.
+                // 3. Update flow for the next recipe in chain
                 currentFlow = pathOutputComp.Quantity * crafts;
 
-                // Move to the next "link" (the next pair in the chain)
                 currentNode = currentNode.Next.Next;
             }
 
@@ -91,9 +92,15 @@ namespace Partlyx.ViewModels.Graph
 
         public Dictionary<ResourceViewModel, double> QuantifyFromOutputAmount(double targetOutputAmount)
         {
-            // To find out how much input is needed, we traverse the path backwards
+            double neededFlow = CalculateRequiredInput(targetOutputAmount);
+
+            return Quantify(neededFlow);
+        }
+
+        public double CalculateRequiredInput(double targetOutputAmount)
+        {
             double neededFlow = targetOutputAmount;
-            var currentNode = Nodes.Last;
+            var currentNode = Steps.Last;
 
             while (currentNode != null && currentNode.Previous != null)
             {
@@ -103,17 +110,20 @@ namespace Partlyx.ViewModels.Graph
 
                 if (recipe != null)
                 {
-                    // Backwards: How many crafts to get 'neededFlow' of this output?
-                    double crafts = recipe.GetCraftsCount(pathOutputComp.Uid, neededFlow, true);
-                    // How much input did that require?
+                    // Detect direction for the backward pass
+                    bool isReverseStep = recipe.Outputs.Any(o => o.Uid == pathInputComp.Uid);
+
+                    // Logic for needed flow also needs to be direction-aware
+                    // If step is reverse (Out -> In), then pathOutputComp is an Input. 
+                    // So we calculate crafts needed to get that Input amount.
+                    double crafts = recipe.GetCraftsCount(pathOutputComp.Uid, neededFlow, !isReverseStep);
                     neededFlow = pathInputComp.Quantity * crafts;
                 }
 
                 currentNode = currentNode.Previous.Previous;
             }
 
-            // Now that we know the initial input required, run the forward calculation
-            return Quantify(neededFlow);
+            return neededFlow;
         }
 
         private void AddDelta(Dictionary<ResourceViewModel, double> dict, ResourceViewModel res, double delta)
@@ -134,5 +144,4 @@ namespace Partlyx.ViewModels.Graph
             return quantified.Select(kvp => new ResourceAmountPairViewModel(kvp.Key, kvp.Value));
         }
     }
-    public enum ComponentPathAmountMode { Input, Output}
 }

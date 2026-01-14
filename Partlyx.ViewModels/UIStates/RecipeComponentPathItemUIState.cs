@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Partlyx.Services.ServiceImplementations;
-using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.Graph.PartsGraph;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using Partlyx.ViewModels.UIServices.Implementations;
 

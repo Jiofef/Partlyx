@@ -8,15 +8,19 @@ using System.Text;
 using System.Threading.Tasks;
 using UJL.CSharp.Collections;
 
-namespace Partlyx.ViewModels.Graph
+namespace Partlyx.ViewModels.Graph.PartsGraph
 {
     public class RecipeGraphNodeViewModel : GraphNodeViewModel, ITypedVMPartHolder<RecipeViewModel>
     {
         public RecipeGraphNodeViewModel(RecipeViewModel value, GraphNodeViewModel? mainRelative = null)
-            : base(mainRelative, value) { }
+            : base(mainRelative, value) 
+        {
+        }
 
         public PartTypeEnumVM? PartType => PartTypeEnumVM.Recipe;
 
         public RecipeViewModel? Part => Value as RecipeViewModel;
+
+        public override GraphNodeShapeEnum NodeShape => GraphNodeShapeEnum.Circle;
     }
 }

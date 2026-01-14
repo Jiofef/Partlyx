@@ -21,13 +21,13 @@ namespace Partlyx.ViewModels.Graph
         // --
         private readonly Dictionary<Guid, GraphNodeViewModel> _nodesDictionary = new();
         public ReadOnlyDictionary<Guid, GraphNodeViewModel> NodesDictionary { get; }
-        protected GraphNodeViewModel? GetNodeByUid(Guid uid) => _nodesDictionary.GetValueOrDefault(uid);
+        public GraphNodeViewModel? GetNodeByUid(Guid uid) => _nodesDictionary.GetValueOrDefault(uid);
         // --
 
 
         // Root
         private GraphNodeViewModel? _rootNode;
-        public GraphNodeViewModel? RootNode { get => _rootNode; protected set => SetProperty(ref _rootNode, value); }
+        public GraphNodeViewModel? RootNode { get => _rootNode; set => SetProperty(ref _rootNode, value); }
         private Dictionary<GraphNodeViewModel, Node> _msaglNodes = new();
 
         // --
@@ -42,7 +42,19 @@ namespace Partlyx.ViewModels.Graph
         public GeometryGraph Graph { get; } = new();
         private Node GetMsaglNodeFrom(GraphNodeViewModel partlyxNode)
         {
-            var curve = CurveFactory.CreateRectangle(partlyxNode.Width, partlyxNode.Height, new Point(partlyxNode.Width / 2, partlyxNode.Height / 2));
+            ICurve curve;
+
+            var center = new Point(partlyxNode.Width / 2, partlyxNode.Height / 2);
+
+            switch (partlyxNode.NodeShape)
+            {
+                case GraphNodeShapeEnum.Circle:
+                    curve = CurveFactory.CreateCircle(partlyxNode.Width / 2, center);
+                    break;
+                default:
+                    curve = CurveFactory.CreateRectangle(partlyxNode.Width, partlyxNode.Height, center);
+                    break;
+            }
 
             return new Node(curve, partlyxNode);
         }
@@ -166,7 +178,7 @@ namespace Partlyx.ViewModels.Graph
             }
         }
 
-        public void DestroyTree()
+        public void ClearGraph()
         {
             _nodes.ClearAndTryDispose();
             _nodesDictionary.Clear();
@@ -175,11 +187,13 @@ namespace Partlyx.ViewModels.Graph
             Graph.Nodes.Clear();
             Graph.Edges.Clear();
 
-            OnTreeDestroyed();
+            RootNode = null;
+
+            OnTreeCleared();
         }
 
         protected virtual void OnNodeAdded(GraphNodeViewModel node) { }
         protected virtual void OnNodeRemoved(GraphNodeViewModel node) { }
-        protected virtual void OnTreeDestroyed() { }
+        protected virtual void OnTreeCleared() { }
     }
 }

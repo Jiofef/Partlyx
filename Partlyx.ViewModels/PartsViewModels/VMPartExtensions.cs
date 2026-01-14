@@ -1,4 +1,4 @@
-﻿using Partlyx.ViewModels.Graph;
+﻿using Partlyx.ViewModels.Graph.PartsGraph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System;
@@ -33,6 +33,13 @@ namespace Partlyx.ViewModels.PartsViewModels
         }
 
         public static RecipeComponentPath? GetRelatedRecipeComponentPath(this IFocusable focusable)
+        {
+            if (focusable is RecipeComponentPathItem pathItem)
+                return pathItem.Path;
+
+            return null;
+        }
+        public static RecipeComponentPath? GetRelatedRecipeComponentPathItem(this IFocusable focusable)
         {
             if (focusable is RecipeComponentPathItem pathItem)
                 return pathItem.Path;

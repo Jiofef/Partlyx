@@ -8,7 +8,7 @@ using Partlyx.ViewModels.UIServices.Interfaces;
 using Partlyx.ViewModels.UIStates;
 using System.Collections.ObjectModel;
 
-namespace Partlyx.ViewModels.Graph
+namespace Partlyx.ViewModels.Graph.PartsGraph
 {
     public class RecipeComponentPathItem : PartlyxObservable, IFocusable
     {
@@ -32,9 +32,16 @@ namespace Partlyx.ViewModels.Graph
         public ReadOnlyObservableCollection<ResourceAmountPairViewModel> SavedInputSums { get; }
         private ObservableCollection<ResourceAmountPairViewModel> _savedOutputSums = new();
         public ReadOnlyObservableCollection<ResourceAmountPairViewModel> SavedOutputSums { get; }
+        public int ComplexitySteps { get => _complexitySteps; private set => SetProperty(ref _complexitySteps, value); }
+
+        // For path based graphs
+        private double _savedEnterValue;
+        public double SavedEnterValue { get => _savedEnterValue; private set => SetProperty(ref _savedEnterValue, value); }
+        private bool _savedCalculateFromOutput;
+        public bool SavedCalculateFromOutput { get => _savedCalculateFromOutput; private set => SetProperty(ref _savedCalculateFromOutput, value); }
 
         private int _complexitySteps;
-        public int ComplexitySteps { get => _complexitySteps; private set => SetProperty(ref _complexitySteps, value); }
+
 
         public double GetSavedSumFor(ResourceViewModel resource)
         {
@@ -62,6 +69,9 @@ namespace Partlyx.ViewModels.Graph
 
             _savedInputSums.AddRange(inputSums);
             _savedOutputSums.AddRange(outputSums);
+
+            SavedEnterValue = amount;
+            SavedCalculateFromOutput = calculateFromOutput;
         }
         public void UpdateInfo()
         {

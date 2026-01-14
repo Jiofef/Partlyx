@@ -1,6 +1,6 @@
 using Moq;
 using Partlyx.Infrastructure.Events;
-using Partlyx.ViewModels.Graph;
+using Partlyx.ViewModels.Graph.PartsGraph;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System.Collections.Generic;

@@ -5,11 +5,12 @@
              xmlns:i="using:Avalonia.Xaml.Interactivity"
              xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
              xmlns:dnd="using:Avalonia.Xaml.Interactions.DragAndDrop"
-             xmlns:graph="using:Partlyx.ViewModels.Graph"
+             xmlns:graph="using:Partlyx.ViewModels.Graph.PartsGraph"
              xmlns:beh="clr-namespace:Partlyx.UI.Avalonia.Behaviors"
              xmlns:vmo="using:Partlyx.ViewModels.UIObjectViewModels"
              xmlns:localo="using:Partlyx.UI.Avalonia.OtherControls"
              xmlns:local="using:Partlyx.UI.Avalonia"
+             xmlns:localdnd="using:Partlyx.UI.Avalonia.DragAndDrop"
              xmlns:mdi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:vmp="using:Partlyx.ViewModels.PartsViewModels"
              xmlns:h="clr-namespace:Partlyx.UI.Avalonia.Helpers"
@@ -24,6 +25,9 @@
                 <TextBlock Text="{h:Loc Input_resource}" Classes="common" FontSize="20"/>
                 <Border Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <i:Interaction.Behaviors>
+					    <localdnd:PartlyxContextDropBehavior DropHandler="{Binding InputResourceDropHandler}"/>
+                    </i:Interaction.Behaviors>
                     <Grid ColumnDefinitions="*,Auto">
                         <local:ResourceIconAndName Resource="{Binding InputResource}" VerticalAlignment="Stretch"/>
                         <Button Content="{h:Loc Select}"
@@ -46,6 +50,9 @@
                 <TextBlock Text="{h:Loc Output_resource}" Classes="common" FontSize="20"/>
                 <Border Background="{StaticResource PxWhiteBrush}" Padding="4" CornerRadius="8" 
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <i:Interaction.Behaviors>
+					    <localdnd:PartlyxContextDropBehavior DropHandler="{Binding OutputResourceDropHandler}"/>
+                    </i:Interaction.Behaviors>
                     <Grid ColumnDefinitions="*,Auto">
                         <local:ResourceIconAndName Resource="{Binding OutputResource}" VerticalAlignment="Stretch"/>
                         <Button Content="{h:Loc Select}"
@@ -63,6 +70,14 @@
                         <TextBlock Text="X" Grid.Column="1" Classes="common" VerticalAlignment="Center" TextAlignment="Center" FontSize="16" MinWidth="24"/>
                     </Grid>
                 </Border>
+                <Button Content="{h:Loc Swap_places}"
+                    HorizontalAlignment="Left"  Classes="base"
+                    Command="{Binding SwapPlacesCommand}"
+                    Height="32"/>
+                <Button Content="{h:Loc Clear_choice}"
+                    HorizontalAlignment="Left"  Classes="base"
+                    Command="{Binding ClearChoiceCommand}"
+                    Height="32"/>
             </StackPanel>
 
             <Separator Background="{StaticResource PxBlue1Brush}" Classes="common"

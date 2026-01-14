@@ -279,9 +279,6 @@
   <data name="partree_Save_Project" xml:space="preserve">
     <value>Save Project (.partree)</value>
   </data>
-  <data name="Total_resources_amount" xml:space="preserve">
-    <value>Total recipe's resources amount</value>
-  </data>
   <data name="Open_in_editor" xml:space="preserve">
     <value>Open in editor</value>
   </data>
@@ -385,6 +382,7 @@ What does Partlyx do?
 * Allows you to describe entities as a dependency graph
 * Visualizes a multi-level structure
 * Calculates total cost / weight / value across the entire graph
+* Allows you to find possible conversions between different resources
 * Works with abstract resource types</value>
   </data>
   <data name="help_text_Some_QOL_Features" xml:space="preserve">
@@ -393,7 +391,8 @@ What does Partlyx do?
 * You can grab any part in the Parts Tree with the mouse and perform certain actions by releasing (dropping) it onto another compatible UI element.
 ** You can drop a grabbed recipe onto the "Default Recipe" property of a resource. If the recipe is compatible, it will be assigned to that property.
 ** You can drop a grabbed recipe onto the "Selected Recipe" property of a component. If the recipe is compatible, it will be assigned to that property.
-** You can drop a grabbed resource onto a recipe, in which case the resource will be added to the recipe as a component. The same can be done by dropping a grabbed resource onto the recipe node in the graph (the topmost node).
+** Similar to the previous ones, you can drop the captured resource over the "Input resource" and "Output resource" options in the resource converter.
+** You can drag and drop the captured resource onto the "Inputs" or "Outputs" group in the recipe, and the resource will be added there as a component. You can also do this by dragging and dropping the captured resource onto the recipe node in the graph.
 ** While dragging a part, hovering over parts in the tree for a short time will automatically expand their list of child parts.
 ** While dragging a part, hovering over the focus button (eye icon) of parts will automatically activate it.
 
@@ -402,8 +401,8 @@ What does Partlyx do?
 
 * You can select multiple parts in the tree by holding Ctrl</value>
   </data>
-  <data name="help_Parts_tree" xml:space="preserve">
-    <value>Parts tree</value>
+  <data name="help_Resources_and_recipes" xml:space="preserve">
+    <value>Resources and recipes</value>
   </data>
   <data name="help_Help" xml:space="preserve">
     <value>Help</value>
@@ -447,31 +446,34 @@ What does Partlyx do?
   <data name="Open_branch" xml:space="preserve">
     <value>Open branch</value>
   </data>
-  <data name="help_text_Parts_and_tree" xml:space="preserve">
-    <value>Most actions are performed in the left panel — the Parts Tree
+  <data name="help_text_Resources_and_recipes" xml:space="preserve">
+    <value>Most actions are performed in the left panel — the element tree.
 
-There are three types of parts:
-* Resources — can contain recipes
-* Recipes — can contain components
-* Components — are created from resources
+There are three types of elements:
+* Resources — store a list of recipes from which this resource can be obtained.
+* Recipes — transformations with a list of inputs and outputs in the form of components.
+* Components — specific instances of resources with a settable quantity.
 
-Accordingly, the tree is divided into three levels from top to bottom: resources first, recipes inside them, and components inside recipes.
+In the "Resources" tab, you will see a tree divided into three layers from top to bottom: resources, recipes, and components.
+In the "Recipes" tab, you will see a list of all created recipes regardless of the resources they produce.
 
-To create a resource, click the button at the bottom of the tree.
-Recipes are created by clicking + on a resource in the tree.
-Components are created in the same way by clicking + on a recipe in the tree — you will be offered a list of existing resources that can be used as components.
+To create a resource, click the button at the bottom of the "Resources" tab.
+Recipes are created by clicking + on a resource in the tree or by clicking the "Create Recipe" button in the "Recipes" menu.
+Components are created in the same way by clicking on the list of recipe inputs and outputs — you will be offered a list of existing resources that can be taken as a component.
+Child elements of any tree element can be hidden or displayed by clicking the up/down arrow to the left of the element.
 
-Child parts of any tree part can be collapsed or expanded by clicking the up/down arrow to the left of the part.
+Each resource has a default recipe — default recipes are switched using the star-shaped button in the "Resources" tab.
+Each element in the tree has an "eye" button. When pressed, it toggles the focus of the element, meaning it opens or closes that element in the graph and the properties window.
+Each element has properties, such as the resource name or component quantity.
+These can be edited from the tree or in the properties window.
 
-Each resource has a default recipe. Default recipes are switched using the star-shaped button.
+Any changes to a resource and its elements affect all recipes where this resource is used.
+You do not need to manually change the resource quantity in all recipes when making any changes.
 
-Each part in the tree has an eye (focus) button. Clicking it toggles the focus of the part, meaning it opens or closes that part in the Parts Graph and the Properties panel.
-
-Each part has properties, such as the resource name or component amount. These properties can be edited either directly in the tree or in the Properties panel.
-
-Any changes to a resource and its parts affect all recipes that use that resource. You do not need to manually update resource amounts in every recipe after making changes.
-
-You can customize the appearance of resources and their recipes by changing their icons. This is done in the properties of the resource or recipe. A wide selection of built-in icons is available, with adjustable colors. You can also upload your own images and use them as icons</value>
+You can change the appearance of resources and their recipes by changing their icon.
+This is done in the resource or recipe properties. Icons from many presets are available, and you can choose a color for them.
+You can enable the display of additional icons in the menu via the "Show all built-in icons" option.
+You can upload your own images and use them as icons.</value>
   </data>
   <data name="help_Parts_graph" xml:space="preserve">
     <value>Parts graph</value>
@@ -483,16 +485,13 @@ You can customize the appearance of resources and their recipes by changing thei
 * If a recipe is selected, that recipe is shown.
 * If a component is selected, its parent recipe is shown.
 
-The graph visualizes all parts from the tree as nodes and displays all required quantities, including component amounts and the amounts of resources produced by recipes.
+The graph visualizes all parts of the tree as nodes and displays all necessary and obtained quantities of elements, counting the quantities of components
 
-By default, the graph shows Default recipes for components, but you can change the displayed recipe for a specific component, for example by clicking its node in the graph.
+By default, the graph displays standard recipes for components, but you can change the recipe displayed for a specific component. For example, by clicking on the recipe below it in the graph
 
 You can move the camera in the graph by holding the left mouse button and dragging. Zoom in and out using the mouse wheel.
 
 By right-clicking a component in the graph, you can select "Open Branch", which will expand the Default or selected recipe of that component in the graph</value>
-  </data>
-  <data name="help_Parts_and_tree" xml:space="preserve">
-    <value>Parts and tree</value>
   </data>
   <data name="Merge_same_components" xml:space="preserve">
     <value>Merge same components</value>
@@ -530,14 +529,14 @@ By right-clicking a component in the graph, you can select "Open Branch", which 
   <data name="Converter" xml:space="preserve">
     <value>Converter</value>
   </data>
-  <data name="Options" xml:space="preserve">
-    <value>Options</value>
-  </data>
   <data name="Input_resource" xml:space="preserve">
     <value>Input resource</value>
   </data>
   <data name="Output_resource" xml:space="preserve">
     <value>Output resource</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Options</value>
   </data>
   <data name="Available_conversions" xml:space="preserve">
     <value>Available conversions:</value>
@@ -556,5 +555,35 @@ By right-clicking a component in the graph, you can select "Open Branch", which 
   </data>
   <data name="Make_a_recipe" xml:space="preserve">
     <value>Make a recipe</value>
+  </data>
+  <data name="Is_reversible" xml:space="preserve">
+    <value>Is reversible</value>
+  </data>
+  <data name="Swap_places" xml:space="preserve">
+    <value>Swap places</value>
+  </data>
+  <data name="Clear_choice" xml:space="preserve">
+    <value>Clear choice</value>
+  </data>
+  <data name="Total_inputs" xml:space="preserve">
+    <value>Total inputs:</value>
+  </data>
+  <data name="Total_outputs" xml:space="preserve">
+    <value>Total outputs:</value>
+  </data>
+  <data name="help_Resources_converter" xml:space="preserve">
+    <value>Resources converter</value>
+  </data>
+  <data name="help_text_Resources_converter" xml:space="preserve">
+    <value>The "Converter" is one of the tabs in the right menu.
+
+The Converter allows you to find possible transformations between two given resources and displays other required and produced resources in the transformation. It also allows you to calculate the quantities of all these resources based on the input amount of the first resource or the required amount of the second resource.
+
+You can select the input and the required output resource for the transformation, as well as specify the given/required number for one of them depending on the "Calculate via:" setting in the "Options" submenu.
+
+After selecting the resources, possible transformations will be displayed at the bottom of the menu. Each transformation will appear as an element. The element will indicate the number of recipes needed to complete this transformation, as well as the amount of required and obtained resources.
+
+You can examine each step of the transformation by clicking the "eye" icon in the corner of the element. This will open it in the graph window.
+The "Make Recipe" button will create a recipe where the inputs are the required components of this transformation and the outputs are the resulting components.</value>
   </data>
 </root>
