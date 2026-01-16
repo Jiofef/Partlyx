@@ -586,4 +586,10 @@ After selecting the resources, possible transformations will be displayed at the
 You can examine each step of the transformation by clicking the "eye" icon in the corner of the element. This will open it in the graph window.
 The "Make Recipe" button will create a recipe where the inputs are the required components of this transformation and the outputs are the resulting components.</value>
   </data>
+  <data name="Default_recipe_craft_amount" xml:space="preserve">
+    <value>Default recipe craft amount</value>
+  </data>
+  <data name="Default_component_quantity" xml:space="preserve">
+    <value>Default component quantity</value>
+  </data>
 </root>

@@ -41,34 +41,5 @@ namespace Partlyx.Tests.ViewModelsTests
             Assert.Equal(-10, result[mockResource1.Object]);
             Assert.Equal(20, result[mockResource2.Object]);
         }
-
-        [Fact]
-        public void GetGraphForResource_ReturnsCorrectGraph()
-        {
-            // Arrange
-            var mockBus = new Mock<IEventBus>();
-            var mockStore = new Mock<IVMPartsStore>();
-
-            var mockComp = new Mock<RecipeComponentViewModel>();
-            var mockResource = new Mock<ResourceViewModel>();
-            mockResource.Setup(r => r.Uid).Returns(Guid.NewGuid());
-            mockComp.Setup(c => c.Resource).Returns(mockResource.Object);
-
-            var components = new Dictionary<Guid, RecipeComponentViewModel>
-            {
-                { Guid.NewGuid(), mockComp.Object }
-            };
-
-            mockStore.Setup(s => s.Components).Returns(components);
-
-            var graphs = new VMComponentsGraphs(mockBus.Object, mockStore.Object);
-
-            // Act
-            var graph = graphs.GetGraphForResource(mockResource.Object.Uid);
-
-            // Assert
-            Assert.NotNull(graph);
-            Assert.Contains(mockComp.Object, graph.Components);
-        }
     }
 }

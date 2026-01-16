@@ -53,3 +53,9 @@ Applied technologies:
 * SQLite for databases
 * ReactiveUI for reactivity in View and ViewModels
 * MSAGL for graph layout
+
+-----
+
+The app is still being polished, and you can help us find bugs or suggest your ideas.
+You can download the available versions of the app here:
+https://github.com/Jiofef/Partlyx/releases

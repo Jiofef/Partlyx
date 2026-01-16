@@ -516,4 +516,10 @@
   <data name="help_text_Resources_converter" xml:space="preserve">
     <value>Resources converter text</value>
   </data>
+  <data name="Default_recipe_craft_amount" xml:space="preserve">
+    <value>Default recipe craft amount</value>
+  </data>
+  <data name="Default_component_quantity" xml:space="preserve">
+    <value>Default component quantity</value>
+  </data>
 </root>

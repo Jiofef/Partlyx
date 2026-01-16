@@ -313,11 +313,29 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Default component quantity.
+        /// </summary>
+        public static string Default_component_quantity {
+            get {
+                return ResourceManager.GetString("Default_component_quantity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Default recipe.
         /// </summary>
         public static string Default_recipe {
             get {
                 return ResourceManager.GetString("Default_recipe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Default recipe craft amount.
+        /// </summary>
+        public static string Default_recipe_craft_amount {
+            get {
+                return ResourceManager.GetString("Default_recipe_craft_amount", resourceCulture);
             }
         }
         
