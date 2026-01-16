@@ -86,7 +86,7 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             {
                 if (node.Parents.Any() ^ node.Children.Any())
                 {
-                    if (!b.ComponentLeafs.Contains(node)) b.ComponentLeafs.Add(node);
+                    if (!b.ComponentLeaves.Contains(node)) b.ComponentLeaves.Add(node);
                 }
             }
 

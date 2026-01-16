@@ -1,6 +1,7 @@
-﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
-using Partlyx.ViewModels.PartsViewModels.Interfaces;
+﻿using DynamicData;
 using Partlyx.ViewModels.PartsViewModels;
+using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.PartsViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,8 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
 
                 if (output.ParentRecipe != null && !visitedRecipes.Contains(output.ParentRecipe.Uid))
                     BuildUpwardTree(outputNode, output.ParentRecipe, output.Resource?.Uid, new HashSet<Guid>(visitedRecipes));
+                else
+                    b.ComponentLeaves.Add(outputNode);
             }
 
             // Start Downward building from Root Recipe Inputs
@@ -52,8 +55,8 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
 
                 if (input.CurrentRecipe != null && !visitedRecipes.Contains(input.CurrentRecipe.Uid))
                     BuildDownwardTree(inputNode, input.CurrentRecipe, input.Resource?.Uid, new HashSet<Guid>(visitedRecipes));
-                else if (input.CurrentRecipe == null)
-                    b.ComponentLeafs.Add(inputNode);
+                else
+                    b.ComponentLeaves.Add(inputNode);
             }
 
             UpdateCosts();
@@ -76,12 +79,14 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             {
                 if (output.Resource?.Uid == bridgeResourceUid) continue;
 
-                var node = output.ToNode();
-                b.AddNode(node);
-                node.AddChild(recipeNode);
+                var outputNode = output.ToNode();
+                b.AddNode(outputNode);
+                outputNode.AddChild(recipeNode);
 
                 if (output.ParentRecipe != null && !visited.Contains(output.ParentRecipe.Uid))
-                    BuildUpwardTree(node, output.ParentRecipe, output.Resource?.Uid, new HashSet<Guid>(visited));
+                    BuildUpwardTree(outputNode, output.ParentRecipe, output.Resource?.Uid, new HashSet<Guid>(visited));
+                else
+                    b.ComponentLeaves.Add(outputNode);
             }
 
             // Process other Inputs
@@ -89,14 +94,14 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             {
                 if (input.Resource?.Uid == bridgeResourceUid) continue;
 
-                var node = input.ToNode();
-                b.AddNode(node);
-                recipeNode.AddChild(node);
+                var inputNode = input.ToNode();
+                b.AddNode(inputNode);
+                recipeNode.AddChild(inputNode);
 
                 if (input.CurrentRecipe != null && !visited.Contains(input.CurrentRecipe.Uid))
-                    BuildDownwardTree(node, input.CurrentRecipe, input.Resource?.Uid, new HashSet<Guid>(visited));
-                else if (input.CurrentRecipe == null)
-                    b.ComponentLeafs.Add(node);
+                    BuildDownwardTree(inputNode, input.CurrentRecipe, input.Resource?.Uid, new HashSet<Guid>(visited));
+                else
+                    b.ComponentLeaves.Add(inputNode);
             }
         }
 
@@ -115,14 +120,14 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             {
                 if (input.Resource?.Uid == bridgeResourceUid) continue;
 
-                var node = input.ToNode();
-                b.AddNode(node);
-                recipeNode.AddChild(node);
+                var inputNode = input.ToNode();
+                b.AddNode(inputNode);
+                recipeNode.AddChild(inputNode);
 
                 if (input.CurrentRecipe != null && !visited.Contains(input.CurrentRecipe.Uid))
-                    BuildDownwardTree(node, input.CurrentRecipe, input.Resource?.Uid, new HashSet<Guid>(visited));
-                else if (input.CurrentRecipe == null)
-                    b.ComponentLeafs.Add(node);
+                    BuildDownwardTree(inputNode, input.CurrentRecipe, input.Resource?.Uid, new HashSet<Guid>(visited));
+                else
+                    b.ComponentLeaves.Add(inputNode);
             }
 
             // Process other Outputs
@@ -130,12 +135,14 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             {
                 if (output.Resource?.Uid == bridgeResourceUid) continue;
 
-                var node = output.ToNode();
-                b.AddNode(node);
-                node.AddChild(recipeNode);
+                var outputNode = output.ToNode();
+                b.AddNode(outputNode);
+                outputNode.AddChild(recipeNode);
 
                 if (output.ParentRecipe != null && !visited.Contains(output.ParentRecipe.Uid))
-                    BuildUpwardTree(node, output.ParentRecipe, output.Resource?.Uid, new HashSet<Guid>(visited));
+                    BuildUpwardTree(outputNode, output.ParentRecipe, output.Resource?.Uid, new HashSet<Guid>(visited));
+                else
+                    b.ComponentLeaves.Add(outputNode);
             }
         }
 

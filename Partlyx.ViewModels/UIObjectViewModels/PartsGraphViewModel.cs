@@ -49,7 +49,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _imagesStore = imagesStore;
 
             SumController = new();
-            _componentSumBinder = new ComponentSumControllerBinder(graph.ComponentLeafs, SumController);
+            _componentSumBinder = new ComponentSumControllerBinder(graph.ComponentLeaves, SumController);
 
             GraphBuilder.OnGraphBuilded += (oldManager, newManager) => 
             {

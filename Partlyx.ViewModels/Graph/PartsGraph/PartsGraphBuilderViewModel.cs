@@ -24,7 +24,7 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
         private readonly Dictionary<Guid, List<IVMPart>> _nodesByPartUid = new();
         public ReadOnlyDictionary<Guid, List<IVMPart>> NodesByPartUid { get; }
 
-        public ObservableCollection<ComponentGraphNodeViewModel> ComponentLeafs { get; } = new();
+        public ObservableCollection<ComponentGraphNodeViewModel> ComponentLeaves { get; } = new();
         /// <summary>
         /// First arg is the old instance manager, the second is the new one
         /// </summary>
@@ -135,7 +135,7 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
 
         protected override void OnTreeCleared()
         {
-            ComponentLeafs.Clear();
+            ComponentLeaves.Clear();
             _nodesByPartUid.Clear();
             IsGraphCleared = true;
         }
