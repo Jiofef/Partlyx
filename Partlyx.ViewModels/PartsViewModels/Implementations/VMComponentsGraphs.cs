@@ -147,7 +147,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             }
         }
 
-        public List<RecipeComponentPath> FindPathsBetweenResources(ResourceViewModel startRes, ResourceViewModel endRes)
+        public List<RecipeComponentPath> FindPathsBetweenResources(ResourceViewModel startRes, ResourceViewModel endRes, int maxPathLength = 64)
         {
             if (!_resourceToGraph.TryGetValue(startRes.Uid, out var graph) ||
                 !_resourceToGraph.TryGetValue(endRes.Uid, out var endGraph) || graph != endGraph)
@@ -181,7 +181,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
                         // Continue BFS to find all possible paths
                     }
 
-                    if (path.Count > 16) continue;
+                    if (path.Count > maxPathLength) continue;
 
                     if (graph.Adjacency.TryGetValue(current, out var neighbors))
                     {

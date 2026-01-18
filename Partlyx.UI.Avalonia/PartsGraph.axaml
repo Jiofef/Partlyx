@@ -42,7 +42,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" MinHeight="32"/>
             <RowDefinition Height="3"/>
-            <RowDefinition Height="152" MinHeight="64"/>
+            <RowDefinition Height="160" MinHeight="64"/>
         </Grid.RowDefinitions>
 
 
@@ -87,7 +87,7 @@
 
                         <ItemsControl.DataTemplates>
                             <DataTemplate x:DataType="graphvm:RecipeGraphNodeViewModel">
-                                <Button Width="{Binding Width}" Height="{Binding Height}" Padding="2" Background="{StaticResource PxWhiteBrush}"
+                                <Button Width="{Binding Width}" Height="{Binding Height}" Padding="8" Background="{StaticResource PxWhiteBrush}"
                                         Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}"
                             BorderBrush="{StaticResource PxGrayBrush}" BorderThickness="2" VerticalContentAlignment="Stretch" CornerRadius="32">
                                     <i:Interaction.Behaviors>
@@ -186,35 +186,35 @@
                 </DataTemplate>
             </Grid.DataTemplates>
 
-            <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
+            <Grid RowDefinitions="Auto, *" VerticalAlignment="Stretch">
                 <TextBlock Text="{h:Loc Total_inputs}" Classes="common" HorizontalAlignment="Center"/>
                 
-                <ScrollViewer VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch">
-                    <ItemsControl ItemsSource="{Binding SumController.PositiveCompilations}">
-                        <ItemsControl.ItemsPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="1">
+                    <ListBox ItemsSource="{Binding SumController.PositiveCompilations}" VerticalAlignment="Top">
+                        <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                                <localo:VirtualizingWrapPanel VerticalAlignment="Top" DisableContainerReuse="True"/>
                             </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                    </ItemsControl>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
                 </ScrollViewer>
-            </StackPanel>
+            </Grid>
 
             <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{StaticResource PxBlue1Brush}"/>
             
-            <StackPanel Orientation="Vertical" Grid.Column="2" VerticalAlignment="Stretch">
+            <Grid RowDefinitions="Auto, *" Grid.Column="2" VerticalAlignment="Stretch">
                 <TextBlock Text="{h:Loc Total_outputs}" Classes="common" HorizontalAlignment="Center"/>
                 
-                <ScrollViewer VerticalScrollBarVisibility="Disabled" VerticalAlignment="Stretch">
-                    <ItemsControl ItemsSource="{Binding SumController.NegativeCompilations}">
-                        <ItemsControl.ItemsPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="1">
+                    <ListBox ItemsSource="{Binding SumController.NegativeCompilations}" VerticalAlignment="Top">
+                        <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                                <localo:VirtualizingWrapPanel VerticalAlignment="Top" DisableContainerReuse="True"/>
                             </ItemsPanelTemplate>
-                           </ItemsControl.ItemsPanel>
-                    </ItemsControl>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
                 </ScrollViewer>
-            </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

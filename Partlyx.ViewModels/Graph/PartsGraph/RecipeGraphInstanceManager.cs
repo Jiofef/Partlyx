@@ -1,7 +1,6 @@
-﻿using DynamicData;
-using Partlyx.ViewModels.PartsViewModels;
-using Partlyx.ViewModels.PartsViewModels.Implementations;
+﻿using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
+using Partlyx.ViewModels.PartsViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,36 +25,33 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             var b = ParentBuilder;
             b.ClearGraph();
 
-            // Root Recipe Node
             var rootRecipeNode = RootRecipe.ToNode();
             b.RootNode = rootRecipeNode;
             b.AddNode(rootRecipeNode);
 
             var visitedRecipes = new HashSet<Guid> { RootRecipe.Uid };
 
-            // Start Upward building from Root Recipe Outputs
+            // 1. Build Upward (Consumers of Root Recipe's Outputs)
             foreach (var output in RootRecipe.Outputs)
             {
                 var outputNode = output.ToNode();
                 b.AddNode(outputNode);
-                outputNode.AddChild(rootRecipeNode); // Recipe -> Output
+                outputNode.AddChild(rootRecipeNode);
 
                 if (output.ParentRecipe != null && !visitedRecipes.Contains(output.ParentRecipe.Uid))
                     BuildUpwardTree(outputNode, output.ParentRecipe, output.Resource?.Uid, new HashSet<Guid>(visitedRecipes));
-                else
-                    b.ComponentLeaves.Add(outputNode);
             }
 
-            // Start Downward building from Root Recipe Inputs
+            // 2. Build Downward (Producers of Root Recipe's Inputs)
             foreach (var input in RootRecipe.Inputs)
             {
                 var inputNode = input.ToNode();
                 b.AddNode(inputNode);
-                rootRecipeNode.AddChild(inputNode); // Recipe -> Input
+                rootRecipeNode.AddChild(inputNode);
 
                 if (input.CurrentRecipe != null && !visitedRecipes.Contains(input.CurrentRecipe.Uid))
                     BuildDownwardTree(inputNode, input.CurrentRecipe, input.Resource?.Uid, new HashSet<Guid>(visitedRecipes));
-                else
+                else if (input.CurrentRecipe == null)
                     b.ComponentLeaves.Add(inputNode);
             }
 
@@ -70,38 +66,30 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             visited.Add(recipe.Uid);
             var recipeNode = recipe.ToNode();
             b.AddNode(recipeNode);
-
-            // Link the bridge node. In this recipe, it acts as an INPUT.
             recipeNode.AddChild(bridgeNode);
 
-            // Process Outputs of this consumer recipe
             foreach (var output in recipe.Outputs)
             {
                 if (output.Resource?.Uid == bridgeResourceUid) continue;
-
-                var outputNode = output.ToNode();
-                b.AddNode(outputNode);
-                outputNode.AddChild(recipeNode);
+                var node = output.ToNode();
+                b.AddNode(node);
+                node.AddChild(recipeNode);
 
                 if (output.ParentRecipe != null && !visited.Contains(output.ParentRecipe.Uid))
-                    BuildUpwardTree(outputNode, output.ParentRecipe, output.Resource?.Uid, new HashSet<Guid>(visited));
-                else
-                    b.ComponentLeaves.Add(outputNode);
+                    BuildUpwardTree(node, output.ParentRecipe, output.Resource?.Uid, new HashSet<Guid>(visited));
             }
 
-            // Process other Inputs
             foreach (var input in recipe.Inputs)
             {
                 if (input.Resource?.Uid == bridgeResourceUid) continue;
-
-                var inputNode = input.ToNode();
-                b.AddNode(inputNode);
-                recipeNode.AddChild(inputNode);
+                var node = input.ToNode();
+                b.AddNode(node);
+                recipeNode.AddChild(node);
 
                 if (input.CurrentRecipe != null && !visited.Contains(input.CurrentRecipe.Uid))
-                    BuildDownwardTree(inputNode, input.CurrentRecipe, input.Resource?.Uid, new HashSet<Guid>(visited));
-                else
-                    b.ComponentLeaves.Add(inputNode);
+                    BuildDownwardTree(node, input.CurrentRecipe, input.Resource?.Uid, new HashSet<Guid>(visited));
+                else if (input.CurrentRecipe == null)
+                    b.ComponentLeaves.Add(node);
             }
         }
 
@@ -111,38 +99,30 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             visited.Add(recipe.Uid);
             var recipeNode = recipe.ToNode();
             b.AddNode(recipeNode);
-
-            // Link the bridge node. In this recipe, it acts as an OUTPUT.
             bridgeNode.AddChild(recipeNode);
 
-            // Process Inputs
             foreach (var input in recipe.Inputs)
             {
                 if (input.Resource?.Uid == bridgeResourceUid) continue;
-
-                var inputNode = input.ToNode();
-                b.AddNode(inputNode);
-                recipeNode.AddChild(inputNode);
+                var node = input.ToNode();
+                b.AddNode(node);
+                recipeNode.AddChild(node);
 
                 if (input.CurrentRecipe != null && !visited.Contains(input.CurrentRecipe.Uid))
-                    BuildDownwardTree(inputNode, input.CurrentRecipe, input.Resource?.Uid, new HashSet<Guid>(visited));
-                else
-                    b.ComponentLeaves.Add(inputNode);
+                    BuildDownwardTree(node, input.CurrentRecipe, input.Resource?.Uid, new HashSet<Guid>(visited));
+                else if (input.CurrentRecipe == null)
+                    b.ComponentLeaves.Add(node);
             }
 
-            // Process other Outputs
             foreach (var output in recipe.Outputs)
             {
                 if (output.Resource?.Uid == bridgeResourceUid) continue;
-
-                var outputNode = output.ToNode();
-                b.AddNode(outputNode);
-                outputNode.AddChild(recipeNode);
+                var node = output.ToNode();
+                b.AddNode(node);
+                node.AddChild(recipeNode);
 
                 if (output.ParentRecipe != null && !visited.Contains(output.ParentRecipe.Uid))
-                    BuildUpwardTree(outputNode, output.ParentRecipe, output.Resource?.Uid, new HashSet<Guid>(visited));
-                else
-                    b.ComponentLeaves.Add(outputNode);
+                    BuildUpwardTree(node, output.ParentRecipe, output.Resource?.Uid, new HashSet<Guid>(visited));
             }
         }
 
@@ -157,56 +137,49 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             var recipe = recipeNode.Part;
             if (recipe == null) return;
 
-            // 1. Process Parents (Outputs of current recipe node)
-            foreach (var parentNode in recipeNode.Parents.OfType<ComponentGraphNodeViewModel>())
+            var componentNodes = recipeNode.Parents.OfType<ComponentGraphNodeViewModel>()
+                .Concat(recipeNode.Children.OfType<ComponentGraphNodeViewModel>());
+
+            // First pass: update costs for all components in the current recipe
+            foreach (var node in componentNodes)
             {
-                var comp = parentNode.Part;
+                var comp = node.Part;
                 if (comp == null || activeResourceBridges.Contains(comp.Resource.Uid)) continue;
 
-                parentNode.AbsCost = comp.Quantity * scale;
-                parentNode.IsOutput = !parentNode.Parents.Any();
-
-                // Move to consumer recipe (Upward)
-                if (comp.ParentRecipe != null)
-                {
-                    var consumerNode = parentNode.Parents.OfType<RecipeGraphNodeViewModel>().FirstOrDefault();
-                    if (consumerNode != null)
-                    {
-                        activeResourceBridges.Add(comp.Resource.Uid);
-                        if (comp.ParentRecipe.InputResourceQuantities.TryGetValue(comp.Resource.Uid, out double totalIn) && totalIn != 0)
-                        {
-                            double nextScale = parentNode.AbsCost / totalIn;
-                            ProcessRecipeNode(consumerNode, nextScale, activeResourceBridges);
-                        }
-                        activeResourceBridges.Remove(comp.Resource.Uid);
-                    }
-                }
+                node.AbsCost = comp.Quantity * scale;
+                node.IsOutput = !node.Parents.Any();
             }
 
-            // 2. Process Children (Inputs of current recipe node)
-            foreach (var childNode in recipeNode.Children.OfType<ComponentGraphNodeViewModel>())
+            // Second pass: propagate scale to connected recipes
+            foreach (var node in componentNodes)
             {
-                var comp = childNode.Part;
+                var comp = node.Part;
                 if (comp == null || activeResourceBridges.Contains(comp.Resource.Uid)) continue;
 
-                childNode.AbsCost = comp.Quantity * scale;
-                childNode.IsOutput = !childNode.Parents.Any();
+                activeResourceBridges.Add(comp.Resource.Uid);
 
-                // Move to producer recipe (Downward)
+                // Downward to producer
                 if (comp.CurrentRecipe != null)
                 {
-                    var producerNode = childNode.Children.OfType<RecipeGraphNodeViewModel>().FirstOrDefault();
-                    if (producerNode != null)
+                    var producerNode = node.Children.OfType<RecipeGraphNodeViewModel>().FirstOrDefault();
+                    if (producerNode != null && comp.CurrentRecipe.OutputResourceQuantities.TryGetValue(comp.Resource.Uid, out double totalOut) && totalOut != 0)
                     {
-                        activeResourceBridges.Add(comp.Resource.Uid);
-                        if (comp.CurrentRecipe.OutputResourceQuantities.TryGetValue(comp.Resource.Uid, out double totalOut) && totalOut != 0)
-                        {
-                            double nextScale = childNode.AbsCost / totalOut;
-                            ProcessRecipeNode(producerNode, nextScale, activeResourceBridges);
-                        }
-                        activeResourceBridges.Remove(comp.Resource.Uid);
+                        double nextScale = node.AbsCost / totalOut;
+                        ProcessRecipeNode(producerNode, nextScale, activeResourceBridges);
                     }
                 }
+                // Upward to consumer
+                else if (comp.ParentRecipe != null)
+                {
+                    var consumerNode = node.Parents.OfType<RecipeGraphNodeViewModel>().FirstOrDefault();
+                    if (consumerNode != null && comp.ParentRecipe.InputResourceQuantities.TryGetValue(comp.Resource.Uid, out double totalIn) && totalIn != 0)
+                    {
+                        double nextScale = node.AbsCost / totalIn;
+                        ProcessRecipeNode(consumerNode, nextScale, activeResourceBridges);
+                    }
+                }
+
+                activeResourceBridges.Remove(comp.Resource.Uid);
             }
         }
     }
