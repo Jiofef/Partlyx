@@ -7,6 +7,22 @@ using System.Linq;
 
 namespace Partlyx.ViewModels.Graph.PartsGraph
 {
+    public enum CalculationArgumentType
+    {
+        Input,  // Amount is the input quantity
+        Output  // Amount is the desired output quantity
+    }
+
+    public record CalculationRequest(
+        double Amount,
+        CalculationArgumentType ArgumentType
+    );
+
+    public record PathCalculationResult(
+        Dictionary<RecipeComponentViewModel, double> StepCosts,
+        Dictionary<ResourceViewModel, double> ResourceTotals
+    );
+
     public class RecipeComponentPath : Path<RecipeComponentViewModel>
     {
         public RecipeComponentPath(LinkedList<RecipeComponentViewModel> nodes) : base(nodes)
@@ -38,19 +54,37 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             return multipliers;
         }
 
-        public record PathQuantitifationOptions(bool AdjustResultToInputAmount = true);
-        public Dictionary<ResourceViewModel, double> Quantify(double inputAmount, PathQuantitifationOptions? options = null)
+        /// <summary>
+        /// Core calculation method that returns both step costs and resource totals.
+        /// Supports both Input and Output as argument types.
+        /// </summary>
+        public PathCalculationResult CalculatePath(
+            CalculationRequest request,
+            bool adjustToArgument = true)
         {
-            var qOptions = options ?? new PathQuantitifationOptions();
+            // Determine input amount based on request type
+            double inputAmount;
+            double? targetOutputAmount = null;
 
+            if (request.ArgumentType == CalculationArgumentType.Input)
+            {
+                inputAmount = request.Amount;
+            }
+            else
+            {
+                // Calculate required input for desired output
+                inputAmount = CalculateRequiredInput(request.Amount);
+                targetOutputAmount = request.Amount;
+            }
+
+            var stepCosts = new Dictionary<RecipeComponentViewModel, double>();
             var totals = new Dictionary<ResourceViewModel, double>();
             double currentFlow = inputAmount;
             var firstNode = Steps.First;
             var firstNodeResource = firstNode?.Value.Resource;
 
-            // Return an empty dictionary if the path is empty
             if (firstNode == null)
-                return totals;
+                return new PathCalculationResult(stepCosts, totals);
 
             var currentNode = firstNode;
 
@@ -62,33 +96,34 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
 
                 if (recipe == null) break;
 
-                // FIX: Detect if we are moving backwards through the recipe
-                // A step is "reverse" if the first component of the pair is actually an Output in the recipe definition
                 bool isReverseStep = recipe.Outputs.Any(o => o.Uid == pathInputComp.Uid);
 
-                // 1. Calculate crafts count based on the direction
-                // If forward: calculate from input amount (false). If reverse: calculate from output amount (true).
                 double crafts = recipe.GetCraftsCount(pathInputComp.Uid, currentFlow, isReverseStep);
-
-                // 2. Add all components to summary with direction-aware signs
-                // In forward: consume Inputs (-), produce Outputs (+)
-                // In reverse: produce Inputs (+), consume Outputs (-)
                 double directionMultiplier = isReverseStep ? -1.0 : 1.0;
 
+                // Store step costs for both path components
+                stepCosts[pathInputComp] = pathInputComp.Quantity * crafts;
+                stepCosts[pathOutputComp] = pathOutputComp.Quantity * crafts;
+
+                // Store step costs for side components (inputs and outputs of the recipe)
                 foreach (var inComp in recipe.Inputs)
                 {
                     if (inComp.Resource != null)
+                    {
+                        stepCosts[inComp] = inComp.Quantity * crafts;
                         AddDelta(totals, inComp.Resource, -inComp.Quantity * crafts * directionMultiplier);
+                    }
                 }
                 foreach (var outComp in recipe.Outputs)
                 {
                     if (outComp.Resource != null)
+                    {
+                        stepCosts[outComp] = outComp.Quantity * crafts;
                         AddDelta(totals, outComp.Resource, outComp.Quantity * crafts * directionMultiplier);
+                    }
                 }
 
-                // 3. Update flow for the next recipe in chain
                 currentFlow = pathOutputComp.Quantity * crafts;
-
                 currentNode = currentNode.Next.Next;
             }
 
@@ -97,27 +132,60 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             foreach (var key in totals.Keys.ToList())
                 if (Math.Abs(totals[key]) < epsilon) totals.Remove(key);
 
-            // If the requested input differs from the final output due to the presence of byproducts from the input resource,
-            // we want to adjust it and all results to match the required input, if necessary
-            if (qOptions.AdjustResultToInputAmount && firstNodeResource != null && totals.ContainsKey(firstNodeResource))
+            // Adjust to argument amount if needed
+            if (adjustToArgument)
             {
-                var resultInput = totals[firstNodeResource];
-                if (Math.Abs(inputAmount - resultInput) > epsilon && resultInput != 0)
+                if (request.ArgumentType == CalculationArgumentType.Input && firstNodeResource != null && totals.ContainsKey(firstNodeResource))
                 {
-                    var adjustCoeff = inputAmount / -resultInput;
-                    foreach(var key in totals.Keys.ToList())
-                        totals[key] *= adjustCoeff;
+                    // Adjust to input amount
+                    var resultInput = totals[firstNodeResource];
+                    if (Math.Abs(inputAmount - resultInput) > epsilon && resultInput != 0)
+                    {
+                        var adjustCoeff = inputAmount / -resultInput;
+                        foreach (var key in totals.Keys.ToList())
+                            totals[key] *= adjustCoeff;
+                        foreach (var key in stepCosts.Keys.ToList())
+                            stepCosts[key] *= adjustCoeff;
+                    }
+                }
+                else if (request.ArgumentType == CalculationArgumentType.Output && targetOutputAmount.HasValue)
+                {
+                    // Adjust to output amount
+                    var lastNode = Steps.Last?.Value;
+                    var lastNodeResource = lastNode?.Resource;
+                    if (lastNodeResource != null && totals.ContainsKey(lastNodeResource))
+                    {
+                        var resultOutput = totals[lastNodeResource];
+                        if (Math.Abs(targetOutputAmount.Value - resultOutput) > epsilon && resultOutput != 0)
+                        {
+                            var adjustCoeff = targetOutputAmount.Value / resultOutput;
+                            foreach (var key in totals.Keys.ToList())
+                                totals[key] *= adjustCoeff;
+                            foreach (var key in stepCosts.Keys.ToList())
+                                stepCosts[key] *= adjustCoeff;
+                        }
+                    }
                 }
             }
 
-            return totals;
+            return new PathCalculationResult(stepCosts, totals);
+        }
+
+        public record PathQuantitifationOptions(bool AdjustResultToInputAmount = true);
+        public Dictionary<ResourceViewModel, double> Quantify(double inputAmount, PathQuantitifationOptions? options = null)
+        {
+            var qOptions = options ?? new PathQuantitifationOptions();
+            var request = new CalculationRequest(inputAmount, CalculationArgumentType.Input);
+            
+            var result = CalculatePath(request, adjustToArgument: qOptions.AdjustResultToInputAmount);
+            return result.ResourceTotals;
         }
 
         public Dictionary<ResourceViewModel, double> QuantifyFromOutputAmount(double targetOutputAmount)
         {
-            double neededFlow = CalculateRequiredInput(targetOutputAmount);
-
-            return Quantify(neededFlow);
+            var request = new CalculationRequest(targetOutputAmount, CalculationArgumentType.Output);
+            var result = CalculatePath(request);
+            return result.ResourceTotals;
         }
 
         public double CalculateRequiredInput(double targetOutputAmount)

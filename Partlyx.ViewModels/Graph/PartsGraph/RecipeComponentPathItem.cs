@@ -1,6 +1,4 @@
 using DynamicData;
-using Partlyx.Core.Contracts;
-using Partlyx.UI.Avalonia.Helpers;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
 using Partlyx.ViewModels.PartsViewModels.Interfaces;
@@ -27,7 +25,11 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
         private RecipeComponentPath _path;
         public RecipeComponentPath Path { get => _path; set { SetProperty(ref _path, value); UpdateInfo(); } }
 
-        // Cached calculated data
+        // Cached calculation result - single source of truth
+        private PathCalculationResult? _cachedCalculationResult;
+        public PathCalculationResult? CachedCalculationResult => _cachedCalculationResult;
+
+        // Cached calculated data from CachedCalculationResult. Used for binding
         private ObservableCollection<ResourceAmountPairViewModel> _savedInputSums = new();
         public ReadOnlyObservableCollection<ResourceAmountPairViewModel> SavedInputSums { get; }
         private ObservableCollection<ResourceAmountPairViewModel> _savedOutputSums = new();
@@ -52,22 +54,28 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
 
             return pair == null ? default : pair.Amount;
         }
-        public void UpdateSums(double amount, bool calculateFromOutput)
+        public void UpdateSums(double amount, bool calculateFromOutput, bool adjustToArgument = true)
         {
-            var sumsUnsorted = calculateFromOutput 
-                ? _path.QuantifyFromOutputAmountToValuePairs(amount)
-                : _path.QuantifyToValuePairs(amount);
+            // Use CalculatePath as single source of truth
+            var argumentType = calculateFromOutput 
+                ? CalculationArgumentType.Output 
+                : CalculationArgumentType.Input;
+            var request = new CalculationRequest(amount, argumentType);
+            
+            _cachedCalculationResult = _path.CalculatePath(request, adjustToArgument);
 
+            // Derive SavedInputSums and SavedOutputSums from cached result
             _savedInputSums.Clear();
             _savedOutputSums.Clear();
 
-            var positiveSumsLookup = sumsUnsorted.ToLookup(s => s.Amount > 0);
+            var positiveSumsLookup = _cachedCalculationResult.ResourceTotals.ToLookup(s => s.Value > 0);
 
-            var inputSums = positiveSumsLookup[false].ToList();
-            var outputSums = positiveSumsLookup[true].ToList();
-            // We invert all inputs, since it is clear from the context that these are spent resources
-            foreach (var pair in inputSums)
-                pair.Amount *= -1;
+            var inputSums = positiveSumsLookup[false]
+                .Select(kvp => new ResourceAmountPairViewModel(kvp.Key, -kvp.Value))
+                .ToList();
+            var outputSums = positiveSumsLookup[true]
+                .Select(kvp => new ResourceAmountPairViewModel(kvp.Key, kvp.Value))
+                .ToList();
 
             _savedInputSums.AddRange(inputSums);
             _savedOutputSums.AddRange(outputSums);

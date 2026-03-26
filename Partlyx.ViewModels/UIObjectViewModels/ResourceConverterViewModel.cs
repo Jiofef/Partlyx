@@ -175,10 +175,13 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                     UpdatePathAmounts(); 
             } 
         }
+        private bool _adjustResultToArgument = true;
+        public bool AdjustResultToArgument { get => _adjustResultToArgument; set { SetProperty(ref _adjustResultToArgument, value); UpdatePathAmounts(); } }
         // <-- Converting results -->
         public ObservableCollection<RecipeComponentPathItem> AvailableConversions { get; } = new();
         public SourceList<RecipeComponentPathItem> AvailableConversionsSource { get; } = new();
         private ReadOnlyObservableCollection<RecipeComponentPathItem> _availableConversionsWithOutputs;
+
         // Unfinished paths with empty results fix
         public ReadOnlyObservableCollection<RecipeComponentPathItem> AvailableConversionsWithOutputs { get => _availableConversionsWithOutputs;
             private set => SetProperty(ref _availableConversionsWithOutputs, value); }
@@ -203,7 +206,7 @@ namespace Partlyx.ViewModels.UIObjectViewModels
         {
             var amountArgument = IsCalculatingFromOutput ? OutputAmount : InputAmount;
             foreach (var path in AvailableConversions)
-                path.UpdateSums(amountArgument, IsCalculatingFromOutput);
+                path.UpdateSums(amountArgument, IsCalculatingFromOutput, AdjustResultToArgument);
 
             var paths = AvailableConversions.Select(pi => pi.Path);
             var ev = new OnComponentPathAmountsUpdatedEvent(paths.ToHashSet());

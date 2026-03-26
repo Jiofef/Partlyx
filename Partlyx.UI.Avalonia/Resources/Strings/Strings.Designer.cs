@@ -70,6 +70,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Adjust result to argument.
+        /// </summary>
+        public static string Adjust_result_to_argument {
+            get {
+                return ResourceManager.GetString("Adjust_result_to_argument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Amount.
         /// </summary>
         public static string Amount {

@@ -610,4 +610,7 @@ The "Make Recipe" button will create a recipe where the inputs are the required 
   <data name="settings_Visuals" xml:space="preserve">
     <value>Visuals</value>
   </data>
+  <data name="Adjust_result_to_argument" xml:space="preserve">
+    <value>Adjust result to argument</value>
+  </data>
 </root>

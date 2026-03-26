@@ -608,4 +608,7 @@
   <data name="settings_Visuals" xml:space="preserve">
     <value>Визуал</value>
   </data>
+  <data name="Adjust_result_to_argument" xml:space="preserve">
+    <value>Подгонять результат под аргумент</value>
+  </data>
 </root>

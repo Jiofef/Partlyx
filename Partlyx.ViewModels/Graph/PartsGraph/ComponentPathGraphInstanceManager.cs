@@ -110,13 +110,9 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
         {
             if (Path.Steps.Count < 2) return;
 
-            // Determine the starting flow based on SavedCalculateFromOutput property
-            double initialInputFlow = PathItem.SavedCalculateFromOutput
-                ? Path.CalculateRequiredInput(PathItem.SavedEnterValue) // Find input that results in given output
-                : PathItem.SavedEnterValue; // Normal calculation from input
-
-            double currentFlow = initialInputFlow;
-            var currentNode = Path.Steps.First;
+            // Use cached calculation result from PathItem - ensures synchronization
+            var calcResult = PathItem.CachedCalculationResult;
+            if (calcResult == null) return;
 
             // Helper to update node properties based on its role in the graph
             void UpdateNodeState(ComponentGraphNodeViewModel node, double cost)
@@ -126,46 +122,34 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
                 node.IsOutput = !node.Children.Any();
             }
 
-            // Set cost for the root node of the path
-            if (_pathNodeMap.TryGetValue(0, out var rootNode))
-                UpdateNodeState(rootNode, currentFlow);
-
+            // Update costs for path nodes using step costs from CalculatePath
             int stepIndex = 0;
+            var currentNode = Path.Steps.First;
             while (currentNode != null && currentNode.Next != null)
             {
                 var pathIn = currentNode.Value;
                 var pathOut = currentNode.Next.Value;
-                var recipe = pathIn.ParentRecipe;
 
-                if (recipe != null)
-                {
-                    bool isReverseStep = recipe.Outputs.Any(o => o.Uid == pathIn.Uid);
-                    double crafts = recipe.GetCraftsCount(pathIn.Uid, currentFlow, isReverseStep);
+                // Update Path Input node
+                if (_pathNodeMap.TryGetValue(stepIndex, out var nodeIn) && calcResult.StepCosts.TryGetValue(pathIn, out var inCost))
+                    UpdateNodeState(nodeIn, inCost);
 
-                    // Update Path Input node
-                    if (_pathNodeMap.TryGetValue(stepIndex == 0 ? 0 : stepIndex - 1, out var nodeIn))
-                        UpdateNodeState(nodeIn, pathIn.Quantity * crafts);
+                // Update Path Output node
+                if (_pathNodeMap.TryGetValue(stepIndex + 1, out var nodeOut) && calcResult.StepCosts.TryGetValue(pathOut, out var outCost))
+                    UpdateNodeState(nodeOut, outCost);
 
-                    // Update Path Output node
-                    if (_pathNodeMap.TryGetValue(stepIndex + 1, out var nodeOut))
-                        UpdateNodeState(nodeOut, pathOut.Quantity * crafts);
-
-                    // Update Side nodes (components not in the main path spine)
-                    if (_sideNodeMap.TryGetValue(recipe.Uid, out var sideNodes))
-                    {
-                        foreach (var sNode in sideNodes)
-                        {
-                            var vm = recipe.Inputs.Concat(recipe.Outputs).FirstOrDefault(c => c.Uid == sNode.Part?.Uid);
-                            if (vm != null)
-                                UpdateNodeState(sNode, vm.Quantity * crafts);
-                        }
-                    }
-
-                    // Carry flow to the next step
-                    currentFlow = pathOut.Quantity * crafts;
-                }
                 currentNode = currentNode.Next.Next;
                 stepIndex += 2;
+            }
+
+            // Update side nodes using step costs from CalculatePath
+            foreach (var (compUid, sideNodes) in _sideNodeMap)
+            {
+                foreach (var sNode in sideNodes)
+                {
+                    if (sNode.Part != null && calcResult.StepCosts.TryGetValue(sNode.Part, out var sideCost))
+                        UpdateNodeState(sNode, sideCost);
+                }
             }
         }
     }

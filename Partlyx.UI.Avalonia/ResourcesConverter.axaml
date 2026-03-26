@@ -93,12 +93,18 @@
 						    <ToggleButton/>
                         </StackPanel>
 
-                        <TextBlock Text="{h:Loc Calculate_using_}" Classes="common" FontSize="20"/>
+                        <TextBlock Text="{h:Loc Calculate_using_}" Classes="common" FontSize="16"/>
 						<RadioButton IsChecked="{Binding IsCalculatingFromInput}" GroupName="CalculateUsingGroup" Content="{h:Loc Input_amount}" FontFamily="Cascadia Code"/>
 						<RadioButton IsChecked="{Binding IsCalculatingFromOutput}" GroupName="CalculateUsingGroup" Content="{h:Loc Output_amount}" FontFamily="Cascadia Code"/>
+                        <StackPanel>
+                            <TextBlock Text="{h:Loc Adjust_result_to_argument}" Classes="common" FontSize="16"/>
+                            <CheckBox IsChecked="{Binding AdjustResultToArgument}"/>
+                        </StackPanel>
                     </StackPanel>
                 </Expander>
             </StackPanel>
+
+
 
             <Separator Background="{StaticResource PxBlue1Brush}" Classes="common"
                        HorizontalAlignment="Stretch" Height="3" Margin="8"/>
