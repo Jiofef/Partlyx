@@ -60,6 +60,7 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
         public Guid DeletedResourceUid { get; }
 
         private Resource? _deletedResource;
+        private List<RecipeComponent>? _deletedComponents;
 
         public DeleteResourceCommand(Guid resourceUid, IResourceService rs, IEventBus bus, IPartlyxRepository repo)
         {
@@ -72,15 +73,27 @@ namespace Partlyx.Services.Commands.ResourceCommonCommands
         public async Task ExecuteAsync()
         {
             _deletedResource = await _repo.GetResourceByUidAsync(DeletedResourceUid);
-            await _resourceService.DeleteResourceAsync(DeletedResourceUid);
+            _deletedComponents = await _resourceService.DeleteResourceAsync(DeletedResourceUid);
         }
 
         public async Task UndoAsync()
         {
             if (_deletedResource != null)
             {
+                // Restore the resource
                 await _partsCreator.CreateResourceAsync(_deletedResource);
+                
+                // Restore all deleted components
+                if (_deletedComponents != null)
+                {
+                    foreach (var component in _deletedComponents)
+                    {
+                        await _partsCreator.CreateRecipeComponentAsync(component);
+                    }
+                }
+                
                 _deletedResource = null;
+                _deletedComponents = null;
             }
         }
     }

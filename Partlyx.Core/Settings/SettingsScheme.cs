@@ -28,6 +28,11 @@ namespace Partlyx.Core.Settings
                         new SchematicOption(Key: SettingKeys.DefaultRecipeOutputAmount, Name: "Default_recipe_craft_amount", DefaultValueJson: Serialize(1.0), TypeName: TypeNames.Double),
                         new SchematicOption(Key: SettingKeys.DefaultRecipeInputAmount, Name: "Default_component_quantity", DefaultValueJson: Serialize(1.0), TypeName: TypeNames.Double),
                         ]),
+                    new SchematicOptionsGroup("settings_Visuals").WithOptions([
+                        new SchematicOption(Key: SettingKeys.DecimalPlacesInGraphNodes, Name: "Decimal_places_in_graph_nodes", DefaultValueJson: Serialize(4), TypeName: TypeNames.Int),
+                        new SchematicOption(Key: SettingKeys.DecimalPlacesInGraphSums, Name: "Decimal_places_in_graph_sums", DefaultValueJson: Serialize(4), TypeName: TypeNames.Int),
+                        ]),
+
                 ]);
 
             ApplicationSettings = new SettingsScheme(optionsGroup);

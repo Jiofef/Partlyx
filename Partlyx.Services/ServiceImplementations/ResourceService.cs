@@ -51,11 +51,36 @@ namespace Partlyx.Services.ServiceImplementations
             return duplicateUid;
         }
 
-        public async Task DeleteResourceAsync(Guid uid)
+        /// <summary>
+        /// Deletes a resource and all components that inherit it.
+        /// Returns a list of deleted components for potential undo operations.
+        /// </summary>
+        public async Task<List<RecipeComponent>> DeleteResourceAsync(Guid uid)
         {
+            // Get all components that inherit this resource
+            var componentsToDelete = await _repo.GetComponentsByResourceUidAsync(uid);
+            
+            // Delete each component
+            foreach (var component in componentsToDelete)
+            {
+                await _repo.DeleteComponentAsync(component.Uid);
+            }
+            
+            // Delete the resource itself
             await _repo.DeleteResourceAsync(uid);
-
+            
+            // Publish events
             _eventBus.Publish(new ResourceDeletedEvent(uid, uid));
+            
+            foreach (var component in componentsToDelete)
+            {
+                _eventBus.Publish(new RecipeComponentDeletedEvent(
+                    component.ParentRecipe?.Uid ?? Guid.Empty, 
+                    component.Uid, 
+                    new HashSet<object> { component.ParentRecipe?.Uid ?? Guid.Empty, component.Uid }));
+            }
+            
+            return componentsToDelete;
         }
 
         public async Task<ResourceDto?> GetResourceAsync(Guid uid)

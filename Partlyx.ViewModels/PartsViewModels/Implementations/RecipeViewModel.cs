@@ -16,6 +16,7 @@ using DynamicData.Binding;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using ReactiveUI;
+using Partlyx.ViewModels.UIServices;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
@@ -34,7 +35,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly ResourceQuantityAggregator _quantityAggregator;
         private readonly ResourceLinksManager _linksManager;
 
-        public RecipeViewModel(RecipeDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store,
+        public RecipeViewModel(RecipeDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, GlobalInformationProvider gip, IVMPartsStore store,
             IVMPartsFactory partsFactory, IRecipeItemUiStateService uiStateS, ILinkedPartsManager lpm, IconServiceViewModel iconService, IEventBus bus)
         {
             Uid = dto.Uid;
@@ -42,6 +43,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             // Services
             Services = service;
             GlobalNavigations = nav;
+            GlobalInfo = gip;
             _store = store;
             _partsFactory = partsFactory;
             _uiStateService = uiStateS;
@@ -335,7 +337,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         {
             UiItem.Dispose();
 
-            // We call ToList to avoid an error due to collection changes during the loop.
+            // We use ToList to avoid an error due to collection changes during the loop.
             foreach (var component in Inputs.ToList())
             {
                 component.Dispose();
@@ -370,6 +372,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         FocusableItemUIState IFocusable.UiItem => UiItem;
         public RecipeNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
         public PartsGlobalNavigations GlobalNavigations { get; }
+        public GlobalInformationProvider GlobalInfo { get; }
 
         // Compatibility
         /// <summary> Self </summary>

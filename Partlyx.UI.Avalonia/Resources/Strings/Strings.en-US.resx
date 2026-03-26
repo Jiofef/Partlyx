@@ -362,7 +362,7 @@
   </data>
   <data name="info_text_About_Us" xml:space="preserve">
     <value>Partlyx
-Version: 1.0.0
+Version: 1.0.1
 License: MIT
 Developed by Jiofef (Artyom Stepanov)</value>
   </data>
@@ -591,5 +591,23 @@ The "Make Recipe" button will create a recipe where the inputs are the required 
   </data>
   <data name="Default_component_quantity" xml:space="preserve">
     <value>Default component quantity</value>
+  </data>
+  <data name="Recipe_multiplier" xml:space="preserve">
+    <value>Recipe multiplier</value>
+  </data>
+  <data name="Create_an_input_for_this_recipe" xml:space="preserve">
+    <value>Create an input for this recipe</value>
+  </data>
+  <data name="Create_an_output_for_this_recipe" xml:space="preserve">
+    <value>Create an output for this recipe</value>
+  </data>
+  <data name="Decimal_places_in_graph_nodes" xml:space="preserve">
+    <value>Decimal places in graph nodes</value>
+  </data>
+  <data name="Decimal_places_in_graph_sums" xml:space="preserve">
+    <value>Decimal places in graph sums</value>
+  </data>
+  <data name="settings_Visuals" xml:space="preserve">
+    <value>Visuals</value>
   </data>
 </root>

@@ -11,6 +11,7 @@ using Partlyx.ViewModels.UIServices.Implementations;
 using Partlyx.ViewModels.UIServices.Interfaces;
 using ReactiveUI;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 
 namespace Partlyx.ViewModels.UIObjectViewModels
 {
@@ -34,6 +35,8 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             _throttled = new ThrottledInvoker(TimeSpan.FromMilliseconds(200));
 
             // Subscriptions
+            Disposables.Add(bus.Subscribe<FileClosedUIEvent>(ev => Reset()));
+
             Disposables.Add(bus.Subscribe<RecipeComponentUpdatedEvent>(ev =>
             {
                 if (ev.ChangedProperties?.ContainsKey(nameof(RecipeComponentViewModel.Quantity)) ?? false)
@@ -48,6 +51,23 @@ namespace Partlyx.ViewModels.UIObjectViewModels
 
             Disposables.Add(InputResourceDropHandler.WhenAnyValue(d => d.Part).Subscribe(_ => InputResource = InputResourceDropHandler.Part));
             Disposables.Add(OutputResourceDropHandler.WhenAnyValue(d => d.Part).Subscribe(_ => OutputResource = OutputResourceDropHandler.Part));
+
+            // Filtering the paths with outputs
+            Disposables.Add(AvailableConversionsSource.Connect()
+                .Filter(AvailableConversionsSource.Connect()
+                    .WhenPropertyChanged(c => c.SavedHasOutputs)
+                    .Select(_ => (Func<RecipeComponentPathItem, bool>)(item => item.SavedHasOutputs))
+                    .StartWith(item => item.SavedHasOutputs)
+                )
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Bind(out _availableConversionsWithOutputs)
+                .DisposeMany()
+                .Subscribe());
+            OnPropertyChanged(nameof(AvailableConversionsWithOutputs));
+        }
+        public void Reset()
+        {
+            ClearChoice();
         }
         // <-- Converting data -->
         private ResourceViewModel? _inputResource;
@@ -99,14 +119,14 @@ namespace Partlyx.ViewModels.UIObjectViewModels
                 OutputResource = selected.Resource;
         }
         [RelayCommand]
-        public async Task SwapPlaces()
+        public void SwapPlaces()
         {
             var output = OutputResource;
 
             SetBoth(output, InputResource);
         }
         [RelayCommand]
-        public async Task ClearChoice()
+        public void ClearChoice()
         {
             SetBoth(null, null);
         }
@@ -156,7 +176,13 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             } 
         }
         // <-- Converting results -->
-        public ObservableCollection<RecipeComponentPathItem> AvailableConversions { get; set; } = new();
+        public ObservableCollection<RecipeComponentPathItem> AvailableConversions { get; } = new();
+        public SourceList<RecipeComponentPathItem> AvailableConversionsSource { get; } = new();
+        private ReadOnlyObservableCollection<RecipeComponentPathItem> _availableConversionsWithOutputs;
+        // Unfinished paths with empty results fix
+        public ReadOnlyObservableCollection<RecipeComponentPathItem> AvailableConversionsWithOutputs { get => _availableConversionsWithOutputs;
+            private set => SetProperty(ref _availableConversionsWithOutputs, value); }
+
 
         public void UpdateResults() => _throttled.InvokeAsync(UpdateResultsPrivate);
         private void UpdateResultsPrivate()
@@ -166,13 +192,12 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             if (InputResource == null || OutputResource == null)
                 return;
 
-            var paths = _graphs.FindPathsBetweenResources(InputResource, OutputResource);
+            var paths = _graphs.FindPathsBetweenResources(InputResource, OutputResource, 64, 128);
             var pathItems = paths.Select(p => new RecipeComponentPathItem(p, _pathItemsStateService));
             AvailableConversions.AddRange(pathItems);
+            AvailableConversionsSource.AddRange(pathItems);
 
             UpdatePathAmounts();
-
-            ClearUselessConversions();
         }
         private void UpdatePathAmounts()
         {
@@ -184,21 +209,10 @@ namespace Partlyx.ViewModels.UIObjectViewModels
             var ev = new OnComponentPathAmountsUpdatedEvent(paths.ToHashSet());
             _bus.Publish(ev);
         }
-        /// <summary>
-        /// "Useless" means conversions with empty outputs
-        /// </summary>
-        private void ClearUselessConversions()
-        {
-            for(int i = AvailableConversions.Count - 1; i >= 0; i++)
-            {
-                var conversion = AvailableConversions[i];
-                if (!conversion.SavedOutputSums.Any())
-                    AvailableConversions.RemoveAt(i);
-            }
-        }
         private void ClearResults()
         {
             AvailableConversions.Clear();
+            AvailableConversionsSource.Clear();
         }
     }
 

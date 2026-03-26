@@ -110,6 +110,12 @@
 
                 </StackPanel.DataTemplates>
                 <ListBox ItemsSource="{Binding AvailableConversions}">
+                    <ListBox.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+
 				    <ListBox.ItemTemplate>
 					    <!-- Path item template -->
                         <DataTemplate x:DataType="graph:RecipeComponentPathItem">

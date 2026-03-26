@@ -277,6 +277,24 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Create an input for this recipe.
+        /// </summary>
+        public static string Create_an_input_for_this_recipe {
+            get {
+                return ResourceManager.GetString("Create_an_input_for_this_recipe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Create an output for this recipe.
+        /// </summary>
+        public static string Create_an_output_for_this_recipe {
+            get {
+                return ResourceManager.GetString("Create_an_output_for_this_recipe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Create indivisible copy.
         /// </summary>
         public static string Create_quantified_copy {
@@ -309,6 +327,24 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string Create_resource_with_recipe_by_default {
             get {
                 return ResourceManager.GetString("Create_resource_with_recipe_by_default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Decimal places in graph nodes.
+        /// </summary>
+        public static string Decimal_places_in_graph_nodes {
+            get {
+                return ResourceManager.GetString("Decimal_places_in_graph_nodes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Decimal places in graph sums.
+        /// </summary>
+        public static string Decimal_places_in_graph_sums {
+            get {
+                return ResourceManager.GetString("Decimal_places_in_graph_sums", resourceCulture);
             }
         }
         
@@ -979,6 +1015,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Recipe multiplier.
+        /// </summary>
+        public static string Recipe_multiplier {
+            get {
+                return ResourceManager.GetString("Recipe_multiplier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Recipe {0}.
         /// </summary>
         public static string Recipe_N {
@@ -1164,6 +1209,15 @@ namespace Partlyx.UI.Avalonia.Resources.Strings {
         public static string settings_Parts {
             get {
                 return ResourceManager.GetString("settings_Parts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Visuals.
+        /// </summary>
+        public static string settings_Visuals {
+            get {
+                return ResourceManager.GetString("settings_Visuals", resourceCulture);
             }
         }
         

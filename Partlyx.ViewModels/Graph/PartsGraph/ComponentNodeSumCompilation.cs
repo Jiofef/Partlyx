@@ -1,6 +1,8 @@
 ﻿using DynamicData.Binding;
 using Partlyx.ViewModels.GraphicsViewModels.HierarchyViewModels;
 using Partlyx.ViewModels.PartsViewModels.Implementations;
+using Partlyx.ViewModels.Settings;
+using Partlyx.ViewModels.UIServices;
 using ReactiveUI;
 
 namespace Partlyx.ViewModels.Graph.PartsGraph
@@ -8,27 +10,35 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
     public class ComponentNodeSumCompilation : SumHierarchyObject
     {
         private readonly List<IDisposable> _subscriptions = new();
+        private readonly ApplicationSettingsProviderViewModel _settingsProvider;
 
         private ResourceViewModel? _componentsResource;
         public ResourceViewModel? ComponentsResource { get => _componentsResource; set => SetProperty(ref _componentsResource, value); }
 
-        public ComponentNodeSumCompilation(ResourceViewModel componentResource)
+        public ComponentNodeSumCompilation(ResourceViewModel componentResource, ApplicationSettingsProviderViewModel settingsProvider)
         {
             _componentsResource = componentResource;
+            _settingsProvider = settingsProvider;
 
             var componentResourceNameUpdateSubscription = this
                 .WhenAnyValue(c => c.ComponentsResource.Name)
-                .Subscribe(n => UpdateColumnText());
+                .Subscribe(_ => UpdateColumnText());
             _subscriptions.Add(componentResourceNameUpdateSubscription);
 
-            var componentsSumChangedSubscription = this.
-                WhenAnyValue(c => c.Sum)
-                .Subscribe(n => UpdateBottomColumnText());
+            var componentsSumChangedSubscription = this
+                .WhenAnyValue(c => c.Sum)
+                .Subscribe(_ => UpdateBottomColumnText());
             _subscriptions.Add(componentsSumChangedSubscription);
+
+            var decimalPlacesChangedSubscription = _settingsProvider
+                .WhenAnyValue(p => p.DecimalPlacesInGraphSums)
+                .Subscribe(_ => UpdateBottomColumnText());
 
             UpdateColumnText();
             UpdateBottomColumnText();
         }
+
+        public ComponentNodeSumCompilation(ResourceViewModel componentResource) : this(componentResource, componentResource.GlobalInfo.ApplicationSettings) { }
 
         private string _columnText = "";
         public string ColumnText { get => _columnText; set => SetProperty(ref _columnText, value); }
@@ -44,7 +54,10 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
 
         private void UpdateBottomColumnText()
         {
-            string newText = $"X{Math.Abs(Sum)}";
+            const int MAX_DECIMAL_PLACES = 16;
+            int decimalPlaces = Math.Min(_settingsProvider.DecimalPlacesInGraphSums, MAX_DECIMAL_PLACES);
+            var costStringMap = InfoVisualisationHelper.GetMappingForFloatsString(decimalPlaces);
+            string newText = $"X{Math.Abs(Sum).ToString(costStringMap)}";
             BottomColumnText = newText;
         }
 

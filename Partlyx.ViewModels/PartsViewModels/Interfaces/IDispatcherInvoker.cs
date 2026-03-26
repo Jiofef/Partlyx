@@ -11,6 +11,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Interfaces
         bool CheckAccess();
         void Invoke(Action action); // sync ui
         void BeginInvoke(Action action); // async ui
+        Task<TResult> InvokeAsync<TResult>(Func<Task<TResult>> task);
     }
 
 }

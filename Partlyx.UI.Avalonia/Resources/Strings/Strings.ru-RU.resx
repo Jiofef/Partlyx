@@ -362,7 +362,7 @@
   </data>
   <data name="info_text_About_Us" xml:space="preserve">
     <value>Partlyx
-Версия: 1.0.0
+Версия: 1.0.1
 Лицензия: MIT
 Разработал Jiofef (Артём Степанов)</value>
   </data>
@@ -589,5 +589,23 @@
   </data>
   <data name="Default_component_quantity" xml:space="preserve">
     <value>Требуемого ресурса по умолчанию:</value>
+  </data>
+  <data name="Recipe_multiplier" xml:space="preserve">
+    <value>Множитель рецепта</value>
+  </data>
+  <data name="Create_an_input_for_this_recipe" xml:space="preserve">
+    <value>Создать вход для рецепта</value>
+  </data>
+  <data name="Create_an_output_for_this_recipe" xml:space="preserve">
+    <value>Создать выход для рецепта</value>
+  </data>
+  <data name="Decimal_places_in_graph_nodes" xml:space="preserve">
+    <value>Числа после запятой в узлах графа</value>
+  </data>
+  <data name="Decimal_places_in_graph_sums" xml:space="preserve">
+    <value>Числа после запятой в суммах графа</value>
+  </data>
+  <data name="settings_Visuals" xml:space="preserve">
+    <value>Визуал</value>
   </data>
 </root>

@@ -36,5 +36,6 @@ namespace Partlyx.Infrastructure.Data.Interfaces
         Task<int> GetResourcesCountAsync();
         Task<string> GetUniqueResourceNameAsync(string baseName);
         Task<string> GetUniqueRecipeNameAsync(string baseName);
+        Task<List<RecipeComponent>> GetComponentsByResourceUidAsync(Guid resourceUid);
     }
 }

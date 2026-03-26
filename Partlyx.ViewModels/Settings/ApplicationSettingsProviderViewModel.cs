@@ -2,6 +2,7 @@
 using Partlyx.Core.Settings;
 using Partlyx.Core.Technical;
 using Partlyx.Infrastructure.Events;
+using ReactiveUI;
 using System.Reactive.Disposables;
 
 namespace Partlyx.ViewModels.Settings
@@ -29,9 +30,13 @@ namespace Partlyx.ViewModels.Settings
             _settersDictionary = new Dictionary<string, Action<object?>>()
             {
                 { SettingKeys.Language, new((arg) => { Language = (LanguageInfo)arg!; }) },
+                
                 { SettingKeys.CreateResourceWithRecipeByDefault, new(arg => { CreateResourceWithRecipeByDefault = (bool)arg!; }) },
                 { SettingKeys.DefaultRecipeOutputAmount, new(arg => { DefaultRecipeOutputAmount = (double)arg!; }) },
                 { SettingKeys.DefaultRecipeInputAmount, new(arg => { DefaultRecipeInputAmount = (double)arg!; }) },
+                
+                { SettingKeys.DecimalPlacesInGraphNodes, new(arg => { DecimalPlacesInGraphNodes = (int)arg!; }) },
+                { SettingKeys.DecimalPlacesInGraphSums, new(arg => { DecimalPlacesInGraphSums = (int)arg!; }) },
             };
         }
 
@@ -54,11 +59,17 @@ namespace Partlyx.ViewModels.Settings
 
         private bool _createResourceWithRecipeByDefault;
 
-        public bool CreateResourceWithRecipeByDefault { get => _createResourceWithRecipeByDefault; set => SetProperty(ref _createResourceWithRecipeByDefault, value); }
+        public bool CreateResourceWithRecipeByDefault { get => _createResourceWithRecipeByDefault; private set => SetProperty(ref _createResourceWithRecipeByDefault, value); }
         private double _defaultRecipeOutputAmount;
-        public double DefaultRecipeOutputAmount { get => _defaultRecipeOutputAmount; set => SetProperty(ref _defaultRecipeOutputAmount, value); }
+        public double DefaultRecipeOutputAmount { get => _defaultRecipeOutputAmount; private set => SetProperty(ref _defaultRecipeOutputAmount, value); }
         private double _defaultRecipeInputAmount;
-        public double DefaultRecipeInputAmount { get => _defaultRecipeInputAmount; set => SetProperty(ref _defaultRecipeInputAmount, value); }
+        public double DefaultRecipeInputAmount { get => _defaultRecipeInputAmount; private set => SetProperty(ref _defaultRecipeInputAmount, value); }
+
+        private int _decimalPlacesInGraphNodes;
+        public int DecimalPlacesInGraphNodes { get => _decimalPlacesInGraphNodes; private set => SetProperty(ref _decimalPlacesInGraphNodes, value); }
+        private int _decimalPlacesInGraphSums;
+        public int DecimalPlacesInGraphSums { get => _decimalPlacesInGraphSums; private set => SetProperty(ref _decimalPlacesInGraphSums, value); }
+
 
         public void Dispose()
             => _disposables?.Dispose();

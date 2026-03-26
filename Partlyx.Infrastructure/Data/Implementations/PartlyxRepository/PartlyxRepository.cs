@@ -213,6 +213,18 @@ namespace Partlyx.Infrastructure.Data.Implementations
 
             return rl;
         }
+        public async Task<List<RecipeComponent>> GetComponentsByResourceUidAsync(Guid resourceUid)
+        {
+            await using var db = _dbFactory.CreateDbContext();
+
+            var components = await db.RecipeComponents
+                .Include(c => c.ComponentResource)
+                .Include(c => c.ParentRecipe)
+                .Where(c => c.ComponentResource.Uid == resourceUid)
+                .ToListAsync();
+
+            return components;
+        }
 
         /// <summary>!!!</summary>
         public async Task ClearEverything()

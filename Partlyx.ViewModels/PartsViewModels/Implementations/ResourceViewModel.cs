@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using Partlyx.ViewModels.PartsViewModels;
 using Partlyx.Core.Partlyx;
 using System.Runtime.CompilerServices;
+using Partlyx.ViewModels.UIServices;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
@@ -27,7 +28,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IEventBus _bus;
         public PartsServiceViewModel Services { get; }
         private ResourceViewModel() { }
-        public ResourceViewModel(ResourceDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav,
+        public ResourceViewModel(ResourceDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, GlobalInformationProvider gip,
             IResourceItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm, IconServiceViewModel iconService, IEventBus bus)
         {
             Uid = dto.Uid;
@@ -35,6 +36,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             // Services
             Services = service;
             GlobalNavigations = nav;
+            GlobalInfo = gip;
             _uiStateService = uiStateS;
             _commands = cs;
             _linkedPartsManager = lpm;
@@ -208,6 +210,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         public ResourceItemUIState UiItem => _uiStateService.GetOrCreateItemUi(this);
         FocusableItemUIState IFocusable.UiItem => UiItem;
         public PartsGlobalNavigations GlobalNavigations { get; }
+        public GlobalInformationProvider GlobalInfo { get; }
 
         // Compatibility
         /// <summary> Self </summary>

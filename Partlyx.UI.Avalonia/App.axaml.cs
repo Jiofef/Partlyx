@@ -205,6 +205,7 @@ namespace Partlyx.UI.Avalonia
             services.AddSingleton<IGlobalRecipesVMContainer, RecipesVMContainer>();
 
             services.AddSingleton<PartsGlobalNavigations>();
+            services.AddSingleton<GlobalInformationProvider>();
 
             services.AddTransient<IResourceItemUiStateService, ResourceItemUiStateService>();
             services.AddTransient<IRecipeItemUiStateService, RecipeItemUiStateService>();

@@ -12,6 +12,7 @@ using Partlyx.ViewModels.UIStates;
 using Partlyx.ViewModels.PartsViewModels;
 using ReactiveUI;
 using System.Collections.ObjectModel;
+using Partlyx.ViewModels.UIServices;
 
 namespace Partlyx.ViewModels.PartsViewModels.Implementations
 {
@@ -32,7 +33,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         private readonly IDisposable _currentRecipeSelectedRecipeUpdateSubscription;
         private readonly IDisposable _iconUpdatedSubscription;
 
-        public RecipeComponentViewModel(RecipeComponentDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, IVMPartsStore store,
+        public RecipeComponentViewModel(RecipeComponentDto dto, PartsServiceViewModel service, PartsGlobalNavigations nav, GlobalInformationProvider gip, IVMPartsStore store,
             IVMPartsFactory partsFactory, IRecipeComponentItemUiStateService uiStateS, ICommandServices cs, ILinkedPartsManager lpm, IEventBus bus)
         {
             Uid = dto.Uid;
@@ -40,6 +41,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
             // Services
             Services = service;
             GlobalNavigations = nav;
+            GlobalInfo = gip;
             _store = store;
             _partsFactory = partsFactory;
             _uiStateService = uiStateS;
@@ -197,6 +199,7 @@ namespace Partlyx.ViewModels.PartsViewModels.Implementations
         FocusableItemUIState IFocusable.UiItem => UiItem;
         public RecipeComponentNodeUIState UiNode => _uiStateService.GetOrCreateNodeUi(this);
         public PartsGlobalNavigations GlobalNavigations { get; }
+        public GlobalInformationProvider GlobalInfo { get; }
         private void UpdateCurrentRecipe()
         {
             bool hasValidSelectedRecipe = LinkedSelectedRecipe?.Value != null;

@@ -147,12 +147,17 @@
                 </Button>
             </StackPanel>
 
+            <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                        Margin="2" IsVisible="{Binding GraphBuilder.IsRecipeGraphShowing}">
+                <TextBlock Text="{h:Loc Recipe_multiplier}" Classes="common"/>
+                <NumericUpDown Value="{Binding GraphBuilder.RecipeMultiplier}" Width="128" Background="Transparent"/>
+            </StackPanel>
+
             <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button Classes="base" Command="{Binding MainWindowController.NameController.RandomizePostfixCommand}" ToolTip.Tip="{h:Loc The_button_that_does_the_weird_thing}" Width="40">
                     <mdi:MaterialIcon Kind="QuestionMark" Foreground="{StaticResource PxBlackBrush}" Width="16" Height="16" Margin="4"/>
                 </Button>
             </StackPanel>
-
         </Grid>
 
         <GridSplitter Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{StaticResource PxBlue1Brush}"/>

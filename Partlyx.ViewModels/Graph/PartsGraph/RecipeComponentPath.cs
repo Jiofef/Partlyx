@@ -38,11 +38,21 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             return multipliers;
         }
 
-        public Dictionary<ResourceViewModel, double> Quantify(double inputAmount)
+        public record PathQuantitifationOptions(bool AdjustResultToInputAmount = true);
+        public Dictionary<ResourceViewModel, double> Quantify(double inputAmount, PathQuantitifationOptions? options = null)
         {
+            var qOptions = options ?? new PathQuantitifationOptions();
+
             var totals = new Dictionary<ResourceViewModel, double>();
             double currentFlow = inputAmount;
-            var currentNode = Steps.First;
+            var firstNode = Steps.First;
+            var firstNodeResource = firstNode?.Value.Resource;
+
+            // Return an empty dictionary if the path is empty
+            if (firstNode == null)
+                return totals;
+
+            var currentNode = firstNode;
 
             while (currentNode != null && currentNode.Next != null)
             {
@@ -86,6 +96,19 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             const double epsilon = 1e-10;
             foreach (var key in totals.Keys.ToList())
                 if (Math.Abs(totals[key]) < epsilon) totals.Remove(key);
+
+            // If the requested input differs from the final output due to the presence of byproducts from the input resource,
+            // we want to adjust it and all results to match the required input, if necessary
+            if (qOptions.AdjustResultToInputAmount && firstNodeResource != null && totals.ContainsKey(firstNodeResource))
+            {
+                var resultInput = totals[firstNodeResource];
+                if (Math.Abs(inputAmount - resultInput) > epsilon && resultInput != 0)
+                {
+                    var adjustCoeff = inputAmount / -resultInput;
+                    foreach(var key in totals.Keys.ToList())
+                        totals[key] *= adjustCoeff;
+                }
+            }
 
             return totals;
         }

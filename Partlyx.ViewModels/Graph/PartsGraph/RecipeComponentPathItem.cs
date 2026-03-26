@@ -32,6 +32,9 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
         public ReadOnlyObservableCollection<ResourceAmountPairViewModel> SavedInputSums { get; }
         private ObservableCollection<ResourceAmountPairViewModel> _savedOutputSums = new();
         public ReadOnlyObservableCollection<ResourceAmountPairViewModel> SavedOutputSums { get; }
+
+        private bool _savedHasOutputs;
+        public bool SavedHasOutputs { get => _savedHasOutputs; private set => SetProperty(ref _savedHasOutputs, value); }
         public int ComplexitySteps { get => _complexitySteps; private set => SetProperty(ref _complexitySteps, value); }
 
         // For path based graphs
@@ -41,7 +44,6 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
         public bool SavedCalculateFromOutput { get => _savedCalculateFromOutput; private set => SetProperty(ref _savedCalculateFromOutput, value); }
 
         private int _complexitySteps;
-
 
         public double GetSavedSumFor(ResourceViewModel resource)
         {
@@ -72,6 +74,8 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
 
             SavedEnterValue = amount;
             SavedCalculateFromOutput = calculateFromOutput;
+
+            SavedHasOutputs = _savedOutputSums.Any();
         }
         public void UpdateInfo()
         {

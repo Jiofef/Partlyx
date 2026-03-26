@@ -33,8 +33,15 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
 
         private IPartsGraphInstanceManager? _currentGraphManager;
         public IPartsGraphInstanceManager? CurrentGraphManager { get => _currentGraphManager; private set => SetProperty(ref _currentGraphManager, value); }
+        
+        private bool _isRecipeGraphShowing;
+        public bool IsRecipeGraphShowing { get => _isRecipeGraphShowing; private set => SetProperty(ref _isRecipeGraphShowing, value); }
+
+        private double _recipeMultiplier = 1.0;
+        public double RecipeMultiplier { get => _recipeMultiplier; set => SetProperty(ref _recipeMultiplier, value); }
 
         private bool _isGraphCleared = true;
+
         public bool IsGraphCleared { get => _isGraphCleared; private set => SetProperty(ref _isGraphCleared, value); }
 
         public PartsGraphBuilderViewModel(
@@ -76,7 +83,10 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
 
             var focused = FocusedElement.Focused;
             if (focused == null)
+            {
+                IsRecipeGraphShowing = false;
                 return false;
+            }
 
             var oldGraphManager = CurrentGraphManager;
 
@@ -85,7 +95,10 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
                 case FocusableElementTypeEnum.RecipeHolder:
                     var recipe = focused.GetRelatedRecipe();
                     if (recipe == null)
+                    {
+                        IsRecipeGraphShowing = false;
                         return false;
+                    }
 
                     if (CurrentGraphManager is not RecipeGraphInstanceManager rcg || rcg.RootRecipe != recipe)
                     {
@@ -101,7 +114,10 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
                 case FocusableElementTypeEnum.ComponentPathHolder:
                     var path = focused as RecipeComponentPathItem;
                     if (path == null)
+                    {
+                        IsRecipeGraphShowing = false;
                         return false;
+                    }
 
                     if (CurrentGraphManager is not ComponentPathGraphInstanceManager cpg || cpg.PathItem != path)
                     {
@@ -116,6 +132,8 @@ namespace Partlyx.ViewModels.Graph.PartsGraph
             }
 
             var newGraphManager = CurrentGraphManager;
+
+            IsRecipeGraphShowing = newGraphManager is RecipeGraphInstanceManager;
 
             OnGraphBuilded?.Invoke(oldGraphManager, newGraphManager);
             IsGraphCleared = false;
